@@ -79,7 +79,7 @@ class VideoFramePage extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    TfbComboBox(datas: [
+                    TfbComboBox(width: 140,datas: [
                       IdNameValue(id: 1, name: '第一个框'),
                       IdNameValue(id: 2, name: '第二个框')
                     ], selectedIndex: 0),
@@ -87,12 +87,12 @@ class VideoFramePage extends StatelessWidget {
                       width: 20,
                     ),
                     SizedBox(
-                      width: 320,
+                      width: 345,
                       child: EditView(
                         hintText: '请输入NVR地址',
                         showLine: false,
                       ),
-                    ),
+                    ).addFlexible(),
                     const SizedBox(
                       width: 20,
                     ),
