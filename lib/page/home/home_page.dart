@@ -29,28 +29,6 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // List<NavigationPaneItem> items = [
-    //   PaneItemHeader(header: const Text('视频配置')),
-    //   PaneItem(
-    //     icon: Icon(Icons.video_settings),
-    //     title: Text('视频配置'),
-    //     body: VideoConfigurationPage(),
-    //     onTap: () => debugPrint('视频配置'),
-    //   ),
-    //   PaneItem(
-    //     icon: Icon(Icons.video_library),
-    //     title: Text('视频画框'),
-    //     body: VideoFramePage(),
-    //     onTap: () => debugPrint('视频画框'),
-    //   ),
-    //   PaneItem(
-    //     icon: Icon(Icons.settings_input_svideo),
-    //     title: Text('操作中心'),
-    //     body: VideoOperationsCenterPage(),
-    //     onTap: () => debugPrint('操作中心'),
-    //   ),
-    // ];
-
     return ProviderWidget<HomeViewModel>(
         model: HomeViewModel(),
         autoLoadData: true,
@@ -75,11 +53,11 @@ class HomePage extends StatelessWidget {
               header: const Text(''),
               items: model.items,
               footerItems: [
-                fu.PaneItem(
-                  icon: const Icon(fu.FluentIcons.settings),
-                  title: const Text('设置'),
-                  body: const NavigationBodyItem(),
-                ),
+                // fu.PaneItem(
+                //   icon: const Icon(fu.FluentIcons.settings),
+                //   title: const Text('设置'),
+                //   body: const NavigationBodyItem(),
+                // ),
                 fu.PaneItemAction(
                   icon: const Icon(fu.FluentIcons.sign_out),
                   title: const Text('登出'),

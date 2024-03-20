@@ -139,7 +139,7 @@ class VideoFramePage extends StatelessWidget {
           children: [
             Video(controller: model.controller),
             CanvasPaintWidget(
-              canvasNum: 1,
+              canvasNum: 4,
               rectangles: model.rectangles,
               onRectangles: (List<Rect> value) {
                 model.updateRectangles(value);

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
+import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/bean/video/video_frame /video_frame _data.dart';
 import 'package:omt/utils/log_utils.dart';
 import 'package:omt/utils/sys_utils.dart';
@@ -21,6 +22,11 @@ class VideoFrameViewModel extends BaseViewModelRefresh<VideoFrameData> {
   late final player = Player();
   late final controller = VideoController(player);
 
+  List<IdNameValue> boxList = [IdNameValue(id: -1, name: '全部')];
+
+  late IdNameValue selectedBox = boxList[0];
+
+  List<Rect> rectanglesBase = [];
   List<Rect> rectangles = [];
 
   @override
