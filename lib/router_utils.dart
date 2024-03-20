@@ -4,7 +4,7 @@ import 'package:kayo_package/views/common/404.dart';
 import 'package:omt/page/home/home_page.dart';
 import 'package:omt/page/user/launcher/launcher_page.dart';
 import 'package:omt/page/user/user_login/user_login_page.dart';
-import 'package:omt/page/video/video_frame%20/video_frame_page.dart';
+import 'package:omt/page/video/video_frame/video_frame_page.dart';
 import 'package:omt/utils/intent_utils.dart';
 import 'package:omt/widget/lib/search/search_page.dart';
 import 'package:omt/page/video/video_configuration/video_configuration_page.dart';

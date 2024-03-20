@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:kayo_package/views/_index_views.dart';
+import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/utils/color_utils.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fu;
@@ -254,10 +255,41 @@ Widget textLine(String title, {bool showLine = false}) {
       ));
 }
 
+Widget TfbComboBox(
+    {int? selectedIndex, List<IdNameValue>? datas, double? width = null}) {
+  var child2 = fu.ComboBox<IdNameValue>(
+    value: null == selectedIndex ? null : datas![selectedIndex],
+    items: datas!.map<fu.ComboBoxItem<IdNameValue>>((e) {
+      return fu.ComboBoxItem<IdNameValue>(
+        value: e,
+        child: TextView(
+          e.name ?? '',
+          maxLine: 1,
+          alignment: Alignment.centerLeft,
+          size: 13,
+          width: null == width ? width : width - 50,
+        ),
+      );
+    }).toList(),
+    onChanged: (data) {},
+    placeholder: TextView(
+      '请选择',
+      maxLine: 1,
+      size: 13,
+      width:null == width ? width : width - 50,
+      alignment: Alignment.centerLeft,
+      color: ColorUtils.colorBlackLite,
+    ),
+  );
+
+  return child2;
+}
+
 Widget TfbTitleSub(
     {String? title,
     String? subTitle,
-    double? width = 160,
+    double width = 160,
+    bool? row = false,
     TextEditingController? controller,
     Color titleColor = BaseColorUtils.colorBlack,
     Color subTitleColor = BaseColorUtils.colorBlackLite,
@@ -266,42 +298,94 @@ Widget TfbTitleSub(
     CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.start,
     double titleSize = 15,
     double subTitleSize = 14,
+    int? selectedIndex,
+    List<IdNameValue>? datas,
     Function()? onTap}) {
-  Widget child = Column(
-    crossAxisAlignment: crossAxisAlignment,
+  Widget? child2;
+
+  if (!BaseSysUtils.empty(datas)) {
+    child2 = fu.ComboBox<IdNameValue>(
+      value: null == selectedIndex ? null : datas![selectedIndex],
+      items: datas!.map<fu.ComboBoxItem<IdNameValue>>((e) {
+        return fu.ComboBoxItem<IdNameValue>(
+          value: e,
+          child: TextView(
+            e.name ?? '',
+            maxLine: 1,
+            alignment: Alignment.centerLeft,
+            size: 13,
+            width: width - 50,
+          ),
+        );
+      }).toList(),
+      onChanged: (data) {},
+      placeholder: TextView(
+        '请选择',
+        maxLine: 1,
+        size: 13,
+        width: width - 50,
+        alignment: Alignment.centerLeft,
+        color: ColorUtils.colorBlackLite,
+      ),
+    );
+  } else {
+    child2 = null != controller
+        ? // fu.TextBox()
+        EditView(
+            text: subTitle,
+            showLine: false,
+            textColor: subTitleColor,
+            maxLines: 1,
+            textSize: subTitleSize,
+            alignment: Alignment.centerLeft,
+            controller: controller..text = subTitle ?? '',
+            hintText: '清填写$title',
+          )
+        : TextView(
+            subTitle,
+            // padding: EdgeInsets.only(top: 12, bottom: 0),
+            maxLine: 5,
+            alignment: Alignment.centerLeft,
+            size: subTitleSize,
+            color: subTitleColor,
+            fontWeight: subTitleFontWeight,
+          );
+  }
+
+  var children = [
+    TextView(
+      title,
+      fontWeight: FontWeight.w600,
+      size: titleSize,
+      color: titleColor,
+    ),
+    Container(
+      width: width,
+      height: 35,
+      margin: EdgeInsets.only(top: 5),
+      child: child2,
+    ),
+  ];
+  Widget child = row == true
+      ? Row(
+          crossAxisAlignment: crossAxisAlignment,
+          children: children,
+        )
+      : Column(
+          crossAxisAlignment: crossAxisAlignment,
+          children: children,
+        );
+  return child;
+}
+
+Widget TitleMsgVideoFrame(String title, String msg, {int? flex}) {
+  return Row(
     children: [
       TextView(
         title,
-        fontWeight: FontWeight.w600,
-        size: titleSize,
-        color: titleColor,
+        color: ColorUtils.colorBlack,
       ),
-      Container(
-        width: width,
-        height: 40,
-        child: null != controller
-            ? // fu.TextBox()
-            EditView(
-                text: subTitle,
-                showLine: false,
-                textColor: subTitleColor,
-                maxLines: 1,
-                textSize: subTitleSize,
-                alignment: Alignment.bottomLeft,
-                controller: controller..text = subTitle ?? '',
-                hintText: '清填写$title',
-              )
-            : TextView(
-                subTitle,
-                // padding: EdgeInsets.only(top: 12, bottom: 0),
-                maxLine: 5,
-                alignment: Alignment.bottomLeft,
-                size: subTitleSize,
-                color: subTitleColor,
-                fontWeight: subTitleFontWeight,
-              ),
-      ),
+      TextView(msg)
     ],
-  );
-  return child;
+  ).addFlexible(flex: flex);
 }

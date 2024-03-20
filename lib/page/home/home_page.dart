@@ -7,7 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/main.dart';
 import 'package:omt/page/video/video_configuration/video_configuration_page.dart';
-import 'package:omt/page/video/video_frame%20/video_frame_page.dart';
+import 'package:omt/page/video/video_frame/video_frame_page.dart';
 import 'package:omt/page/video/video_operations_center/video_operations_center_page.dart';
 import 'package:omt/theme.dart';
 import 'package:omt/utils/intent_utils.dart';

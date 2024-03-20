@@ -8,7 +8,7 @@ import 'package:omt/bean/user/user_login/user_login_data.dart';
 import 'package:omt/page/home/home_page.dart';
 import 'package:omt/page/user/user_login/user_login_page.dart';
 import 'package:omt/page/video/video_configuration/video_configuration_page.dart';
-import 'package:omt/page/video/video_frame%20/video_frame_page.dart';
+import 'package:omt/page/video/video_frame/video_frame_page.dart';
 import 'package:omt/page/video/video_operations_center/video_operations_center_page.dart';
 import 'package:omt/utils/intent_utils.dart';
 import 'package:window_manager/window_manager.dart';

@@ -418,10 +418,21 @@ class SysUtils {
       if (!kIsWeb) const WindowButtons(),
     ];
   }
- static String randomString(int length) {
+
+  static String randomString(int length) {
     const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
     final random = Random();
     return String.fromCharCodes(Iterable.generate(
         length, (_) => chars.codeUnitAt(random.nextInt(chars.length))));
+  }
+
+  static String testLivePlay() {
+    // return 'https://user-images.githubusercontent.com/28951144/229373695-22f88f13-d18f-4288-9bf1-c3e078d83722.mp4';
+    // return 'http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8';
+    // return 'rtsp://192.168.101.189:8554/mystream';
+    // return 'http://192.168.101.189:8888/mystream';
+    // return 'http://localhost:8888/mystream';
+    return 'rtsp://192.168.101.189:8554/mystream';
+    // return 'http://192.168.101.189:3000/a.mkv';
   }
 }

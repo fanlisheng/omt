@@ -3,6 +3,8 @@ import 'package:kayo_package/kayo_package.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:omt/bean/video/video_frame /video_frame _data.dart';
+import 'package:omt/utils/log_utils.dart';
+import 'package:omt/utils/sys_utils.dart';
 
 ///
 ///  omt
@@ -19,14 +21,14 @@ class VideoFrameViewModel extends BaseViewModelRefresh<VideoFrameData> {
   late final player = Player();
   late final controller = VideoController(player);
 
-
+  List<Rect> rectangles = [];
 
   @override
   void initState() async {
     super.initState();
     // player.open(Media('https://user-images.githubusercontent.com/28951144/229373695-22f88f13-d18f-4288-9bf1-c3e078d83722.mp4'));
     // player.open(Media('http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8'));
-    player.open(Media(rtspUrl));
+    player.open(Media(SysUtils.testLivePlay()));
   }
 
   @override
@@ -38,5 +40,14 @@ class VideoFrameViewModel extends BaseViewModelRefresh<VideoFrameData> {
   @override
   loadData({onSuccess, onCache, onError}) {
     ///网络请求
+  }
+
+  void updateRectangles(List<Rect> value) {
+    notifyListeners();
+  }
+
+  void clearRectangles() {
+    rectangles.clear();
+    notifyListeners();
   }
 }
