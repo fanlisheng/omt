@@ -106,7 +106,7 @@ class VideoOperationsCenterPage extends StatelessWidget {
   List<Widget> _views(VideoOperationsCenterViewModel model, bool _row) {
     return [
       SizedBox(
-        width: 600,
+        width: 640,
         height: 360,
         child: Video(controller: model.controller),
       ),
@@ -122,12 +122,12 @@ class VideoOperationsCenterPage extends StatelessWidget {
             runSpacing: 12,
             children: [
               SizedBox(
-                width: 300,
+                width: 320,
                 height: 180,
                 child: Video(controller: model.controller2),
               ),
               SizedBox(
-                width: 300,
+                width: 320,
                 height: 180,
                 child: Video(controller: model.controller3),
               )

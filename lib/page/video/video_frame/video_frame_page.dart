@@ -133,7 +133,7 @@ class VideoFramePage extends StatelessWidget {
   List<Widget> _views(VideoFrameViewModel model, bool _row) {
     return [
       SizedBox(
-        width: 600,
+        width: 640,
         height: 360,
         child: Stack(
           children: [
