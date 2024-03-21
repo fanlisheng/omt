@@ -8,11 +8,10 @@ class CanvasPaintWidget extends StatefulWidget {
   final ValueChanged<List<Rect>> onRectangles;
 
   CanvasPaintWidget(
-      {Key? key,
+      {super.key,
       required this.canvasNum,
       required this.rectangles,
-      required this.onRectangles})
-      : super(key: key);
+      required this.onRectangles});
 
   @override
   State<CanvasPaintWidget> createState() => _CanvasPaintWidgetState();
