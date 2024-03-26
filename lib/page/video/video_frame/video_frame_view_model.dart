@@ -56,6 +56,7 @@ class VideoFrameViewModel extends BaseViewModelRefresh<VideoFrameData> {
   loadData({onSuccess, onCache, onError}) {
     HttpQuery.share.videoConfigurationService.deviceList(onSuccess: (data) {
       rtspList = data;
+      onTapIndex(rtspIndex);
       notifyListeners();
     });
   }

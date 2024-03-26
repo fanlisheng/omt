@@ -386,7 +386,7 @@ Widget TitleMsgVideoFrame(String title, String? msg, {int? flex}) {
         title,
         color: ColorUtils.colorBlack,
       ),
-      TextView(msg)
+      Expanded(child: TextView(msg,maxLine: 2,))
     ],
   ).addFlexible(flex: flex);
 }

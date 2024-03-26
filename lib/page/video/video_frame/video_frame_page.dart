@@ -38,7 +38,7 @@ class VideoFramePage extends StatelessWidget {
 
           var itemCount = model.rtspList?.length ?? 0;
           VideoInfoCamEntity? theRtsp = model.findTheRtsp();
-              ;
+          ;
           return fu.ScaffoldPage.scrollable(
               header: const fu.PageHeader(
                 title: Text('视频画框'),
@@ -48,11 +48,15 @@ class VideoFramePage extends StatelessWidget {
                   children: [
                     Container(
                       alignment: Alignment.centerLeft,
-                      height: 50,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) {
+                      child: Wrap(
+                        children: (model.rtspList ?? []).map((e) {
+                          var index = model.rtspList?.indexOf(e) ?? 0;
+                          if (-1 == index) {
+                            index = 0;
+                          }
                           return TextView(
+                            width: 120,
+                            maxLine: 2,
                             model.rtspList![index].name,
                             color: index == model.rtspIndex
                                 ? ColorUtils.colorAccent
@@ -67,10 +71,34 @@ class VideoFramePage extends StatelessWidget {
                               model.onTapIndex(index);
                             },
                           );
-                        },
-                        itemCount: itemCount > 3 ? 4 : itemCount,
+                        }).toList(),
                       ),
-                    ).addExpanded(flex: _row ? 2 : null),
+                    ).addFlexible(flex: _row ? 2 : 1),
+                    // Container(
+                    //   alignment: Alignment.centerLeft,
+                    //   height: 50,
+                    //   child: ListView.builder(
+                    //     scrollDirection: Axis.horizontal,shrinkWrap: true,
+                    //     itemBuilder: (context, index) {
+                    //       return TextView(
+                    //         model.rtspList![index].name,
+                    //         color: index == model.rtspIndex
+                    //             ? ColorUtils.colorAccent
+                    //             : ColorUtils.colorBlackLite,
+                    //         size: index == model.rtspIndex ? 14 : 14,
+                    //         fontWeight: index == model.rtspIndex
+                    //             ? FontWeight.bold
+                    //             : FontWeight.normal,
+                    //         padding: const EdgeInsets.only(left: 20, right: 20),
+                    //         alignment: Alignment.centerLeft,
+                    //         onTap: () {
+                    //           model.onTapIndex(index);
+                    //         },
+                    //       );
+                    //     },
+                    //     itemCount: itemCount > 3 ? 4 : itemCount,
+                    //   ),
+                    // ).addFlexible(flex: _row ? 2 : 1),
                     EditView(
                       showLine: false,
                       padding: const EdgeInsets.only(left: 20, right: 20),
