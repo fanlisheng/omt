@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kayo_package/http/_index_http.dart';
+import 'package:kayo_package/kayo_package.dart';
 import 'package:kayo_package/utils/platform_utils.dart';
 import 'package:omt/utils/shared_utils.dart';
 
@@ -84,6 +85,16 @@ class API extends BaseAPI {
   }
 
   // String get hostWeb => 'http://192.168.103.88:8001/';
+
+  Future<String> get hostVideoConfiguration async {
+    var cip = await SharedUtils.getControlIP();
+
+    if (BaseSysUtils.empty(cip)) {
+      return '';
+    } else {
+      return 'http://$cip:8000';
+    }
+  }
 
   @override
   String get host => _host ?? '';

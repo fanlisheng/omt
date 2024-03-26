@@ -33,6 +33,14 @@ class SysUtils {
     return BaseSysUtils.isDebug;
   }
 
+
+ static bool isIPAddress(String str) {
+    final ipRegExp = RegExp(
+        r'^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$');
+    return ipRegExp.hasMatch(str);
+  }
+
+
   // static bool get isInDebugMode {
   //   bool inDebugMode = false;
   //   assert(inDebugMode = true); //如果debug模式下会触发赋值
@@ -432,7 +440,8 @@ class SysUtils {
     // return 'rtsp://192.168.101.189:8554/mystream';
     // return 'http://192.168.101.189:8888/mystream';
     // return 'http://localhost:8888/mystream';
-    return 'rtsp://192.168.101.189:8554/mystream';
+    // return 'rtsp://192.168.101.189:8554/mystream';
+    return 'rtsp://admin:flm2020hb@192.168.101.236:554/Streaming/Channels/101';
     // return 'http://192.168.101.189:3000/a.mkv';
   }
 }

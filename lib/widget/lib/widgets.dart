@@ -276,7 +276,7 @@ Widget TfbComboBox(
       '请选择',
       maxLine: 1,
       size: 13,
-      width:null == width ? width : width - 50,
+      width: null == width ? width : width - 50,
       alignment: Alignment.centerLeft,
       color: ColorUtils.colorBlackLite,
     ),
@@ -338,7 +338,8 @@ Widget TfbTitleSub(
             maxLines: 1,
             textSize: subTitleSize,
             alignment: Alignment.centerLeft,
-            controller: controller..text = subTitle ?? '',
+            controller: controller
+              ..text = controller.text.defaultStr(data: subTitle ?? ''),
             hintText: '清填写$title',
           )
         : TextView(
@@ -378,7 +379,7 @@ Widget TfbTitleSub(
   return child;
 }
 
-Widget TitleMsgVideoFrame(String title, String msg, {int? flex}) {
+Widget TitleMsgVideoFrame(String title, String? msg, {int? flex}) {
   return Row(
     children: [
       TextView(

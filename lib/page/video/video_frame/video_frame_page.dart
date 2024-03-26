@@ -4,10 +4,12 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/common/id_name_value.dart';
+import 'package:omt/bean/video/video_configuration/Video_Connect_entity.dart';
 import 'package:omt/page/video/video_frame/video_frame_view_model.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fu;
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
+import 'package:omt/utils/color_utils.dart';
 import 'package:omt/utils/sys_utils.dart';
 import 'package:omt/widget/canvas/canvas_paint_widget.dart';
 import 'package:omt/widget/lib/widgets.dart';
@@ -34,6 +36,9 @@ class VideoFramePage extends StatelessWidget {
 
           var _row = windowWidth > 600 * 2 + 200;
 
+          var itemCount = model.rtspList?.length ?? 0;
+          VideoInfoCamEntity? theRtsp = model.findTheRtsp();
+              ;
           return fu.ScaffoldPage.scrollable(
               header: const fu.PageHeader(
                 title: Text('视频画框'),
@@ -41,25 +46,54 @@ class VideoFramePage extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Container().addExpanded(flex: _row ? 2 : null),
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      height: 50,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) {
+                          return TextView(
+                            model.rtspList![index].name,
+                            color: index == model.rtspIndex
+                                ? ColorUtils.colorAccent
+                                : ColorUtils.colorBlackLite,
+                            size: index == model.rtspIndex ? 14 : 14,
+                            fontWeight: index == model.rtspIndex
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                            padding: const EdgeInsets.only(left: 20, right: 20),
+                            alignment: Alignment.centerLeft,
+                            onTap: () {
+                              model.onTapIndex(index);
+                            },
+                          );
+                        },
+                        itemCount: itemCount > 3 ? 4 : itemCount,
+                      ),
+                    ).addExpanded(flex: _row ? 2 : null),
                     EditView(
                       showLine: false,
+                      padding: const EdgeInsets.only(left: 20, right: 20),
                       maxLines: 1,
                       alignment: Alignment.centerLeft,
-                      hintText: '清填写',
+                      controller: model.controllerRtsp,
+                      hintText: '清输入rtsp地址',
                     ).addExpanded(flex: 1),
                     EditView(
                       showLine: false,
                       maxLines: 1,
                       alignment: Alignment.centerLeft,
-                      hintText: '清填写',
+                      controller: model.controllerDeviceName,
+                      hintText: '清输入设备名称',
                     ).addExpanded(flex: 1),
                     Container(
                       width: 100,
                       child: ButtonView(
                         textDarkOnlyOpacity: true,
                         text: '新增',
-                        onPressed: () {},
+                        onPressed: () {
+                          model.onTapAdd();
+                        },
                       ),
                     )
                   ],
@@ -69,9 +103,8 @@ class VideoFramePage extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    TitleMsgVideoFrame('RTSP：', '192.168.3.62', flex: 1),
-                    TitleMsgVideoFrame('设备编码：', SysUtils.randomString(8),
-                        flex: 1),
+                    TitleMsgVideoFrame('RTSP：', theRtsp?.rtsp, flex: 1),
+                    TitleMsgVideoFrame('设备编码：', theRtsp?.value, flex: 1),
                   ],
                 ),
                 const SizedBox(
@@ -79,10 +112,13 @@ class VideoFramePage extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    TfbComboBox(width: 140,datas: [
-                      IdNameValue(id: 1, name: '第一个框'),
-                      IdNameValue(id: 2, name: '第二个框')
-                    ], selectedIndex: 0),
+                    TfbComboBox(
+                        width: 140,
+                        datas: [
+                          IdNameValue(id: 1, name: '第一个框'),
+                          IdNameValue(id: 2, name: '第二个框')
+                        ],
+                        selectedIndex: 0),
                     const SizedBox(
                       width: 20,
                     ),

@@ -25,6 +25,7 @@ class SharedUtils {
   static const String _shared_host_file = '_shared_host_file';
   static const String _shared_host_socket = '_shared_host_socket';
   static const String _shared_udid = '_shared_udid';
+  static const String _shared_control_ip = '_shared_control_ip';
 
   static setHost(String data) {
     return set(_shared_host, data);
@@ -67,6 +68,14 @@ class SharedUtils {
 
   static Future<String> getHostSocket() async {
     return await getString(_shared_host_socket) ?? '';
+  }
+
+  static setControlIP(String data) {
+    return set(_shared_control_ip, data);
+  }
+
+  static Future<String> getControlIP() async {
+    return await getString(_shared_control_ip) ?? '';
   }
 
   ////获取历史数据

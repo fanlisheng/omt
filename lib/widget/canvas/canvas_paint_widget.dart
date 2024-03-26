@@ -57,7 +57,7 @@ class _CanvasPaintWidgetState extends State<CanvasPaintWidget> {
         }
       },
       onPanEnd: (_) {
-        LogUtils.info(msg: '$widget.rectangles');
+        LogUtils.info(msg: '${widget.rectangles}');
         if (popData && !BaseSysUtils.empty(widget.rectangles)) {
           widget.rectangles.removeLast();
         } else {

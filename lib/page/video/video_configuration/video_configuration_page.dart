@@ -41,11 +41,16 @@ class VideoConfigurationPage extends StatelessWidget {
                     elevation: 8,
                     child: Row(
                       children: [
-                        TfbTitleSub(title: '中控机器IP', subTitle: '192.168.3.91'),
+                        TfbTitleSub(
+                            title: '中控机器IP',
+                            subTitle: '',
+                            controller: model.controllerIP),
                         const Spacer(),
                         TextView(
-                          '未连接',
-                          color: ColorUtils.colorRed,
+                          null != model.videoConnectEntity ? '已连接' : '未连接',
+                          color: null != model.videoConnectEntity
+                              ? ColorUtils.colorGreen
+                              : ColorUtils.colorRed,
                         ),
                         const SizedBox(
                           width: 30,
@@ -53,7 +58,9 @@ class VideoConfigurationPage extends StatelessWidget {
                         ButtonView(
                           text: '连接',
                           textDarkOnlyOpacity: true,
-                          onPressed: () {},
+                          onPressed: () {
+                            model.connect();
+                          },
                         ),
                       ],
                     )),
@@ -73,21 +80,25 @@ class VideoConfigurationPage extends StatelessWidget {
                           runSpacing: 16,
                           children: [
                             TfbTitleSub(
-                                title: '服务器地址',
-                                subTitle: '192.168.3.91',
-                                controller: TextEditingController()),
+                              title: '服务器地址',
+                              subTitle: model.videoConnectEntity?.tcpAddr,
+                              // controller: TextEditingController()
+                            ),
                             TfbTitleSub(
-                                title: '建委地址',
-                                subTitle: '192.168.3.91',
-                                controller: TextEditingController()),
+                              title: '建委地址',
+                              subTitle: model.videoConnectEntity?.httpAddr,
+                              // controller: TextEditingController()
+                            ),
                             TfbTitleSub(
-                                title: '建委Key',
-                                subTitle: SysUtils.randomString(10),
-                                controller: TextEditingController()),
+                              title: '建委Key',
+                              subTitle: model.videoConnectEntity?.key,
+                              // controller: TextEditingController()
+                            ),
                             TfbTitleSub(
-                                title: '建委Secret',
-                                subTitle: SysUtils.randomString(10),
-                                controller: TextEditingController())
+                              title: '建委Secret',
+                              subTitle: model.videoConnectEntity?.secret,
+                              // controller: TextEditingController()
+                            )
                           ],
                         )),
                         const SizedBox(
@@ -96,7 +107,9 @@ class VideoConfigurationPage extends StatelessWidget {
                         ButtonView(
                           text: '保存',
                           textDarkOnlyOpacity: true,
-                          onPressed: () {},
+                          onPressed: () {
+                            LoadingUtils.showInfo(data: '暂时不开放');
+                          },
                         ),
                       ],
                     )),
@@ -117,21 +130,25 @@ class VideoConfigurationPage extends StatelessWidget {
                           runSpacing: 16,
                           children: [
                             TfbTitleSub(
-                                title: '修改IP',
-                                subTitle: '192.168.3.91',
-                                controller: TextEditingController()),
+                              title: '修改IP',
+                              subTitle: model.controllerIP?.text,
+                              // controller: TextEditingController()
+                            ),
                             TfbTitleSub(
-                                title: '掩码',
-                                subTitle: '255.255.255.0',
-                                controller: TextEditingController()),
+                              title: '掩码',
+                              subTitle: '',
+                              // controller: TextEditingController()
+                            ),
                             TfbTitleSub(
                                 title: '网关',
-                                subTitle: '192.168.3.18',
-                                controller: TextEditingController()),
+                                subTitle: '',
+                                // controller: TextEditingController()
+                            ),
                             TfbTitleSub(
                                 title: 'DNS',
-                                subTitle: '114.114.114.114',
-                                controller: TextEditingController())
+                                subTitle: '',
+                                // controller: TextEditingController()
+                            )
                           ],
                         )),
                         const SizedBox(
@@ -140,7 +157,9 @@ class VideoConfigurationPage extends StatelessWidget {
                         ButtonView(
                           text: '保存',
                           textDarkOnlyOpacity: true,
-                          onPressed: () {},
+                          onPressed: () {
+                            LoadingUtils.showInfo(data: '暂时不开放');
+                          },
                         ),
                       ],
                     ))

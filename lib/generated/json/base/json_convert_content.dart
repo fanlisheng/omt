@@ -12,6 +12,7 @@ import 'package:omt/bean/common/name_value.dart';
 import 'package:omt/bean/home/home_page/home_page_data.dart';
 import 'package:omt/bean/user/user_login/user_login_data.dart';
 import 'package:omt/bean/user/ver_info.dart';
+import 'package:omt/bean/video/video_configuration/Video_Connect_entity.dart';
 import 'package:omt/bean/video/video_configuration/video_configuration_data.dart';
 import 'package:omt/bean/video/video_frame /video_frame _data.dart';
 import 'package:omt/bean/video/video_operations_center/video_operations_center_data.dart';
@@ -191,6 +192,26 @@ class JsonConvert {
       return data.map<VerInfoRet>((Map<String, dynamic> e) =>
           VerInfoRet.fromJson(e)).toList() as M;
     }
+    if (<VideoConnectEntity>[] is M) {
+      return data.map<VideoConnectEntity>((Map<String, dynamic> e) =>
+          VideoConnectEntity.fromJson(e)).toList() as M;
+    }
+    if (<VideoInfoEntity>[] is M) {
+      return data.map<VideoInfoEntity>((Map<String, dynamic> e) =>
+          VideoInfoEntity.fromJson(e)).toList() as M;
+    }
+    if (<VideoInfoCamEntity>[] is M) {
+      return data.map<VideoInfoCamEntity>((Map<String, dynamic> e) =>
+          VideoInfoCamEntity.fromJson(e)).toList() as M;
+    }
+    if (<VideoInfoRectEntity>[] is M) {
+      return data.map<VideoInfoRectEntity>((Map<String, dynamic> e) =>
+          VideoInfoRectEntity.fromJson(e)).toList() as M;
+    }
+    if (<VideoInfoOtherEntity>[] is M) {
+      return data.map<VideoInfoOtherEntity>((Map<String, dynamic> e) =>
+          VideoInfoOtherEntity.fromJson(e)).toList() as M;
+    }
     if (<VideoConfigurationData>[] is M) {
       return data.map<VideoConfigurationData>((Map<String, dynamic> e) =>
           VideoConfigurationData.fromJson(e)).toList() as M;
@@ -235,6 +256,11 @@ class JsonConvertClassCollection {
     (UserLoginData).toString(): UserLoginData.fromJson,
     (VerInfo).toString(): VerInfo.fromJson,
     (VerInfoRet).toString(): VerInfoRet.fromJson,
+    (VideoConnectEntity).toString(): VideoConnectEntity.fromJson,
+    (VideoInfoEntity).toString(): VideoInfoEntity.fromJson,
+    (VideoInfoCamEntity).toString(): VideoInfoCamEntity.fromJson,
+    (VideoInfoRectEntity).toString(): VideoInfoRectEntity.fromJson,
+    (VideoInfoOtherEntity).toString(): VideoInfoOtherEntity.fromJson,
     (VideoConfigurationData).toString(): VideoConfigurationData.fromJson,
     (VideoFrameData).toString(): VideoFrameData.fromJson,
     (VideoOperationsCenterData).toString(): VideoOperationsCenterData.fromJson,

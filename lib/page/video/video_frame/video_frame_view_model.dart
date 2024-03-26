@@ -3,7 +3,10 @@ import 'package:kayo_package/kayo_package.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:omt/bean/common/id_name_value.dart';
+import 'package:omt/bean/video/video_configuration/Video_Connect_entity.dart';
 import 'package:omt/bean/video/video_frame /video_frame _data.dart';
+import 'package:omt/http/http_query.dart';
+import 'package:omt/utils/json_utils.dart';
 import 'package:omt/utils/log_utils.dart';
 import 'package:omt/utils/sys_utils.dart';
 
@@ -17,10 +20,14 @@ import 'package:omt/utils/sys_utils.dart';
 ///
 
 class VideoFrameViewModel extends BaseViewModelRefresh<VideoFrameData> {
-  // String rtspUrl = "rtsp://127.0.0.1:8554/mystream";
-  String rtspUrl = "rtsp://192.168.101.189:8554/mystream";
   late final player = Player();
   late final controller = VideoController(player);
+
+  List<VideoInfoCamEntity>? rtspList;
+  int rtspIndex = 0;
+
+  TextEditingController? controllerRtsp;
+  TextEditingController? controllerDeviceName;
 
   List<IdNameValue> boxList = [IdNameValue(id: -1, name: '全部')];
 
@@ -32,9 +39,11 @@ class VideoFrameViewModel extends BaseViewModelRefresh<VideoFrameData> {
   @override
   void initState() async {
     super.initState();
-    // player.open(Media('https://user-images.githubusercontent.com/28951144/229373695-22f88f13-d18f-4288-9bf1-c3e078d83722.mp4'));
-    // player.open(Media('http://devimages.apple.com/iphone/samples/bipbop/bipbopall.m3u8'));
-    player.open(Media(SysUtils.testLivePlay()));
+
+    controllerRtsp = TextEditingController();
+    controllerDeviceName = TextEditingController();
+
+    // player.open(Media(SysUtils.testLivePlay()));
   }
 
   @override
@@ -45,7 +54,10 @@ class VideoFrameViewModel extends BaseViewModelRefresh<VideoFrameData> {
 
   @override
   loadData({onSuccess, onCache, onError}) {
-    ///网络请求
+    HttpQuery.share.videoConfigurationService.deviceList(onSuccess: (data) {
+      rtspList = data;
+      notifyListeners();
+    });
   }
 
   void updateRectangles(List<Rect> value) {
@@ -55,5 +67,41 @@ class VideoFrameViewModel extends BaseViewModelRefresh<VideoFrameData> {
   void clearRectangles() {
     rectangles.clear();
     notifyListeners();
+  }
+
+  void onTapAdd() {
+    var cr = controllerRtsp?.text;
+    var cdn = controllerDeviceName?.text;
+    if (BaseSysUtils.empty(cdn)) {
+      LoadingUtils.showInfo(data: '请输入设备名称');
+      return;
+    } else if (BaseSysUtils.empty(cr) || cr?.contains('rtsp') != true) {
+      LoadingUtils.showInfo(data: '请输入rtsp地址');
+      return;
+    }
+
+    var webcam = VideoInfoCamEntity()
+      ..name = cdn
+      ..rtsp = cr
+      ..in_out = 0;
+
+    HttpQuery.share.videoConfigurationService.addDevice(
+        data: webcam,
+        onSuccess: (data) {
+          loadData();
+        });
+  }
+
+  void onTapIndex(int index) {
+    rtspIndex = index;
+    var rtsp2 = findTheRtsp()?.rtsp;
+    if (!BaseSysUtils.empty(rtsp2)) {
+      player.open(Media(rtsp2!));
+    }
+    notifyListeners();
+  }
+
+  VideoInfoCamEntity? findTheRtsp() {
+    return rtspList?.findData<VideoInfoCamEntity>(rtspIndex);
   }
 }
