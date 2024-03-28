@@ -55,7 +55,7 @@ class UserLoginPage extends StatelessWidget {
                     ),
                     _editView(
                       model,
-                      hintText: '请输入手机号码',
+                      hintText: '请输入账号',
                       title: '账号',
                       showBtn: false,
                       focusNode: model.node,
@@ -70,7 +70,7 @@ class UserLoginPage extends StatelessWidget {
                     ),
                     _editView(
                       model,
-                      hintText: '请输入账号密码',
+                      hintText: '请输入密码',
                       title: '密码',
                       obscureText: model.pwdObscureText,
                       keyboardType:

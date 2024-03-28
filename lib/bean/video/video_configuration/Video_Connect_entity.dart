@@ -34,7 +34,7 @@ class VideoInfoEntity {
   VideoInfoRectEntity? rect3;
   VideoInfoRectEntity? rect4;
   VideoInfoOtherEntity? other;
-  
+
   VideoInfoEntity();
 
   factory VideoInfoEntity.fromJson(Map<String, dynamic> json) =>
@@ -80,6 +80,13 @@ class VideoInfoRectEntity {
 
   VideoInfoRectEntity();
 
+  VideoInfoRectEntity.empty() {
+    x = 0;
+    y = 0;
+    width = 0;
+    height = 0;
+  }
+
   factory VideoInfoRectEntity.fromJson(Map<String, dynamic> json) =>
       $VideoInfoRectEntityFromJson(json);
 
@@ -90,12 +97,13 @@ class VideoInfoRectEntity {
     return jsonEncode(this);
   }
 }
+
 @JsonSerializable()
 class VideoInfoOtherEntity {
   int? time_interval;
+
   // 0:无，1:左，2:右
   int? offset;
-
 
   VideoInfoOtherEntity();
 

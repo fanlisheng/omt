@@ -61,6 +61,7 @@ class VideoConfigurationViewModel
             videoConnectEntity = data;
             SharedUtils.setControlIP(controllerIP!.text);
             notifyListeners();
+            LoadingUtils.showSuccess(data: '连接成功');
           },
           onError: (e) {
             videoConnectEntity = null;

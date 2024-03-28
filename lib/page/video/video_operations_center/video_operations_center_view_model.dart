@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
+import 'package:omt/bean/video/video_configuration/Video_Connect_entity.dart';
 import 'package:omt/bean/video/video_operations_center/video_operations_center_data.dart';
+import 'package:omt/http/http_query.dart';
 import 'package:omt/utils/sys_utils.dart';
 
 ///
@@ -14,20 +18,21 @@ import 'package:omt/utils/sys_utils.dart';
 ///  Copyright © 2024 .. All rights reserved.
 ///
 
-class VideoOperationsCenterViewModel extends BaseViewModelRefresh<VideoOperationsCenterData> {
-  String rtspUrl = "rtsp://192.168.101.189:8554/mystream";
+class VideoOperationsCenterViewModel
+    extends BaseViewModelRefresh<VideoOperationsCenterData> {
   late final player = Player();
   late final controller = VideoController(player);
   late final player2 = Player();
   late final controller2 = VideoController(player2);
   late final player3 = Player();
   late final controller3 = VideoController(player3);
+
+  List<VideoInfoCamEntity>? rtspList;
+  int rtspIndex = 0;
+
   @override
   void initState() async {
     super.initState();
-    player.open(Media(SysUtils.testLivePlay()));
-    player2.open(Media(SysUtils.testLivePlay()));
-    player3.open(Media(SysUtils.testLivePlay()));
   }
 
   @override
@@ -38,10 +43,104 @@ class VideoOperationsCenterViewModel extends BaseViewModelRefresh<VideoOperation
     super.dispose();
   }
 
-
   @override
   loadData({onSuccess, onCache, onError}) {
-    ///网络请求
+    HttpQuery.share.videoConfigurationService.deviceList(onSuccess: (data) {
+      rtspList = data;
+      onTapIndex(rtspIndex);
+      notifyListeners();
+    });
+  }
 
+  VideoInfoCamEntity? findTheRtsp() {
+    return rtspList?.findData<VideoInfoCamEntity>(rtspIndex);
+  }
+
+  void onTapIndex(int index) {
+    rtspIndex = index;
+    var tr = findTheRtsp();
+    var rtsp2 = tr?.rtsp;
+    if (!BaseSysUtils.empty(rtsp2)) {
+      player.open(Media(rtsp2!));
+      player2.open(Media(rtsp2));
+      player3.open(Media(rtsp2));
+    }
+
+    notifyListeners();
+  }
+
+  void stopRecognition() {
+    if (BaseSysUtils.empty(findTheRtsp()?.value) && false) {
+      LoadingUtils.showInfo(data: '请选择设备');
+    }
+    HttpQuery.share.videoConfigurationService.stopRecognition(
+        uuid: findTheRtsp()?.value,
+        onSuccess: (data) {
+          LoadingUtils.showSuccess(data: '停止识别成功');
+        });
+  }
+
+  void restartRecognition() {
+    if (BaseSysUtils.empty(findTheRtsp()?.value) && false) {
+      LoadingUtils.showInfo(data: '请选择设备');
+    }
+    HttpQuery.share.videoConfigurationService.restartRecognition(
+        uuid: findTheRtsp()?.value,
+        onSuccess: (data) {
+          LoadingUtils.showSuccess(data: '重启识别成功');
+        });
+  }
+
+  void restartCentralControl() {
+    if (BaseSysUtils.empty(findTheRtsp()?.value) && false) {
+      LoadingUtils.showInfo(data: '请选择设备');
+    }
+    HttpQuery.share.videoConfigurationService.restartCentralControl(
+        uuid: findTheRtsp()?.value,
+        onSuccess: (data) {
+          LoadingUtils.showSuccess(data: '重启中控成功');
+        },
+        onError: (e) {
+          if (e.endsWith('contrl/golang/restart\n')) {
+            Timer(const Duration(milliseconds: 100), () {
+              LoadingUtils.showSuccess(data: '重启中控成功');
+            });
+          }
+          // LoadingUtils.showInfo(data: e);
+        });
+  }
+
+  void restartDevice() {
+    if (BaseSysUtils.empty(findTheRtsp()?.value) && false) {
+      LoadingUtils.showInfo(data: '请选择设备');
+    }
+    HttpQuery.share.videoConfigurationService.restartDevice(
+        uuid: findTheRtsp()?.value,
+        onSuccess: (data) {
+          LoadingUtils.showSuccess(data: '重启设备成功');
+        },
+        onError: (e) {
+          if (e.endsWith('contrl/system/restart\n')) {
+            Timer(const Duration(milliseconds: 100), () {
+              LoadingUtils.showSuccess(data: '重启设备成功');
+            });
+          }
+          // LoadingUtils.showInfo(data: e);
+        });
+  }
+
+  void deleteDevice() {
+    if (BaseSysUtils.empty(findTheRtsp()?.value)) {
+      LoadingUtils.showInfo(data: '请选择设备');
+    }
+    HttpQuery.share.videoConfigurationService.deleteDevice(
+        uuid: findTheRtsp()!.value!,
+        onSuccess: (data) {
+          LoadingUtils.showSuccess(data: '删除设备成功');
+          rtspIndex = 0;
+          Timer(const Duration(seconds: 1), () {
+            loadData();
+          });
+        });
   }
 }

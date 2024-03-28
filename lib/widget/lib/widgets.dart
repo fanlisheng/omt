@@ -290,6 +290,7 @@ Widget TfbTitleSub(
     String? subTitle,
     double width = 160,
     bool? row = false,
+    String? hint,
     TextEditingController? controller,
     Color titleColor = BaseColorUtils.colorBlack,
     Color subTitleColor = BaseColorUtils.colorBlackLite,
@@ -300,12 +301,17 @@ Widget TfbTitleSub(
     double subTitleSize = 14,
     int? selectedIndex,
     List<IdNameValue>? datas,
+      ValueChanged<IdNameValue?>? onSelected,
     Function()? onTap}) {
   Widget? child2;
 
   if (!BaseSysUtils.empty(datas)) {
     child2 = fu.ComboBox<IdNameValue>(
-      value: null == selectedIndex ? null : datas![selectedIndex],
+      value: (null == selectedIndex ||
+              selectedIndex < 0 ||
+              selectedIndex >= (datas?.length ?? 0))
+          ? null
+          : datas![selectedIndex],
       items: datas!.map<fu.ComboBoxItem<IdNameValue>>((e) {
         return fu.ComboBoxItem<IdNameValue>(
           value: e,
@@ -318,7 +324,9 @@ Widget TfbTitleSub(
           ),
         );
       }).toList(),
-      onChanged: (data) {},
+      onChanged: (data) {
+        onSelected?.call(data);
+      },
       placeholder: TextView(
         '请选择',
         maxLine: 1,
@@ -340,7 +348,7 @@ Widget TfbTitleSub(
             alignment: Alignment.centerLeft,
             controller: controller
               ..text = controller.text.defaultStr(data: subTitle ?? ''),
-            hintText: '清填写$title',
+            hintText: hint ?? '清填写$title',
           )
         : TextView(
             subTitle,
@@ -386,7 +394,11 @@ Widget TitleMsgVideoFrame(String title, String? msg, {int? flex}) {
         title,
         color: ColorUtils.colorBlack,
       ),
-      Expanded(child: TextView(msg,maxLine: 2,))
+      Expanded(
+          child: TextView(
+        msg,
+        maxLine: 2,
+      ))
     ],
   ).addFlexible(flex: flex);
 }

@@ -28,6 +28,27 @@ class VideoConfigurationService {
   get _device_list async =>
       '${await API.share.hostVideoConfiguration}/webcam/list';
 
+  get _device_info async =>
+      '${await API.share.hostVideoConfiguration}/webcam/info';
+
+  get _update_device async =>
+      '${await API.share.hostVideoConfiguration}/webcam/info/save';
+
+  get _stop_recognition async =>
+      '${await API.share.hostVideoConfiguration}/contrl/python/stop';
+
+  get _restart_recognition async =>
+      '${await API.share.hostVideoConfiguration}/contrl/python/restart';
+
+  get _restart_centralcontrol async =>
+      '${await API.share.hostVideoConfiguration}/contrl/golang/restart';
+
+  get _restart_device async =>
+      '${await API.share.hostVideoConfiguration}/contrl/system/restart';
+
+  get _delete_device async =>
+      '${await API.share.hostVideoConfiguration}/webcam/remove';
+
   connect({
     required String host,
     ValueChanged<VideoConnectEntity?>? onSuccess,
@@ -73,6 +94,138 @@ class VideoConfigurationService {
       await _device_list,
       {},
       method: 'get',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  deviceInfo({
+    required String uuid,
+    ValueChanged<VideoInfoEntity?>? onSuccess,
+    ValueChanged<VideoInfoEntity?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<VideoInfoEntity>(
+      '${await _device_info}/$uuid',
+      {},
+      method: 'get',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  void updateDevice({
+    required String uuid,
+    required VideoInfoEntity? data,
+    ValueChanged<dynamic>? onSuccess,
+    ValueChanged<dynamic>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<dynamic>(
+      '${await _update_device}/$uuid',
+      JsonUtils.getMap(data.toJson2()),
+      method: 'post',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  void stopRecognition({
+    required String? uuid,
+    ValueChanged<dynamic>? onSuccess,
+    ValueChanged<dynamic>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<dynamic>(
+      // '${await _stop_recognition}/$uuid',
+      '${await _stop_recognition}',
+      {},
+      method: 'post',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  void restartRecognition({
+    required String? uuid,
+    ValueChanged<dynamic>? onSuccess,
+    ValueChanged<dynamic>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<dynamic>(
+      // '${await _stop_recognition}/$uuid',
+      '${await _restart_recognition}',
+      {},
+      method: 'post',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  void restartCentralControl({
+    required String? uuid,
+    ValueChanged<dynamic>? onSuccess,
+    ValueChanged<dynamic>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<dynamic>(
+      // '${await _stop_recognition}/$uuid',
+      '${await _restart_centralcontrol}',
+      {},
+      method: 'post',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  void restartDevice({
+    required String? uuid,
+    ValueChanged<dynamic>? onSuccess,
+    ValueChanged<dynamic>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<dynamic>(
+      // '${await _stop_recognition}/$uuid',
+      '${await _restart_device}',
+      {},
+      method: 'post',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  void deleteDevice({
+    required String uuid,
+    ValueChanged<dynamic>? onSuccess,
+    ValueChanged<dynamic>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<dynamic>(
+      '${await _delete_device}/$uuid',
+      // '${await _delete_device}',
+      {},
+      method: 'post',
       autoHideDialog: true,
       autoShowDialog: true,
       onSuccess: onSuccess,

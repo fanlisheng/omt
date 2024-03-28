@@ -36,10 +36,40 @@ class VideoOperationsCenterPage extends StatelessWidget {
                 title: Text('操作中心'),
               ),
               children: [
+                Wrap(
+                  runSpacing: 0,
+                  spacing: 10,
+                  children: (model.rtspList ?? []).map((e) {
+                    var index = model.rtspList?.indexOf(e) ?? 0;
+                    if (-1 == index) {
+                      index = 0;
+                    }
+                    return TextView(
+                      width: 120,
+                      maxLine: 2,
+                      model.rtspList![index].name,
+                      color: index == model.rtspIndex
+                          ? ColorUtils.colorAccent
+                          : ColorUtils.colorBlackLite,
+                      size: index == model.rtspIndex ? 14 : 14,
+                      fontWeight: index == model.rtspIndex
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                      padding: const EdgeInsets.only(
+                          left: 16, right: 16, top: 6, bottom: 6),
+                      alignment: Alignment.center,
+                      onTap: () {
+                        model.onTapIndex(index);
+                      },
+                    );
+                  }).toList(),
+                ),
                 Row(
                   children: [
-                    TitleMsgVideoFrame('RTSP：', '192.168.3.62', flex: 1),
-                    TitleMsgVideoFrame('设备编码：', SysUtils.randomString(8), flex: 1),
+                    TitleMsgVideoFrame('RTSP：', model.findTheRtsp()?.rtsp,
+                        flex: 1),
+                    TitleMsgVideoFrame('设备编码：', model.findTheRtsp()?.value,
+                        flex: 1),
                   ],
                 ).addContainer(margin: EdgeInsets.only(top: 12, bottom: 20)),
                 _row
@@ -63,35 +93,45 @@ class VideoOperationsCenterPage extends StatelessWidget {
                         text: '停止识别',
                         textDarkOnlyOpacity: true,
                         bgColor: ColorUtils.colorAccent,
-                        onPressed: () {}),
+                        onPressed: () {
+                          model.stopRecognition();
+                        }),
                     ButtonView(
                         height: 40,
                         width: 100,
                         text: '重新识别',
                         textDarkOnlyOpacity: true,
                         bgColor: ColorUtils.colorAccent,
-                        onPressed: () {}),
+                        onPressed: () {
+                          model.restartRecognition();
+                        }),
                     ButtonView(
                         height: 40,
                         width: 100,
                         text: '重启中控',
                         textDarkOnlyOpacity: true,
                         bgColor: ColorUtils.colorAccent,
-                        onPressed: () {}),
+                        onPressed: () {
+                            model.restartCentralControl();
+                        }),
                     ButtonView(
                         height: 40,
                         width: 100,
                         text: '重启设备',
                         textDarkOnlyOpacity: true,
                         bgColor: ColorUtils.colorAccent,
-                        onPressed: () {}),
+                        onPressed: () {
+                          model.restartDevice();
+                        }),
                     ButtonView(
                         height: 40,
                         width: 100,
                         text: '删除设备',
                         textDarkOnlyOpacity: true,
                         bgColor: ColorUtils.colorRed,
-                        onPressed: () {}),
+                        onPressed: () {
+                          model.deleteDevice();
+                        }),
                   ],
                 ).addContainer(
                   margin: EdgeInsets.only(top: 50),
@@ -100,8 +140,6 @@ class VideoOperationsCenterPage extends StatelessWidget {
               ]);
         });
   }
-
-
 
   List<Widget> _views(VideoOperationsCenterViewModel model, bool _row) {
     return [
@@ -161,34 +199,41 @@ class VideoOperationsCenterPage extends StatelessWidget {
                     height: 1,
                     margin: EdgeInsets.only(top: 8, bottom: 8),
                   ),
-                  SizedBox(
-                    height: 30 * 4,
-                    child: ListView.builder(
-                      itemBuilder: (context, index) {
-                        return Container(
-                          height: 30,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              TextView(
-                                '川AAC119',
-                                color: ColorUtils.colorBlack,
-                              ).addExpanded(),
-                              TextView(
-                                '2023-10-12 12:47:54:12',
-                                color: ColorUtils.colorBlack,
-                              ).addExpanded(),
-                              TextView(
-                                '渣土车',
-                                color: ColorUtils.colorBlack,
-                              ).addExpanded(),
-                            ],
+                  true
+                      ? TextView(
+                          '无',
+                          margin: const EdgeInsets.only(top: 20, bottom: 20),
+                          alignment: Alignment.centerLeft,
+                        )
+                      : SizedBox(
+                          height: 30 * 4,
+                          child: ListView.builder(
+                            itemBuilder: (context, index) {
+                              return Container(
+                                height: 30,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    TextView(
+                                      '川AAC119',
+                                      color: ColorUtils.colorBlack,
+                                    ).addExpanded(),
+                                    TextView(
+                                      '2023-10-12 12:47:54:12',
+                                      color: ColorUtils.colorBlack,
+                                    ).addExpanded(),
+                                    TextView(
+                                      '渣土车',
+                                      color: ColorUtils.colorBlack,
+                                    ).addExpanded(),
+                                  ],
+                                ),
+                              );
+                            },
+                            itemCount: 4,
                           ),
-                        );
-                      },
-                      itemCount: 4,
-                    ),
-                  )
+                        )
                 ],
               ))
         ],

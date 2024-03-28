@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/bean/video/video_configuration/Video_Connect_entity.dart';
+import 'package:omt/http/http_query.dart';
 import 'package:omt/page/video/video_frame/video_frame_view_model.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fu;
 import 'package:media_kit/media_kit.dart';
@@ -36,96 +37,87 @@ class VideoFramePage extends StatelessWidget {
 
           var _row = windowWidth > 600 * 2 + 200;
 
-          var itemCount = model.rtspList?.length ?? 0;
           VideoInfoCamEntity? theRtsp = model.findTheRtsp();
-          ;
+          var headerLeft = Container(
+            alignment: Alignment.centerLeft,
+            child: Wrap(
+              runSpacing: 0,
+              spacing: 10,
+              children: (model.rtspList ?? []).map((e) {
+                var index = model.rtspList?.indexOf(e) ?? 0;
+                if (-1 == index) {
+                  index = 0;
+                }
+                return TextView(
+                  width: 120,
+                  maxLine: 2,
+                  model.rtspList![index].name,
+                  color: index == model.rtspIndex
+                      ? ColorUtils.colorAccent
+                      : ColorUtils.colorBlackLite,
+                  size: index == model.rtspIndex ? 14 : 14,
+                  fontWeight: index == model.rtspIndex
+                      ? FontWeight.bold
+                      : FontWeight.normal,
+                  padding: const EdgeInsets.only(
+                      left: 16, right: 16, top: 6, bottom: 6),
+                  alignment: Alignment.center,
+                  onTap: () {
+                    model.onTapIndex(index);
+                  },
+                );
+              }).toList(),
+            ),
+          ).addFlexible(flex: _row ? 2 : null);
+          var headerRight = Row(
+            children: [
+              EditView(
+                showLine: false,
+                padding: const EdgeInsets.only(left: 20, right: 20),
+                maxLines: 1,
+                alignment: Alignment.centerLeft,
+                controller: model.controllerRtsp,
+                hintText: '清输入rtsp地址',
+              ).addExpanded(flex: 10),
+              EditView(
+                showLine: false,
+                maxLines: 1,
+                alignment: Alignment.centerLeft,
+                controller: model.controllerDeviceName,
+                hintText: '清输入设备名称',
+              ).addExpanded(flex: 8),
+              Container(
+                width: 100,
+                margin: const EdgeInsets.only(left: 16),
+                child: ButtonView(
+                  textDarkOnlyOpacity: true,
+                  text: '新增',
+                  onPressed: () {
+                    model.onTapAdd();
+                  },
+                ),
+              )
+            ],
+          ).addExpanded(flex: _row ? 2 : null);
+
           return fu.ScaffoldPage.scrollable(
               header: const fu.PageHeader(
                 title: Text('视频画框'),
               ),
               children: [
-                Row(
-                  children: [
-                    Container(
-                      alignment: Alignment.centerLeft,
-                      child: Wrap(
-                        children: (model.rtspList ?? []).map((e) {
-                          var index = model.rtspList?.indexOf(e) ?? 0;
-                          if (-1 == index) {
-                            index = 0;
-                          }
-                          return TextView(
-                            width: 120,
-                            maxLine: 2,
-                            model.rtspList![index].name,
-                            color: index == model.rtspIndex
-                                ? ColorUtils.colorAccent
-                                : ColorUtils.colorBlackLite,
-                            size: index == model.rtspIndex ? 14 : 14,
-                            fontWeight: index == model.rtspIndex
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                            padding: const EdgeInsets.only(left: 20, right: 20),
-                            alignment: Alignment.centerLeft,
-                            onTap: () {
-                              model.onTapIndex(index);
-                            },
-                          );
-                        }).toList(),
+                _row
+                    ? Row(
+                        children: [headerLeft, headerRight],
+                      )
+                    : Column(
+                        children: [
+                          SizedBox(
+                            width: double.infinity,
+                            child: headerLeft,
+                          ),
+                          headerRight,
+                        ],
                       ),
-                    ).addFlexible(flex: _row ? 2 : 1),
-                    // Container(
-                    //   alignment: Alignment.centerLeft,
-                    //   height: 50,
-                    //   child: ListView.builder(
-                    //     scrollDirection: Axis.horizontal,shrinkWrap: true,
-                    //     itemBuilder: (context, index) {
-                    //       return TextView(
-                    //         model.rtspList![index].name,
-                    //         color: index == model.rtspIndex
-                    //             ? ColorUtils.colorAccent
-                    //             : ColorUtils.colorBlackLite,
-                    //         size: index == model.rtspIndex ? 14 : 14,
-                    //         fontWeight: index == model.rtspIndex
-                    //             ? FontWeight.bold
-                    //             : FontWeight.normal,
-                    //         padding: const EdgeInsets.only(left: 20, right: 20),
-                    //         alignment: Alignment.centerLeft,
-                    //         onTap: () {
-                    //           model.onTapIndex(index);
-                    //         },
-                    //       );
-                    //     },
-                    //     itemCount: itemCount > 3 ? 4 : itemCount,
-                    //   ),
-                    // ).addFlexible(flex: _row ? 2 : 1),
-                    EditView(
-                      showLine: false,
-                      padding: const EdgeInsets.only(left: 20, right: 20),
-                      maxLines: 1,
-                      alignment: Alignment.centerLeft,
-                      controller: model.controllerRtsp,
-                      hintText: '清输入rtsp地址',
-                    ).addExpanded(flex: 1),
-                    EditView(
-                      showLine: false,
-                      maxLines: 1,
-                      alignment: Alignment.centerLeft,
-                      controller: model.controllerDeviceName,
-                      hintText: '清输入设备名称',
-                    ).addExpanded(flex: 1),
-                    Container(
-                      width: 100,
-                      child: ButtonView(
-                        textDarkOnlyOpacity: true,
-                        text: '新增',
-                        onPressed: () {
-                          model.onTapAdd();
-                        },
-                      ),
-                    )
-                  ],
-                ),
                 const LineView(
                   margin: EdgeInsets.only(top: 12, bottom: 12),
                 ),
@@ -140,36 +132,39 @@ class VideoFramePage extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    TfbComboBox(
-                        width: 140,
-                        datas: [
-                          IdNameValue(id: 1, name: '第一个框'),
-                          IdNameValue(id: 2, name: '第二个框')
-                        ],
-                        selectedIndex: 0),
-                    const SizedBox(
-                      width: 20,
-                    ),
+                    // TfbComboBox(
+                    //     width: 140,
+                    //     datas: [
+                    //       IdNameValue(id: 1, name: '第一个框'),
+                    //       IdNameValue(id: 2, name: '第二个框')
+                    //     ],
+                    //     selectedIndex: 0),
+                    // const SizedBox(
+                    //   width: 20,
+                    // ),
                     SizedBox(
                       width: 345,
                       child: EditView(
                         hintText: '请输入NVR地址',
+                        controller: model.controllerNvr,
                         showLine: false,
                       ),
                     ).addFlexible(),
                     const SizedBox(
                       width: 20,
                     ),
-                    SizedBox(
-                      width: 120,
-                      child: ButtonView(
-                        text: '清除',
-                        textDarkOnlyOpacity: true,
-                        onPressed: () {
-                          model.clearRectangles();
-                        },
-                      ),
-                    ),
+                    _row != true
+                        ? const SizedBox()
+                        : SizedBox(
+                            width: 120,
+                            child: ButtonView(
+                              text: '清除识别框',
+                              textDarkOnlyOpacity: true,
+                              onPressed: () {
+                                model.clearRectangles();
+                              },
+                            ),
+                          ),
                     // Expanded(
                     //   child: Container(),
                     //   flex: _row ? 3 : 0,
@@ -202,13 +197,15 @@ class VideoFramePage extends StatelessWidget {
         child: Stack(
           children: [
             Video(controller: model.controller),
-            CanvasPaintWidget(
-              canvasNum: 4,
-              rectangles: model.rectangles,
-              onRectangles: (List<Rect> value) {
-                model.updateRectangles(value);
-              },
-            ).setVisible2(visible: true)
+            _row != true
+                ? const SizedBox()
+                : CanvasPaintWidget(
+                    canvasNum: 4,
+                    rectangles: model.rectangles,
+                    onRectangles: (List<Rect> value) {
+                      model.updateRectangles(value);
+                    },
+                  ).setVisible2(visible: true)
           ],
         ),
       ),
@@ -220,6 +217,50 @@ class VideoFramePage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
+          ...(model.rectangles
+              .asMap()
+              .map((index, e) {
+                var indexStr = '';
+                if (index > 0) {
+                  indexStr = '${index + 1}';
+                }
+
+                return MapEntry(
+                    index,
+                    CardView(
+                      shadowRadius: 8,
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      margin: const EdgeInsets.only(bottom: 12),
+                      elevation: 8,
+                      child: Wrap(
+                        alignment: WrapAlignment.spaceBetween,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 30,
+                        runSpacing: 20,
+                        children: [
+                          TfbTitleSub(
+                              title: '识别框$indexStr-X',
+                              subTitle: '${model.fixShowRectNum(e.left)}',
+                              width: 100),
+                          TfbTitleSub(
+                              title: '识别框$indexStr-Y',
+                              subTitle: '${model.fixShowRectNum(e.top)}',
+                              width: 100),
+                          TfbTitleSub(
+                              title: '识别框$indexStr-宽',
+                              subTitle: '${model.fixShowRectNum(e.width)}',
+                              width: 100),
+                          TfbTitleSub(
+                              title: '识别框$indexStr-高',
+                              subTitle: '${model.fixShowRectNum(e.height)}',
+                              width: 100),
+                        ],
+                      ),
+                    ));
+              })
+              .values
+              .toList()),
           CardView(
             shadowRadius: 8,
             width: double.infinity,
@@ -231,102 +272,41 @@ class VideoFramePage extends StatelessWidget {
               spacing: 30,
               runSpacing: 20,
               children: [
-                TfbTitleSub(title: '识别框X', subTitle: '0', width: 100),
-                TfbTitleSub(title: '识别框Y', subTitle: '0', width: 100),
-                TfbTitleSub(title: '识别框宽', subTitle: '0', width: 100),
-                TfbTitleSub(title: '识别框高', subTitle: '0', width: 100),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12, width: 12),
-          CardView(
-            shadowRadius: 8,
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            elevation: 8,
-            child: Wrap(
-              alignment: WrapAlignment.spaceBetween,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: 30,
-              runSpacing: 20,
-              children: [
-                TfbTitleSub(title: '识别框2X', subTitle: '0', width: 100),
-                TfbTitleSub(title: '识别框2Y', subTitle: '0', width: 100),
-                TfbTitleSub(title: '识别框2宽', subTitle: '0', width: 100),
-                TfbTitleSub(title: '识别框2高', subTitle: '0', width: 100),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12, width: 12),
-          CardView(
-            shadowRadius: 8,
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            elevation: 8,
-            child: Wrap(
-              alignment: WrapAlignment.spaceBetween,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: 30,
-              runSpacing: 20,
-              children: [
-                TfbTitleSub(title: '识别框3X', subTitle: '0', width: 100),
-                TfbTitleSub(title: '识别框3Y', subTitle: '0', width: 100),
-                TfbTitleSub(title: '识别框3宽', subTitle: '0', width: 100),
-                TfbTitleSub(title: '识别框3高', subTitle: '0', width: 100),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12, width: 12),
-          CardView(
-            shadowRadius: 8,
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            elevation: 8,
-            child: Wrap(
-              alignment: WrapAlignment.spaceBetween,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: 30,
-              runSpacing: 20,
-              children: [
-                TfbTitleSub(title: '识别框4X', subTitle: '0', width: 100),
-                TfbTitleSub(title: '识别框4Y', subTitle: '0', width: 100),
-                TfbTitleSub(title: '识别框4宽', subTitle: '0', width: 100),
-                TfbTitleSub(title: '识别框4高', subTitle: '0', width: 100),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12, width: 12),
-          CardView(
-            shadowRadius: 8,
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            elevation: 8,
-            child: Wrap(
-              alignment: WrapAlignment.spaceBetween,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: 30,
-              runSpacing: 20,
-              children: [
-                TfbTitleSub(title: '识别间隔/S', subTitle: '0', width: 100),
+                TfbTitleSub(
+                    title: '识别间隔/S',
+                    hint: '0',
+                    controller: model.controllerRecognitionInterval,
+                    width: 100),
                 TfbTitleSub(
                     title: '车辆漂移',
                     subTitle: '0',
                     width: 100,
-                    selectedIndex: 1,
-                    datas: [
-                      IdNameValue(id: 1, name: '前'),
-                      IdNameValue(id: 2, name: '后')
-                    ]),
-                TfbTitleSub(title: '进出场', subTitle: '0', width: 100, datas: [
-                  IdNameValue(id: 1, name: '进'),
-                  IdNameValue(id: 2, name: '出')
-                ]),
+                    onSelected: (data) {
+                      model.selectedOffsetId = data?.id ?? -1;
+                      model.notifyListeners();
+                    },
+                    selectedIndex:
+                        model.findIndex(model.offsets, model.selectedOffsetId),
+                    datas: model.offsets),
+                TfbTitleSub(
+                    title: '进出场',
+                    subTitle: '0',
+                    width: 100,
+                    onSelected: (data) {
+                      model.selectedInoutId = data?.id ?? -1;
+                      model.notifyListeners();
+                    },
+                    selectedIndex:
+                        model.findIndex(model.inOuts, model.selectedInoutId),
+                    datas: model.inOuts),
                 Container(
                   width: 100,
                   child: ButtonView(
                     textDarkOnlyOpacity: true,
                     text: '保存',
-                    onPressed: () {},
+                    onPressed: () {
+                      model.onTapUpdate();
+                    },
                   ),
                 ),
               ],

@@ -39,8 +39,8 @@ class UserLoginViewModel extends BaseViewModelRefresh<UserLoginData> {
   @override
   void initState() async {
     super.initState();
-    phoneController = TextEditingController(text: '1');
-    pwdController = TextEditingController(text: '1');
+    phoneController = TextEditingController(text: 'admin');
+    pwdController = TextEditingController(text: 'admin');
     canLogin = !BaseSysUtils.empty(phoneController.text) &&
         !BaseSysUtils.empty(pwdController.text);
     canClear = !BaseSysUtils.empty(phoneController.text);
@@ -88,7 +88,25 @@ class UserLoginViewModel extends BaseViewModelRefresh<UserLoginData> {
   }
 
   login() {
-    // DataPicker.show(context!, datas: ['dddd', '1111', '222']);
+    var phone = phoneController.text;
+    var pwd = pwdController.text;
+
+    if (BaseSysUtils.empty(phone)) {
+      LoadingUtils.showInfo(data: '请输入账号');
+      return;
+    }
+
+    if (BaseSysUtils.empty(pwd)) {
+      LoadingUtils.showInfo(data: '请输入密码');
+      return;
+    }
+
+    if (!BaseSysUtils.equals(phone, 'admin') ||
+        !BaseSysUtils.equals(pwd, 'admin')) {
+      LoadingUtils.showInfo(data: '账号或密码不正确');
+      return;
+    }
+
     IntentUtils.share.goHome(context);
   }
 }

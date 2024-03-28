@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
+import 'package:omt/utils/color_utils.dart';
 import 'package:omt/utils/log_utils.dart';
 
 class CanvasPaintWidget extends StatefulWidget {
@@ -97,7 +98,15 @@ class CanvasPaint extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3.0;
 
+    int i = 0;
+    var colors = [
+      ColorUtils.colorRed,
+      ColorUtils.colorGreen,
+      ColorUtils.colorBlue,
+      ColorUtils.colorYellow
+    ];
     for (final rect in rectangles) {
+      paint.color = colors[i++ % 4];
       canvas.drawRect(rect, paint);
     }
   }
