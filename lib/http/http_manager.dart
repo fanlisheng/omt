@@ -76,7 +76,10 @@ class HttpManager extends BaseHttpManager {
       'OS-Version': osVersion,
       'Brand': brand,
       'UDID': UDID,
-    });
+      // 'Access-Control-Allow-Origin': '*',
+      // 'Access-Control-Allow-Methods': 'GET,PUT,PATCH,POST,DELETE',
+      // 'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
+      });
     return map;
   }
 

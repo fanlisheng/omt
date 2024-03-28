@@ -94,7 +94,8 @@ class VideoFrameViewModel extends BaseViewModelRefresh<VideoFrameData> {
     if (BaseSysUtils.empty(cdn)) {
       LoadingUtils.showInfo(data: '请输入设备名称');
       return;
-    } else if (BaseSysUtils.empty(cr) || cr?.contains('rtsp') != true) {
+    } else if (BaseSysUtils.empty(cr) ||
+        (cr?.contains('rtsp') != true && cr?.contains('http') != true)) {
       LoadingUtils.showInfo(data: '请输入rtsp地址');
       return;
     }
