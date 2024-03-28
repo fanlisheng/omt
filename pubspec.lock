@@ -512,9 +512,11 @@ packages:
   kayo_package:
     dependency: "direct main"
     description:
-      path: "../plugin/kayo_package"
-      relative: true
-    source: path
+      path: "."
+      ref: "v3.19"
+      resolved-ref: "933c9f4c312b3ae9287aa9b27dd7fe54213b0736"
+      url: "https://gitee.com/kayoxu/kayo_package.git"
+    source: git
     version: "0.0.1"
   leak_tracker:
     dependency: transitive
