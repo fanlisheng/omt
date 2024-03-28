@@ -1,5 +1,5 @@
 import 'package:omt/generated/json/base/json_convert_content.dart';
-import 'package:omt/bean/video/video_frame /video_frame _data.dart';
+import 'package:omt/bean/video/video_frame/video_frame_data.dart';
 import 'dart:core';
 
 import 'package:omt/generated/json/base/json_convert_content.dart';

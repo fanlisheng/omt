@@ -6,7 +6,7 @@ import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/bean/video/video_configuration/Video_Connect_entity.dart';
-import 'package:omt/bean/video/video_frame /video_frame _data.dart';
+import 'package:omt/bean/video/video_frame/video_frame_data.dart';
 import 'package:omt/http/http_query.dart';
 import 'package:omt/utils/json_utils.dart';
 import 'package:omt/utils/log_utils.dart';

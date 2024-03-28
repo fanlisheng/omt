@@ -14,7 +14,7 @@ import 'package:omt/bean/user/user_login/user_login_data.dart';
 import 'package:omt/bean/user/ver_info.dart';
 import 'package:omt/bean/video/video_configuration/Video_Connect_entity.dart';
 import 'package:omt/bean/video/video_configuration/video_configuration_data.dart';
-import 'package:omt/bean/video/video_frame /video_frame _data.dart';
+import 'package:omt/bean/video/video_frame/video_frame_data.dart';
 import 'package:omt/bean/video/video_operations_center/video_operations_center_data.dart';
 
 JsonConvert jsonConvert = JsonConvert();
