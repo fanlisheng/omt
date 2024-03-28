@@ -128,14 +128,15 @@ class _MyHomePageState extends State<MyHomePage>
             content: const Text('你确定要关闭窗口？'),
             actions: [
               fu.FilledButton(
-                child: const Text('确定'),
+                child: TextView('确定',
+                    textDarkOnlyOpacity: true, color: ColorUtils.colorWhite),
                 onPressed: () {
                   Navigator.pop(KayoPackage.share.context);
                   windowManager.destroy();
                 },
               ),
               fu.Button(
-                child: const Text('取消'),
+                child: TextView('取消', color: ColorUtils.colorBlack),
                 onPressed: () {
                   Navigator.pop(KayoPackage.share.context);
                 },
