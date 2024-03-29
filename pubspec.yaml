@@ -1,4 +1,4 @@
-name: 运维工具
+name: omt
 description: "Operation and maintenance tools"
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
