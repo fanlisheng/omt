@@ -149,7 +149,7 @@ class VideoFramePage extends StatelessWidget {
                         controller: model.controllerNvr,
                         showLine: false,
                       ),
-                    ).addExpanded(),
+                    ).addFlexible(),
                     const SizedBox(
                       width: 20,
                     ),
