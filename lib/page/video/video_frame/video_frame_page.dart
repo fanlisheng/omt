@@ -68,7 +68,7 @@ class VideoFramePage extends StatelessWidget {
                 );
               }).toList(),
             ),
-          ).addFlexible(flex: _row ? 2 : null);
+          ).addExpanded(flex: _row ? 2 : null);
           var headerRight = Row(
             children: [
               EditView(
@@ -149,7 +149,7 @@ class VideoFramePage extends StatelessWidget {
                         controller: model.controllerNvr,
                         showLine: false,
                       ),
-                    ).addFlexible(),
+                    ).addExpanded(),
                     const SizedBox(
                       width: 20,
                     ),
