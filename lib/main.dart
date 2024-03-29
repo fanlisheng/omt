@@ -18,6 +18,7 @@ import 'package:system_theme/system_theme.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart' as flutter_acrylic;
 import 'package:window_manager/window_manager.dart';
 import 'package:provider/provider.dart';
+import 'package:bot_toast/bot_toast.dart';
 
 bool get isDesktop {
   if (kIsWeb) return false;
@@ -222,6 +223,7 @@ class _MyHomePageState extends State<MyHomePage>
             title: '运维工具',
             debugShowCheckedModeBanner: false,
             navigatorKey: KayoPackage.share.navigatorKey,
+            navigatorObservers: [BotToastNavigatorObserver()],
             localizationsDelegates: const [
               RefreshLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
