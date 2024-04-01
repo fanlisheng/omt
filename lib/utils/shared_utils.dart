@@ -5,6 +5,8 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 
 import 'package:kayo_package/kayo_package.dart';
+import 'package:omt/bean/user/user_login/user_login_data.dart';
+import 'package:omt/utils/json_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:uuid/uuid.dart';
@@ -26,6 +28,7 @@ class SharedUtils {
   static const String _shared_host_socket = '_shared_host_socket';
   static const String _shared_udid = '_shared_udid';
   static const String _shared_control_ip = '_shared_control_ip';
+  static const String _shared_user_permission = '_shared_user_permission';
 
   static setHost(String data) {
     return set(_shared_host, data);
@@ -41,6 +44,19 @@ class SharedUtils {
 
   static Future<String> getHost() async {
     return await getString(_shared_host) ?? '';
+  }
+
+  static setUser(List<UserPermission> data) {
+    return set(_shared_user_permission, JsonUtils.toJson(data));
+  }
+
+  static Future<List<UserPermission>> getUserPermissions() async {
+    try {
+      var s = await getString(_shared_user_permission) ?? '[]';
+      return JsonUtils.getBeanSync<List<UserPermission>>(s) ?? [];
+    } catch (e) {
+      return [];
+    }
   }
 
   static Future<String> getUDID() async {

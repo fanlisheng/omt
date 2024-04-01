@@ -27,3 +27,22 @@ class UserLoginData {
     return jsonEncode(this);
   }
 }
+
+@JsonSerializable()
+class UserPermission {
+  int? id;
+  String? terminal = '';
+  String? name = '';
+
+  UserPermission();
+
+  factory UserPermission.fromJson(Map<String, dynamic> json) =>
+      $UserPermissionFromJson(json);
+
+  Map<String, dynamic> toJson() => $UserPermissionToJson(this);
+
+  @override
+  String toString() {
+    return jsonEncode(this);
+  }
+}
