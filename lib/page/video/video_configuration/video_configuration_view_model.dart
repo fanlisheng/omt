@@ -53,7 +53,7 @@ class VideoConfigurationViewModel
 
   void connect() {
     if (BaseSysUtils.empty(controllerIP?.text)) {
-      LoadingUtils.showInfo(data: '请输入中控机IP');
+      LoadingUtils.showInfo(data: '请输入工控机IP');
     } else if (SysUtils.isIPAddress(controllerIP!.text)) {
       HttpQuery.share.videoConfigurationService.connect(
           host: controllerIP!.text,
@@ -70,7 +70,7 @@ class VideoConfigurationViewModel
             LoadingUtils.showInfo(data: '连接失败');
           });
     } else {
-      LoadingUtils.showInfo(data: '请输入正确的中控机IP');
+      LoadingUtils.showInfo(data: '请输入正确的工控机IP');
     }
   }
 }

@@ -42,7 +42,7 @@ class VideoConfigurationPage extends StatelessWidget {
                     child: Row(
                       children: [
                         TfbTitleSub(
-                            title: '中控机器IP',
+                            title: '工控机IP',
                             subTitle: '',
                             controller: model.controllerIP),
                         const Spacer(),
