@@ -5,17 +5,41 @@ import 'dart:core';
 import 'package:omt/generated/json/base/json_convert_content.dart';
 
 
-UserLoginData $UserLoginDataFromJson(Map<String, dynamic> json) {
-  final UserLoginData userLoginData = UserLoginData();
-  return userLoginData;
+UserInfoData $UserInfoDataFromJson(Map<String, dynamic> json) {
+  final UserInfoData userInfoData = UserInfoData();
+  final String? phone = jsonConvert.convert<String>(json['phone']);
+  if (phone != null) {
+    userInfoData.phone = phone;
+  }
+  final List<
+      UserPermission>? userPermissions = (json['userPermissions'] as List<
+      dynamic>?)
+      ?.map(
+          (e) => jsonConvert.convert<UserPermission>(e) as UserPermission)
+      .toList();
+  if (userPermissions != null) {
+    userInfoData.userPermissions = userPermissions;
+  }
+  return userInfoData;
 }
 
-Map<String, dynamic> $UserLoginDataToJson(UserLoginData entity) {
+Map<String, dynamic> $UserInfoDataToJson(UserInfoData entity) {
   final Map<String, dynamic> data = <String, dynamic>{};
+  data['phone'] = entity.phone;
+  data['userPermissions'] =
+      entity.userPermissions?.map((v) => v.toJson()).toList();
   return data;
 }
 
-extension UserLoginDataExtension on UserLoginData {
+extension UserInfoDataExtension on UserInfoData {
+  UserInfoData copyWith({
+    String? phone,
+    List<UserPermission>? userPermissions,
+  }) {
+    return UserInfoData()
+      ..phone = phone ?? this.phone
+      ..userPermissions = userPermissions ?? this.userPermissions;
+  }
 }
 
 UserPermission $UserPermissionFromJson(Map<String, dynamic> json) {

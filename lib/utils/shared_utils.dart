@@ -28,7 +28,7 @@ class SharedUtils {
   static const String _shared_host_socket = '_shared_host_socket';
   static const String _shared_udid = '_shared_udid';
   static const String _shared_control_ip = '_shared_control_ip';
-  static const String _shared_user_permission = '_shared_user_permission';
+  static const String _shared_user_info_data = '_shared_user_info_data';
 
   static setHost(String data) {
     return set(_shared_host, data);
@@ -46,16 +46,16 @@ class SharedUtils {
     return await getString(_shared_host) ?? '';
   }
 
-  static setUser(List<UserPermission> data) {
-    return set(_shared_user_permission, JsonUtils.toJson(data));
+  static setUserInfo(UserInfoData data) {
+    return set(_shared_user_info_data, JsonUtils.toJson(data));
   }
 
-  static Future<List<UserPermission>> getUserPermissions() async {
+  static Future<UserInfoData?> getUserInfo() async {
     try {
-      var s = await getString(_shared_user_permission) ?? '[]';
-      return JsonUtils.getBeanSync<List<UserPermission>>(s) ?? [];
+      var s = await getString(_shared_user_info_data) ?? '{}';
+      return JsonUtils.getBeanSync<UserInfoData>(s);
     } catch (e) {
-      return [];
+      return null;
     }
   }
 

@@ -180,9 +180,9 @@ class JsonConvert {
       return data.map<HomePageData>((Map<String, dynamic> e) =>
           HomePageData.fromJson(e)).toList() as M;
     }
-    if (<UserLoginData>[] is M) {
-      return data.map<UserLoginData>((Map<String, dynamic> e) =>
-          UserLoginData.fromJson(e)).toList() as M;
+    if (<UserInfoData>[] is M) {
+      return data.map<UserInfoData>((Map<String, dynamic> e) =>
+          UserInfoData.fromJson(e)).toList() as M;
     }
     if (<UserPermission>[] is M) {
       return data.map<UserPermission>((Map<String, dynamic> e) =>
@@ -257,7 +257,7 @@ class JsonConvertClassCollection {
     (LocationData).toString(): LocationData.fromJson,
     (NameValue).toString(): NameValue.fromJson,
     (HomePageData).toString(): HomePageData.fromJson,
-    (UserLoginData).toString(): UserLoginData.fromJson,
+    (UserInfoData).toString(): UserInfoData.fromJson,
     (UserPermission).toString(): UserPermission.fromJson,
     (VerInfo).toString(): VerInfo.fromJson,
     (VerInfoRet).toString(): VerInfoRet.fromJson,

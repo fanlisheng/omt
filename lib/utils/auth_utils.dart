@@ -1,7 +1,5 @@
 import 'dart:collection';
 
-import 'package:flutter/cupertino.dart';
-import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/user/user_login/user_login_data.dart';
 import 'package:omt/generated/json/base/json_convert_content.dart';
 import 'package:omt/utils/shared_utils.dart';
@@ -24,7 +22,7 @@ class AuthEnum {
 
 class AuthUtils {
   final HashMap<int, UserPermission> _authList = HashMap();
-  List<UserPermission> userPermissions = [];
+  UserInfoData? userLoginData;
 
   static AuthUtils get share => AuthUtils._share();
 
@@ -40,9 +38,9 @@ class AuthUtils {
   ///初始化
   init() async {
     _authList.clear();
-    userPermissions = await SharedUtils.getUserPermissions();
+    userLoginData = await SharedUtils.getUserInfo();
 
-    for (UserPermission p in userPermissions) {
+    for (UserPermission p in userLoginData?.userPermissions ?? []) {
       if (null != p.id) {
         _authList[p.id!] = p;
       }
@@ -62,5 +60,4 @@ class AuthUtils {
   bool authTest() {
     return true;
   }
-
 }

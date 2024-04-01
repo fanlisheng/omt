@@ -14,13 +14,16 @@ import 'package:omt/generated/json/user_login_data.g.dart';
 ///  Copyright © 2024 .. All rights reserved.
 ///
 @JsonSerializable()
-class UserLoginData {
-  UserLoginData();
+class UserInfoData {
+  String? phone;
+  List<UserPermission>? userPermissions;
 
-  factory UserLoginData.fromJson(Map<String, dynamic> json) =>
-      $UserLoginDataFromJson(json);
+  UserInfoData();
 
-  Map<String, dynamic> toJson() => $UserLoginDataToJson(this);
+  factory UserInfoData.fromJson(Map<String, dynamic> json) =>
+      $UserInfoDataFromJson(json);
+
+  Map<String, dynamic> toJson() => $UserInfoDataToJson(this);
 
   @override
   String toString() {

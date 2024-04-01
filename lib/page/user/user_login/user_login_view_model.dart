@@ -13,7 +13,7 @@ import 'package:omt/utils/intent_utils.dart';
 ///  Copyright © 2024 .. All rights reserved.
 ///
 
-class UserLoginViewModel extends BaseViewModelRefresh<UserLoginData> {
+class UserLoginViewModel extends BaseViewModelRefresh<UserInfoData> {
   late TextEditingController phoneController;
   late TextEditingController pwdController;
   int? platformId;
