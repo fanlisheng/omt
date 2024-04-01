@@ -36,6 +36,7 @@ class VideoFramePage extends StatelessWidget {
           var windowWidth = BaseSysUtils.getWidth(context);
 
           var _row = windowWidth > 600 * 2 + 200;
+          var _show_draw = windowWidth > 600 + 200;
 
           VideoInfoCamEntity? theRtsp = model.findTheRtsp();
           var headerLeft = Container(
@@ -153,7 +154,7 @@ class VideoFramePage extends StatelessWidget {
                     const SizedBox(
                       width: 20,
                     ),
-                    _row != true
+                    _row != true && !_show_draw
                         ? const SizedBox()
                         : SizedBox(
                             width: 120,
@@ -178,37 +179,40 @@ class VideoFramePage extends StatelessWidget {
                     ? Row(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: _views(model, _row),
+                        children: _views(model, _row, _show_draw),
                       )
                     : Column(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: _views(model, _row),
+                        children: _views(model, _row, _show_draw),
                       )
               ]);
         });
   }
 
-  List<Widget> _views(VideoFrameViewModel model, bool _row) {
+  List<Widget> _views(VideoFrameViewModel model, bool _row, bool _show_draw) {
     return [
-      SizedBox(
-        width: 640,
-        height: 360,
-        child: Stack(
-          children: [
-            Video(controller: model.controller),
-            _row != true
-                ? const SizedBox()
-                : CanvasPaintWidget(
-                    canvasNum: 4,
-                    rectangles: model.rectangles,
-                    onRectangles: (List<Rect> value) {
-                      model.updateRectangles(value);
-                    },
-                  ).setVisible2(visible: true)
-          ],
-        ),
-      ),
+      LayoutBuilder(builder: (context, constraints) {
+        double widgetWidth = constraints.maxWidth;
+        return SizedBox(
+          width: 640,
+          height: 360,
+          child: Stack(
+            children: [
+              Video(controller: model.controller),
+              (_row == true || _show_draw) && widgetWidth > 640
+                  ? CanvasPaintWidget(
+                      canvasNum: 4,
+                      rectangles: model.rectangles,
+                      onRectangles: (List<Rect> value) {
+                        model.updateRectangles(value);
+                      },
+                    ).setVisible2(visible: true)
+                  : const SizedBox()
+            ],
+          ),
+        );
+      }),
       const SizedBox(
         height: 20,
         width: 20,
