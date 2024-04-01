@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_acrylic/flutter_acrylic.dart';
-import 'package:kayo_package/mvvm/base/base_view_model_bus_event.dart';
 import 'package:kayo_package/mvvm/base/base_view_theme_bus_event.dart';
 import 'package:omt/utils/color_utils.dart';
 import 'package:system_theme/system_theme.dart';
