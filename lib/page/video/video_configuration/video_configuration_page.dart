@@ -2,11 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:kayo_package/kayo_package.dart';
-import 'package:kayo_package/views/_index_views.dart';
-import 'package:kayo_package/views/widget/_index_widget.dart';
-import 'package:kayo_package/views/widget/base/_index_widget_base.dart';
 import 'package:omt/utils/color_utils.dart';
-import 'package:omt/utils/sys_utils.dart';
 import 'package:omt/widget/lib/widgets.dart';
 import 'video_configuration_view_model.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fu;
@@ -108,7 +104,7 @@ class VideoConfigurationPage extends StatelessWidget {
                           text: '保存',
                           textDarkOnlyOpacity: true,
                           onPressed: () {
-                            LoadingUtils.showInfo(data: '暂时不开放');
+                            LoadingUtils.showInfo(data: '暂不开放修改');
                           },
                         ),
                       ],
@@ -158,7 +154,7 @@ class VideoConfigurationPage extends StatelessWidget {
                           text: '保存',
                           textDarkOnlyOpacity: true,
                           onPressed: () {
-                            LoadingUtils.showInfo(data: '暂时不开放');
+                            LoadingUtils.showInfo(data: '暂不开放修改');
                           },
                         ),
                       ],
