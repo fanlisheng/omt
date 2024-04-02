@@ -12,7 +12,7 @@ import '../../../bean/video/video_configuration/Video_Connect_entity.dart';
 
 ///
 ///  omt
-///  video_configuration_service.dart
+///  camera_configuration_service.dart
 ///  视频配置
 ///
 ///  Created by kayoxu on 2024-03-08 at 11:44:33

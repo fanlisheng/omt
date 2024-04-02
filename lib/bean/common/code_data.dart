@@ -21,3 +21,22 @@ class CodeMessageData {
     return jsonEncode(this);
   }
 }
+
+@JsonSerializable()
+class CommonPageData {
+  int? total;
+  int? page;
+  int? limit;
+
+  CommonPageData();
+
+  factory CommonPageData.fromJson(Map<String, dynamic> json) =>
+      $CommonPageDataFromJson(json);
+
+  Map<String, dynamic> toJson() => $CommonPageDataToJson(this);
+
+  @override
+  String toString() {
+    return jsonEncode(this);
+  }
+}

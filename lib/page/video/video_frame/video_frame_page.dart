@@ -8,10 +8,8 @@ import 'package:omt/bean/video/video_configuration/Video_Connect_entity.dart';
 import 'package:omt/http/http_query.dart';
 import 'package:omt/page/video/video_frame/video_frame_view_model.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fu;
-import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:omt/utils/color_utils.dart';
-import 'package:omt/utils/sys_utils.dart';
 import 'package:omt/widget/canvas/canvas_paint_widget.dart';
 import 'package:omt/widget/lib/widgets.dart';
 

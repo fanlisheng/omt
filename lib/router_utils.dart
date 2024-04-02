@@ -10,6 +10,7 @@ import 'package:omt/widget/lib/search/search_page.dart';
 import 'package:omt/page/video/video_configuration/video_configuration_page.dart';
 
 import 'package:omt/page/video/video_operations_center/video_operations_center_page.dart';
+import 'package:omt/page/camera/camera_bound/camera_bound_page.dart';
 
 ///ReplaceRouterPageImport
 
@@ -44,6 +45,9 @@ class RouterPage {
 
   ///视频操作中心
   static const String VideoOperationsCenterPage = 'VideoOperationsCenterPage';
+
+  ///已绑定矿区摄像头管理
+  static const String CameraBoundPage = 'CameraBoundPage';
 
   ///ReplaceRouterPageDefine
 }
@@ -90,6 +94,12 @@ Route<dynamic> generateRoute(RouteSettings settings, {uniqueId}) {
           settings: settings,
           builder: (context) {
             return VideoOperationsCenterPage();
+          });
+    case RouterPage.CameraBoundPage:
+      return CupertinoPageRoute(
+          settings: settings,
+          builder: (context) {
+            return CameraBoundPage();
           });
     ///ReplaceRouterGenerateRoute
 
