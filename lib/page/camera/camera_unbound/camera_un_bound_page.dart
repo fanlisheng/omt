@@ -29,7 +29,6 @@ class CameraUnBoundPage extends StatelessWidget {
         model: CameraUnBoundViewModel()..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
-
           return fu.ScaffoldPage(
               header: const fu.PageHeader(
                 title: Text('未绑定矿区摄像头'),
@@ -90,7 +89,9 @@ class CameraUnBoundPage extends StatelessWidget {
                                               right: 12,
                                               top: 4,
                                               bottom: 4),
-                                          onTap: () {},
+                                          onTap: () {
+                                            model.bindDevice(data);
+                                          },
                                         ),
                                       ).addExpanded(flex: 1)
                                     ],

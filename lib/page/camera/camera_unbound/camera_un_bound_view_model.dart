@@ -8,6 +8,7 @@ import 'package:omt/bean/camera/camera_entity.dart';
 import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/http/http_query.dart';
 import 'package:omt/utils/log_utils.dart';
+import 'package:omt/widget/picker/id_name_picker.dart';
 
 ///
 ///  omt
@@ -22,6 +23,7 @@ class CameraUnBoundViewModel extends BaseViewModelList<CameraInfoEntity> {
 
   CameraHttpEntity? cameraHttpEntity;
 
+  List<IdNameValue> points = [];
 
   @override
   int getPageSize() {
@@ -31,7 +33,12 @@ class CameraUnBoundViewModel extends BaseViewModelList<CameraInfoEntity> {
   @override
   void initState() async {
     super.initState();
-
+    HttpQuery.share.cameraConfigurationService.pointList(onSuccess: (data) {
+      points.clear();
+      if (!BaseSysUtils.empty(data)) {
+        points.addAll(data!);
+      }
+    });
   }
 
   @override
@@ -67,28 +74,15 @@ class CameraUnBoundViewModel extends BaseViewModelList<CameraInfoEntity> {
   }
 
 
-  void deleteDevice(CameraInfoEntity data) {
-    showDialog<String>(
-      context: context!,
-      builder: (context) => ContentDialog(
-        title: const Text('删除'),
-        content: const Text(
-          '确定要删除?',
-        ),
-        actions: [
-          Button(
-            child: const Text('删除'),
-            onPressed: () {
-              Navigator.pop(context);
-
-            },
-          ),
-          FilledButton(
-            child: const Text('取消'),
-            onPressed: () => Navigator.pop(context),
-          ),
-        ],
-      ),
-    );
+  void bindDevice(CameraInfoEntity data) {
+    IdNamePickerWidget.show(
+        context: context!,
+        points: points,
+        title: '选择矿区',
+        okBtnText: '绑定矿区',
+        placeholder: '请输入或者选择矿区',
+        onDataPick: (data) {
+          LogUtils.info(msg: data.toString());
+        });
   }
 }

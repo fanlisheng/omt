@@ -94,7 +94,9 @@ class CameraBoundDeletePage extends StatelessWidget {
                                               right: 12,
                                               top: 4,
                                               bottom: 4),
-                                          onTap: () {},
+                                          onTap: () {
+                                            model.bindDevice(data);
+                                          },
                                         ),
                                       ).addExpanded(flex: 1)
                                     ],
