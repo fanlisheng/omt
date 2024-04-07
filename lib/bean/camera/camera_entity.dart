@@ -28,7 +28,7 @@ class CameraHttpEntity {
 
 @JsonSerializable()
 class CameraInfoEntity {
-  int? gb_id;
+  String? gb_id;
   String? name;
   String? parent_id;
   String? lat;
@@ -38,6 +38,8 @@ class CameraInfoEntity {
   String? rect_data;
   int? online;
   int? ptz_type;
+  String? channel_info;
+  String? point_name;
 
   CameraInfoEntity();
 

@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/common/id_name_value.dart';
+import 'package:omt/page/camera/camera_unbound/camera_un_bound_view_model.dart';
 import 'package:omt/utils/color_utils.dart';
 import 'package:omt/utils/log_utils.dart';
 import 'package:omt/utils/refresh_tools.dart';
 import 'package:omt/widget/page/pager_indicator_item.dart';
-import 'camera_bound_view_model.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fu;
 
 ///
@@ -20,96 +20,22 @@ import 'package:fluent_ui/fluent_ui.dart' as fu;
 ///  Copyright © 2024 .. All rights reserved.
 ///
 
-class CameraBoundPage extends StatelessWidget {
-  const CameraBoundPage({Key? key}) : super(key: key);
+class CameraUnBoundPage extends StatelessWidget {
+  const CameraUnBoundPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return ProviderWidget<CameraBoundViewModel>(
-        model: CameraBoundViewModel()..themeNotifier = true,
+    return ProviderWidget<CameraUnBoundViewModel>(
+        model: CameraUnBoundViewModel()..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
-          var noteMessage =
-              'IP标记为红色，说明该条IP在NVR上有重复配置；\nID标记为红色，说明NVR当前没有配置此设备到国标配置中；\nIP、ID全是红色，可能是NVR离线了。';
 
           return fu.ScaffoldPage(
               header: const fu.PageHeader(
-                title: Text('已绑定矿区摄像头管理'),
+                title: Text('未绑定矿区摄像头'),
               ),
               content: Column(
                 children: [
-                  Row(
-                    children: [
-                      SizedBox(
-                          width: 300,
-                          child: fu.AutoSuggestBox<IdNameValue>(
-                            placeholder: '输入或选择矿区',
-                            key: model.asbKey,
-                            items: model.points.map((e) {
-                              return fu.AutoSuggestBoxItem<IdNameValue>(
-                                  value: e,
-                                  label: e.name ?? '',
-                                  child: TextView(
-                                    e.name,
-                                    maxLine: 1,
-                                    color: ColorUtils.colorBlackLite,
-                                    size: 12,
-                                  ),
-                                  onFocusChange: (focused) {
-                                    if (focused) {
-                                      // debugPrint('Focused $e -- ${model.asbKey.currentState?.widget.controller?.text}',);
-                                    }
-                                  });
-                            }).toList(),
-                            focusNode: model.focusNode,
-                            onSelected: (item) {
-                              model.onPointSelected(item);
-                            },
-                            onChanged: (text, TextChangedReason r) {
-                              if (r == TextChangedReason.cleared) {
-                                model.onPointSelected(null);
-                              }
-                              model.sgText = text;
-                              LogUtils.info(
-                                  tag: 'TextChangedReason', msg: r.toString());
-                            },
-                          )),
-                      const SizedBox(
-                        width: 12,
-                      ),
-                      fu.Tooltip(
-                        message: noteMessage,
-                        displayHorizontally: true,
-                        useMousePosition: true,
-                        style: const fu.TooltipThemeData(preferBelow: true),
-                        child: fu.IconButton(
-                          icon: const Icon(Icons.info, size: 24.0),
-                          onPressed: () {
-                            fu.showDialog<String>(
-                              context: context,
-                              builder: (context) => ContentDialog(
-                                title: const Text('备注'),
-                                content: Text(
-                                  noteMessage,
-                                ),
-                                actions: [
-                                  Button(
-                                    child: const Text('确定'),
-                                    onPressed: () {
-                                      Navigator.pop(
-                                        context,
-                                      );
-                                      // Delete file here
-                                    },
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
                   Row(
                     // mainAxisSize: MainAxisSize.max,
                     children: [
@@ -152,27 +78,19 @@ class CameraBoundPage extends StatelessWidget {
                                         maxLine: 2,
                                       ).addExpanded(flex: 3),
                                       TextView(
-                                        data.gb_id,
+                                        data.channel_info,
                                         maxLine: 2,
                                       ).addExpanded(flex: 3),
                                       Container(
                                         alignment: Alignment.center,
                                         child: TextView(
-                                          '删除',
+                                          '绑定矿区',
                                           padding: const EdgeInsets.only(
                                               left: 12,
                                               right: 12,
                                               top: 4,
                                               bottom: 4),
-                                          onTap: () {
-                                            if (model.selectedPoint?.id ==
-                                                null) {
-                                              LoadingUtils.showInfo(
-                                                  data: '请先选择矿区');
-                                            } else {
-                                              model.deleteDevice(data);
-                                            }
-                                          },
+                                          onTap: () {},
                                         ),
                                       ).addExpanded(flex: 1)
                                     ],

@@ -6,6 +6,8 @@ import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:omt/bean/user/user_login/user_login_data.dart';
 import 'package:omt/page/camera/camera_bound/camera_bound_page.dart';
+import 'package:omt/page/camera/camera_bound_delete/camera_bound_delete_page.dart';
+import 'package:omt/page/camera/camera_unbound/camera_un_bound_page.dart';
 import 'package:omt/page/home/home_page.dart';
 import 'package:omt/page/user/user_login/user_login_page.dart';
 import 'package:omt/page/video/video_configuration/video_configuration_page.dart';
@@ -76,14 +78,14 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
     PaneItem(
       icon: Icon(FluentIcons.t_v_monitor),
       title: Text('未绑定矿区'),
-      body: VideoFramePage(),
-      onTap: () => debugPrint('视频画框'),
+      body: CameraUnBoundPage(),
+      onTap: () => debugPrint('未绑定矿区'),
     ),
     PaneItem(
       icon: Icon(Icons.delete),
       title: Text('绑定到已删除矿区'),
-      body: VideoOperationsCenterPage(),
-      onTap: () => debugPrint('操作中心'),
+      body: CameraBoundDeletePage(),
+      onTap: () => debugPrint('绑定到已删除矿区'),
     ),
   ];
 

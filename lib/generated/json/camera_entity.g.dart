@@ -54,7 +54,7 @@ extension CameraHttpEntityExtension on CameraHttpEntity {
 
 CameraInfoEntity $CameraInfoEntityFromJson(Map<String, dynamic> json) {
   final CameraInfoEntity cameraInfoEntity = CameraInfoEntity();
-  final int? gb_id = jsonConvert.convert<int>(json['gb_id']);
+  final String? gb_id = jsonConvert.convert<String>(json['gb_id']);
   if (gb_id != null) {
     cameraInfoEntity.gb_id = gb_id;
   }
@@ -94,6 +94,15 @@ CameraInfoEntity $CameraInfoEntityFromJson(Map<String, dynamic> json) {
   if (ptz_type != null) {
     cameraInfoEntity.ptz_type = ptz_type;
   }
+  final String? channel_info = jsonConvert.convert<String>(
+      json['channel_info']);
+  if (channel_info != null) {
+    cameraInfoEntity.channel_info = channel_info;
+  }
+  final String? point_name = jsonConvert.convert<String>(json['point_name']);
+  if (point_name != null) {
+    cameraInfoEntity.point_name = point_name;
+  }
   return cameraInfoEntity;
 }
 
@@ -109,12 +118,14 @@ Map<String, dynamic> $CameraInfoEntityToJson(CameraInfoEntity entity) {
   data['rect_data'] = entity.rect_data;
   data['online'] = entity.online;
   data['ptz_type'] = entity.ptz_type;
+  data['channel_info'] = entity.channel_info;
+  data['point_name'] = entity.point_name;
   return data;
 }
 
 extension CameraInfoEntityExtension on CameraInfoEntity {
   CameraInfoEntity copyWith({
-    int? gb_id,
+    String? gb_id,
     String? name,
     String? parent_id,
     String? lat,
@@ -124,6 +135,8 @@ extension CameraInfoEntityExtension on CameraInfoEntity {
     String? rect_data,
     int? online,
     int? ptz_type,
+    String? channel_info,
+    String? point_name,
   }) {
     return CameraInfoEntity()
       ..gb_id = gb_id ?? this.gb_id
@@ -135,6 +148,8 @@ extension CameraInfoEntityExtension on CameraInfoEntity {
       ..ip_address = ip_address ?? this.ip_address
       ..rect_data = rect_data ?? this.rect_data
       ..online = online ?? this.online
-      ..ptz_type = ptz_type ?? this.ptz_type;
+      ..ptz_type = ptz_type ?? this.ptz_type
+      ..channel_info = channel_info ?? this.channel_info
+      ..point_name = point_name ?? this.point_name;
   }
 }

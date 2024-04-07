@@ -18,56 +18,25 @@ import 'package:omt/utils/log_utils.dart';
 ///  Copyright © 2024 .. All rights reserved.
 ///
 
-class CameraBoundViewModel extends BaseViewModelList<CameraInfoEntity> {
-  final asbKey = GlobalKey<AutoSuggestBoxState>(
-    debugLabel: 'Manually controlled AutoSuggestBox',
-  );
-
-  FocusNode focusNode = FocusNode();
+class CameraUnBoundViewModel extends BaseViewModelList<CameraInfoEntity> {
 
   CameraHttpEntity? cameraHttpEntity;
 
-  List<IdNameValue> points = [];
-
-  IdNameValue? selectedPoint;
-
-  String sgText = '';
 
   @override
   int getPageSize() {
     return 20;
   }
 
-  void _onFocusChange() {
-    if (focusNode.hasFocus) {
-      if (asbKey.currentState?.isOverlayVisible != true) {
-        asbKey.currentState?.showOverlay();
-      }
-    } else {
-      if (BaseSysUtils.empty(sgText) && null != selectedPoint) {
-        onPointSelected(null);
-      }
-    }
-  }
-
   @override
   void initState() async {
     super.initState();
-    focusNode.addListener(_onFocusChange);
 
-    HttpQuery.share.cameraConfigurationService.pointList(onSuccess: (data) {
-      points.clear();
-      if (!BaseSysUtils.empty(data)) {
-        points.addAll(data!);
-      }
-      notifyListeners();
-    });
   }
 
   @override
   void dispose() {
-    focusNode.removeListener(_onFocusChange);
-    super.dispose();
+     super.dispose();
   }
 
   @override
@@ -82,8 +51,7 @@ class CameraBoundViewModel extends BaseViewModelList<CameraInfoEntity> {
     var nowTimestamp = BaseTimeUtils.nowTimestamp();
     if (nowTimestamp - times > 500) {
       times = nowTimestamp;
-      HttpQuery.share.cameraConfigurationService.pointCameraList(
-          instanceId: selectedPoint?.id,
+      HttpQuery.share.cameraConfigurationService.pointCameraUnbindList(
           pageIndex: pageIndex,
           pageSize: pageSize,
           onSuccess: (data) {
@@ -98,10 +66,6 @@ class CameraBoundViewModel extends BaseViewModelList<CameraInfoEntity> {
     }
   }
 
-  void onPointSelected(AutoSuggestBoxItem<IdNameValue>? item) {
-    selectedPoint = item?.value;
-    refresh();
-  }
 
   void deleteDevice(CameraInfoEntity data) {
     showDialog<String>(
@@ -116,12 +80,7 @@ class CameraBoundViewModel extends BaseViewModelList<CameraInfoEntity> {
             child: const Text('删除'),
             onPressed: () {
               Navigator.pop(context);
-              HttpQuery.share.cameraConfigurationService.deleteDevice(
-                  code: [data.gb_id ?? ''],
-                  instanceId: selectedPoint?.id,
-                  onSuccess: (data) {
-                    loadDataWithPageIndex(getPageIndex());
-                  });
+
             },
           ),
           FilledButton(

@@ -1,12 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:kayo_package/kayo_package.dart';
 import 'package:kayo_package/utils/_index_utils.dart';
 import 'package:omt/utils/color_utils.dart';
+import 'package:omt/widget/page/pager_indicator_item.dart';
 
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class RefreshUtils {
-  static SmartRefresher init(
+  static Widget init(
       {required Widget child,
       required bool showNoDataWidget,
       String noDataMsg = '没有数据',
@@ -17,29 +19,30 @@ class RefreshUtils {
       required RefreshController controller,
       Function()? onRefresh,
       Function()? onLoad,
+      ValueChanged<int>? onLoadPageWithIndex,
+      bool? notApp = false,
+      int page = 1,
+      int size = 20,
+      int? total,
       Color bgColor = ColorUtils.colorWhite,
       bool lightText = false}) {
+    if (notApp == true && null != total) {
+      return Column(
+        children: [
+          child.addExpanded(),
+          TablePagerIndicator(
+            totalCount: total,
+            pageEach: size,
+            callback: (int totalPages, int currentPageIndex) {
+              onLoadPageWithIndex?.call(currentPageIndex);
+            },
+          )
+        ],
+      );
+    }
+
     return SmartRefresher(
-      header: const WaterDropMaterialHeader(
-        // textStyle: TextStyle(color: lightText ? Colors.white : Colors.grey),
-        // failedIcon:
-        //     Icon(Icons.error, color: lightText ? Colors.white : Colors.grey),
-        // completeIcon:
-        //     Icon(Icons.done, color: lightText ? Colors.white : Colors.grey),
-        // idleIcon: Icon(Icons.arrow_downward,
-        //     color: lightText ? Colors.white : Colors.grey),
-        // releaseIcon:
-        //     Icon(Icons.refresh, color: lightText ? Colors.white : Colors.grey),
-        // refreshingIcon: SizedBox(
-        //     width: 25.0,
-        //     height: 25.0,
-        //     child: const CupertinoActivityIndicator()),
-        // completeText: '加载完成',
-        // failedText: '加载失败',
-        // refreshingText: '下拉刷新',
-        // releaseText: '释放以刷新',
-        // idleText: '下拉刷新',
-      ),
+      header: const WaterDropMaterialHeader(),
       footer: ClassicFooter(
         textStyle: TextStyle(color: lightText ? Colors.white : Colors.grey),
         failedIcon:
@@ -49,9 +52,7 @@ class RefreshUtils {
         idleIcon: Icon(Icons.arrow_upward,
             color: lightText ? Colors.white : Colors.grey),
         loadingIcon: const SizedBox(
-            width: 25.0,
-            height: 25.0,
-            child: CupertinoActivityIndicator()),
+            width: 25.0, height: 25.0, child: CupertinoActivityIndicator()),
         idleText: '上拉加载更多',
         canLoadingText: '释放以加载更多',
         failedText: '加载失败',
@@ -66,7 +67,8 @@ class RefreshUtils {
       child: showNoDataWidget
           ? ListView(
               children: [
-                (noDataWidget ?? BaseViewUtils.noData(
+                (noDataWidget ??
+                    BaseViewUtils.noData(
                         marginImageTop: 12,
                         msg: noDataMsg,
                         width: 220,

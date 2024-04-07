@@ -27,6 +27,15 @@ class CameraConfigurationService {
   get _point_camera_list async =>
       '${await API.share.hostCameraConfiguration}/api/gbserver/client/point_webcam_list';
 
+  get _point_camera_unbind_list async =>
+      '${await API.share.hostCameraConfiguration}/api/gbserver/client/unbind_list';
+
+  get _point_camera_bind_delete_list async =>
+      '${await API.share.hostCameraConfiguration}/api/gbserver/client/bind_delete_point_history';
+
+  get _delete_dev async =>
+      '${await API.share.hostCameraConfiguration}/api/gbserver/client/delete_dev';
+
   pointList({
     ValueChanged<List<IdNameValue>?>? onSuccess,
     ValueChanged<List<IdNameValue>?>? onCache,
@@ -45,13 +54,101 @@ class CameraConfigurationService {
   }
 
   pointCameraList({
+    int? instanceId,
+    int? pageIndex,
+    int? pageSize,
     ValueChanged<CameraHttpEntity?>? onSuccess,
     ValueChanged<CameraHttpEntity?>? onCache,
     ValueChanged<String>? onError,
   }) async {
+    Map<String, dynamic> params = {
+      'fullData': true,
+      'page': pageIndex,
+      'limit': pageSize,
+    };
+    if (null != instanceId) {
+      params.addAll({'instance_id': instanceId});
+    }
     HttpManager.share.doHttpPost<CameraHttpEntity>(
       await _point_camera_list,
-      {'fullData': true},
+      params,
+      method: 'get',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  pointCameraUnbindList({
+    int? pageIndex,
+    int? pageSize,
+    ValueChanged<CameraHttpEntity?>? onSuccess,
+    ValueChanged<CameraHttpEntity?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    Map<String, dynamic> params = {
+      'fullData': true,
+      'page': pageIndex,
+      'limit': pageSize,
+    };
+
+    HttpManager.share.doHttpPost<CameraHttpEntity>(
+      await _point_camera_unbind_list,
+      params,
+      method: 'get',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  pointCameraBindDeleteList({
+    int? pageIndex,
+    int? pageSize,
+    ValueChanged<CameraHttpEntity?>? onSuccess,
+    ValueChanged<CameraHttpEntity?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    Map<String, dynamic> params = {
+      'fullData': true,
+      'page': pageIndex,
+      'limit': pageSize,
+    };
+
+    HttpManager.share.doHttpPost<CameraHttpEntity>(
+      await _point_camera_bind_delete_list,
+      params,
+      method: 'get',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  deleteDevice({
+    int? instanceId,
+    List<String>? code,
+    ValueChanged<dynamic>? onSuccess,
+    ValueChanged<dynamic>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    Map<String, dynamic> params = {
+      'fullData': true,
+      'instance_id': instanceId,
+      'code': code,
+    };
+    if (null != instanceId) {
+      params.addAll({'instance_id': instanceId});
+    }
+    HttpManager.share.doHttpPost<dynamic>(
+      await _delete_dev,
+      params,
       method: 'get',
       autoHideDialog: true,
       autoShowDialog: true,
