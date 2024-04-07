@@ -55,6 +55,13 @@ class IdNamePickerWidget extends StatefulWidget {
               }
             },
           ),
+          FilledButton(
+            child: const Text(
+              '取消',
+              style: TextStyle(color: ColorUtils.colorWhite),
+            ),
+            onPressed: () => Navigator.pop(context),
+          ),
         ],
       ),
     );

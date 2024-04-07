@@ -9,6 +9,8 @@ import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/http/http_query.dart';
 import 'package:omt/utils/log_utils.dart';
 
+import '../../../utils/color_utils.dart';
+
 ///
 ///  omt
 ///  camera_bound_delete_view_model.dart
@@ -107,7 +109,7 @@ class CameraBoundViewModel extends BaseViewModelList<CameraInfoEntity> {
     showDialog<String>(
       context: context!,
       builder: (context) => ContentDialog(
-        title: const Text('删除'),
+        title: const Text('删除', style: TextStyle(color: ColorUtils.colorWhite)),
         content: const Text(
           '确定要删除?',
         ),
