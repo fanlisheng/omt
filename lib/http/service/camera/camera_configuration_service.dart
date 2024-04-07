@@ -36,6 +36,9 @@ class CameraConfigurationService {
   get _delete_dev async =>
       '${await API.share.hostCameraConfiguration}/api/gbserver/client/delete_dev';
 
+  get _bind_2_point async =>
+      '${await API.share.hostCameraConfiguration}/api/gbserver/client/bind_to_point';
+
   pointList({
     ValueChanged<List<IdNameValue>?>? onSuccess,
     ValueChanged<List<IdNameValue>?>? onCache,
@@ -148,6 +151,32 @@ class CameraConfigurationService {
     }
     HttpManager.share.doHttpPost<dynamic>(
       await _delete_dev,
+      params,
+      method: 'get',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+  bind2Point({
+    int? instanceId,
+    List<String>? code,
+    ValueChanged<dynamic>? onSuccess,
+    ValueChanged<dynamic>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    Map<String, dynamic> params = {
+      'fullData': true,
+      'instance_id': instanceId,
+      'code': code,
+    };
+    if (null != instanceId) {
+      params.addAll({'instance_id': instanceId});
+    }
+    HttpManager.share.doHttpPost<dynamic>(
+      await _bind_2_point,
       params,
       method: 'get',
       autoHideDialog: true,

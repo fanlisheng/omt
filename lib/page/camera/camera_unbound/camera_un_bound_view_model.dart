@@ -81,8 +81,15 @@ class CameraUnBoundViewModel extends BaseViewModelList<CameraInfoEntity> {
         title: '选择矿区',
         okBtnText: '绑定矿区',
         placeholder: '请输入或者选择矿区',
-        onDataPick: (data) {
-          LogUtils.info(msg: data.toString());
+        onDataPick: (dp) {
+          if (null != dp) {
+            HttpQuery.share.cameraConfigurationService.bind2Point(
+                instanceId: dp.id,
+                code: [data.channel_info!],
+                onSuccess: (data) {
+                  loadDataWithPageIndex(getPageIndex());
+                });
+          }
         });
   }
 }

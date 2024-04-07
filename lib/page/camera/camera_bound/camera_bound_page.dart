@@ -167,7 +167,7 @@ class CameraBoundPage extends StatelessWidget {
                                           onTap: () {
                                             if (model.selectedPoint?.id ==
                                                 null) {
-                                              LoadingUtils.showInfo(
+                                              LoadingUtils.showToast(
                                                   data: '请先选择矿区');
                                             } else {
                                               model.deleteDevice(data);
