@@ -1,3 +1,4 @@
+import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/common/code_data.dart';
 import 'package:omt/generated/json/base/json_field.dart';
 import 'package:omt/generated/json/Video_Connect_entity.g.dart';
@@ -51,5 +52,14 @@ class CameraInfoEntity {
   @override
   String toString() {
     return jsonEncode(this);
+  }
+
+  duplicateIP(List<CameraInfoEntity?> list, CameraInfoEntity data) {
+    var ipAddress = data.ip_address;
+    int count = list.where((entity) => entity?.ip_address == ipAddress).length;
+    if (BaseSysUtils.empty(ipAddress) || count < 2) {
+      return false;
+    }
+    return count > 1;
   }
 }
