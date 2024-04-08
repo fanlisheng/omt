@@ -33,9 +33,7 @@ class UserLoginPage extends StatelessWidget {
               ImageView(
                 src: source('login/ic_bg'),
                 fit: BoxFit.fitWidth,
-                color: context.isDark
-                    ? ColorUtils.colorBlack
-                    : null,
+                color: context.isDark ? ColorUtils.colorBlack : null,
                 width: double.infinity,
               ),
               ToolBar(
@@ -114,6 +112,11 @@ class UserLoginPage extends StatelessWidget {
                           model.login();
                         },
                       ),
+                    ),
+
+                    TextView(
+                      '视频配置：账号tfb，密码123456\n摄像头配置：账号zt，密码123456\n管理员账号admin，密码123456',
+                      margin: const EdgeInsets.only(top: 20),
                     ),
 
                     Spacer(),
@@ -202,7 +205,7 @@ Widget _editView(model,
         TextView(
           title ?? '',
           size: 14,
-          color: ColorUtils.colorWhite ,
+          color: ColorUtils.colorWhite,
           margin: EdgeInsets.only(bottom: 10),
         ),
         Container(
@@ -218,8 +221,8 @@ Widget _editView(model,
                   margin: EdgeInsets.only(left: 20),
                   obscureText: obscureText,
                   keyboardType: keyboardType,
-                  textColor: ColorUtils.colorBlackLite ,
-                  hintTextColor: ColorUtils.colorBlackLiteLite ,
+                  textColor: ColorUtils.colorBlackLite,
+                  hintTextColor: ColorUtils.colorBlackLiteLite,
                   inputFormatters: inputFormatters,
                   controller: controller,
                   showLine: false,
