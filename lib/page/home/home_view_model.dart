@@ -13,7 +13,9 @@ import 'package:omt/page/user/user_login/user_login_page.dart';
 import 'package:omt/page/video/video_configuration/video_configuration_page.dart';
 import 'package:omt/page/video/video_frame/video_frame_page.dart';
 import 'package:omt/page/video/video_operations_center/video_operations_center_page.dart';
+import 'package:omt/utils/auth_utils.dart';
 import 'package:omt/utils/intent_utils.dart';
+import 'package:omt/utils/shared_utils.dart';
 import 'package:window_manager/window_manager.dart';
 
 ///
@@ -48,7 +50,7 @@ class NavigationBodyItem extends StatelessWidget {
 class HomeViewModel extends BaseViewModelRefresh<dynamic> {
   int topIndex = 0;
 
-  List<NavigationPaneItem> items = [
+  List<NavigationPaneItem> videoItems = [
     PaneItemHeader(header: const Text('视频配置')),
     PaneItem(
       icon: Icon(Icons.video_settings),
@@ -68,6 +70,9 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
       body: VideoOperationsCenterPage(),
       onTap: () => debugPrint('操作中心'),
     ),
+  ];
+
+  List<NavigationPaneItem> cameraItems = [
     PaneItemHeader(header: const Text('摄像头配置')),
     PaneItem(
       icon: Icon(FluentIcons.t_v_monitor_selected),
@@ -88,10 +93,19 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
       onTap: () => debugPrint('绑定到已删除矿区'),
     ),
   ];
+  List<NavigationPaneItem> items = [];
 
   @override
   void initState() async {
     super.initState();
+
+    if (AuthUtils.share.hasAuth(authId: AuthEnum.menuVideoConfiguration)) {
+      items.addAll(videoItems);
+    }
+    if (AuthUtils.share.hasAuth(authId: AuthEnum.menuCameraConfiguration)) {
+      items.addAll(cameraItems);
+    }
+    notifyListeners();
   }
 
   @override

@@ -2,7 +2,9 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/user/user_login/user_login_data.dart';
+import 'package:omt/utils/auth_utils.dart';
 import 'package:omt/utils/intent_utils.dart';
+import 'package:omt/utils/shared_utils.dart';
 
 ///
 ///  omt
@@ -40,7 +42,7 @@ class UserLoginViewModel extends BaseViewModelRefresh<UserInfoData> {
   void initState() async {
     super.initState();
     phoneController = TextEditingController(text: 'admin');
-    pwdController = TextEditingController(text: 'admin');
+    pwdController = TextEditingController(text: '123456');
     canLogin = !BaseSysUtils.empty(phoneController.text) &&
         !BaseSysUtils.empty(pwdController.text);
     canClear = !BaseSysUtils.empty(phoneController.text);
@@ -87,7 +89,7 @@ class UserLoginViewModel extends BaseViewModelRefresh<UserInfoData> {
     notifyListeners();
   }
 
-  login() {
+  login() async {
     var phone = phoneController.text;
     var pwd = pwdController.text;
 
@@ -101,11 +103,47 @@ class UserLoginViewModel extends BaseViewModelRefresh<UserInfoData> {
       return;
     }
 
-    if (!BaseSysUtils.equals(phone, 'admin') ||
-        !BaseSysUtils.equals(pwd, 'admin')) {
+    UserInfoData userInfoData = UserInfoData();
+
+    bool canNext = true;
+
+    if (BaseSysUtils.equals(phone, 'admin')) {
+      if (!BaseSysUtils.equals(pwd, '123456')) {
+        canNext = false;
+      } else {
+        userInfoData.userPermissions = [
+          UserPermission()..id = AuthEnum.menuVideoConfiguration,
+          UserPermission()..id = AuthEnum.menuCameraConfiguration
+        ];
+      }
+    }
+    if (BaseSysUtils.equals(phone, 'zt')) {
+      if (!BaseSysUtils.equals(pwd, '123456')) {
+        canNext = false;
+      } else {
+        userInfoData.userPermissions = [
+          UserPermission()..id = AuthEnum.menuCameraConfiguration
+        ];
+      }
+    }
+    if (BaseSysUtils.equals(phone, 'tfb')) {
+      if (!BaseSysUtils.equals(pwd, '123456')) {
+        canNext = false;
+      } else {
+        userInfoData.userPermissions = [
+          UserPermission()..id = AuthEnum.menuVideoConfiguration,
+        ];
+      }
+    }
+
+    if (canNext == false) {
       LoadingUtils.showInfo(data: '账号或密码不正确');
       return;
     }
+
+    await SharedUtils.setUserInfo(userInfoData);
+
+    await AuthUtils.share.init(userLoginData: userInfoData);
 
     IntentUtils.share.goHome(context);
   }

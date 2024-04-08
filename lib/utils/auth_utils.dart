@@ -17,7 +17,7 @@ class AuthEnum {
   static const int menuVideoConfiguration = 101;
 
   ///
-  static const int menuEmergencyList = 102;
+  static const int menuCameraConfiguration = 102;
 }
 
 class AuthUtils {
@@ -36,9 +36,9 @@ class AuthUtils {
   }
 
   ///初始化
-  init() async {
+  init({UserInfoData? userLoginData}) async {
     _authList.clear();
-    userLoginData = await SharedUtils.getUserInfo();
+    userLoginData = userLoginData?? await SharedUtils.getUserInfo();
 
     for (UserPermission p in userLoginData?.userPermissions ?? []) {
       if (null != p.id) {
