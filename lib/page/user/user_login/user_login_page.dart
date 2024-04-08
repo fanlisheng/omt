@@ -28,6 +28,148 @@ class UserLoginPage extends StatelessWidget {
         model: UserLoginViewModel(),
         autoLoadData: true,
         builder: (context, model, child) {
+          var windowWidth = BaseSysUtils.getWidth(context) / 5 * 3;
+          if (windowWidth < 600) {
+            windowWidth = 600;
+          }
+
+          var column = Column(
+            children: <Widget>[
+              TextView(
+                '欢迎登录',
+                margin: EdgeInsets.only(top: 30, bottom: 30, left: 32),
+                color: ColorUtils.colorBlack,
+                alignment: Alignment.centerLeft,
+                size: 32,
+              ),
+              _editView(
+                model,
+                hintText: '请输入账号',
+                title: '账号',
+                showBtn: false,
+                focusNode: model.node,
+                showObscureText: model.canClear,
+                keyboardType: TextInputType.emailAddress,
+                controller: model.phoneController,
+                inputFormatters: <TextInputFormatter>[
+                  LengthLimitingTextInputFormatter(11),
+//                          WhitelistingTextInputFormatter.digitsOnly
+                ],
+                onChanged: model.onEditValueChange,
+              ),
+              _editView(
+                model,
+                hintText: '请输入密码',
+                title: '密码',
+                obscureText: model.pwdObscureText,
+                keyboardType:
+                    false ? FlutterKeyboard.number : TextInputType.text,
+                controller: model.pwdController,
+                onChanged: model.onEditValueChange,
+              ),
+              TextView(
+                // (isyzm ?? false) ? '验证码错误请重新填写' : '手机号或密码错误请重新输入',
+                model.tips,
+                size: 13,
+                color: ColorUtils.colorRedGradientStart,
+                margin: EdgeInsets.only(top: 20, left: 30, right: 30),
+                maxLine: 2,
+                alignment: Alignment.centerLeft,
+                textAlign: TextAlign.center,
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  color: model.canLogin
+                      ? ColorUtils.colorBlue
+                      : ColorUtils.colorBlue.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(15),
+                  boxShadow: [
+                    BoxShadow(
+                      offset: Offset(0, 15),
+                      blurRadius: 15,
+                      color: ColorUtils.colorBlue.withOpacity(0.15),
+                    ),
+                  ],
+                ),
+                margin: EdgeInsets.only(top: 48, left: 32, right: 32),
+                height: 58,
+                child: TextView(
+                  '登录',
+                  size: 17,
+                  color: ColorUtils.colorWhite.dark,
+                  fontWeight: FontWeight.bold,
+                  alignment: Alignment.center,
+                  onTap: () {
+                    model.login();
+                  },
+                ),
+              ),
+
+              TextView(
+                '视频配置：账号tfb，密码123456\n摄像头配置：账号zt，密码123456\n管理员账号admin，密码123456',
+                margin: const EdgeInsets.only(top: 20),
+              ),
+
+              Spacer(),
+              // SafeArea(
+              //   top: false,
+              //   child: Row(
+              //     mainAxisAlignment: MainAxisAlignment.center,
+              //     children: [
+              //       ImageView(
+              //         src: source(model.privacy
+              //             ? 'login/ic_agree'
+              //             : 'login/ic_disagree'),
+              //         width: 16,
+              //         height: 16,
+              //         margin: EdgeInsets.only(top: 0),
+              //         padding: EdgeInsets.all(8),
+              //         onClick: () {
+              //           model.privacy = !model.privacy;
+              //           model.notifyListeners();
+              //         },
+              //       ),
+              //       TextView(
+              //         '同意',
+              //         size: 12,
+              //         color: ColorUtils.colorBlackLite,
+              //         margin: EdgeInsets.only(top: 0),
+              //       ),
+              //       TextView(
+              //         '《用户协议》',
+              //         size: 12,
+              //         color: ColorUtils.colorBlue,
+              //         margin: EdgeInsets.only(top: 0),
+              //         onTap: () {
+              //           var s =
+              //               'https://tfblue.shomes.cn/tfblueapp/document/privacy_policy_zt';
+              //           IntentUtils.share.push(
+              //             context,
+              //             routeName: RouterPage.WebViewPage,
+              //             data: {'url': s},
+              //           );
+              //         },
+              //       ),
+              //       TextView(
+              //         '《个人信息保护政策》',
+              //         size: 12,
+              //         color: ColorUtils.colorBlue,
+              //         margin: EdgeInsets.only(top: 0),
+              //         onTap: () {
+              //           var s =
+              //               'https://tfblue.shomes.cn/tfblueapp/document/privacy_policy_zt';
+              //           IntentUtils.share.push(
+              //             context,
+              //             routeName: RouterPage.WebViewPage,
+              //             data: {'url': s},
+              //           );
+              //         },
+              //       ),
+              //     ],
+              //   ),
+              // ),
+            ],
+          );
           return Stack(
             children: [
               ImageView(
@@ -42,142 +184,12 @@ class UserLoginPage extends StatelessWidget {
                 backgroundColor: ColorUtils.transparent,
                 appbarColor: ColorUtils.transparent,
                 actions: SysUtils.appBarActions(context),
-                child: Column(
-                  children: <Widget>[
-                    TextView(
-                      '欢迎登录',
-                      margin: EdgeInsets.only(top: 30, bottom: 30, left: 32),
-                      color: ColorUtils.colorBlack,
-                      alignment: Alignment.centerLeft,
-                      size: 32,
-                    ),
-                    _editView(
-                      model,
-                      hintText: '请输入账号',
-                      title: '账号',
-                      showBtn: false,
-                      focusNode: model.node,
-                      showObscureText: model.canClear,
-                      keyboardType: TextInputType.emailAddress,
-                      controller: model.phoneController,
-                      inputFormatters: <TextInputFormatter>[
-                        LengthLimitingTextInputFormatter(11),
-//                          WhitelistingTextInputFormatter.digitsOnly
-                      ],
-                      onChanged: model.onEditValueChange,
-                    ),
-                    _editView(
-                      model,
-                      hintText: '请输入密码',
-                      title: '密码',
-                      obscureText: model.pwdObscureText,
-                      keyboardType:
-                          false ? FlutterKeyboard.number : TextInputType.text,
-                      controller: model.pwdController,
-                      onChanged: model.onEditValueChange,
-                    ),
-                    TextView(
-                      // (isyzm ?? false) ? '验证码错误请重新填写' : '手机号或密码错误请重新输入',
-                      model.tips,
-                      size: 13,
-                      color: ColorUtils.colorRedGradientStart,
-                      margin: EdgeInsets.only(top: 20, left: 30, right: 30),
-                      maxLine: 2,
-                      alignment: Alignment.centerLeft,
-                      textAlign: TextAlign.center,
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: model.canLogin
-                            ? ColorUtils.colorBlue
-                            : ColorUtils.colorBlue.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(15),
-                        boxShadow: [
-                          BoxShadow(
-                            offset: Offset(0, 15),
-                            blurRadius: 15,
-                            color: ColorUtils.colorBlue.withOpacity(0.15),
-                          ),
-                        ],
-                      ),
-                      margin: EdgeInsets.only(top: 48, left: 32, right: 32),
-                      height: 58,
-                      child: TextView(
-                        '登录',
-                        size: 17,
-                        color: ColorUtils.colorWhite,
-                        fontWeight: FontWeight.bold,
-                        alignment: Alignment.center,
-                        onTap: () {
-                          model.login();
-                        },
-                      ),
-                    ),
-
-                    TextView(
-                      '视频配置：账号tfb，密码123456\n摄像头配置：账号zt，密码123456\n管理员账号admin，密码123456',
-                      margin: const EdgeInsets.only(top: 20),
-                    ),
-
-                    Spacer(),
-                    // SafeArea(
-                    //   top: false,
-                    //   child: Row(
-                    //     mainAxisAlignment: MainAxisAlignment.center,
-                    //     children: [
-                    //       ImageView(
-                    //         src: source(model.privacy
-                    //             ? 'login/ic_agree'
-                    //             : 'login/ic_disagree'),
-                    //         width: 16,
-                    //         height: 16,
-                    //         margin: EdgeInsets.only(top: 0),
-                    //         padding: EdgeInsets.all(8),
-                    //         onClick: () {
-                    //           model.privacy = !model.privacy;
-                    //           model.notifyListeners();
-                    //         },
-                    //       ),
-                    //       TextView(
-                    //         '同意',
-                    //         size: 12,
-                    //         color: ColorUtils.colorBlackLite,
-                    //         margin: EdgeInsets.only(top: 0),
-                    //       ),
-                    //       TextView(
-                    //         '《用户协议》',
-                    //         size: 12,
-                    //         color: ColorUtils.colorBlue,
-                    //         margin: EdgeInsets.only(top: 0),
-                    //         onTap: () {
-                    //           var s =
-                    //               'https://tfblue.shomes.cn/tfblueapp/document/privacy_policy_zt';
-                    //           IntentUtils.share.push(
-                    //             context,
-                    //             routeName: RouterPage.WebViewPage,
-                    //             data: {'url': s},
-                    //           );
-                    //         },
-                    //       ),
-                    //       TextView(
-                    //         '《个人信息保护政策》',
-                    //         size: 12,
-                    //         color: ColorUtils.colorBlue,
-                    //         margin: EdgeInsets.only(top: 0),
-                    //         onTap: () {
-                    //           var s =
-                    //               'https://tfblue.shomes.cn/tfblueapp/document/privacy_policy_zt';
-                    //           IntentUtils.share.push(
-                    //             context,
-                    //             routeName: RouterPage.WebViewPage,
-                    //             data: {'url': s},
-                    //           );
-                    //         },
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
-                  ],
+                child: Center(
+                  child: Container(
+                    alignment: Alignment.center,
+                    width: windowWidth,
+                    child: column,
+                  ),
                 ),
               )
             ],
