@@ -53,7 +53,7 @@ class VideoConfigurationViewModel
 
   void connect() {
     if (BaseSysUtils.empty(controllerIP?.text)) {
-      LoadingUtils.showInfo(data: '请输入工控机IP');
+      LoadingUtils.showToast(data: '请输入工控机IP');
     } else if (SysUtils.isIPAddress(controllerIP!.text)) {
       HttpQuery.share.videoConfigurationService.connect(
           host: controllerIP!.text,
@@ -61,16 +61,16 @@ class VideoConfigurationViewModel
             videoConnectEntity = data;
             SharedUtils.setControlIP(controllerIP!.text);
             notifyListeners();
-            LoadingUtils.showSuccess(data: '连接成功');
+            LoadingUtils.showToast(data: '连接成功');
           },
           onError: (e) {
             videoConnectEntity = null;
             SharedUtils.setControlIP('');
             notifyListeners();
-            LoadingUtils.showInfo(data: '连接失败');
+            LoadingUtils.showToast(data: '连接失败');
           });
     } else {
-      LoadingUtils.showInfo(data: '请输入正确的工控机IP');
+      LoadingUtils.showToast(data: '请输入正确的工控机IP');
     }
   }
 }

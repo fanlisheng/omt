@@ -71,72 +71,72 @@ class VideoOperationsCenterViewModel
 
   void stopRecognition() {
     if (BaseSysUtils.empty(findTheRtsp()?.value) && false) {
-      LoadingUtils.showInfo(data: '请选择设备');
+      LoadingUtils.showToast(data: '请选择设备');
     }
     HttpQuery.share.videoConfigurationService.stopRecognition(
         uuid: findTheRtsp()?.value,
         onSuccess: (data) {
-          LoadingUtils.showSuccess(data: '停止识别成功');
+          LoadingUtils.showToast(data: '停止识别成功');
         });
   }
 
   void restartRecognition() {
     if (BaseSysUtils.empty(findTheRtsp()?.value) && false) {
-      LoadingUtils.showInfo(data: '请选择设备');
+      LoadingUtils.showToast(data: '请选择设备');
     }
     HttpQuery.share.videoConfigurationService.restartRecognition(
         uuid: findTheRtsp()?.value,
         onSuccess: (data) {
-          LoadingUtils.showSuccess(data: '重启识别成功');
+          LoadingUtils.showToast(data: '重启识别成功');
         });
   }
 
   void restartCentralControl() {
     if (BaseSysUtils.empty(findTheRtsp()?.value) && false) {
-      LoadingUtils.showInfo(data: '请选择设备');
+      LoadingUtils.showToast(data: '请选择设备');
     }
     HttpQuery.share.videoConfigurationService.restartCentralControl(
         uuid: findTheRtsp()?.value,
         onSuccess: (data) {
-          LoadingUtils.showSuccess(data: '重启中控成功');
+          LoadingUtils.showToast(data: '重启中控成功');
         },
         onError: (e) {
           if (e.endsWith('contrl/golang/restart\n')) {
             Timer(const Duration(milliseconds: 100), () {
-              LoadingUtils.showSuccess(data: '重启中控成功');
+              LoadingUtils.showToast(data: '重启中控成功');
             });
           }
-          // LoadingUtils.showInfo(data: e);
+          // LoadingUtils.showToast(data: e);
         });
   }
 
   void restartDevice() {
     if (BaseSysUtils.empty(findTheRtsp()?.value) && false) {
-      LoadingUtils.showInfo(data: '请选择设备');
+      LoadingUtils.showToast(data: '请选择设备');
     }
     HttpQuery.share.videoConfigurationService.restartDevice(
         uuid: findTheRtsp()?.value,
         onSuccess: (data) {
-          LoadingUtils.showSuccess(data: '重启设备成功');
+          LoadingUtils.showToast(data: '重启设备成功');
         },
         onError: (e) {
           if (e.endsWith('contrl/system/restart\n')) {
             Timer(const Duration(milliseconds: 100), () {
-              LoadingUtils.showSuccess(data: '重启设备成功');
+              LoadingUtils.showToast(data: '重启设备成功');
             });
           }
-          // LoadingUtils.showInfo(data: e);
+          // LoadingUtils.showToast(data: e);
         });
   }
 
   void deleteDevice() {
     if (BaseSysUtils.empty(findTheRtsp()?.value)) {
-      LoadingUtils.showInfo(data: '请选择设备');
+      LoadingUtils.showToast(data: '请选择设备');
     }
     HttpQuery.share.videoConfigurationService.deleteDevice(
         uuid: findTheRtsp()!.value!,
         onSuccess: (data) {
-          LoadingUtils.showSuccess(data: '删除设备成功');
+          LoadingUtils.showToast(data: '删除设备成功');
           rtspIndex = 0;
           Timer(const Duration(seconds: 1), () {
             loadData();

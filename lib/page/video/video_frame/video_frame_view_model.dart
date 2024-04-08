@@ -90,11 +90,11 @@ class VideoFrameViewModel extends BaseViewModelRefresh<VideoFrameData> {
     var cr = controllerRtsp?.text;
     var cdn = controllerDeviceName?.text;
     if (BaseSysUtils.empty(cdn)) {
-      LoadingUtils.showInfo(data: '请输入设备名称');
+      LoadingUtils.showToast(data: '请输入设备名称');
       return;
     } else if (BaseSysUtils.empty(cr) ||
         (cr?.contains('rtsp') != true && cr?.contains('http') != true)) {
-      LoadingUtils.showInfo(data: '请输入rtsp地址');
+      LoadingUtils.showToast(data: '请输入rtsp地址');
       return;
     }
 

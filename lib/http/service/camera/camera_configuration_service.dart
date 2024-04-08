@@ -152,7 +152,7 @@ class CameraConfigurationService {
     HttpManager.share.doHttpPost<dynamic>(
       await _delete_dev,
       params,
-      method: 'get',
+      method: 'DELETE',
       autoHideDialog: true,
       autoShowDialog: true,
       onSuccess: onSuccess,
@@ -178,7 +178,7 @@ class CameraConfigurationService {
     HttpManager.share.doHttpPost<dynamic>(
       await _bind_2_point,
       params,
-      method: 'get',
+      method: 'PUT',
       autoHideDialog: true,
       autoShowDialog: true,
       onSuccess: onSuccess,

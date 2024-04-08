@@ -88,6 +88,7 @@ class CameraUnBoundViewModel extends BaseViewModelList<CameraInfoEntity> {
                 code: [data.channel_info!],
                 onSuccess: (data) {
                   loadDataWithPageIndex(getPageIndex());
+                  LoadingUtils.showToast(data: '绑定成功');
                 });
           }
         });

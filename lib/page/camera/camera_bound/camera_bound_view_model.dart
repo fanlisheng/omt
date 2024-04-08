@@ -123,6 +123,7 @@ class CameraBoundViewModel extends BaseViewModelList<CameraInfoEntity> {
                   instanceId: selectedPoint?.id,
                   onSuccess: (data) {
                     loadDataWithPageIndex(getPageIndex());
+                    LoadingUtils.showToast(data: '删除成功');
                   });
             },
           ),
