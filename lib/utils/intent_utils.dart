@@ -122,9 +122,18 @@ class IntentUtils extends BaseIntentUtilsNoBoost {
     }
   }
 
-  void goHome(BuildContext? context) {
+  void goHome(BuildContext? context, {bool checkUserPermission = false}) async {
     if (SysUtils.useNavi()) {
-      gotoNav(context);
+      if (checkUserPermission) {
+        var theUserPermission = await SharedUtils.getTheUserPermission();
+        if (theUserPermission?.id == null) {
+          gotoNav(context);
+        }else{
+          goHomeBase(context);
+        }
+      } else {
+        gotoNav(context);
+      }
     } else {
       goHomeBase(context);
     }

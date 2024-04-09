@@ -20,8 +20,6 @@ export 'package:fluttertoast/fluttertoast.dart';
 ///  Copyright © 2019 kayoxu. All rights reserved.
 
 class SharedUtils {
-  static const String _shared_login_info = '_shared_login_info';
-  static const String _shared_identity = '_shared_identity';
   static const String _shared_host = '_shared_host';
   static const String _shared_host_web = '_shared_host_web';
   static const String _shared_host_file = '_shared_host_file';
@@ -59,6 +57,7 @@ class SharedUtils {
       return null;
     }
   }
+
   static setTheUserPermission(UserPermission data) {
     return set(_shared_the_auth, JsonUtils.toJson(data));
   }
@@ -121,8 +120,8 @@ class SharedUtils {
   }
 
   static Future clear() async {
-    // SysUtils.userInfo = null;
-    clearForKey(_shared_login_info);
+    clearForKey(_shared_user_info_data);
+    clearForKey(_shared_the_auth);
 
     return Future.value(1);
   }

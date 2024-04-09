@@ -24,9 +24,9 @@ class LauncherViewModel extends BaseViewModelRefresh<dynamic> {
 
     SharedUtils.getUserInfo().then((value) {
       if (BaseSysUtils.empty(value?.phone)) {
-        IntentUtils.share.gotoLogin(context,noAlert: true);
+        IntentUtils.share.gotoLogin(context, noAlert: true);
       } else {
-        IntentUtils.share.goHome(context);
+        IntentUtils.share.goHome(context, checkUserPermission: true);
       }
     });
   }
