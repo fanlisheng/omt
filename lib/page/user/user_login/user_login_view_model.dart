@@ -112,8 +112,12 @@ class UserLoginViewModel extends BaseViewModelRefresh<UserInfoData> {
         canNext = false;
       } else {
         userInfoData.userPermissions = [
-          UserPermission()..id = AuthEnum.menuVideoConfiguration,
-          UserPermission()..id = AuthEnum.menuCameraConfiguration
+          UserPermission()
+            ..id = AuthEnum.menuVideoConfiguration
+            ..name = '视频配置',
+          UserPermission()
+            ..id = AuthEnum.menuCameraConfiguration
+            ..name = '摄像头配置'
         ];
       }
     }
@@ -122,7 +126,9 @@ class UserLoginViewModel extends BaseViewModelRefresh<UserInfoData> {
         canNext = false;
       } else {
         userInfoData.userPermissions = [
-          UserPermission()..id = AuthEnum.menuCameraConfiguration
+          UserPermission()
+            ..id = AuthEnum.menuCameraConfiguration
+            ..name = '摄像头配置'
         ];
       }
     }
@@ -131,7 +137,9 @@ class UserLoginViewModel extends BaseViewModelRefresh<UserInfoData> {
         canNext = false;
       } else {
         userInfoData.userPermissions = [
-          UserPermission()..id = AuthEnum.menuVideoConfiguration,
+          UserPermission()
+            ..id = AuthEnum.menuVideoConfiguration
+            ..name = '视频配置',
         ];
       }
     }

@@ -29,6 +29,7 @@ class SharedUtils {
   static const String _shared_udid = '_shared_udid';
   static const String _shared_control_ip = '_shared_control_ip';
   static const String _shared_user_info_data = '_shared_user_info_data';
+  static const String _shared_the_auth = '_shared_the_auth';
 
   static setHost(String data) {
     return set(_shared_host, data);
@@ -54,6 +55,18 @@ class SharedUtils {
     try {
       var s = await getString(_shared_user_info_data) ?? '{}';
       return JsonUtils.getBeanSync<UserInfoData>(s);
+    } catch (e) {
+      return null;
+    }
+  }
+  static setTheUserPermission(UserPermission data) {
+    return set(_shared_the_auth, JsonUtils.toJson(data));
+  }
+
+  static Future<UserPermission?> getTheUserPermission() async {
+    try {
+      var s = await getString(_shared_the_auth) ?? '{}';
+      return JsonUtils.getBeanSync<UserPermission>(s);
     } catch (e) {
       return null;
     }

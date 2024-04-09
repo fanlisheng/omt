@@ -9,6 +9,7 @@ import 'package:omt/router_utils.dart';
 import 'package:omt/utils/image_utils.dart';
 import 'package:omt/utils/shared_utils.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fu;
+import 'package:omt/utils/sys_utils.dart';
 import 'color_utils.dart';
 
 ///  smart_community
@@ -122,7 +123,50 @@ class IntentUtils extends BaseIntentUtilsNoBoost {
   }
 
   void goHome(BuildContext? context) {
+    if (SysUtils.useNavi()) {
+      gotoNav(context);
+    } else {
+      goHomeBase(context);
+    }
+  }
+
+  void goHomeBase(BuildContext? context) {
     push(context, routeName: RouterPage.HomePage, removeAll: true);
+  }
+
+  void gotoNav(BuildContext? context, {bool showDialog = false}) {
+    if (showDialog) {
+      fu.showDialog<String>(
+        context: context!,
+        builder: (context) => fu.ContentDialog(
+          title: const Text('返回导航页面'),
+          content: const Text(
+            '你确定要返回导航页面？',
+          ),
+          actions: [
+            fu.FilledButton(
+              child: TextView(
+                '确定',
+                color: ColorUtils.colorWhite,
+                textDarkOnlyOpacity: true,
+              ),
+              onPressed: () async {
+                push(context, routeName: RouterPage.NaviPage, removeAll: true);
+              },
+            ),
+            fu.Button(
+              child: TextView(
+                '取消',
+                color: ColorUtils.colorBlack,
+              ),
+              onPressed: () => Navigator.pop(context, '取消'),
+            ),
+          ],
+        ),
+      );
+    } else {
+      push(context, routeName: RouterPage.NaviPage, removeAll: true);
+    }
   }
 
   ///播放视频

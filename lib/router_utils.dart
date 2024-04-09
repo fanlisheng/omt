@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:kayo_package/views/common/404.dart';
 import 'package:omt/page/home/home_page.dart';
 import 'package:omt/page/user/launcher/launcher_page.dart';
+import 'package:omt/page/user/nav/navi_page.dart';
 import 'package:omt/page/user/user_login/user_login_page.dart';
 import 'package:omt/page/video/video_frame/video_frame_page.dart';
 import 'package:omt/utils/intent_utils.dart';
@@ -48,6 +49,9 @@ class RouterPage {
 
   ///已绑定矿区摄像头管理
   static const String CameraBoundPage = 'CameraBoundPage';
+
+  ///导航页
+  static const String NaviPage = 'NaviPage';
 
   ///ReplaceRouterPageDefine
 }
@@ -101,6 +105,13 @@ Route<dynamic> generateRoute(RouteSettings settings, {uniqueId}) {
           builder: (context) {
             return CameraBoundPage();
           });
+    case RouterPage.NaviPage:
+      return CupertinoPageRoute(
+          settings: settings,
+          builder: (context) {
+            return NaviPage();
+          });
+
     ///ReplaceRouterGenerateRoute
 
     default:

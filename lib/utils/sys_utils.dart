@@ -427,6 +427,11 @@ class SysUtils {
     ];
   }
 
+
+  static bool useNavi(){
+    return true;
+  }
+
   static String randomString(int length) {
     const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
     final random = Random();

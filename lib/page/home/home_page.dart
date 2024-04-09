@@ -52,20 +52,32 @@ class HomePage extends StatelessWidget {
               indicator: const fu.StickyNavigationIndicator(),
               header: const Text(''),
               items: model.items,
-              footerItems: [
-                // fu.PaneItem(
-                //   icon: const Icon(fu.FluentIcons.settings),
-                //   title: const Text('设置'),
-                //   body: const NavigationBodyItem(),
-                // ),
-                fu.PaneItemAction(
-                  icon: const Icon(fu.FluentIcons.sign_out),
-                  title: const Text('登出'),
-                  onTap: () {
-                    IntentUtils.share.gotoLogin(context);
-                  },
-                ),
-              ],
+              footerItems: SysUtils.useNavi()
+                  ? [
+                      fu.PaneItemAction(
+                        icon: const Icon(Icons.home),
+                        title: const Text('返回导航页面'),
+                        onTap: () {
+                          IntentUtils.share.gotoNav(context, showDialog: true);
+                        },
+                      ),
+                      fu.PaneItemAction(
+                        icon: const Icon(fu.FluentIcons.sign_out),
+                        title: const Text('登出'),
+                        onTap: () {
+                          IntentUtils.share.gotoLogin(context);
+                        },
+                      ),
+                    ]
+                  : [
+                      fu.PaneItemAction(
+                        icon: const Icon(fu.FluentIcons.sign_out),
+                        title: const Text('登出'),
+                        onTap: () {
+                          IntentUtils.share.gotoLogin(context);
+                        },
+                      )
+                    ],
             ),
             transitionBuilder: null,
           );

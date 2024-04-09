@@ -16,6 +16,7 @@ import 'package:omt/page/video/video_operations_center/video_operations_center_p
 import 'package:omt/utils/auth_utils.dart';
 import 'package:omt/utils/intent_utils.dart';
 import 'package:omt/utils/shared_utils.dart';
+import 'package:omt/utils/sys_utils.dart';
 import 'package:window_manager/window_manager.dart';
 
 ///
@@ -99,13 +100,24 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
   void initState() async {
     super.initState();
 
-    if (AuthUtils.share.hasAuth(authId: AuthEnum.menuVideoConfiguration)) {
-      items.addAll(videoItems);
+    if (SysUtils.useNavi()) {
+      SharedUtils.getTheUserPermission().then((value) {
+        if (value?.id == AuthEnum.menuVideoConfiguration) {
+          items.addAll(videoItems);
+        } else if (value?.id == AuthEnum.menuCameraConfiguration) {
+          items.addAll(cameraItems);
+        }
+        notifyListeners();
+      });
+    } else {
+      if (AuthUtils.share.hasAuth(authId: AuthEnum.menuVideoConfiguration)) {
+        items.addAll(videoItems);
+      }
+      if (AuthUtils.share.hasAuth(authId: AuthEnum.menuCameraConfiguration)) {
+        items.addAll(cameraItems);
+      }
+      notifyListeners();
     }
-    if (AuthUtils.share.hasAuth(authId: AuthEnum.menuCameraConfiguration)) {
-      items.addAll(cameraItems);
-    }
-    notifyListeners();
   }
 
   @override
