@@ -348,7 +348,7 @@ Widget TfbTitleSub(
             alignment: Alignment.centerLeft,
             controller: controller
               ..text = controller.text.defaultStr(data: subTitle ?? ''),
-            hintText: hint ?? '清填写$title',
+            hintText: hint ?? '请填写$title',
           )
         : TextView(
             subTitle,

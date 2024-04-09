@@ -76,14 +76,14 @@ class VideoFramePage extends StatelessWidget {
                 maxLines: 1,
                 alignment: Alignment.centerLeft,
                 controller: model.controllerRtsp,
-                hintText: '清输入rtsp地址',
+                hintText: '请输入rtsp地址',
               ).addExpanded(flex: 10),
               EditView(
                 showLine: false,
                 maxLines: 1,
                 alignment: Alignment.centerLeft,
                 controller: model.controllerDeviceName,
-                hintText: '清输入设备名称',
+                hintText: '请输入设备名称',
               ).addExpanded(flex: 8),
               Container(
                 width: 100,

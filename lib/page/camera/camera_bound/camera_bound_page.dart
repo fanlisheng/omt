@@ -31,7 +31,7 @@ class CameraBoundPage extends StatelessWidget {
         builder: (context, model, child) {
           var noteMessage =
               // 'IP标记为红色，说明该条IP在NVR上有重复配置；\nID标记为红色，说明NVR当前没有配置此设备到国标配置中；\nIP、ID全是红色，可能是NVR离线了。';
-              '红色ID：当前设备离线\n红色IP：有重复配置';
+              '红色ID：设备离线\n红色IP：有重复配置';
 
           return fu.ScaffoldPage(
               header: const fu.PageHeader(

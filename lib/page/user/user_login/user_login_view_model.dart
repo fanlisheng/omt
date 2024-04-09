@@ -103,8 +103,7 @@ class UserLoginViewModel extends BaseViewModelRefresh<UserInfoData> {
       return;
     }
 
-    UserInfoData userInfoData = UserInfoData();
-
+    UserInfoData userInfoData = UserInfoData()..phone = phone;
     bool canNext = true;
 
     if (BaseSysUtils.equals(phone, 'admin')) {
