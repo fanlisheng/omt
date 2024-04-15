@@ -69,7 +69,7 @@ void main() async {
     windowManager.waitUntilReadyToShow().then((_) async {
       await windowManager.setTitleBarStyle(
         isWindows?TitleBarStyle.normal:TitleBarStyle.hidden,
-        windowButtonVisibility: false,
+        windowButtonVisibility: true,
       );
       if(isWindows){
         await windowManager.setTitle('');
