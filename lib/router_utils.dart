@@ -12,6 +12,7 @@ import 'package:omt/page/video/video_configuration/video_configuration_page.dart
 
 import 'package:omt/page/video/video_operations_center/video_operations_center_page.dart';
 import 'package:omt/page/camera/camera_bound/camera_bound_page.dart';
+import 'package:omt/page/label/label_me/label_me_page.dart';
 
 ///ReplaceRouterPageImport
 
@@ -52,6 +53,9 @@ class RouterPage {
 
   ///导航页
   static const String NaviPage = 'NaviPage';
+
+  ///数据标注
+  static const String LabelMePage = 'LabelMePage';
 
   ///ReplaceRouterPageDefine
 }
@@ -112,6 +116,12 @@ Route<dynamic> generateRoute(RouteSettings settings, {uniqueId}) {
             return NaviPage();
           });
 
+    case RouterPage.LabelMePage:
+      return CupertinoPageRoute(
+          settings: settings,
+          builder: (context) {
+            return LabelMePage();
+          });
     ///ReplaceRouterGenerateRoute
 
     default:

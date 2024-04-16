@@ -106,41 +106,57 @@ class UserLoginViewModel extends BaseViewModelRefresh<UserInfoData> {
     UserInfoData userInfoData = UserInfoData()..phone = phone;
     bool canNext = true;
 
-    if (BaseSysUtils.equals(phone, 'admin')) {
-      if (!BaseSysUtils.equals(pwd, '123456')) {
-        canNext = false;
-      } else {
-        userInfoData.userPermissions = [
-          UserPermission()
-            ..id = AuthEnum.menuVideoConfiguration
-            ..name = '视频配置',
-          UserPermission()
-            ..id = AuthEnum.menuCameraConfiguration
-            ..name = '摄像头配置'
-        ];
-      }
-    }
-    if (BaseSysUtils.equals(phone, 'zt')) {
-      if (!BaseSysUtils.equals(pwd, '123456')) {
-        canNext = false;
-      } else {
-        userInfoData.userPermissions = [
-          UserPermission()
-            ..id = AuthEnum.menuCameraConfiguration
-            ..name = '摄像头配置'
-        ];
-      }
-    }
-    if (BaseSysUtils.equals(phone, 'tfb')) {
-      if (!BaseSysUtils.equals(pwd, '123456')) {
-        canNext = false;
-      } else {
-        userInfoData.userPermissions = [
-          UserPermission()
-            ..id = AuthEnum.menuVideoConfiguration
-            ..name = '视频配置',
-        ];
-      }
+    switch (phone) {
+      case 'admin':
+        if (!BaseSysUtils.equals(pwd, '123456')) {
+          canNext = false;
+        } else {
+          userInfoData.userPermissions = [
+            UserPermission()
+              ..id = AuthEnum.menuVideoConfiguration
+              ..name = '视频配置',
+            UserPermission()
+              ..id = AuthEnum.menuCameraConfiguration
+              ..name = '摄像头配置'
+          ];
+        }
+        break;
+
+      case 'zt':
+        if (!BaseSysUtils.equals(pwd, '123456')) {
+          canNext = false;
+        } else {
+          userInfoData.userPermissions = [
+            UserPermission()
+              ..id = AuthEnum.menuCameraConfiguration
+              ..name = '摄像头配置'
+          ];
+        }
+        break;
+      case 'tfb':
+        if (!BaseSysUtils.equals(pwd, '123456')) {
+          canNext = false;
+        } else {
+          userInfoData.userPermissions = [
+            UserPermission()
+              ..id = AuthEnum.menuVideoConfiguration
+              ..name = '视频配置',
+          ];
+        }
+        break;
+      case 'labelme':
+        if (!BaseSysUtils.equals(pwd, '123456')) {
+          canNext = false;
+        } else {
+          userInfoData.userPermissions = [
+            UserPermission()
+              ..id = AuthEnum.menuLabelMe
+              ..name = '数据标注',
+          ];
+        }
+        break;
+      default:
+        break;
     }
 
     if (canNext == false) {

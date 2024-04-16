@@ -9,6 +9,7 @@ import 'package:omt/page/camera/camera_bound/camera_bound_page.dart';
 import 'package:omt/page/camera/camera_bound_delete/camera_bound_delete_page.dart';
 import 'package:omt/page/camera/camera_unbound/camera_un_bound_page.dart';
 import 'package:omt/page/home/home_page.dart';
+import 'package:omt/page/label/label_me/label_me_page.dart';
 import 'package:omt/page/user/user_login/user_login_page.dart';
 import 'package:omt/page/video/video_configuration/video_configuration_page.dart';
 import 'package:omt/page/video/video_frame/video_frame_page.dart';
@@ -94,6 +95,15 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
       onTap: () => debugPrint('绑定到已删除矿区'),
     ),
   ];
+  List<NavigationPaneItem> labelMeItems = [
+    PaneItemHeader(header: const Text('标注')),
+    PaneItem(
+      icon: Icon(FluentIcons.label),
+      title: Text('标注'),
+      body: LabelMePage(),
+      onTap: () => debugPrint('标注'),
+    ),
+  ];
   List<NavigationPaneItem> items = [];
 
   @override
@@ -106,6 +116,8 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
           items.addAll(videoItems);
         } else if (value?.id == AuthEnum.menuCameraConfiguration) {
           items.addAll(cameraItems);
+        } else if (value?.id == AuthEnum.menuLabelMe) {
+          items.addAll(labelMeItems);
         }
         notifyListeners();
       });

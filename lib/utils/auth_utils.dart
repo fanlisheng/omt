@@ -16,8 +16,11 @@ class AuthEnum {
   ///视频配置
   static const int menuVideoConfiguration = 101;
 
-  ///
+  ///摄像头配置
   static const int menuCameraConfiguration = 102;
+
+  ///数据标注
+  static const int menuLabelMe = 9999;
 }
 
 class AuthUtils {
@@ -38,7 +41,7 @@ class AuthUtils {
   ///初始化
   init({UserInfoData? userLoginData}) async {
     _authList.clear();
-    userLoginData = userLoginData?? await SharedUtils.getUserInfo();
+    userLoginData = userLoginData ?? await SharedUtils.getUserInfo();
 
     for (UserPermission p in userLoginData?.userPermissions ?? []) {
       if (null != p.id) {
