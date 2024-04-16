@@ -51,7 +51,7 @@ class NavigationBodyItem extends StatelessWidget {
 
 class HomeViewModel extends BaseViewModelRefresh<dynamic> {
   int topIndex = 0;
-
+  PaneDisplayMode displayMode = PaneDisplayMode.auto;
   List<NavigationPaneItem> videoItems = [
     PaneItemHeader(header: const Text('视频配置')),
     PaneItem(
@@ -140,5 +140,10 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
   @override
   loadData({onSuccess, onCache, onError}) {
     ///网络请求
+  }
+
+  void setDisplayMode(PaneDisplayMode mode) {
+    displayMode = mode;
+    notifyListeners();
   }
 }

@@ -48,9 +48,20 @@ class HomePage extends StatelessWidget {
                 model.topIndex = index;
                 model.notifyListeners();
               },
-              displayMode: fu.PaneDisplayMode.auto,
+              displayMode: model.displayMode,
               indicator: const fu.StickyNavigationIndicator(),
-              header: const Text(''),
+              header: model.displayMode == fu.PaneDisplayMode.open ||
+                      model.displayMode == fu.PaneDisplayMode.compact
+                  ? TextView('')
+                  : fu.IconButton(
+                      icon: const fu.Icon(
+                        Icons.menu_outlined,
+                        size: 18,
+                      ),
+                      onPressed: () {
+                        model.setDisplayMode(fu.PaneDisplayMode.compact);
+                      },
+                    ),
               items: model.items,
               footerItems: SysUtils.useNavi()
                   ? [
@@ -58,7 +69,7 @@ class HomePage extends StatelessWidget {
                         icon: const Icon(Icons.home),
                         title: const Text('返回导航页面'),
                         onTap: () {
-                          IntentUtils.share.gotoNav(context, showDialog: true);
+                          IntentUtils.share.gotoNav(context, showDialog: false);
                         },
                       ),
                       fu.PaneItemAction(
