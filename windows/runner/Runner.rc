@@ -89,13 +89,14 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "omt" "\0"
+            VALUE "CompanyName", "cn.tfblue" "\0"
+            VALUE "FileDescription", "运维工具" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "omt" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2024 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "omt.exe" "\0"
-            VALUE "ProductName", "omt" "\0"
+            VALUE "InternalName", "运维工具" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2024 成都福利盟环保大数据有限公司. All rights reserved." "\0"
+//            VALUE "OriginalFilename", "F" "\0"
+            VALUE "OriginalFilename", "运维工具.exe" "\0"
+            VALUE "ProductName", "运维工具" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
