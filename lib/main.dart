@@ -61,7 +61,7 @@ void main() async {
   if (isDesktop) {
     await flutter_acrylic.Window.initialize();
     if (defaultTargetPlatform == TargetPlatform.windows) {
-      await flutter_acrylic.Window.showWindowControls();
+      await flutter_acrylic.Window.hideWindowControls();
     }
     var isWindows = defaultTargetPlatform == TargetPlatform.windows;
 
