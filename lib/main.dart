@@ -67,12 +67,12 @@ void main() async {
 
     await WindowManager.instance.ensureInitialized();
     windowManager.waitUntilReadyToShow().then((_) async {
-      // await windowManager.setTitleBarStyle(
-      //   isWindows?TitleBarStyle.normal:TitleBarStyle.hidden,
-      //   windowButtonVisibility: false,
-      // );
+      await windowManager.setTitleBarStyle(
+        TitleBarStyle.hidden,
+        windowButtonVisibility: false,
+      );
       if(isWindows){
-        await windowManager.setTitle('');
+        // await windowManager.setTitle('');
       }
 
       await windowManager.setMinimumSize(const Size(800, 600));
