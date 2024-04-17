@@ -23,8 +23,11 @@ class LabelMeViewModel extends BaseViewModelRefresh<dynamic> {
   List<Rect> rectangles = [];
 
   FileSystemEntity? theFileSystemEntity;
-  double theImgWidth = 1280;
-  double theImgHeight = 720;
+  static const double initImgWidth = 1280;
+  static const double initImgHeight = 720;
+  final bool imgFitHeight = true;
+  double theImgWidth = initImgWidth;
+  double theImgHeight = initImgHeight;
 
   @override
   void initState() async {
@@ -84,8 +87,13 @@ class LabelMeViewModel extends BaseViewModelRefresh<dynamic> {
       var height = image.height + 0.0;
       var width = image.width + 0.0;
 
-      theImgWidth = width * 720 / height;
-      theImgHeight = 720;
+      if (imgFitHeight) {
+        theImgWidth = width * initImgHeight / height;
+        theImgHeight = initImgHeight;
+      } else {
+        theImgWidth = initImgWidth;
+        theImgHeight = height * initImgWidth / width;
+      }
     }
 
     var filePath = theFileSystemEntity?.path.replaceAll('.jpg', '.txt');
@@ -100,10 +108,10 @@ class LabelMeViewModel extends BaseViewModelRefresh<dynamic> {
           double width = double.parse(parts[3]);
           double height = double.parse(parts[4]);
           Rect rect = Rect.fromLTRB(
-              (xCenter - width / 2) * 1280,
-              (yCenter - height / 2) * 720,
-              (xCenter + width / 2) * 1280,
-              (yCenter + height / 2) * 720);
+              (xCenter - width / 2) * theImgWidth,
+              (yCenter - height / 2) * theImgHeight,
+              (xCenter + width / 2) * theImgWidth,
+              (yCenter + height / 2) * theImgHeight);
           rectangles.add(rect);
         }
       }

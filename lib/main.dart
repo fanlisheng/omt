@@ -61,16 +61,16 @@ void main() async {
   if (isDesktop) {
     await flutter_acrylic.Window.initialize();
     if (defaultTargetPlatform == TargetPlatform.windows) {
-      await flutter_acrylic.Window.hideWindowControls();
+      await flutter_acrylic.Window.showWindowControls();
     }
     var isWindows = defaultTargetPlatform == TargetPlatform.windows;
 
     await WindowManager.instance.ensureInitialized();
     windowManager.waitUntilReadyToShow().then((_) async {
-      await windowManager.setTitleBarStyle(
-        isWindows?TitleBarStyle.normal:TitleBarStyle.hidden,
-        windowButtonVisibility: false,
-      );
+      // await windowManager.setTitleBarStyle(
+      //   isWindows?TitleBarStyle.normal:TitleBarStyle.hidden,
+      //   windowButtonVisibility: false,
+      // );
       if(isWindows){
         await windowManager.setTitle('');
       }
