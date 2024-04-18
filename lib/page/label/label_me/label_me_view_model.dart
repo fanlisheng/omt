@@ -4,6 +4,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:image/image.dart' as img;
+import 'package:omt/widget/canvas/paint_yolo.dart';
+import 'package:file_selector/file_selector.dart' as fs;
 
 ///
 ///  omt
@@ -20,7 +22,9 @@ class LabelMeViewModel extends BaseViewModelRefresh<dynamic> {
   List<FileSystemEntity> files = [];
 
   int fileIndex = 0;
-  List<Rect> rectangles = [];
+  List<PaintYolo> rectangles = [];
+
+  bool autoSave = false;
 
   FileSystemEntity? theFileSystemEntity;
   static const double initImgWidth = 1280;
@@ -45,9 +49,8 @@ class LabelMeViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   void setSelectedDir() async {
-    FilePicker.platform
-        .getDirectoryPath(lockParentWindow: true, initialDirectory: selectedDir)
-        .then((value) {
+
+    fs.getDirectoryPath(initialDirectory: selectedDir).then((value) {
       if (null != value) {
         if (selectedDir != value) {
           files.clear();
@@ -112,7 +115,7 @@ class LabelMeViewModel extends BaseViewModelRefresh<dynamic> {
               (yCenter - height / 2) * theImgHeight,
               (xCenter + width / 2) * theImgWidth,
               (yCenter + height / 2) * theImgHeight);
-          rectangles.add(rect);
+          rectangles.add(PaintYolo(rect: rect));
         }
       }
     }
@@ -120,7 +123,12 @@ class LabelMeViewModel extends BaseViewModelRefresh<dynamic> {
     notifyListeners();
   }
 
-  void updateRectangles(List<Rect> value) {
+  void updateRectangles(List<PaintYolo> value) {
+    notifyListeners();
+  }
+
+  void setAutoSave(bool value) {
+    autoSave = value;
     notifyListeners();
   }
 }

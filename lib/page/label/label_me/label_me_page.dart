@@ -1,13 +1,16 @@
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:kayo_package/kayo_package.dart';
+import 'package:omt/utils/color_utils.dart';
 import 'package:omt/widget/canvas/canvas_paint_widget.dart';
+import 'package:omt/widget/canvas/canvas_paint_yolo_widget.dart';
+import 'package:omt/widget/canvas/paint_yolo.dart';
 import 'label_me_view_model.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fu;
-import 'package:open_filex/open_filex.dart';
+import 'dart:math' as math;
 
 ///
 ///  omt
@@ -28,22 +31,58 @@ class LabelMePage extends StatelessWidget {
         autoLoadData: true,
         builder: (context, model, child) {
           return fu.ScaffoldPage.scrollable(
-            // header: Text('标注'),
-            children: [
-              Row(
+            header: fu.PageHeader(
+              title: Row(
                 children: [
-                  fu.Button(
+                  IconButton(
+                    tooltip: '打开文件夹',
+                    icon: const Icon(Icons.folder_outlined),
                     onPressed: () {
                       model.setSelectedDir();
                     },
-                    child: TextView('选择标注文件夹'),
                   ),
+                  IconButton(
+                    tooltip: '上一张',
+                    icon: Transform(
+                      alignment: Alignment.center,
+                      transform: Matrix4.rotationY(math.pi),
+                      child: Icon(Icons.next_plan_outlined),
+                    ),
+                    onPressed: () {
+                      model.nextIndex(pre: true);
+                    },
+                  ),
+                  IconButton(
+                    tooltip: '下一张',
+                    icon: const Icon(Icons.next_plan_outlined),
+                    onPressed: () {
+                      model.nextIndex();
+                    },
+                  ),
+                  IconButton(
+                    tooltip: '保存',
+                    icon: const Icon(Icons.save_outlined),
+                    onPressed: () {},
+                  ),
+                  fu.ToggleSwitch(
+                      leadingContent: false,
+                      content: TextView(
+                        '自动保存',
+                        color: ColorUtils.colorBlack,
+                      ),
+                      checked: model.autoSave,
+                      onChanged: (value) {
+                        model.setAutoSave(value);
+                      }),
                   TextView(
                     model.selectedDir,
-                    margin: const EdgeInsets.only(left: 20),
-                  ),
+                    size: 13,
+                    margin: EdgeInsets.only(left: 20),
+                  )
                 ],
               ),
+            ),
+            children: [
               Row(
                 children: [
                   Stack(
@@ -52,43 +91,22 @@ class LabelMePage extends StatelessWidget {
                       ImageView(
                         height: model.theImgHeight,
                         width: model.theImgWidth,
+                        srcToFile: true,
                         src: model.theFileSystemEntity?.path,
-                      ),
+                       ),
                       SizedBox(
                         height: model.theImgHeight,
                         width: model.theImgWidth,
-                        child: CanvasPaintWidget(
+                        child: CanvasPaintYoloWidget(
                           canvasNum: 10,
                           rectangles: model.rectangles,
-                          onRectangles: (List<Rect> value) {
+                          onRectangles: (List<PaintYolo> value) {
                             model.updateRectangles(value);
                           },
                         ),
                       ),
                     ],
                   ),
-                  Expanded(
-                      child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          TextView('删除'),
-                          TextView(
-                            '上一张',
-                            onTap: () {
-                              model.nextIndex(pre: true);
-                            },
-                          ),
-                          TextView(
-                            '下一张',
-                            onTap: () {
-                              model.nextIndex();
-                            },
-                          ),
-                        ],
-                      )
-                    ],
-                  ))
                 ],
               )
             ],

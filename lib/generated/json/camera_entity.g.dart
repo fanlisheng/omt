@@ -1,5 +1,7 @@
 import 'package:omt/generated/json/base/json_convert_content.dart';
 import 'package:omt/bean/camera/camera_entity.dart';
+import 'package:kayo_package/kayo_package.dart';
+
 import 'package:omt/bean/common/code_data.dart';
 
 
