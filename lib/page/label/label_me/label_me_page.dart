@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/utils/color_utils.dart';
-import 'package:omt/widget/canvas/canvas_paint_widget.dart';
 import 'package:omt/widget/canvas/canvas_paint_yolo_widget.dart';
 import 'package:omt/widget/canvas/paint_yolo.dart';
 import 'label_me_view_model.dart';
@@ -85,6 +84,7 @@ class LabelMePage extends StatelessWidget {
             children: [
               Row(
                 children: [
+                  Spacer(),
                   Stack(
                     alignment: Alignment.center,
                     children: [
@@ -93,7 +93,7 @@ class LabelMePage extends StatelessWidget {
                         width: model.theImgWidth,
                         srcToFile: true,
                         src: model.theFileSystemEntity?.path,
-                       ),
+                      ),
                       SizedBox(
                         height: model.theImgHeight,
                         width: model.theImgWidth,
@@ -107,6 +107,47 @@ class LabelMePage extends StatelessWidget {
                       ),
                     ],
                   ),
+                  Spacer(),
+                  Column(
+                    children: [
+                      SizedBox(
+                        height: 200,
+                        width: 200,
+                        child: Scrollbar(
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            physics: NeverScrollableScrollPhysics(),
+                            child: Container(
+                              width: 400,
+                              child: Scrollbar(
+                                controller: model.scrollControllerImg,
+                                child: ListView.builder(
+                                  itemCount: model.files.length,
+                                  itemExtent: model.itemHeightImgSrc,
+                                  controller: model.scrollControllerImg,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return TextView(
+                                      model.files[index].path.split('/').last,
+                                      // maxLine: 1,
+                                      alignment: Alignment.centerLeft,
+                                      color: index == model.fileIndex
+                                          ? ColorUtils.colorAccent
+                                          : ColorUtils.colorBlack,
+                                      size: 12,
+                                      onTap: () {
+                                        model.nextIndex(index: index);
+                                      },
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  )
                 ],
               )
             ],

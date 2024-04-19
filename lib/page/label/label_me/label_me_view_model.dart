@@ -22,9 +22,12 @@ class LabelMeViewModel extends BaseViewModelRefresh<dynamic> {
   List<FileSystemEntity> files = [];
 
   int fileIndex = 0;
+  double itemHeightImgSrc = 36;
   List<PaintYolo> rectangles = [];
 
   bool autoSave = false;
+
+  ScrollController scrollControllerImg = ScrollController();
 
   FileSystemEntity? theFileSystemEntity;
   static const double initImgWidth = 1280;
@@ -49,7 +52,6 @@ class LabelMeViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   void setSelectedDir() async {
-
     fs.getDirectoryPath(initialDirectory: selectedDir).then((value) {
       if (null != value) {
         if (selectedDir != value) {
@@ -72,14 +74,22 @@ class LabelMeViewModel extends BaseViewModelRefresh<dynamic> {
     });
   }
 
-  void nextIndex({bool pre = false}) async {
+  void nextIndex({bool pre = false, int? index}) async {
     fileIndex = pre ? fileIndex - 1 : fileIndex + 1;
+    if (null != index) {
+      fileIndex = index;
+    }
     if (fileIndex > (files.length ?? 0) - 1) {
       fileIndex = (files.length ?? 0) - 1;
     }
     if (fileIndex < 0) {
       fileIndex = 0;
     }
+    if (null == index) {
+      scrollControllerImg.animateTo((fileIndex) * itemHeightImgSrc,
+          duration: const Duration(milliseconds: 10), curve: Curves.ease);
+    }
+
     rectangles.clear();
     theFileSystemEntity = files.findData<FileSystemEntity>(fileIndex);
 
