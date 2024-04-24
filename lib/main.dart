@@ -39,6 +39,7 @@ void main() async {
   SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
   MediaKit.ensureInitialized();
   KayoPackage.share.init(
+      enableDark: true,
       onTapToolbarBack: (context) {
         print(context.toString());
         IntentUtils.share.pop(context);
@@ -71,7 +72,7 @@ void main() async {
         TitleBarStyle.hidden,
         windowButtonVisibility: false,
       );
-      if(isWindows){
+      if (isWindows) {
         // await windowManager.setTitle('');
       }
 
