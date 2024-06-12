@@ -19,6 +19,9 @@ class AuthEnum {
   ///摄像头配置
   static const int menuCameraConfiguration = 102;
 
+  ///小工具
+  static const int menuTools = 103;
+
   ///数据标注
   static const int menuLabelMe = 9999;
 }

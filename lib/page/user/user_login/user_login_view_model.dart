@@ -117,7 +117,10 @@ class UserLoginViewModel extends BaseViewModelRefresh<UserInfoData> {
               ..name = '视频配置',
             UserPermission()
               ..id = AuthEnum.menuCameraConfiguration
-              ..name = '摄像头配置'
+              ..name = '摄像头配置',
+            UserPermission()
+              ..id = AuthEnum.menuTools
+              ..name = '小工具'
           ];
         }
         break;

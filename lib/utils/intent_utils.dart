@@ -58,6 +58,7 @@ class IntentUtils extends BaseIntentUtilsNoBoost {
   }
 
   void gotoLogin(BuildContext? context, {bool noAlert = false}) async {
+    LoadingUtils.dismiss();
     if (noAlert == true) {
       await SharedUtils.clear();
       // await SocketService.socketClose();
@@ -128,7 +129,7 @@ class IntentUtils extends BaseIntentUtilsNoBoost {
         var theUserPermission = await SharedUtils.getTheUserPermission();
         if (theUserPermission?.id == null) {
           gotoNav(context);
-        }else{
+        } else {
           goHomeBase(context);
         }
       } else {
