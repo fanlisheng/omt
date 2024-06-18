@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:image/image.dart' as img;
 import 'package:omt/bean/common/id_name_value.dart';
@@ -55,11 +56,29 @@ class LabelMeViewModel extends BaseViewModelRefresh<dynamic> {
   @override
   void initState() async {
     super.initState();
+    HardwareKeyboard.instance.addHandler(_handleKeyEvent);
   }
 
   @override
   void dispose() {
+    HardwareKeyboard.instance.removeHandler(_handleKeyEvent);
     super.dispose();
+  }
+
+  bool _handleKeyEvent(KeyEvent event) {
+    if (event is KeyDownEvent) {
+      if (event.logicalKey == LogicalKeyboardKey.delete) {
+        return true;
+      }
+    } else if (event is KeyUpEvent) {
+      if (event.logicalKey == LogicalKeyboardKey.delete) {
+        rectangles.remove(rectangleSelected);
+        rectangleSelected = null;
+        notifyListeners();
+        return true;
+      }
+    }
+    return false;
   }
 
   @override
