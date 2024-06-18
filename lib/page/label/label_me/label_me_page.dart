@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:kayo_package/kayo_package.dart';
+import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/utils/color_utils.dart';
 import 'package:omt/widget/canvas/canvas_paint_yolo_widget.dart';
 import 'package:omt/widget/canvas/paint_yolo.dart';
@@ -41,11 +42,22 @@ class LabelMePage extends StatelessWidget {
                     },
                   ),
                   IconButton(
-                    tooltip: '上一张',
+                    tooltip: '撤销',
                     icon: Transform(
                       alignment: Alignment.center,
                       transform: Matrix4.rotationY(math.pi),
                       child: Icon(Icons.next_plan_outlined),
+                    ),
+                    onPressed: () {
+                      model.undo();
+                    },
+                  ),
+                  IconButton(
+                    tooltip: '上一张',
+                    icon: Transform(
+                      alignment: Alignment.center,
+                      transform: Matrix4.rotationY(math.pi),
+                      child: Icon(Icons.arrow_forward_outlined),
                     ),
                     onPressed: () {
                       model.nextIndex(pre: true);
@@ -53,7 +65,7 @@ class LabelMePage extends StatelessWidget {
                   ),
                   IconButton(
                     tooltip: '下一张',
-                    icon: const Icon(Icons.next_plan_outlined),
+                    icon: const Icon(Icons.arrow_forward_outlined),
                     onPressed: () {
                       model.nextIndex();
                     },
@@ -84,8 +96,8 @@ class LabelMePage extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Spacer(),
-                  Stack(
+                  Expanded(
+                      child: Stack(
                     alignment: Alignment.center,
                     children: [
                       ImageView(
@@ -100,19 +112,63 @@ class LabelMePage extends StatelessWidget {
                         child: CanvasPaintYoloWidget(
                           canvasNum: 10,
                           rectangles: model.rectangles,
-                          onRectangles: (List<PaintYolo> value) {
+                          rectangleSelected: model.rectangleSelected,
+                          onRectangleSelect: (data) {
+                            model.setRectSelected(index: -1, rectangle: data);
+                          },
+                          onRectangles: (List<PaintYolo> value,
+                              ValueChanged<IdNameValue> callback) {
+                            callback(IdNameValue(id: model.rectangles.length));
                             model.updateRectangles(value);
                           },
                         ),
                       ),
                     ],
-                  ),
-                  Spacer(),
+                  )),
                   Column(
                     children: [
                       SizedBox(
                         height: 200,
-                        width: 200,
+                        width: 150,
+                        child: Scrollbar(
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            physics: NeverScrollableScrollPhysics(),
+                            child: Container(
+                              width: 400,
+                              child: Scrollbar(
+                                controller: model.scrollControllerRectangle,
+                                child: ListView.builder(
+                                  itemCount: model.rectangles.length,
+                                  itemExtent: model.itemHeightImgSrc,
+                                  controller: model.scrollControllerRectangle,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return TextView(
+                                      model.rectangles
+                                          .findData<PaintYolo>(index)
+                                          ?.type
+                                          ?.nameShow,
+                                      // maxLine: 1,
+                                      alignment: Alignment.centerLeft,
+                                      color: index == model.indexRectangle
+                                          ? ColorUtils.colorAccent
+                                          : ColorUtils.colorBlack,
+                                      size: 12,
+                                      onTap: () {
+                                        model.setRectSelected(index: index);
+                                      },
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 200,
+                        width: 150,
                         child: Scrollbar(
                           child: SingleChildScrollView(
                             scrollDirection: Axis.horizontal,

@@ -61,6 +61,8 @@ class IdNameValue {
     this.isMultiple,
   });
 
+  String get nameShow => name ?? '$id';
+
   IdNameValue.all() {
     this.id = -1;
     this.name = '全部';

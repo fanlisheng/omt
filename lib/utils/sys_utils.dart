@@ -33,13 +33,11 @@ class SysUtils {
     return BaseSysUtils.isDebug;
   }
 
-
- static bool isIPAddress(String str) {
+  static bool isIPAddress(String str) {
     final ipRegExp = RegExp(
         r'^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$');
     return ipRegExp.hasMatch(str);
   }
-
 
   // static bool get isInDebugMode {
   //   bool inDebugMode = false;
@@ -427,8 +425,69 @@ class SysUtils {
     ];
   }
 
+  static List<Color> generateColors49() {
+    List<String> colorList = [
+      "#ffcc99",
+      "#ff6666",
+      "#fe9a65",
+      "#ffff00",
+      "#ccff00",
+      "#73c0de",
+      "#c2c2f0",
+      "#ff3333",
+      "#c2f0c2",
+      "#ff8000",
+      "#ffc0cb",
+      "#ffb3b3",
+      "#00ff66",
+      "#91cc75",
+      "#00ccff",
+      "#ff69b4",
+      "#f7a35c",
+      "#6495ed",
+      "#ff99cc",
+      "#ff6666",
+      "#ffc125",
+      "#c0ff3e",
+      "#87cefa",
+      "#ba55d3",
+      "#8b9fc9",
+      "#ffb3e6",
+      "#fac858",
+      "#ff8c29",
+      "#00ff00",
+      "#ffb3b3",
+      "#00ff33",
+      "#ff9900",
+      "#3ba272",
+      "#f15c80",
+      "#997950",
+      "#00ffff",
+      "#ea7ccc",
+      "#ff69b4",
+      "#ffff99",
+      "#ff6600",
+      "#ff9c00",
+      "#9a60b4",
+      "#66ff00",
+      "#5470c6",
+      "#00ff99",
+      "#ff9999",
+      "#66ccff",
+      "#ffcc00",
+      "#ffeead"
+    ];
+;
 
-  static bool useNavi(){
+    List<Color> colors = [];
+    for(var c in colorList){
+      colors.add(c.toColor());
+    }
+
+    return colors;
+  }
+
+  static bool useNavi() {
     return true;
   }
 
