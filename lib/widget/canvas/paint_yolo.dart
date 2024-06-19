@@ -7,4 +7,9 @@ class PaintYolo {
   Rect? rect;
 
   PaintYolo({this.type, this.rect});
+
+  @override
+  String toString() {
+    return '${type?.nameShow}';
+  }
 }

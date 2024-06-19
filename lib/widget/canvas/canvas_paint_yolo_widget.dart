@@ -1,7 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart' as fu;
 import 'package:flutter/material.dart';
- import 'package:omt/bean/common/id_name_value.dart';
- import 'package:omt/utils/log_utils.dart';
+import 'package:omt/bean/common/id_name_value.dart';
+import 'package:omt/utils/log_utils.dart';
 import 'package:omt/utils/sys_utils.dart';
 import 'package:omt/widget/canvas/paint_yolo.dart';
 
@@ -109,16 +109,18 @@ class _CanvasPaintYoloWidgetState extends State<CanvasPaintYoloWidget> {
       },
       onPanEnd: (_) {
         if (activeRectangle == null) {
-          LogUtils.info(msg: '${widget.rectangles}');
           if (popData && widget.rectangles.isNotEmpty) {
             widget.rectangles.removeLast();
           } else {
             widget.onRectangles(widget.rectangles, (data) {
-              if (data?.id == null) {
-                widget.rectangles.removeLast();
-              } else {
-                widget.rectangles.last.type = data;
-              }
+              setState(() {
+                if (data?.id == null) {
+                  widget.rectangles.removeLast();
+                } else {
+                  widget.rectangles.last.type = data;
+                }
+                LogUtils.info(msg: '${widget.rectangles}');
+              });
             });
           }
         }
@@ -195,10 +197,10 @@ class CanvasPaint extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3.0;
 
-    final Paint paintSelected = Paint()
-      ..color = Colors.orange
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 6.0;
+    // final Paint paintSelected = Paint()
+    //   ..color = Colors.orange
+    //   ..style = PaintingStyle.stroke
+    //   ..strokeWidth = 6.0;
 
     final Paint handlePaint = Paint()
       ..color = Colors.black
@@ -208,6 +210,8 @@ class CanvasPaint extends CustomPainter {
       ..color = Colors.blue
       ..style = PaintingStyle.fill;
 
+    double strokeWidthPlus = 0;
+
     int i = 0;
     int colorSize = 49;
     var colors = SysUtils.generateColors49();
@@ -215,14 +219,15 @@ class CanvasPaint extends CustomPainter {
     for (final rect in rectangles) {
       paint.color = colors[i++ % colorSize];
       moveHandlePaint.color = paint.color;
-      paintSelected.color = paint.color;
       if (rectangleSelected?.type?.id != null &&
           rect.type?.id == rectangleSelected?.type?.id) {
-        canvas.drawRect(rect.rect!, paintSelected);
+        strokeWidthPlus = 3;
+        paint.strokeWidth = 6;
       } else {
-        canvas.drawRect(rect.rect!, paint);
+        strokeWidthPlus = 0.0;
+        paint.strokeWidth = 3;
       }
-
+      canvas.drawRect(rect.rect!, paint);
       canvas.drawRect(
         Rect.fromCenter(
           center: rect.rect!.bottomRight,
@@ -236,8 +241,8 @@ class CanvasPaint extends CustomPainter {
       canvas.drawRect(
         Rect.fromPoints(
           rect.rect!.topLeft,
-          Offset(rect.rect!.left + handleSize * 1.5,
-              rect.rect!.top + handleSize * 1.5),
+          Offset(rect.rect!.left + handleSize * 1.5 + strokeWidthPlus,
+              rect.rect!.top + handleSize * 1.5 + strokeWidthPlus),
         ),
         moveHandlePaint,
       );

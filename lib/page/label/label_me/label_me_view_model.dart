@@ -100,7 +100,7 @@ class LabelMeViewModel extends BaseViewModelRefresh<dynamic> {
               }
             }
           }
-          fileIndex = 0;
+          nextIndex(index: 0);
         }
       }
       selectedDir = value;

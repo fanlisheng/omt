@@ -106,23 +106,27 @@ class LabelMePage extends StatelessWidget {
                         srcToFile: true,
                         src: model.theFileSystemEntity?.path,
                       ),
-                      SizedBox(
-                        height: model.theImgHeight,
-                        width: model.theImgWidth,
-                        child: CanvasPaintYoloWidget(
-                          canvasNum: 10,
-                          rectangles: model.rectangles,
-                          rectangleSelected: model.rectangleSelected,
-                          onRectangleSelect: (data) {
-                            model.setRectSelected(index: -1, rectangle: data);
-                          },
-                          onRectangles: (List<PaintYolo> value,
-                              ValueChanged<IdNameValue> callback) {
-                            callback(IdNameValue(id: model.rectangles.length));
-                            model.updateRectangles(value);
-                          },
-                        ),
-                      ),
+                      model.files.isEmpty
+                          ? Container()
+                          : SizedBox(
+                              height: model.theImgHeight,
+                              width: model.theImgWidth,
+                              child: CanvasPaintYoloWidget(
+                                canvasNum: 10,
+                                rectangles: model.rectangles,
+                                rectangleSelected: model.rectangleSelected,
+                                onRectangleSelect: (data) {
+                                  model.setRectSelected(
+                                      index: -1, rectangle: data);
+                                },
+                                onRectangles: (List<PaintYolo> value,
+                                    ValueChanged<IdNameValue> callback) {
+                                  callback(
+                                      IdNameValue(id: model.rectangles.length));
+                                  model.updateRectangles(value);
+                                },
+                              ),
+                            ),
                     ],
                   )),
                   Column(
@@ -159,7 +163,7 @@ class LabelMePage extends StatelessWidget {
                                         model.setRectSelected(index: index);
                                       },
                                     );
-                                  },
+                                   },
                                 ),
                               ),
                             ),
