@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 import 'package:kayo_package/kayo_package.dart';
 
@@ -18,8 +17,7 @@ class KSearchPage extends StatelessWidget {
   final String? hintText;
   final String? historyTag;
 
-  const KSearchPage({Key? key, this.keyword, this.hintText, this.historyTag})
-      : super(key: key);
+  const KSearchPage({super.key, this.keyword, this.hintText, this.historyTag});
 
   @override
   Widget build(BuildContext context) {
@@ -32,10 +30,10 @@ class KSearchPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
-                  SizedBox(
+                  const SizedBox(
                     height: 40,
                   ), //上半部分
-                  Container(
+                  SizedBox(
                     height: 40,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,9 +41,9 @@ class KSearchPage extends StatelessWidget {
                         Expanded(
                           child: Container(
                             height: 40,
-                            margin: EdgeInsets.only(left: 20),
+                            margin: const EdgeInsets.only(left: 20),
                             decoration: BoxDecoration(
-                                color: Color(0xffEEEEEE),
+                                color: const Color(0xffEEEEEE),
                                 borderRadius: BorderRadius.circular(20)),
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -63,16 +61,17 @@ class KSearchPage extends StatelessWidget {
                                   width: 12,
                                 ), //输入框
                                 Expanded(
-                                  child: Container(
+                                  child: SizedBox(
+                                    height: 38,
                                     child: EditView(
                                       // padding: EdgeInsets.only(top: 5),
                                       focusNode: model.contentFocusNode,
                                       textSize: 14,
                                       controller: model.controller,
-                                      textColor: Color(0xFF42434C),
+                                      textColor: const Color(0xFF42434C),
                                       hintText: hintText ?? '请输入搜索关键字',
                                       hintTextSize: 14,
-                                      hintTextColor: Color(0xFF828892),
+                                      hintTextColor: const Color(0xFF828892),
                                       maxLines: 1,
                                       showLine: false,
                                       keyboardType: TextInputType.text,
@@ -87,13 +86,12 @@ class KSearchPage extends StatelessWidget {
                                         // dispatch(SearchActionCreator.onSearch(T));
                                       },
                                       onChanged: (T) {
-                                        if (T.length <= 0) {
+                                        if (T.isEmpty) {
                                           model.onTextFieldClear();
                                           // dispatch(SearchActionCreator.onTextFieldClear());
                                         }
                                       },
                                     ),
-                                    height: 38,
                                   ),
                                 ),
                               ],
@@ -101,17 +99,17 @@ class KSearchPage extends StatelessWidget {
                           ), //左边圆角背景
                         ),
                         Clickable(
+                          alignment: Alignment.center,
+                          padding: const EdgeInsets.only(right: 20, left: 18),
+                          onTap: () {
+                            // dispatch(SearchActionCreator.onSearch(''));
+                            model.onSearch('');
+                          },
                           child: TextView(
                             '取消',
                             color: Colors.blueAccent,
                             size: 15,
                           ),
-                          alignment: Alignment.center,
-                          padding: EdgeInsets.only(right: 20, left: 18),
-                          onTap: () {
-                            // dispatch(SearchActionCreator.onSearch(''));
-                            model.onSearch('');
-                          },
                         ), //取消按钮
                       ],
                     ),
@@ -124,15 +122,15 @@ class KSearchPage extends StatelessWidget {
           Widget HistoryItem(String t) {
             return GestureDetector(
               child: Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                     color: Color(0xffFFFFFF),
                     borderRadius: BorderRadius.all(Radius.circular(16))),
                 height: 32,
                 padding:
-                    EdgeInsets.only(left: 16, top: 8, right: 16, bottom: 8),
+                    const EdgeInsets.only(left: 16, top: 8, right: 16, bottom: 8),
                 child: Text(
                   t,
-                  style: TextStyle(fontSize: 13, color: Color(0xff575961)),
+                  style: const TextStyle(fontSize: 13, color: Color(0xff575961)),
                 ),
               ),
               onTap: () {
@@ -150,8 +148,8 @@ class KSearchPage extends StatelessWidget {
                   children: <Widget>[
                     Expanded(
                       child: Container(
-                        margin: EdgeInsets.only(left: 11),
-                        child: Text(
+                        margin: const EdgeInsets.only(left: 11),
+                        child: const Text(
                           '历史记录',
                           style: TextStyle(
                               fontSize: 17,
@@ -163,7 +161,7 @@ class KSearchPage extends StatelessWidget {
                     GestureDetector(
                       child: Row(
                         children: <Widget>[
-                          Text(
+                          const Text(
                             '删除',
                             style: TextStyle(
                                 color: Color(0xff888A8E),
@@ -194,7 +192,7 @@ class KSearchPage extends StatelessWidget {
                 ),
                 Container(
                   width: MediaQuery.of(context).size.width,
-                  margin: EdgeInsets.only(left: 16, right: 16),
+                  margin: const EdgeInsets.only(left: 16, right: 16),
                   child: Wrap(
                     direction: Axis.horizontal,
                     spacing: 10,

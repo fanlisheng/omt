@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/common/id_name_value.dart';
@@ -31,7 +30,7 @@ class TfbSpinnerNew extends StatefulWidget {
   final EdgeInsets? margin;
 
   const TfbSpinnerNew(
-      {Key? key,
+      {super.key,
       required this.datas,
       this.onPicked,
       this.onTap,
@@ -40,8 +39,7 @@ class TfbSpinnerNew extends StatefulWidget {
       this.childAboveOfGZXDropDownMenuPositioned,
       required this.child,
       this.padding,
-      this.margin})
-      : super(key: key);
+      this.margin});
 
   @override
   State<TfbSpinnerNew> createState() => _TfbSpinnerNewState();
@@ -50,7 +48,7 @@ class TfbSpinnerNew extends StatefulWidget {
 class _TfbSpinnerNewState extends State<TfbSpinnerNew> {
   //标题当前选中项
   int currentIndex = -1;
-  GlobalKey _stackKey = GlobalKey();
+  final GlobalKey _stackKey = GlobalKey();
   List<GZXDropDownHeaderItem> items = [];
   List<GZXDropdownMenuBuilder> menus = [];
   final GZXDropdownMenuController _dropdownMenuController =
@@ -62,7 +60,7 @@ class _TfbSpinnerNewState extends State<TfbSpinnerNew> {
     super.initState();
   }
 
-  buildDropdownListWidget(IdNameValue? data, void itemOnTap(IdNameValue item)) {
+  buildDropdownListWidget(IdNameValue? data, void Function(IdNameValue item) itemOnTap) {
     if (data == null || (data.children?.length ?? 0) == 0) {
       return Container();
     } else {
@@ -72,7 +70,7 @@ class _TfbSpinnerNewState extends State<TfbSpinnerNew> {
         itemCount: data.children?.length ?? 0,
         // item 的个数
         separatorBuilder: (BuildContext context, int index) =>
-            Divider(height: 1.0),
+            const Divider(height: 1.0),
         // 添加分割线
         itemBuilder: (BuildContext context, int index) {
           IdNameValue item = data.children![index];
@@ -81,11 +79,11 @@ class _TfbSpinnerNewState extends State<TfbSpinnerNew> {
               data.selectSub = item;
               itemOnTap(data);
             },
-            child: Container(
+            child: SizedBox(
               height: 50,
               child: Row(
                 children: <Widget>[
-                  SizedBox(
+                  const SizedBox(
                     width: 16,
                   ),
                   Expanded(
@@ -106,7 +104,7 @@ class _TfbSpinnerNewState extends State<TfbSpinnerNew> {
                   //         size: 16,
                   //       )
                   //     : SizedBox(),
-                  SizedBox(
+                  const SizedBox(
                     width: 16,
                   ),
                 ],
@@ -156,6 +154,10 @@ class _TfbSpinnerNewState extends State<TfbSpinnerNew> {
           children: <Widget>[
             ...(widget.childrenAboveOfSpinner ?? []),
             Container(
+              padding: widget.padding ?? const EdgeInsets.symmetric(horizontal: 10),
+              margin: widget.margin,
+              color: Colors.white,
+              height: 43,
               child: GZXDropDownHeader(
                 items: items,
                 stackKey: _stackKey,
@@ -164,19 +166,15 @@ class _TfbSpinnerNewState extends State<TfbSpinnerNew> {
                 dividerHeight: 0,
                 // borderColor: Colors.transparent,
                 style:
-                    TextStyle(fontSize: 13, color: ColorUtils.colorBlackLite),
+                    const TextStyle(fontSize: 13, color: ColorUtils.colorBlackLite),
               ),
-              padding: widget.padding ?? EdgeInsets.symmetric(horizontal: 10),
-              margin: widget.margin,
-              color: Colors.white,
-              height: 43,
             ),
             ...(widget.childrenBelowOfSpinner ?? []),
             Expanded(child: widget.child),
           ],
         ),
         (widget.childAboveOfGZXDropDownMenuPositioned ??
-            SizedBox(
+            const SizedBox(
               height: 0,
               width: 0,
             )),

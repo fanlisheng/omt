@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
@@ -25,7 +24,7 @@ class TfbTimePicker extends StatefulWidget {
   final OnDateTimePick? onDateTimePick;
 
   const TfbTimePicker(
-      {Key? key,
+      {super.key,
       this.padding,
       this.margin,
       required this.startTime,
@@ -35,8 +34,7 @@ class TfbTimePicker extends StatefulWidget {
       this.timeFormat = 'HH:mm',
       this.dateFormat = 'MM月dd日',
       this.pickerDateTimeFormat,
-      this.onDateTimePick})
-      : super(key: key);
+      this.onDateTimePick});
 
   @override
   State<TfbTimePicker> createState() => _TfbTimePickerState();
@@ -70,11 +68,11 @@ class _TfbTimePickerState extends State<TfbTimePicker> {
           });
         });
       },
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(4)),
           color: ColorUtils.colorBgSearch),
       height: 36,
-      margin: EdgeInsets.only(left: 20, right: 20, top: 6, bottom: 6),
+      margin: const EdgeInsets.only(left: 20, right: 20, top: 6, bottom: 6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -84,7 +82,7 @@ class _TfbTimePickerState extends State<TfbTimePicker> {
                 src: source('alarm/ic_date'),
                 width: 16,
                 height: 16,
-                margin: EdgeInsets.only(left: 16),
+                margin: const EdgeInsets.only(left: 16),
               ),
               TextView(
                 BaseTimeUtils.dateToTimeStr(
@@ -93,7 +91,7 @@ class _TfbTimePickerState extends State<TfbTimePicker> {
                 size: 13,
                 fontWeight: FontWeight.w600,
                 color: ColorUtils.colorBlack,
-                margin: EdgeInsets.only(left: 4),
+                margin: const EdgeInsets.only(left: 4),
               ),
               TextView(
                 BaseTimeUtils.dateToTimeStr(
@@ -101,7 +99,7 @@ class _TfbTimePickerState extends State<TfbTimePicker> {
                     format: widget.timeFormat),
                 size: 11,
                 color: ColorUtils.colorBlackLite,
-                margin: EdgeInsets.only(left: 2),
+                margin: const EdgeInsets.only(left: 2),
               ),
             ],
           ),
@@ -119,9 +117,9 @@ class _TfbTimePickerState extends State<TfbTimePicker> {
                 border: true,
                 borderColor: ColorUtils.colorLine,
                 borderWidth: 1,
-                borderRadius: BorderRadius.all(Radius.circular(8)),
+                borderRadius: const BorderRadius.all(Radius.circular(8)),
                 padding:
-                    EdgeInsets.only(left: 12, top: 1, bottom: 1, right: 12),
+                    const EdgeInsets.only(left: 12, top: 1, bottom: 1, right: 12),
               ),
               Container(
                 width: 8,
@@ -144,7 +142,7 @@ class _TfbTimePickerState extends State<TfbTimePicker> {
                 size: 13,
                 fontWeight: FontWeight.w600,
                 color: ColorUtils.colorBlack,
-                margin: EdgeInsets.only(left: 4),
+                margin: const EdgeInsets.only(left: 4),
               ),
               TextView(
                 BaseTimeUtils.dateToTimeStr(
@@ -152,7 +150,7 @@ class _TfbTimePickerState extends State<TfbTimePicker> {
                     format: widget.timeFormat),
                 size: 11,
                 color: ColorUtils.colorBlackLite,
-                margin: EdgeInsets.only(left: 2, right: 16),
+                margin: const EdgeInsets.only(left: 2, right: 16),
               ),
             ],
           ),

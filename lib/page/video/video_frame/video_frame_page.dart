@@ -1,11 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:kayo_package/kayo_package.dart';
-import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/bean/video/video_configuration/Video_Connect_entity.dart';
-import 'package:omt/http/http_query.dart';
 import 'package:omt/page/video/video_frame/video_frame_view_model.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fu;
 import 'package:media_kit_video/media_kit_video.dart';
@@ -23,7 +20,7 @@ import 'package:omt/widget/lib/widgets.dart';
 ///
 
 class VideoFramePage extends StatelessWidget {
-  const VideoFramePage({Key? key}) : super(key: key);
+  const VideoFramePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -33,8 +30,8 @@ class VideoFramePage extends StatelessWidget {
         builder: (context, model, child) {
           var windowWidth = BaseSysUtils.getWidth(context);
 
-          var _row = windowWidth > 600 * 2 + 200;
-          var _show_draw = windowWidth > 600 + 200;
+          var row = windowWidth > 600 * 2 + 200;
+          var showDraw = windowWidth > 600 + 200;
 
           VideoInfoCamEntity? theRtsp = model.findTheRtsp();
           var headerLeft = Container(
@@ -67,7 +64,7 @@ class VideoFramePage extends StatelessWidget {
                 );
               }).toList(),
             ),
-          ).addExpanded(flex: _row ? 2 : null);
+          ).addExpanded(flex: row ? 2 : null);
           var headerRight = Row(
             children: [
               EditView(
@@ -97,14 +94,14 @@ class VideoFramePage extends StatelessWidget {
                 ),
               )
             ],
-          ).addExpanded(flex: _row ? 2 : null);
+          ).addExpanded(flex: row ? 2 : null);
 
           return fu.ScaffoldPage.scrollable(
               header: const fu.PageHeader(
                 title: Text('视频画框'),
               ),
               children: [
-                _row
+                row
                     ? Row(
                         children: [headerLeft, headerRight],
                       )
@@ -152,7 +149,7 @@ class VideoFramePage extends StatelessWidget {
                     const SizedBox(
                       width: 20,
                     ),
-                    _row != true && !_show_draw
+                    row != true && !showDraw
                         ? const SizedBox()
                         : SizedBox(
                             width: 120,
@@ -173,22 +170,22 @@ class VideoFramePage extends StatelessWidget {
                 const SizedBox(
                   height: 12,
                 ),
-                _row
+                row
                     ? Row(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: _views(model, _row, _show_draw),
+                        children: _views(model, row, showDraw),
                       )
                     : Column(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: _views(model, _row, _show_draw),
+                        children: _views(model, row, showDraw),
                       )
               ]);
         });
   }
 
-  List<Widget> _views(VideoFrameViewModel model, bool _row, bool _show_draw) {
+  List<Widget> _views(VideoFrameViewModel model, bool row, bool showDraw) {
     return [
       LayoutBuilder(builder: (context, constraints) {
         double widgetWidth = constraints.maxWidth;
@@ -198,7 +195,7 @@ class VideoFramePage extends StatelessWidget {
           child: Stack(
             children: [
               Video(controller: model.controller),
-              (_row == true || _show_draw) && widgetWidth > 640
+              (row == true || showDraw) && widgetWidth > 640
                   ? CanvasPaintWidget(
                       canvasNum: 4,
                       rectangles: model.rectangles,
@@ -301,7 +298,7 @@ class VideoFramePage extends StatelessWidget {
                     selectedIndex:
                         model.findIndex(model.inOuts, model.selectedInoutId),
                     datas: model.inOuts),
-                Container(
+                SizedBox(
                   width: 100,
                   child: ButtonView(
                     textDarkOnlyOpacity: true,
@@ -315,7 +312,7 @@ class VideoFramePage extends StatelessWidget {
             ),
           ),
         ],
-      ).addExpanded(flex: _row ? 1 : null),
+      ).addExpanded(flex: row ? 1 : null),
     ];
   }
 }

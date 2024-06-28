@@ -5,7 +5,7 @@ import 'package:media_kit_video/media_kit_video.dart';
 
 class CameraPlayerMKTestWidget extends StatefulWidget {
   final String url;
-  CameraPlayerMKTestWidget(this.url);
+  const CameraPlayerMKTestWidget(this.url, {super.key});
 
   @override
   CameraPlayerMKTestWidgetState createState() =>

@@ -17,7 +17,7 @@ import 'package:fluent_ui/fluent_ui.dart' as fu;
 ///
 
 class VideoConfigurationPage extends StatelessWidget {
-  const VideoConfigurationPage({Key? key}) : super(key: key);
+  const VideoConfigurationPage({super.key});
 
   @override
   Widget build(BuildContext context) {

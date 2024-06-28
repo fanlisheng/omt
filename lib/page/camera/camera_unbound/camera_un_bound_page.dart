@@ -1,14 +1,8 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:kayo_package/kayo_package.dart';
-import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/page/camera/camera_unbound/camera_un_bound_view_model.dart';
 import 'package:omt/utils/color_utils.dart';
-import 'package:omt/utils/log_utils.dart';
 import 'package:omt/utils/refresh_tools.dart';
-import 'package:omt/widget/page/pager_indicator_item.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fu;
 
 ///
@@ -21,7 +15,7 @@ import 'package:fluent_ui/fluent_ui.dart' as fu;
 ///
 
 class CameraUnBoundPage extends StatelessWidget {
-  const CameraUnBoundPage({Key? key}) : super(key: key);
+  const CameraUnBoundPage({super.key});
 
   @override
   Widget build(BuildContext context) {

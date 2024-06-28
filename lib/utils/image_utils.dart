@@ -4,10 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kayo_package/kayo_package.dart';
-import 'package:kayo_package/utils/base_sys_utils.dart';
-import 'package:kayo_package/utils/loading_utils.dart';
-import 'package:kayo_package/views/widget/base/image_view.dart';
-import 'package:kayo_package/views/widget/base/text_view.dart';
 import 'package:omt/http/api.dart';
 import 'package:omt/http/http_query.dart';
 import 'package:omt/utils/file/pdf_view_page.dart';
@@ -27,13 +23,11 @@ class ImageUtils {
   static ImageUtils? _instance;
 
   ImageUtils._() {
-    if (null == _imagePicker) _imagePicker = ImagePicker();
+    _imagePicker ??= ImagePicker();
   }
 
   factory ImageUtils._share() {
-    if (_instance == null) {
-      _instance = ImageUtils._();
-    }
+    _instance ??= ImageUtils._();
     return _instance!;
   }
 
@@ -62,7 +56,7 @@ class ImageUtils {
                 onPressed: () {
                   Navigator.pop(cxt, 0);
                 },
-                child: Text("取消")),
+                child: const Text("取消")),
             actions: <Widget>[
               CupertinoActionSheetAction(
                   onPressed: () async {
@@ -74,7 +68,7 @@ class ImageUtils {
                       if (null != onSuccess) onSuccess(f);
                     }
                   },
-                  child: Text('相机')),
+                  child: const Text('相机')),
               CupertinoActionSheetAction(
                   onPressed: () async {
                     var f = await getCameraImage(camera: false);
@@ -85,7 +79,7 @@ class ImageUtils {
                       if (null != onSuccess) onSuccess(f);
                     }
                   },
-                  child: Text('相册')),
+                  child: const Text('相册')),
             ],
           );
           return dialog;
@@ -168,7 +162,7 @@ class ImageUtils {
                       textAlign: TextAlign.center,
                       maxLine: 2,
                       size: 12,
-                      color: Color(0xffFD322C),
+                      color: const Color(0xffFD322C),
                     ),
             );
           },
@@ -230,7 +224,7 @@ class ImageUtils {
     HttpQuery.share.fileService.down(url!,
         loading: '处理中，请稍等',
         loadingFail: '打开文件失败',
-        fileName: '${BaseSysUtils.getMd5(url.toString())}.${fileType}',
+        fileName: '${BaseSysUtils.getMd5(url.toString())}.$fileType',
         onPath: (data) {
       OpenFilex.open(data);
     });
@@ -257,7 +251,7 @@ class ImageUtils {
       var split = urlsStr!.split(",");
       urls = [];
 
-      if (split.length > 0) {
+      if (split.isNotEmpty) {
         for (var i in split) {
           if (!BaseSysUtils.empty(i)) urls.add(i);
         }
@@ -293,7 +287,7 @@ class ImageUtils {
                       textAlign: TextAlign.center,
                       maxLine: 2,
                       size: 12,
-                      color: Color(0xffFD322C),
+                      color: const Color(0xffFD322C),
                     ),
               hasRotationButton: hasRotationButton,
             );

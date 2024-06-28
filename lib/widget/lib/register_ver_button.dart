@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 
 import 'package:kayo_package/kayo_package.dart';
 
@@ -20,7 +19,7 @@ class LoginFormCode extends StatefulWidget {
   final Color availableColor;
   final Color unavailableColor;
 
-  LoginFormCode({
+  const LoginFormCode({super.key, 
     this.countdown = 60,
     this.onTapCallback,
     this.available = false,
@@ -57,6 +56,7 @@ class _LoginFormCodeState extends State<LoginFormCode> {
   }
 
   // ignore: must_call_super
+  @override
   @protected
   @mustCallSuper
   void dispose() {
@@ -67,7 +67,7 @@ class _LoginFormCodeState extends State<LoginFormCode> {
   /// 启动倒计时的计时器。
   void _startTimer() {
     // 计时器（`Timer`）组件的定期（`periodic`）构造函数，创建一个新的重复计时器。
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_seconds == 1) {
         istap = false;
         _cancelTimer();
@@ -79,7 +79,7 @@ class _LoginFormCodeState extends State<LoginFormCode> {
         return;
       }
       _seconds = _seconds! - 1;
-      _verifyStr = '$_seconds' + 's后重新发送';
+      _verifyStr = '$_seconds' 's后重新发送';
       // if (_seconds == 0) {
       //   _verifyStr = '重新发送';
       // }
@@ -98,13 +98,6 @@ class _LoginFormCodeState extends State<LoginFormCode> {
     // 墨水瓶（`InkWell`）组件，响应触摸的矩形区域。
     return widget.available
         ? InkWell(
-            child: TextView(
-              '  $_verifyStr  ',
-              color: currentColor ?? ColorUtils.colorBlue,
-              size: 14,
-              padding: EdgeInsets.only(left: 10, right: 10, top: 7, bottom: 8),
-              margin: EdgeInsets.only(right: 25, left: 5),
-            ),
             onTap: (_seconds == widget.countdown)
                 ? () {
                     if (istap == false) {
@@ -113,13 +106,20 @@ class _LoginFormCodeState extends State<LoginFormCode> {
                         _startTimer();
                         currentColor = widget.unavailableColor;
                         currentBgColor = '#F0F1F3'.toColor();
-                        _verifyStr = '$_seconds' + 's后重新发送';
+                        _verifyStr = '$_seconds' 's后重新发送';
                         setState(() {});
                         widget.onTapCallback!();
                       }
                     }
                   }
                 : null,
+            child: TextView(
+              '  $_verifyStr  ',
+              color: currentColor ?? ColorUtils.colorBlue,
+              size: 14,
+              padding: const EdgeInsets.only(left: 10, right: 10, top: 7, bottom: 8),
+              margin: const EdgeInsets.only(right: 25, left: 5),
+            ),
           )
         : InkWell(
             child: TextView(
@@ -130,8 +130,8 @@ class _LoginFormCodeState extends State<LoginFormCode> {
               border: false,
               // bgColor: '#F0F1F3'.toColor(),
               // borderColor: widget.unavailableColor,
-              padding: EdgeInsets.only(left: 10, right: 10, top: 7, bottom: 8),
-              margin: EdgeInsets.only(right: 25, left: 5),
+              padding: const EdgeInsets.only(left: 10, right: 10, top: 7, bottom: 8),
+              margin: const EdgeInsets.only(right: 25, left: 5),
             ),
           );
   }

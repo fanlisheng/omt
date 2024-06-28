@@ -46,7 +46,7 @@ void main() async {
       },
       reLoginCode: 419);
 
-  Widget homePage = MyHomePage();
+  Widget homePage = const MyHomePage();
 
   if (isDesktop || kIsWeb) {
     WidgetsFlutterBinding.ensureInitialized();
@@ -93,7 +93,7 @@ void main() async {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, this.title}) : super(key: key);
+  const MyHomePage({super.key, this.title});
   final String? title;
 
   @override
@@ -349,7 +349,7 @@ class _MyHomePageState extends State<MyHomePage>
                     // IntentUtils.share.finish(c);
                     IntentUtils.share.gotoLogin(context, noAlert: true);
                   },
-                  child: Text('确定')),
+                  child: const Text('确定')),
             ],
           );
 

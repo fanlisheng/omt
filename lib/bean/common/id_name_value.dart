@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
-import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/generated/json/base/json_field.dart';
 import 'package:omt/generated/json/id_name_value.g.dart';
 
@@ -64,13 +62,13 @@ class IdNameValue {
   String get nameShow => name ?? '$id';
 
   IdNameValue.all() {
-    this.id = -1;
-    this.name = '全部';
+    id = -1;
+    name = '全部';
   }
 
   IdNameValue.cd() {
-    this.id = 5101;
-    this.name = '成都市';
+    id = 5101;
+    name = '成都市';
   }
 
   String get itemId {

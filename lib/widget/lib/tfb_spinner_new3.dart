@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/common/id_name_value.dart';
@@ -42,7 +41,7 @@ class TfbSpinnerNew3 extends StatefulWidget {
   final OnDateTimePick? onDateTimePick;
 
   const TfbSpinnerNew3(
-      {Key? key,
+      {super.key,
       required this.datas,
       this.hintText,
       this.onPicked,
@@ -58,8 +57,7 @@ class TfbSpinnerNew3 extends StatefulWidget {
       this.endTime,
       this.timeFormat,
       this.timeShowFormat,
-      this.onDateTimePick})
-      : super(key: key);
+      this.onDateTimePick});
 
   @override
   State<TfbSpinnerNew3> createState() => _TfbSpinnerNew3State();
@@ -68,14 +66,14 @@ class TfbSpinnerNew3 extends StatefulWidget {
 class _TfbSpinnerNew3State extends State<TfbSpinnerNew3> {
   //标题当前选中项
   int currentIndex = -1;
-  GlobalKey _stackKey = GlobalKey();
+  final GlobalKey _stackKey = GlobalKey();
   List<GZXDropDownHeaderItem> items = [];
   List<GZXDropdownMenuBuilder> menus = [];
   final GZXDropdownMenuController _dropdownMenuController =
       GZXDropdownMenuController();
 
   IdNameValue? subListParent;
-  String? timeStr = null;
+  String? timeStr;
 
   void _setTimeStr(DateTime? startTime, DateTime? endTime) {
     if (null != startTime && null != endTime) {
@@ -98,7 +96,7 @@ class _TfbSpinnerNew3State extends State<TfbSpinnerNew3> {
   }
 
   buildDropdownListWidget(
-      IdNameValue? data, void itemOnTap(IdNameValue item, bool hide)) {
+      IdNameValue? data, void Function(IdNameValue item, bool hide) itemOnTap) {
     if (data == null || (data.children?.length ?? 0) == 0) {
       return Container();
     } else {
@@ -159,12 +157,12 @@ class _TfbSpinnerNew3State extends State<TfbSpinnerNew3> {
             ),
             ...hasLevel2
                 ? [
-                    LineView(
+                    const LineView(
                       width: 1,
                       height: double.infinity,
                     ),
                     Expanded(
-                      child: Container(
+                      child: SizedBox(
                         height: 50.0 * l,
                         child: buildListView(subListParent!, true, (data) {
                           itemOnTap.call(data,
@@ -176,12 +174,12 @@ class _TfbSpinnerNew3State extends State<TfbSpinnerNew3> {
                 : [],
             ...hasLevel3
                 ? [
-                    LineView(
+                    const LineView(
                       width: 1,
                       height: double.infinity,
                     ),
                     Expanded(
-                      child: Container(
+                      child: SizedBox(
                         height: 50.0 * l,
                         child: buildListView(subListParent!.selectSub!, true,
                             (data) {
@@ -194,12 +192,12 @@ class _TfbSpinnerNew3State extends State<TfbSpinnerNew3> {
                 : [],
             ...hasLevel4
                 ? [
-                    LineView(
+                    const LineView(
                       width: 1,
                       height: double.infinity,
                     ),
                     Expanded(
-                      child: Container(
+                      child: SizedBox(
                         height: 50.0 * l,
                         child: buildListView(
                             subListParent!.selectSub!.selectSub!, true, (data) {
@@ -212,12 +210,12 @@ class _TfbSpinnerNew3State extends State<TfbSpinnerNew3> {
                 : [],
             ...hasLevel5
                 ? [
-                    LineView(
+                    const LineView(
                       width: 1,
                       height: double.infinity,
                     ),
                     Expanded(
-                      child: Container(
+                      child: SizedBox(
                         height: 50.0 * l,
                         child: buildListView(
                             subListParent!.selectSub!.selectSub!.selectSub!,
@@ -231,12 +229,12 @@ class _TfbSpinnerNew3State extends State<TfbSpinnerNew3> {
                 : [],
             ...hasLevel6
                 ? [
-                    LineView(
+                    const LineView(
                       width: 1,
                       height: double.infinity,
                     ),
                     Expanded(
-                      child: Container(
+                      child: SizedBox(
                         height: 50.0 * l,
                         child: buildListView(
                             subListParent!
@@ -258,7 +256,7 @@ class _TfbSpinnerNew3State extends State<TfbSpinnerNew3> {
   }
 
   ListView buildListView(
-      IdNameValue data, bool children, void itemOnTap(IdNameValue item)) {
+      IdNameValue data, bool children, void Function(IdNameValue item) itemOnTap) {
     return ListView.separated(
       shrinkWrap: true,
       scrollDirection: Axis.vertical,
@@ -294,11 +292,11 @@ class _TfbSpinnerNew3State extends State<TfbSpinnerNew3> {
         }
         return Clickable(
           onTap: tap,
-          child: Container(
+          child: SizedBox(
             height: 50,
             child: Row(
               children: <Widget>[
-                SizedBox(
+                const SizedBox(
                   width: 16,
                 ),
                 Expanded(
@@ -310,7 +308,7 @@ class _TfbSpinnerNew3State extends State<TfbSpinnerNew3> {
                     ),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 16,
                 ),
               ],
@@ -321,27 +319,30 @@ class _TfbSpinnerNew3State extends State<TfbSpinnerNew3> {
     );
   }
 
-  Widget _buildSearchView(
-      {
-      // required TextEditingController controller,
-      String? hintText,
-      ValueChanged<String>? onSubmitted}) {
+  Widget _buildSearchView() {
     return Visibility(
+      visible: widget.hintText?.isNotEmpty ?? false,
       child: Container(
         height: 30,
-        margin: EdgeInsets.only(left: 16, right: 16, top: 15, bottom: 10),
-        padding: EdgeInsets.only(left: 10, right: 10),
+        margin: const EdgeInsets.only(left: 16, right: 16, top: 15, bottom: 10),
+        padding: const EdgeInsets.only(left: 10, right: 10),
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.all(Radius.circular(3)),
+          border: Border.all(
+            color: ColorUtils.colorBlackRader,
+          ),
+        ),
         child: TextField(
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 12,
           ),
           decoration: InputDecoration(
             border: InputBorder.none,
             isDense: true,
-            contentPadding: EdgeInsets.only(top: 6),
+            contentPadding: const EdgeInsets.only(top: 6),
             hintText: widget.hintText,
             hintStyle:
-                TextStyle(fontSize: 12, color: ColorUtils.colorBlackLiteLite),
+                const TextStyle(fontSize: 12, color: ColorUtils.colorBlackLiteLite),
           ),
           textInputAction: TextInputAction.search,
           onSubmitted: (t) {
@@ -351,14 +352,7 @@ class _TfbSpinnerNew3State extends State<TfbSpinnerNew3> {
             }
           },
         ),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(3)),
-          border: Border.all(
-            color: ColorUtils.colorBlackRader,
-          ),
-        ),
       ),
-      visible: widget.hintText?.isNotEmpty ?? false,
     );
   }
 
@@ -387,7 +381,6 @@ class _TfbSpinnerNew3State extends State<TfbSpinnerNew3> {
             data.selectSub?.selectSub?.selectSub?.name ??
             data.selectSub?.selectSub?.name ??
             data.selectSub?.name;
-        ;
         if (-1 == data.selectSub?.id) {
           name2 = null;
         }
@@ -441,7 +434,7 @@ class _TfbSpinnerNew3State extends State<TfbSpinnerNew3> {
                         border: true,
                         height: 30,
                         radius: 4,
-                        margin: EdgeInsets.only(top: 15, bottom: 10, left: 16),
+                        margin: const EdgeInsets.only(top: 15, bottom: 10, left: 16),
                         borderRadius: BorderRadius.only(
                             topLeft: 4.toRadius(), bottomLeft: 4.toRadius()),
                         borderColor: '#F0F0F0'.toColor(),
@@ -459,13 +452,13 @@ class _TfbSpinnerNew3State extends State<TfbSpinnerNew3> {
                             });
                           });
                         },
-                        padding: EdgeInsets.only(
+                        padding: const EdgeInsets.only(
                             top: SizeUtils.paddingVertical,
                             bottom: SizeUtils.paddingVertical,
                             left: 10,
                             right: 10),
                         rightIcon: source('home/ic_down'),
-                        rightIconMargin: EdgeInsets.only(left: 6),
+                        rightIconMargin: const EdgeInsets.only(left: 6),
                         rightIconColor: ColorUtils.colorBlackLite,
                         rightIconWidth: 8,
                         rightIconHeight: 8,
@@ -474,6 +467,10 @@ class _TfbSpinnerNew3State extends State<TfbSpinnerNew3> {
                     ],
                   ),
             Container(
+              padding: widget.padding ?? const EdgeInsets.symmetric(horizontal: 10),
+              margin: widget.margin,
+              color: Colors.white,
+              height: 43,
               child: GZXDropDownHeader(
                 items: items,
                 stackKey: _stackKey,
@@ -482,19 +479,15 @@ class _TfbSpinnerNew3State extends State<TfbSpinnerNew3> {
                 dividerHeight: 0,
                 // borderColor: Colors.transparent,
                 style:
-                    TextStyle(fontSize: 12, color: ColorUtils.colorBlackLite),
+                    const TextStyle(fontSize: 12, color: ColorUtils.colorBlackLite),
               ),
-              padding: widget.padding ?? EdgeInsets.symmetric(horizontal: 10),
-              margin: widget.margin,
-              color: Colors.white,
-              height: 43,
             ),
             ...(widget.childrenBelowOfSpinner ?? []),
             Expanded(child: widget.child),
           ],
         ),
         (widget.childAboveOfGZXDropDownMenuPositioned ??
-            SizedBox(
+            const SizedBox(
               height: 0,
               width: 0,
             )),

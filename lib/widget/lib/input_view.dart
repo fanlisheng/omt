@@ -32,7 +32,7 @@ class InputView extends StatefulWidget {
   final TextStyle? textStyle;
 
   const InputView({
-    Key? key,
+    super.key,
     this.hintText,
     this.controller,
     this.focusNode,
@@ -59,7 +59,7 @@ class InputView extends StatefulWidget {
     this.editable = true,
     this.onClick,
     this.textStyle,
-  }) : super(key: key);
+  });
 
   @override
   _InputViewState createState() => _InputViewState();
@@ -79,14 +79,12 @@ class _InputViewState extends State<InputView> {
       alignment: Alignment.centerRight,
       children: [
         TextField(
-          onTap: null == widget.onClick ? onClick : widget.onClick,
+          onTap: widget.onClick ?? onClick,
           inputFormatters: widget.inputFormatters,
-          style: null == widget.textStyle
-              ? TextStyle(
+          style: widget.textStyle ?? TextStyle(
                   color: widget.textColor,
                   fontSize: widget.textSize,
-                )
-              : widget.textStyle,
+                ),
           autocorrect: false,
           enabled: widget.editable,
           onEditingComplete: widget.onEditingComplete,
@@ -103,10 +101,10 @@ class _InputViewState extends State<InputView> {
           onChanged: widget.onChanged,
           obscureText: widget.obscureText ?? false,
           decoration: InputDecoration(
-            contentPadding: widget.padding ?? EdgeInsets.all(0),
+            contentPadding: widget.padding ?? const EdgeInsets.all(0),
             isDense: true,
             border: widget.showBorder == true
-                ? OutlineInputBorder(
+                ? const OutlineInputBorder(
                     ///设置边框四个角的弧度
                     borderRadius: BorderRadius.all(Radius.circular(10)),
 
@@ -123,7 +121,7 @@ class _InputViewState extends State<InputView> {
 
             ///设置输入框可编辑时的边框样式
             enabledBorder: widget.showBorder == true
-                ? OutlineInputBorder(
+                ? const OutlineInputBorder(
                     ///设置边框四个角的弧度
                     borderRadius: BorderRadius.all(Radius.circular(10)),
 
@@ -140,7 +138,7 @@ class _InputViewState extends State<InputView> {
 
             ///用来配置输入框获取焦点时的颜色
             focusedBorder: widget.showBorder == true
-                ? OutlineInputBorder(
+                ? const OutlineInputBorder(
                     ///设置边框四个角的弧度
                     borderRadius: BorderRadius.all(Radius.circular(10)),
 

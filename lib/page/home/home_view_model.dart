@@ -1,25 +1,17 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:kayo_package/kayo_package.dart';
-import 'package:media_kit/media_kit.dart';
-import 'package:media_kit_video/media_kit_video.dart';
-import 'package:omt/bean/user/user_login/user_login_data.dart';
 import 'package:omt/page/camera/camera_bound/camera_bound_page.dart';
 import 'package:omt/page/camera/camera_bound_delete/camera_bound_delete_page.dart';
 import 'package:omt/page/camera/camera_unbound/camera_un_bound_page.dart';
-import 'package:omt/page/home/home_page.dart';
 import 'package:omt/page/label/label_me/label_me_page.dart';
 import 'package:omt/page/tools/terminal/terminal_page.dart';
-import 'package:omt/page/user/user_login/user_login_page.dart';
 import 'package:omt/page/video/video_configuration/video_configuration_page.dart';
 import 'package:omt/page/video/video_frame/video_frame_page.dart';
 import 'package:omt/page/video/video_operations_center/video_operations_center_page.dart';
 import 'package:omt/utils/auth_utils.dart';
-import 'package:omt/utils/intent_utils.dart';
 import 'package:omt/utils/shared_utils.dart';
 import 'package:omt/utils/sys_utils.dart';
-import 'package:window_manager/window_manager.dart';
 
 ///
 ///  omt
@@ -33,7 +25,7 @@ final rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
 class NavigationBodyItem extends StatelessWidget {
-  const NavigationBodyItem({
+  const NavigationBodyItem({super.key, 
     this.header,
     this.content,
   });
@@ -56,21 +48,21 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
   List<NavigationPaneItem> videoItems = [
     PaneItemHeader(header: const Text('视频配置')),
     PaneItem(
-      icon: Icon(Icons.video_settings),
-      title: Text('视频配置'),
-      body: VideoConfigurationPage(),
+      icon: const Icon(Icons.video_settings),
+      title: const Text('视频配置'),
+      body: const VideoConfigurationPage(),
       onTap: () => debugPrint('视频配置'),
     ),
     PaneItem(
-      icon: Icon(Icons.video_library),
-      title: Text('视频画框'),
-      body: VideoFramePage(),
+      icon: const Icon(Icons.video_library),
+      title: const Text('视频画框'),
+      body: const VideoFramePage(),
       onTap: () => debugPrint('视频画框'),
     ),
     PaneItem(
-      icon: Icon(Icons.settings_input_svideo),
-      title: Text('操作中心'),
-      body: VideoOperationsCenterPage(),
+      icon: const Icon(Icons.settings_input_svideo),
+      title: const Text('操作中心'),
+      body: const VideoOperationsCenterPage(),
       onTap: () => debugPrint('操作中心'),
     ),
   ];
@@ -78,21 +70,21 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
   List<NavigationPaneItem> cameraItems = [
     PaneItemHeader(header: const Text('摄像头配置')),
     PaneItem(
-      icon: Icon(FluentIcons.t_v_monitor_selected),
-      title: Text('已绑定矿区'),
-      body: CameraBoundPage(),
+      icon: const Icon(FluentIcons.t_v_monitor_selected),
+      title: const Text('已绑定矿区'),
+      body: const CameraBoundPage(),
       onTap: () => debugPrint('已绑定矿区'),
     ),
     PaneItem(
-      icon: Icon(FluentIcons.t_v_monitor),
-      title: Text('未绑定矿区'),
-      body: CameraUnBoundPage(),
+      icon: const Icon(FluentIcons.t_v_monitor),
+      title: const Text('未绑定矿区'),
+      body: const CameraUnBoundPage(),
       onTap: () => debugPrint('未绑定矿区'),
     ),
     PaneItem(
-      icon: Icon(Icons.delete),
-      title: Text('绑定到已删除矿区'),
-      body: CameraBoundDeletePage(),
+      icon: const Icon(Icons.delete),
+      title: const Text('绑定到已删除矿区'),
+      body: const CameraBoundDeletePage(),
       onTap: () => debugPrint('绑定到已删除矿区'),
     ),
   ];
@@ -100,9 +92,9 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
   List<NavigationPaneItem> toolsItems = [
     PaneItemHeader(header: const Text('小工具')),
     PaneItem(
-      icon: Icon(Icons.terminal_outlined),
-      title: Text('终端'),
-      body: TerminalPage(),
+      icon: const Icon(Icons.terminal_outlined),
+      title: const Text('终端'),
+      body: const TerminalPage(),
       onTap: () => debugPrint('小工具'),
     ),
 
@@ -110,9 +102,9 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
   List<NavigationPaneItem> labelMeItems = [
     PaneItemHeader(header: const Text('标注')),
     PaneItem(
-      icon: Icon(FluentIcons.label),
-      title: Text('标注'),
-      body: LabelMePage(),
+      icon: const Icon(FluentIcons.label),
+      title: const Text('标注'),
+      body: const LabelMePage(),
       onTap: () => debugPrint('标注'),
     ),
   ];
@@ -146,10 +138,6 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
     }
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
 
   @override
   loadData({onSuccess, onCache, onError}) {

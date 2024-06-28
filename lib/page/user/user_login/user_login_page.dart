@@ -1,10 +1,7 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:kayo_package/kayo_package.dart';
-import 'package:kayo_package/views/_index_views.dart';
-import 'package:omt/main.dart';
 import 'package:omt/utils/color_utils.dart';
 import 'package:omt/utils/sys_utils.dart';
 import 'package:omt/widget/lib/register_ver_button.dart';
@@ -20,7 +17,7 @@ import 'user_login_view_model.dart';
 ///
 
 class UserLoginPage extends StatelessWidget {
-  const UserLoginPage({Key? key}) : super(key: key);
+  const UserLoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +34,7 @@ class UserLoginPage extends StatelessWidget {
             children: <Widget>[
               TextView(
                 '欢迎登录',
-                margin: EdgeInsets.only(top: 30, bottom: 30, left: 32),
+                margin: const EdgeInsets.only(top: 30, bottom: 30, left: 32),
                 color: ColorUtils.colorBlack,
                 alignment: Alignment.centerLeft,
                 size: 32,
@@ -72,7 +69,7 @@ class UserLoginPage extends StatelessWidget {
                 model.tips,
                 size: 13,
                 color: ColorUtils.colorRedGradientStart,
-                margin: EdgeInsets.only(top: 20, left: 30, right: 30),
+                margin: const EdgeInsets.only(top: 20, left: 30, right: 30),
                 maxLine: 2,
                 alignment: Alignment.centerLeft,
                 textAlign: TextAlign.center,
@@ -85,13 +82,13 @@ class UserLoginPage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(15),
                   boxShadow: [
                     BoxShadow(
-                      offset: Offset(0, 15),
+                      offset: const Offset(0, 15),
                       blurRadius: 15,
                       color: ColorUtils.colorBlue.withOpacity(0.15),
                     ),
                   ],
                 ),
-                margin: EdgeInsets.only(top: 48, left: 32, right: 32),
+                margin: const EdgeInsets.only(top: 48, left: 32, right: 32),
                 height: 58,
                 child: TextView(
                   '登录',
@@ -110,7 +107,7 @@ class UserLoginPage extends StatelessWidget {
                 margin: const EdgeInsets.only(top: 20),
               ),
 
-              Spacer(),
+              const Spacer(),
               // SafeArea(
               //   top: false,
               //   child: Row(
@@ -210,7 +207,7 @@ Widget _editView(model,
     List<TextInputFormatter>? inputFormatters,
     TextInputType? keyboardType}) {
   return Container(
-    margin: EdgeInsets.only(left: 32, right: 32, top: 20, bottom: 0),
+    margin: const EdgeInsets.only(left: 32, right: 32, top: 20, bottom: 0),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -218,7 +215,7 @@ Widget _editView(model,
           title ?? '',
           size: 14,
           color: ColorUtils.colorWhite,
-          margin: EdgeInsets.only(bottom: 10),
+          margin: const EdgeInsets.only(bottom: 10),
         ),
         Container(
           decoration: BoxDecoration(
@@ -230,7 +227,7 @@ Widget _editView(model,
               Expanded(
                 child: EditView(
                   textSize: 14,
-                  margin: EdgeInsets.only(left: 20),
+                  margin: const EdgeInsets.only(left: 20),
                   obscureText: obscureText,
                   keyboardType: keyboardType,
                   textColor: ColorUtils.colorBlackLite,
@@ -263,10 +260,10 @@ Widget _editView(model,
                   },
                   height: 19,
                   width: 19,
-                  padding: EdgeInsets.all(9),
+                  padding: const EdgeInsets.all(9),
                   radius: 20,
                   fit: BoxFit.fitWidth,
-                  margin: EdgeInsets.only(left: 2, right: 11),
+                  margin: const EdgeInsets.only(left: 2, right: 11),
                 ),
               ),
             ],

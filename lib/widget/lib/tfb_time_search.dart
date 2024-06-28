@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
@@ -37,7 +36,7 @@ class TfbTimeSearch extends StatefulWidget {
   final IdNameValue? area;
 
   const TfbTimeSearch(
-      {Key? key,
+      {super.key,
       this.width,
       this.margin,
       this.startTime,
@@ -56,17 +55,16 @@ class TfbTimeSearch extends StatefulWidget {
       this.showTime = true,
       this.showArea = false,
       this.showSearch = true,
-      this.area})
-      : super(key: key);
+      this.area});
 
   @override
   State<TfbTimeSearch> createState() => _TfbTimeSearchState();
 }
 
 class _TfbTimeSearchState extends State<TfbTimeSearch> {
-  String? timeStr = null;
-  String? searchStr = null;
-  String? areaStr = null;
+  String? timeStr;
+  String? searchStr;
+  String? areaStr;
 
   @override
   void initState() {
@@ -94,8 +92,12 @@ class _TfbTimeSearchState extends State<TfbTimeSearch> {
   Widget build(BuildContext context) {
     return Container(
       width: widget.width,
-      padding: EdgeInsets.only(top: 4, bottom: 8),
-      margin: widget.margin ?? EdgeInsets.only(right: 0),
+      padding: const EdgeInsets.only(top: 4, bottom: 8),
+      margin: widget.margin ?? const EdgeInsets.only(right: 0),
+      decoration: const BoxDecoration(
+        color: ColorUtils.colorWhite,
+        // borderRadius: BorderRadius.all(Radius.circular(RadiusUtils.radius4))
+      ),
       child: Row(
         children: [
           widget.showArea == true
@@ -103,12 +105,12 @@ class _TfbTimeSearchState extends State<TfbTimeSearch> {
                   color: ColorUtils.colorBlack,
                   size: 13,
                   onTap: () {},
-                  padding: EdgeInsets.only(
+                  padding: const EdgeInsets.only(
                       top: SizeUtils.paddingVertical,
                       bottom: SizeUtils.paddingVertical,
                       left: SizeUtils.padding,
                       right: SizeUtils.padding))
-              : SizedBox(
+              : const SizedBox(
                   height: 0,
                   width: SizeUtils.padding,
                 ),
@@ -135,13 +137,13 @@ class _TfbTimeSearchState extends State<TfbTimeSearch> {
                     });
                   });
                 },
-            padding: EdgeInsets.only(
+            padding: const EdgeInsets.only(
                 top: SizeUtils.paddingVertical,
                 bottom: SizeUtils.paddingVertical,
                 left: 10,
                 right: 10),
             rightIcon: source('home/ic_down'),
-            rightIconMargin: EdgeInsets.only(left: 6),
+            rightIconMargin: const EdgeInsets.only(left: 6),
             rightIconColor: ColorUtils.colorBlackLite,
             rightIconWidth: 8,
             rightIconHeight: 8,
@@ -157,7 +159,7 @@ class _TfbTimeSearchState extends State<TfbTimeSearch> {
             size: 13,
             borderRadius: BorderRadius.only(
                 topRight: 4.toRadius(), bottomRight: 4.toRadius()),
-            margin: EdgeInsets.only(right: 15),
+            margin: const EdgeInsets.only(right: 15),
             bgColor: '#F6F5F5'.toColor(),
             onTap: widget.onTapSearch ??
                 () {
@@ -175,7 +177,7 @@ class _TfbTimeSearchState extends State<TfbTimeSearch> {
                     }
                   });
                 },
-            padding: EdgeInsets.only(
+            padding: const EdgeInsets.only(
                 top: SizeUtils.paddingVertical,
                 bottom: SizeUtils.paddingVertical,
                 left: SizeUtils.paddingHorizontal),
@@ -183,16 +185,12 @@ class _TfbTimeSearchState extends State<TfbTimeSearch> {
               src: source('ic_search'),
               width: 16,
               color: ColorUtils.colorBlackLite,
-              margin: EdgeInsets.only(right: 4),
+              margin: const EdgeInsets.only(right: 4),
               height: 16,
             ),
           )).setVisible(
               visible: showSearch == true ? Visible.visible : Visible.gone)
         ],
-      ),
-      decoration: BoxDecoration(
-        color: ColorUtils.colorWhite,
-        // borderRadius: BorderRadius.all(Radius.circular(RadiusUtils.radius4))
       ),
     );
   }

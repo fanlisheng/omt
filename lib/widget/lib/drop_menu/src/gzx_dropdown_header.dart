@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:kayo_package/extension/base_string_extension.dart';
 import 'package:kayo_package/extension/base_widget_extension.dart';
 import 'package:omt/utils/color_utils.dart';
 
@@ -29,8 +28,8 @@ class GZXDropDownHeader extends StatefulWidget {
   final GlobalKey stackKey;
 
   /// Creates a dropdown header widget, Contains more than one header items.
-  GZXDropDownHeader({
-    Key? key,
+  const GZXDropDownHeader({
+    super.key,
     required this.items,
     required this.controller,
     required this.stackKey,
@@ -46,7 +45,7 @@ class GZXDropDownHeader extends StatefulWidget {
     this.dividerColor = const Color(0xFFeeede6),
     this.onItemTap,
     this.color = Colors.white,
-  }) : super(key: key);
+  });
 
   @override
   _GZXDropDownHeaderState createState() => _GZXDropDownHeaderState();
@@ -57,7 +56,7 @@ class _GZXDropDownHeaderState extends State<GZXDropDownHeader>
   bool _isShowDropDownItemWidget = false;
   late double _screenWidth;
   late int _menuCount;
-  GlobalKey _keyDropDownHeader = GlobalKey();
+  final GlobalKey _keyDropDownHeader = GlobalKey();
   TextStyle? _dropDownStyle;
   Color? _iconDropDownColor;
 
@@ -100,7 +99,7 @@ class _GZXDropDownHeaderState extends State<GZXDropDownHeader>
 
     List<Widget> list = [];
     for (var i in widget.items) {
-      list.add(SizedBox(
+      list.add(const SizedBox(
         width: 12,
       ));
       list.add(_menu(i));
@@ -114,7 +113,7 @@ class _GZXDropDownHeaderState extends State<GZXDropDownHeader>
       children: list,
     );
 
-    return Container(
+    return SizedBox(
       key: _keyDropDownHeader,
       height: widget.height,
 //      padding: EdgeInsets.only(top: 1, bottom: 1),
@@ -122,9 +121,6 @@ class _GZXDropDownHeaderState extends State<GZXDropDownHeader>
     );
   }
 
-  dispose() {
-    super.dispose();
-  }
 
   Widget _menu(GZXDropDownHeaderItem item) {
     int index = widget.items.indexOf(item);
@@ -183,7 +179,7 @@ class _GZXDropDownHeaderState extends State<GZXDropDownHeader>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
                   Expanded(
@@ -207,7 +203,7 @@ class _GZXDropDownHeaderState extends State<GZXDropDownHeader>
                         : item.style?.color ?? widget.iconColor,
                     size: item.iconSize ?? widget.iconSize,
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 6,
                   ),
                 ],

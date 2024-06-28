@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:kayo_package/views/widget/base/_index_widget_base.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
@@ -9,7 +8,7 @@ class FIleViewPage extends StatefulWidget {
   final File? file;
   final String? url;
 
-  const FIleViewPage({Key? key, this.file, this.url}) : super(key: key);
+  const FIleViewPage({super.key, this.file, this.url});
 
   @override
   _PDFViewPage createState() => _PDFViewPage();

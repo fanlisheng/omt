@@ -4,7 +4,6 @@ import 'package:flutter/widgets.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:omt/utils/color_utils.dart';
-import 'package:omt/utils/sys_utils.dart';
 import 'package:omt/widget/lib/widgets.dart';
 import 'video_operations_center_view_model.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fu;
@@ -19,7 +18,7 @@ import 'package:fluent_ui/fluent_ui.dart' as fu;
 ///
 
 class VideoOperationsCenterPage extends StatelessWidget {
-  const VideoOperationsCenterPage({Key? key}) : super(key: key);
+  const VideoOperationsCenterPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +28,7 @@ class VideoOperationsCenterPage extends StatelessWidget {
         builder: (context, model, child) {
           var windowWidth = BaseSysUtils.getWidth(context);
 
-          var _row = windowWidth > 600 * 2 + 200;
+          var row = windowWidth > 600 * 2 + 200;
 
           return fu.ScaffoldPage.scrollable(
               header: const fu.PageHeader(
@@ -71,17 +70,17 @@ class VideoOperationsCenterPage extends StatelessWidget {
                     TitleMsgVideoFrame('设备编码：', model.findTheRtsp()?.value,
                         flex: 1),
                   ],
-                ).addContainer(margin: EdgeInsets.only(top: 12, bottom: 20)),
-                _row
+                ).addContainer(margin: const EdgeInsets.only(top: 12, bottom: 20)),
+                row
                     ? Row(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: _views(model, _row),
+                        children: _views(model, row),
                       )
                     : Column(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: _views(model, _row),
+                        children: _views(model, row),
                       ),
                 Wrap(
                   runSpacing: 20,
@@ -134,14 +133,14 @@ class VideoOperationsCenterPage extends StatelessWidget {
                         }),
                   ],
                 ).addContainer(
-                  margin: EdgeInsets.only(top: 50),
+                  margin: const EdgeInsets.only(top: 50),
                   alignment: Alignment.center,
                 )
               ]);
         });
   }
 
-  List<Widget> _views(VideoOperationsCenterViewModel model, bool _row) {
+  List<Widget> _views(VideoOperationsCenterViewModel model, bool row) {
     return [
       SizedBox(
         width: 640,
@@ -172,10 +171,10 @@ class VideoOperationsCenterPage extends StatelessWidget {
             ],
           ),
           CardView(
-              margin: EdgeInsets.only(top: 16),
+              margin: const EdgeInsets.only(top: 16),
               radius: 8,
               padding:
-                  EdgeInsets.only(top: 12, bottom: 12, left: 12, right: 12),
+                  const EdgeInsets.only(top: 12, bottom: 12, left: 12, right: 12),
               shadowRadius: 8,
               child: Column(
                 children: [
@@ -209,7 +208,7 @@ class VideoOperationsCenterPage extends StatelessWidget {
                           height: 30 * 4,
                           child: ListView.builder(
                             itemBuilder: (context, index) {
-                              return Container(
+                              return SizedBox(
                                 height: 30,
                                 child: Row(
                                   mainAxisAlignment:
@@ -237,7 +236,7 @@ class VideoOperationsCenterPage extends StatelessWidget {
                 ],
               ))
         ],
-      ).addExpanded(flex: _row ? 1 : null),
+      ).addExpanded(flex: row ? 1 : null),
     ];
   }
 }

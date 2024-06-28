@@ -1,4 +1,3 @@
-import 'dart:async';
 
 import 'package:fluent_ui/fluent_ui.dart';
 
@@ -7,7 +6,6 @@ import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/camera/camera_entity.dart';
 import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/http/http_query.dart';
-import 'package:omt/utils/log_utils.dart';
 
 import '../../../utils/color_utils.dart';
 

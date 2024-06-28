@@ -1,5 +1,4 @@
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:lpinyin/lpinyin.dart';
 import 'package:omt/utils/json_utils.dart';
@@ -23,9 +22,7 @@ class HttpManager extends BaseHttpManager {
   static HttpManager? _instance;
 
   factory HttpManager._share() {
-    if (_instance == null) {
-      _instance = HttpManager._();
-    }
+    _instance ??= HttpManager._();
     return _instance!;
   }
 

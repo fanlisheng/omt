@@ -1,13 +1,11 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:omt/bean/video/video_configuration/Video_Connect_entity.dart';
 import 'package:omt/bean/video/video_operations_center/video_operations_center_data.dart';
 import 'package:omt/http/http_query.dart';
-import 'package:omt/utils/sys_utils.dart';
 
 ///
 ///  omt
@@ -30,10 +28,6 @@ class VideoOperationsCenterViewModel
   List<VideoInfoCamEntity>? rtspList;
   int rtspIndex = 0;
 
-  @override
-  void initState() async {
-    super.initState();
-  }
 
   @override
   void dispose() {

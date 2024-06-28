@@ -1,7 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
-import 'package:kayo_package/views/widget/base/clickable.dart';
 import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/utils/color_utils.dart';
 import 'package:omt/widget/lib/drop_menu/src/gzx_dropdown_header.dart';
@@ -35,7 +33,7 @@ class TfbSpinner extends StatefulWidget {
   final GZXDropdownMenuController? dropdownMenuController;
 
   const TfbSpinner(
-      {Key? key,
+      {super.key,
       required this.datas,
       this.customMenus,
       this.onPick,
@@ -45,8 +43,7 @@ class TfbSpinner extends StatefulWidget {
       required this.child,
       this.padding,
       this.margin,
-      this.dropdownMenuController})
-      : super(key: key);
+      this.dropdownMenuController});
 
   @override
   State<StatefulWidget> createState() => _TfbSpinnerState();
@@ -55,7 +52,7 @@ class TfbSpinner extends StatefulWidget {
 class _TfbSpinnerState extends State<TfbSpinner> {
   //标题当前选中项
   int currentIndex = -1;
-  GlobalKey _stackKey = GlobalKey();
+  final GlobalKey _stackKey = GlobalKey();
   List<GZXDropDownHeaderItem> items = [];
   List<GZXDropdownMenuBuilder> menus = [];
   late GZXDropdownMenuController _dropdownMenuController;
@@ -71,7 +68,7 @@ class _TfbSpinnerState extends State<TfbSpinner> {
     }
   }
 
-  buildDropdownListWidget(IdNameValue? data, void itemOnTap(IdNameValue item)) {
+  buildDropdownListWidget(IdNameValue? data, void Function(IdNameValue item) itemOnTap) {
     if (data == null || (data.children?.length ?? 0) == 0) {
       return Container();
     } else {
@@ -90,11 +87,11 @@ class _TfbSpinnerState extends State<TfbSpinner> {
               data.selectSub = item;
               itemOnTap(data);
             },
-            child: Container(
+            child: SizedBox(
               height: 50,
               child: Row(
                 children: <Widget>[
-                  SizedBox(
+                  const SizedBox(
                     width: 16,
                   ),
                   Expanded(
@@ -115,7 +112,7 @@ class _TfbSpinnerState extends State<TfbSpinner> {
                   //         size: 16,
                   //       )
                   //     : SizedBox(),
-                  SizedBox(
+                  const SizedBox(
                     width: 16,
                   ),
                 ],
@@ -169,6 +166,10 @@ class _TfbSpinnerState extends State<TfbSpinner> {
           children: <Widget>[
             ...(widget.childrenAboveOfSpinner ?? []),
             Container(
+              padding: widget.padding ?? const EdgeInsets.symmetric(horizontal: 10),
+              margin: widget.margin,
+              color: Colors.white,
+              height: 43,
               child: GZXDropDownHeader(
                 items: items,
                 stackKey: _stackKey,
@@ -177,19 +178,15 @@ class _TfbSpinnerState extends State<TfbSpinner> {
                 dividerHeight: 0,
                 // borderColor: Colors.transparent,
                 style:
-                    TextStyle(fontSize: 13, color: ColorUtils.colorBlackLite),
+                    const TextStyle(fontSize: 13, color: ColorUtils.colorBlackLite),
               ),
-              padding: widget.padding ?? EdgeInsets.symmetric(horizontal: 10),
-              margin: widget.margin,
-              color: Colors.white,
-              height: 43,
             ),
             ...(widget.childrenBelowOfSpinner ?? []),
             Expanded(child: widget.child),
           ],
         ),
         (widget.childAboveOfGZXDropDownMenuPositioned ??
-            SizedBox(
+            const SizedBox(
               height: 0,
               width: 0,
             )),

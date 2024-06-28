@@ -1,12 +1,9 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
-import 'package:kayo_package/views/_index_views.dart';
 import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/utils/color_utils.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fu;
 
 ///
@@ -41,12 +38,12 @@ Widget TfbSwitch({
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             left,
-            SizedBox(
+            const SizedBox(
               height: 2,
             ),
             Text(
               subTitle,
-              style: TextStyle(
+              style: const TextStyle(
                   color: ColorUtils.colorBlackLiteLite,
                   fontSize: SizeUtils.fontSize12),
             )
@@ -57,9 +54,9 @@ Widget TfbSwitch({
   // colorOff = colorOff ?? ColorUtils.colorAccent;
 
   return Container(
-    padding: EdgeInsets.all(SizeUtils.padding),
+    padding: const EdgeInsets.all(SizeUtils.padding),
     margin: margin,
-    decoration: BoxDecoration(
+    decoration: const BoxDecoration(
         color: ColorUtils.colorWhite,
         borderRadius: BorderRadius.all(Radius.circular(0))),
     child: Row(
@@ -91,7 +88,7 @@ Widget TfbTitleMsg(String? title,
           fontWeight: FontWeight.bold,
           color: titleColor ?? ColorUtils.colorBlack,
           maxLine: 3,
-          padding: EdgeInsets.only(
+          padding: const EdgeInsets.only(
               left: SizeUtils.marginHorizontal,
               top: SizeUtils.padding,
               bottom: SizeUtils.padding,
@@ -99,7 +96,7 @@ Widget TfbTitleMsg(String? title,
         ),
         LineView(
           visible: showLine == true ? Visible.visible : Visible.gone,
-          margin: EdgeInsets.only(
+          margin: const EdgeInsets.only(
             left: SizeUtils.marginHorizontal,
             right: SizeUtils.marginHorizontal,
           ),
@@ -117,7 +114,7 @@ Widget TfbTitleMsg(String? title,
               fontWeight: FontWeight.bold,
               color: titleColor ?? ColorUtils.colorBlack,
               maxLine: 3,
-              padding: EdgeInsets.only(
+              padding: const EdgeInsets.only(
                   left: SizeUtils.marginHorizontal,
                   top: SizeUtils.padding,
                   bottom: SizeUtils.padding,
@@ -130,7 +127,7 @@ Widget TfbTitleMsg(String? title,
               size: 15,
               color: msgColor ?? ColorUtils.colorBlackLiteLite,
               maxLine: 3,
-              padding: EdgeInsets.only(
+              padding: const EdgeInsets.only(
                   left: SizeUtils.marginHorizontal,
                   top: SizeUtils.padding,
                   bottom: SizeUtils.padding,
@@ -140,7 +137,7 @@ Widget TfbTitleMsg(String? title,
         ),
         LineView(
           visible: showLine == true ? Visible.visible : Visible.gone,
-          margin: EdgeInsets.only(
+          margin: const EdgeInsets.only(
             left: SizeUtils.marginHorizontal,
             right: SizeUtils.marginHorizontal,
           ),
@@ -152,7 +149,7 @@ Widget TfbTitleMsg(String? title,
   return HorizontalTitleMsgView(
     title: title ?? '',
     height: 50,
-    padding: EdgeInsets.only(
+    padding: const EdgeInsets.only(
         left: SizeUtils.marginHorizontal, right: SizeUtils.marginHorizontal),
     // padding: EdgeInsets.only(top: 15, bottom: 15),
     titleColor: titleColor ?? ColorUtils.colorBlack,
@@ -166,7 +163,7 @@ Widget TfbTitleMsg(String? title,
     onClick: onTap,
     bottomLine: showLine ?? true,
     bottomLineColor: ColorUtils.colorSeparator,
-    bottomLineMargin: EdgeInsets.only(
+    bottomLineMargin: const EdgeInsets.only(
         left: SizeUtils.marginHorizontal, right: SizeUtils.marginHorizontal),
   );
 }
@@ -186,7 +183,7 @@ Widget columnText(
         title.defaultStr(),
         size: titleSize ?? 12,
         color: titleColor ?? ColorUtils.colorBlackLite,
-        margin: EdgeInsets.only(bottom: 4),
+        margin: const EdgeInsets.only(bottom: 4),
       ),
       TextView(
         msg.defaultStr(),
@@ -211,13 +208,13 @@ Widget rowText(
       TextView(
         text1,
         size: 13,
-        color: Color(0xFF999999),
-        margin: EdgeInsets.only(right: 4),
+        color: const Color(0xFF999999),
+        margin: const EdgeInsets.only(right: 4),
       ),
       TextView(
         text2,
         size: 13,
-        color: Color(0xFF333333),
+        color: const Color(0xFF333333),
         maxLine: flexMsg == null ? 1 : 3,
       ).addExpanded(flex: flexMsg),
       ...(rightViews ?? [])
@@ -256,7 +253,7 @@ Widget textLine(String title, {bool showLine = false}) {
 }
 
 Widget TfbComboBox(
-    {int? selectedIndex, List<IdNameValue>? datas, double? width = null}) {
+    {int? selectedIndex, List<IdNameValue>? datas, double? width}) {
   var child2 = fu.ComboBox<IdNameValue>(
     value: null == selectedIndex ? null : datas![selectedIndex],
     items: datas!.map<fu.ComboBoxItem<IdNameValue>>((e) {
@@ -371,7 +368,7 @@ Widget TfbTitleSub(
     Container(
       width: width,
       height: 35,
-      margin: EdgeInsets.only(top: 5),
+      margin: const EdgeInsets.only(top: 5),
       child: child2,
     ),
   ];

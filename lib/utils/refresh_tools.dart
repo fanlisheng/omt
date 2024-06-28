@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
-import 'package:kayo_package/utils/_index_utils.dart';
 import 'package:omt/utils/color_utils.dart';
 import 'package:omt/widget/page/pager_indicator_item.dart';
 

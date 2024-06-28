@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:xterm/ui.dart';
 import 'package:xterm/xterm.dart';
 import 'package:flutter_pty/flutter_pty.dart';
 
@@ -52,7 +51,7 @@ class _TerminalPageState extends State<TerminalPage> {
 
     pty.output
         .cast<List<int>>()
-        .transform(Utf8Decoder())
+        .transform(const Utf8Decoder())
         .listen(terminal.write);
 
     pty.exitCode.then((code) {

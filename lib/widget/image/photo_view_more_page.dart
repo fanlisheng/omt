@@ -32,7 +32,7 @@ class PhotoViewMorePage extends StatefulWidget {
   final List<String>? imageSrc;
   final bool? hasRotationButton;
 
-  PhotoViewMorePage({
+  PhotoViewMorePage({super.key, 
     this.url,
     this.urls,
     this.src,
@@ -79,9 +79,9 @@ class _PhotoViewMorePageState extends State<PhotoViewMorePage> {
     if (showTitle) {
       children2.add(TextView(
         widget.title,
-        margin: EdgeInsets.all(0),
-        padding: EdgeInsets.all(0),
-        color: Color(0xff191D2D),
+        margin: const EdgeInsets.all(0),
+        padding: const EdgeInsets.all(0),
+        color: const Color(0xff191D2D),
         size: 17,
       ));
     }
@@ -89,9 +89,9 @@ class _PhotoViewMorePageState extends State<PhotoViewMorePage> {
     if (showSubTitle) {
       children2.add(TextView(
         widget.subTitle,
-        margin: EdgeInsets.all(0),
-        padding: EdgeInsets.all(0),
-        color: Color(0xff191D2D),
+        margin: const EdgeInsets.all(0),
+        padding: const EdgeInsets.all(0),
+        color: const Color(0xff191D2D),
         size: 10,
       ));
     }
@@ -102,10 +102,10 @@ class _PhotoViewMorePageState extends State<PhotoViewMorePage> {
             minScale: PhotoViewComputedScale.contained,
             loadingBuilder: (c, e) {
               return Container(
-                child: Stack(
+                child: const Stack(
                   children: <Widget>[
                     Center(
-                        child: new SpinKitFoldingCube(
+                        child: SpinKitFoldingCube(
                             color: Colors.white, size: 60.0)),
                   ],
                 ),
@@ -126,10 +126,10 @@ class _PhotoViewMorePageState extends State<PhotoViewMorePage> {
                 // maxScale: PhotoViewComputedScale.contained,
                 loadingBuilder: (c, e) {
                   return Container(
-                    child: Stack(
+                    child: const Stack(
                       children: <Widget>[
                         Center(
-                            child: new SpinKitFoldingCube(
+                            child: SpinKitFoldingCube(
                                 color: Colors.white, size: 60.0)),
                       ],
                     ),
@@ -166,7 +166,7 @@ class _PhotoViewMorePageState extends State<PhotoViewMorePage> {
 //                    Icons.arrow_back_ios,
                   ),
                   iconSize: 25,
-                  color: Color(0xff50525c),
+                  color: const Color(0xff50525c),
                   onPressed: () async {
                     if (Navigator.canPop(context)) {
                       return Navigator.of(context).pop('');
@@ -203,7 +203,7 @@ class _PhotoViewMorePageState extends State<PhotoViewMorePage> {
                     child: FloatingActionButton(
                       mini: true,
                       elevation: 0,
-                      backgroundColor: Color(0x22000000),
+                      backgroundColor: const Color(0x22000000),
                       onPressed: () {
                         IntentUtils.share.pop(context);
                       },
@@ -224,9 +224,9 @@ class _PhotoViewMorePageState extends State<PhotoViewMorePage> {
                       color: ColorUtils.colorWhite,
                       size: 13,
                       padding:
-                          EdgeInsets.only(left: 8, right: 8, top: 2, bottom: 2),
+                          const EdgeInsets.only(left: 8, right: 8, top: 2, bottom: 2),
                       radius: 30,
-                      bgColor: Color(0x55000000),
+                      bgColor: const Color(0x55000000),
                     ))),
             Visibility(
               visible: (widget.hasRotationButton ?? false) ? true : false,
@@ -242,11 +242,11 @@ class _PhotoViewMorePageState extends State<PhotoViewMorePage> {
                         width: 44,
                         height: 44,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(6)),
+                          borderRadius: const BorderRadius.all(Radius.circular(6)),
                           color: ColorUtils.colorBlackLiteLite.withOpacity(0.3),
                         ),
                         child: ImageView(
-                          padding: EdgeInsets.all(12),
+                          padding: const EdgeInsets.all(12),
                           src: source('ic_rotation_left'),
                         ),
                       ),
@@ -263,11 +263,11 @@ class _PhotoViewMorePageState extends State<PhotoViewMorePage> {
                         width: 44,
                         height: 44,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(6)),
+                          borderRadius: const BorderRadius.all(Radius.circular(6)),
                           color: ColorUtils.colorBlackLiteLite.withOpacity(0.3),
                         ),
                         child: ImageView(
-                          padding: EdgeInsets.all(12),
+                          padding: const EdgeInsets.all(12),
                           src: source('ic_rotation_right'),
                         ),
                       ),

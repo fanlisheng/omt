@@ -4,9 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/http/api.dart';
-import 'package:omt/page/user/user_login/user_login_page.dart';
 import 'package:omt/router_utils.dart';
-import 'package:omt/utils/image_utils.dart';
 import 'package:omt/utils/shared_utils.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fu;
 import 'package:omt/utils/sys_utils.dart';
@@ -46,16 +44,6 @@ class IntentUtils extends BaseIntentUtilsNoBoost {
         routeName: routeName, finish: finish, removeAll: removeAll, data: data);
   }
 
-  @override
-  pop(BuildContext context,
-      {Map<String, dynamic>? data, bool finishAct = false}) {
-    /*  if (useFlutterBoost == true) {
-      return BoostNavigator.instance.pop(data);
-    } else */
-    {
-      return super.pop(context, data: data, finishAct: finishAct);
-    }
-  }
 
   void gotoLogin(BuildContext? context, {bool noAlert = false}) async {
     LoadingUtils.dismiss();

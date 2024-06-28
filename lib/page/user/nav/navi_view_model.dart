@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/user/user_login/user_login_data.dart';
 import 'package:omt/utils/intent_utils.dart';
@@ -25,10 +24,6 @@ class NaviViewModel extends BaseViewModelRefresh<dynamic> {
     });
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
 
   @override
   loadData({onSuccess, onCache, onError}) {

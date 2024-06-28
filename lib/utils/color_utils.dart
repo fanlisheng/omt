@@ -14,7 +14,7 @@ class ColorUtils {
 
   static const Color colorAccent = Color(0xFF3D7EFF);
   static const Color colorAccentLite = Color(0xFF88B8FD);
-  static const Color transparent = Color(0x0000000);
+  static const Color transparent = Color(0x00000000);
 
   static const Color colorBlue = Color(0xFF3D7EFF);
   static const Color colorGreen = Color(0xFF26CA83);
@@ -67,9 +67,9 @@ class ColorUtils {
   static const Color colorGra = Color(0x80FFE8D5);
   static const Color colorGrayLight = Color(0xFFcccccc);
 
-  static const MaterialColor primarySwatch = const MaterialColor(
+  static const MaterialColor primarySwatch = MaterialColor(
     colorPrimaryColor,
-    const <int, Color>{
+    <int, Color>{
       50: colorPrimaryLight,
       100: colorPrimaryLight,
       200: colorPrimaryLight,
@@ -93,9 +93,9 @@ class RadiusUtils {
 class TextStyleUtils {
   ///登录注册页标题、导航标题、重要文本
   static TextStyle? get title =>
-      TextStyle(color: ColorUtils.colorBlack, fontSize: SizeUtils.fontSize17);
+      const TextStyle(color: ColorUtils.colorBlack, fontSize: SizeUtils.fontSize17);
 
-  static TextStyle? get titleBold => TextStyle(
+  static TextStyle? get titleBold => const TextStyle(
       color: ColorUtils.colorBlack,
       fontSize: SizeUtils.fontSize17,
       fontWeight: FontWeight.bold);

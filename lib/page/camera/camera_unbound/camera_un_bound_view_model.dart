@@ -1,13 +1,10 @@
-import 'dart:async';
 
-import 'package:fluent_ui/fluent_ui.dart';
 
 // import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/camera/camera_entity.dart';
 import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/http/http_query.dart';
-import 'package:omt/utils/log_utils.dart';
 import 'package:omt/widget/picker/id_name_picker.dart';
 
 ///
@@ -41,10 +38,6 @@ class CameraUnBoundViewModel extends BaseViewModelList<CameraInfoEntity> {
     });
   }
 
-  @override
-  void dispose() {
-     super.dispose();
-  }
 
   @override
   bool hasMore() {

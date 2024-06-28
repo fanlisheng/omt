@@ -14,7 +14,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 ///
 
 class LauncherPage extends StatelessWidget {
-  const LauncherPage({Key? key}) : super(key: key);
+  const LauncherPage({super.key});
 
   @override
   Widget build(BuildContext context) {

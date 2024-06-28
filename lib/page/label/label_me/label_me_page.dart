@@ -1,8 +1,5 @@
-import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/utils/color_utils.dart';
@@ -22,7 +19,7 @@ import 'dart:math' as math;
 ///
 
 class LabelMePage extends StatelessWidget {
-  const LabelMePage({Key? key}) : super(key: key);
+  const LabelMePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +43,7 @@ class LabelMePage extends StatelessWidget {
                     icon: Transform(
                       alignment: Alignment.center,
                       transform: Matrix4.rotationY(math.pi),
-                      child: Icon(Icons.next_plan_outlined),
+                      child: const Icon(Icons.next_plan_outlined),
                     ),
                     onPressed: () {
                       model.undo();
@@ -57,7 +54,7 @@ class LabelMePage extends StatelessWidget {
                     icon: Transform(
                       alignment: Alignment.center,
                       transform: Matrix4.rotationY(math.pi),
-                      child: Icon(Icons.arrow_forward_outlined),
+                      child: const Icon(Icons.arrow_forward_outlined),
                     ),
                     onPressed: () {
                       model.nextIndex(pre: true);
@@ -88,7 +85,7 @@ class LabelMePage extends StatelessWidget {
                   TextView(
                     model.selectedDir,
                     size: 13,
-                    margin: EdgeInsets.only(left: 20),
+                    margin: const EdgeInsets.only(left: 20),
                   )
                 ],
               ),
@@ -137,8 +134,8 @@ class LabelMePage extends StatelessWidget {
                         child: Scrollbar(
                           child: SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
-                            physics: NeverScrollableScrollPhysics(),
-                            child: Container(
+                            physics: const NeverScrollableScrollPhysics(),
+                            child: SizedBox(
                               width: 400,
                               child: Scrollbar(
                                 controller: model.scrollControllerRectangle,
@@ -176,8 +173,8 @@ class LabelMePage extends StatelessWidget {
                         child: Scrollbar(
                           child: SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
-                            physics: NeverScrollableScrollPhysics(),
-                            child: Container(
+                            physics: const NeverScrollableScrollPhysics(),
+                            child: SizedBox(
                               width: 400,
                               child: Scrollbar(
                                 controller: model.scrollControllerImg,

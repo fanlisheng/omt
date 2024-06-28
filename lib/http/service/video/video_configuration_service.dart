@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:kayo_package/extension/_index_extension.dart';
 
-import 'package:omt/bean/common/code_data.dart';
-import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/http/api.dart';
 import 'package:omt/http/http_manager.dart';
 import 'package:omt/utils/json_utils.dart';

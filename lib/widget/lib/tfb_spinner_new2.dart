@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/common/id_name_value.dart';
@@ -31,7 +30,7 @@ class TfbSpinnerNew2 extends StatefulWidget {
   final EdgeInsets? margin;
 
   const TfbSpinnerNew2(
-      {Key? key,
+      {super.key,
       required this.datas,
       this.onPicked,
       this.onTap,
@@ -40,8 +39,7 @@ class TfbSpinnerNew2 extends StatefulWidget {
       this.childAboveOfGZXDropDownMenuPositioned,
       required this.child,
       this.padding,
-      this.margin})
-      : super(key: key);
+      this.margin});
 
   @override
   State<TfbSpinnerNew2> createState() => _TfbSpinnerNew2State();
@@ -50,7 +48,7 @@ class TfbSpinnerNew2 extends StatefulWidget {
 class _TfbSpinnerNew2State extends State<TfbSpinnerNew2> {
   //标题当前选中项
   int currentIndex = -1;
-  GlobalKey _stackKey = GlobalKey();
+  final GlobalKey _stackKey = GlobalKey();
   List<GZXDropDownHeaderItem> items = [];
   List<GZXDropdownMenuBuilder> menus = [];
   final GZXDropdownMenuController _dropdownMenuController =
@@ -64,7 +62,7 @@ class _TfbSpinnerNew2State extends State<TfbSpinnerNew2> {
     super.initState();
   }
 
-  buildDropdownListWidget(IdNameValue? data, void itemOnTap(IdNameValue item)) {
+  buildDropdownListWidget(IdNameValue? data, void Function(IdNameValue item) itemOnTap) {
     if (data == null || (data.children?.length ?? 0) == 0) {
       return Container();
     } else {
@@ -90,12 +88,12 @@ class _TfbSpinnerNew2State extends State<TfbSpinnerNew2> {
               height: 50.0 * (subListParent?.children?.length ?? 0),
               child: firstList,
             ),
-            LineView(
+            const LineView(
               width: 1,
               height: double.infinity,
             ),
             Expanded(
-              child: Container(
+              child: SizedBox(
                 height: 50.0 * (subListParent?.children?.length ?? 0),
                 child: buildListView(subListParent!, true, itemOnTap),
               ),
@@ -109,7 +107,7 @@ class _TfbSpinnerNew2State extends State<TfbSpinnerNew2> {
   }
 
   ListView buildListView(
-      IdNameValue data, bool children, void itemOnTap(IdNameValue item)) {
+      IdNameValue data, bool children, void Function(IdNameValue item) itemOnTap) {
     return ListView.separated(
       shrinkWrap: true,
       scrollDirection: Axis.vertical,
@@ -128,11 +126,11 @@ class _TfbSpinnerNew2State extends State<TfbSpinnerNew2> {
             data.selectSub = item;
             itemOnTap(data);
           },
-          child: Container(
+          child: SizedBox(
             height: 50,
             child: Row(
               children: <Widget>[
-                SizedBox(
+                const SizedBox(
                   width: 16,
                 ),
                 Expanded(
@@ -146,7 +144,7 @@ class _TfbSpinnerNew2State extends State<TfbSpinnerNew2> {
                     ),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 16,
                 ),
               ],
@@ -167,7 +165,6 @@ class _TfbSpinnerNew2State extends State<TfbSpinnerNew2> {
         var name2 = data.selectSub?.selectSub?.selectSub?.name ??
             data.selectSub?.selectSub?.name ??
             data.selectSub?.name;
-        ;
         if (-1 == data.selectSub?.id) {
           name2 = null;
         }
@@ -215,6 +212,10 @@ class _TfbSpinnerNew2State extends State<TfbSpinnerNew2> {
           children: <Widget>[
             ...(widget.childrenAboveOfSpinner ?? []),
             Container(
+              padding: widget.padding ?? const EdgeInsets.symmetric(horizontal: 10),
+              margin: widget.margin,
+              color: Colors.white,
+              height: 43,
               child: GZXDropDownHeader(
                 items: items,
                 stackKey: _stackKey,
@@ -223,19 +224,15 @@ class _TfbSpinnerNew2State extends State<TfbSpinnerNew2> {
                 dividerHeight: 0,
                 // borderColor: Colors.transparent,
                 style:
-                    TextStyle(fontSize: 13, color: ColorUtils.colorBlackLite),
+                    const TextStyle(fontSize: 13, color: ColorUtils.colorBlackLite),
               ),
-              padding: widget.padding ?? EdgeInsets.symmetric(horizontal: 10),
-              margin: widget.margin,
-              color: Colors.white,
-              height: 43,
             ),
             ...(widget.childrenBelowOfSpinner ?? []),
             Expanded(child: widget.child),
           ],
         ),
         (widget.childAboveOfGZXDropDownMenuPositioned ??
-            SizedBox(
+            const SizedBox(
               height: 0,
               width: 0,
             )),

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/utils/color_utils.dart';
@@ -10,7 +9,7 @@ class SearchPage extends StatefulWidget {
   final String? keyValue;
   final bool? ShowTime;
 
-  const SearchPage({Key? key, this.keyValue, this.ShowTime}) : super(key: key);
+  const SearchPage({super.key, this.keyValue, this.ShowTime});
 
   @override
   State<StatefulWidget> createState() => _SearchPageState();
@@ -47,7 +46,7 @@ class _SearchPageState extends State<SearchPage> {
         showResult = true;
         setState(() {});
       } else {
-        if (resultData.length == 0 && (controller?.text?.length ?? 0) == 0) {
+        if (resultData.isEmpty && (controller?.text.length ?? 0) == 0) {
           showHistory = true;
           showResult = false;
           setState(() {});
@@ -105,8 +104,11 @@ class _SearchPageState extends State<SearchPage> {
                         child: Row(
                           children: [
                             VisibleView(
+                              visible: (widget.ShowTime ?? false) == true
+                                  ? Visible.visible
+                                  : Visible.gone,
                               child: Container(
-                                decoration: BoxDecoration(
+                                decoration: const BoxDecoration(
                                     borderRadius: BorderRadius.only(
                                       bottomLeft: Radius.circular(15),
                                       topLeft: Radius.circular(15),
@@ -116,11 +118,11 @@ class _SearchPageState extends State<SearchPage> {
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     TextView(
-                                      '${startTime} - ${endTime}',
+                                      '$startTime - $endTime',
                                       size: 14,
                                       alignment: Alignment.center,
                                       color: ColorUtils.colorBlackLite,
-                                      margin: EdgeInsets.only(
+                                      margin: const EdgeInsets.only(
                                         left: 10,
                                       ),
                                       onTap: () {
@@ -148,15 +150,12 @@ class _SearchPageState extends State<SearchPage> {
                                   ],
                                 ),
                               ),
-                              visible: (widget.ShowTime ?? false) == true
-                                  ? Visible.visible
-                                  : Visible.gone,
                             ),
                             ImageView(
                               src: source('ic_search'),
                               width: 24,
                               height: 24,
-                              margin: EdgeInsets.only(left: 12),
+                              margin: const EdgeInsets.only(left: 12),
                             ),
                             Expanded(
                                 child: InputView(
@@ -165,7 +164,7 @@ class _SearchPageState extends State<SearchPage> {
                                   hintTextColor: ColorUtils.colorBlackLiteLite,
                                   hintTextSize: 14,
                                   hintText: '请输入关键字',
-                                  padding: EdgeInsets.only(top: 0),
+                                  padding: const EdgeInsets.only(top: 0),
                                   textColor: ColorUtils.colorBlack,
                                   onChanged: (value) {},
                                   onEditingComplete: () {
@@ -184,8 +183,8 @@ class _SearchPageState extends State<SearchPage> {
                     ),
                     TextView(
                       '取消',
-                      margin: EdgeInsets.only(right: 8, bottom: 10),
-                      padding: EdgeInsets.all(8),
+                      margin: const EdgeInsets.only(right: 8, bottom: 10),
+                      padding: const EdgeInsets.all(8),
                       onTap: () {
                         Navigator.pop(context);
                       },
@@ -195,6 +194,7 @@ class _SearchPageState extends State<SearchPage> {
               ),
             ),
             VisibleView(
+              visible: showHistory ? Visible.visible : Visible.gone,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -205,7 +205,7 @@ class _SearchPageState extends State<SearchPage> {
                       TextView(
                         '历史记录',
                         margin:
-                        EdgeInsets.only(left: 18, top: 16, bottom: 15),
+                        const EdgeInsets.only(left: 18, top: 16, bottom: 15),
                         color: ColorUtils.colorBlack,
                         size: 15,
                         fontWeight: FontWeight.bold,
@@ -217,9 +217,9 @@ class _SearchPageState extends State<SearchPage> {
                         src: source('ic_clear'),
                         width: 14,
                         height: 14,
-                        padding: EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(10),
                         margin:
-                        EdgeInsets.only(right: 8, top: 10, bottom: 15),
+                        const EdgeInsets.only(right: 8, top: 10, bottom: 15),
                         onClick: () {
                           items.clear();
                           setState(() {});
@@ -228,7 +228,7 @@ class _SearchPageState extends State<SearchPage> {
                     ],
                   ),
                   Container(
-                    margin: EdgeInsets.only(left: 15, right: 15),
+                    margin: const EdgeInsets.only(left: 15, right: 15),
                     child: Wrap(
                       spacing: 15,
                       runSpacing: 12,
@@ -237,12 +237,12 @@ class _SearchPageState extends State<SearchPage> {
                   ),
                 ],
               ),
-              visible: showHistory ? Visible.visible : Visible.gone,
             ),
             VisibleView(
+              visible: showResult ? Visible.visible : Visible.gone,
               child: Expanded(
                 child: ListView.builder(
-                  padding: EdgeInsets.only(top: 0),
+                  padding: const EdgeInsets.only(top: 0),
                   itemCount: resultData.length,
                   itemBuilder: (BuildContext context, int index) {
                     String title = resultData[index];
@@ -253,14 +253,14 @@ class _SearchPageState extends State<SearchPage> {
                           TextView(
                             title,
                             margin:
-                            EdgeInsets.only(left: 15, top: 12, right: 15),
+                            const EdgeInsets.only(left: 15, top: 12, right: 15),
                             size: 14,
                             fontWeight: FontWeight.bold,
                             color: ColorUtils.colorBlack,
                           ),
                           TextView(
                             title,
-                            margin: EdgeInsets.only(
+                            margin: const EdgeInsets.only(
                                 left: 15, top: 7, bottom: 10, right: 15),
                             size: 12,
                             color: ColorUtils.colorBlackLiteLite,
@@ -268,7 +268,7 @@ class _SearchPageState extends State<SearchPage> {
                           Container(
                             color: ColorUtils.colorItemLine,
                             height: .5,
-                            margin: EdgeInsets.only(left: 15, right: 15),
+                            margin: const EdgeInsets.only(left: 15, right: 15),
                           )
                         ],
                       ),
@@ -276,7 +276,6 @@ class _SearchPageState extends State<SearchPage> {
                   },
                 ),
               ),
-              visible: showResult ? Visible.visible : Visible.gone,
             ),
           ],
         ),
@@ -292,11 +291,11 @@ class _SearchPageState extends State<SearchPage> {
           title,
           size: 13,
           color: ColorUtils.colorBlack,
-          padding: EdgeInsets.only(top: 6, bottom: 6, left: 14, right: 14),
+          padding: const EdgeInsets.only(top: 6, bottom: 6, left: 14, right: 14),
           border: true,
           borderColor: ColorUtils.colorBorder,
           borderWidth: 0.5,
-          borderRadius: BorderRadius.all(Radius.circular(15)),
+          borderRadius: const BorderRadius.all(Radius.circular(15)),
           onTap: () {
             controller?.text = title;
             setState(() {});

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/common/id_name_value.dart';
@@ -11,8 +10,7 @@ class TfbSpinnerBottom extends StatefulWidget {
   final ValueChanged<List<IdNameValue>?>? onPick;
 
   const TfbSpinnerBottom(
-      {Key? key, this.nomalColor, this.selectedColor, this.datas, this.onPick})
-      : super(key: key);
+      {super.key, this.nomalColor, this.selectedColor, this.datas, this.onPick});
 
   @override
   State<StatefulWidget> createState() => _TfbSpinnerBottomState();
@@ -40,7 +38,7 @@ class _TfbSpinnerBottomState extends State<TfbSpinnerBottom> {
               child: Clickable(
             child: Container(
               alignment: Alignment.center,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                   // borderRadius: BorderRadius.circular(6),
                   // color: currentIndex == i
                   //     ? ColorUtils.colorTitleBgs
@@ -57,7 +55,7 @@ class _TfbSpinnerBottomState extends State<TfbSpinnerBottom> {
                         ? ColorUtils.colorBlue
                         : ColorUtils.colorBlackLite,
                     padding:
-                        EdgeInsets.only(left: 8, right: 8, top: 6, bottom: 6),
+                        const EdgeInsets.only(left: 8, right: 8, top: 6, bottom: 6),
                     size: 12,
                   )),
                   ImageView(
@@ -65,7 +63,7 @@ class _TfbSpinnerBottomState extends State<TfbSpinnerBottom> {
                         currentIndex == i ? 'ic_top_arrow' : 'ic_bottom_arrow'),
                     width: 10,
                     height: 10,
-                    margin: EdgeInsets.only(right: 7.5),
+                    margin: const EdgeInsets.only(right: 7.5),
                   ),
                 ],
               ),
@@ -107,7 +105,7 @@ class _TfbSpinnerBottomState extends State<TfbSpinnerBottom> {
     }
 
     return Container(
-      padding: EdgeInsets.only(top: 10, bottom: 10),
+      padding: const EdgeInsets.only(top: 10, bottom: 10),
       color: Colors.white,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,

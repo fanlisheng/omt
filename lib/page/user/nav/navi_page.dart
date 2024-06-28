@@ -1,13 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/page/user/nav/navi_view_model.dart';
 import 'package:omt/utils/color_utils.dart';
-import 'package:omt/utils/intent_utils.dart';
-import 'package:omt/utils/shared_utils.dart';
-import 'package:omt/utils/sys_utils.dart';
 
 ///
 ///  omt
@@ -19,7 +13,7 @@ import 'package:omt/utils/sys_utils.dart';
 ///
 
 class NaviPage extends StatelessWidget {
-  const NaviPage({Key? key}) : super(key: key);
+  const NaviPage({super.key});
 
   @override
   Widget build(BuildContext context) {

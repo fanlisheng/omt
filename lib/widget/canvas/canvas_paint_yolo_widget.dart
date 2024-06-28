@@ -1,4 +1,3 @@
-import 'package:fluent_ui/fluent_ui.dart' as fu;
 import 'package:flutter/material.dart';
 import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/utils/log_utils.dart';

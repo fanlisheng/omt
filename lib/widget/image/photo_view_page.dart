@@ -24,8 +24,8 @@ class PhotoViewPage extends StatelessWidget {
   final String? subTitle;
   final Widget? imgDesc;
 
-  PhotoViewPage(
-      {this.url, this.src, this.file, this.title, this.subTitle, this.imgDesc});
+  const PhotoViewPage(
+      {super.key, this.url, this.src, this.file, this.title, this.subTitle, this.imgDesc});
 
   @override
   Widget build(BuildContext context) {
@@ -37,9 +37,9 @@ class PhotoViewPage extends StatelessWidget {
     if (showTitle) {
       children2.add(TextView(
         title,
-        margin: EdgeInsets.all(0),
-        padding: EdgeInsets.all(0),
-        color: Color(0xff191D2D),
+        margin: const EdgeInsets.all(0),
+        padding: const EdgeInsets.all(0),
+        color: const Color(0xff191D2D),
         size: 17,
       ));
     }
@@ -47,9 +47,9 @@ class PhotoViewPage extends StatelessWidget {
     if (showSubTitle) {
       children2.add(TextView(
         subTitle,
-        margin: EdgeInsets.all(0),
-        padding: EdgeInsets.all(0),
-        color: Color(0xff191D2D),
+        margin: const EdgeInsets.all(0),
+        padding: const EdgeInsets.all(0),
+        color: const Color(0xff191D2D),
         size: 10,
       ));
     }
@@ -65,12 +65,12 @@ class PhotoViewPage extends StatelessWidget {
               ),
               backgroundColor: ColorUtils.colorWhite,
               leading: IconButton(
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.close,
 //                    Icons.arrow_back_ios,
                   ),
                   iconSize: 25,
-                  color: Color(0xff50525c),
+                  color: const Color(0xff50525c),
                   onPressed: () async {
                     if (Navigator.canPop(context)) {
                       return Navigator.of(context).pop();
@@ -89,10 +89,10 @@ class PhotoViewPage extends StatelessWidget {
               minScale: PhotoViewComputedScale.contained,
               loadingBuilder: (c, e) {
                 return Container(
-                  child: Stack(
+                  child: const Stack(
                     children: <Widget>[
                       Center(
-                          child: new SpinKitFoldingCube(
+                          child: SpinKitFoldingCube(
                               color: Colors.white, size: 60.0)),
                     ],
                   ),
@@ -111,7 +111,7 @@ class PhotoViewPage extends StatelessWidget {
                     child: FloatingActionButton(
                       mini: true,
                       elevation: 0,
-                      backgroundColor: Color(0x22000000),
+                      backgroundColor: const Color(0x22000000),
                       onPressed: () {
                         IntentUtils.share.pop(context,
                             data: {'data': IntentUtils.share.RESULT_OK});

@@ -1,8 +1,6 @@
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:omt/utils/color_utils.dart';
 import 'package:provider/provider.dart';
 
 import 'package:kayo_package/kayo_package.dart';
@@ -10,7 +8,6 @@ import 'package:omt/bean/common/location_data_entity.dart';
 import 'package:omt/main.dart';
 import 'package:omt/theme.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'json_utils.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fu;
 
 ///  tfblue_flutter_module
@@ -88,9 +85,9 @@ class SysUtils {
     var s = '万';
     if (data > 100000) {
       data = data / 10000;
-      return '${fixedStringNum('${data.toStringAsFixed(fixed)}')}$s';
+      return '${fixedStringNum(data.toStringAsFixed(fixed))}$s';
     } else {
-      String string = fixedStringNum('${data.toStringAsFixed(fixed)}');
+      String string = fixedStringNum(data.toStringAsFixed(fixed));
       return string;
     }
   }
@@ -307,7 +304,7 @@ class SysUtils {
     } else if (data > 100000000) {
       var d = data / 100000000;
       var stringAsFixed = d.toStringAsFixed(2);
-      dat = '${stringAsFixed}亿'.replaceAll('.00亿', '亿');
+      dat = '$stringAsFixed亿'.replaceAll('.00亿', '亿');
       if (dat.contains('.')) {
         dat = dat.replaceAll('0亿', '亿');
       }
@@ -315,14 +312,14 @@ class SysUtils {
       var d = data / 100000000;
       var stringAsFixed = d.toStringAsFixed(3);
       dat =
-          '${stringAsFixed}亿'.replaceAll('.00亿', '亿').replaceAll('.000亿', '亿');
+          '$stringAsFixed亿'.replaceAll('.00亿', '亿').replaceAll('.000亿', '亿');
       if (dat.contains('.')) {
         dat = dat.replaceAll('00亿', '亿').replaceAll('0亿', '亿');
       }
     } else if (data > 10000) {
       var d = data / 10000;
       var stringAsFixed = d.toStringAsFixed(2);
-      dat = '${stringAsFixed}万'.replaceAll('.00万', '万');
+      dat = '$stringAsFixed万'.replaceAll('.00万', '万');
       if (dat.contains('.')) {
         dat = dat.replaceAll('0万', '万');
       }
@@ -381,10 +378,10 @@ class SysUtils {
       Align(
         alignment: AlignmentDirectional.centerEnd,
         child: Padding(
-          padding: EdgeInsetsDirectional.only(end: 8.0),
+          padding: const EdgeInsetsDirectional.only(end: 8.0),
           child: fu.ToggleSwitch(
             // style: fu.ToggleSwitchThemeData.standard(theme.copyWith(activeColor: ColorUtils.colorAccent)),
-            content: Text('深色模式'),
+            content: const Text('深色模式'),
             checked: fu.FluentTheme.of(context).brightness.isDark,
             onChanged: (v) {
               if (v) {
@@ -407,9 +404,9 @@ class SysUtils {
       Align(
         alignment: AlignmentDirectional.centerEnd,
         child: Padding(
-          padding: EdgeInsetsDirectional.only(end: 8.0),
+          padding: const EdgeInsetsDirectional.only(end: 8.0),
           child: fu.ToggleSwitch(
-            content: Text('深色模式'),
+            content: const Text('深色模式'),
             checked: fu.FluentTheme.of(context).brightness.isDark,
             onChanged: (v) {
               if (v) {
@@ -477,7 +474,6 @@ class SysUtils {
       "#ffcc00",
       "#ffeead"
     ];
-;
 
     List<Color> colors = [];
     for(var c in colorList){

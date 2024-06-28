@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:ui';
 
 import 'package:omt/generated/json/base/json_field.dart';
 import 'package:omt/generated/json/name_value.g.dart';
@@ -23,7 +22,7 @@ class NameValue {
   String? path;
 
   String getUrl() {
-    return 'file/${id}/${uuid}';
+    return 'file/$id/$uuid';
   }
 
   NameValue({

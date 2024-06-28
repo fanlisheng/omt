@@ -1,8 +1,5 @@
 import 'dart:collection';
-import 'dart:io';
-import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:flutter/services.dart';
 
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/user/user_login/user_login_data.dart';
@@ -74,7 +71,7 @@ class SharedUtils {
   static Future<String> getUDID() async {
     var s = await getString(_shared_udid);
     if (BaseSysUtils.empty(s)) {
-      var uuid = Uuid();
+      var uuid = const Uuid();
       var v1 = uuid.v1().replaceAll('-', '');
       s = v1;
       await set(_shared_udid, v1);

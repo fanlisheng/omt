@@ -22,15 +22,14 @@ class TFBCheckBox extends StatefulWidget {
   final Color bgColor;
 
   const TFBCheckBox(
-      {Key? key,
+      {super.key,
       this.checked,
       this.title,
       this.subTitle,
       this.onChange,
       this.margin,
       this.bgColor = ColorUtils.colorWhite,
-      this.multiple = false})
-      : super(key: key);
+      this.multiple = false});
 
   @override
   State<TFBCheckBox> createState() => _TFBCheckBoxState();
@@ -68,7 +67,7 @@ class _TFBCheckBoxState extends State<TFBCheckBox> {
                         height: 20,
                         width: 20,
                       )),
-        SizedBox(
+        const SizedBox(
           width: 10,
         ),
         Column(
@@ -83,7 +82,7 @@ class _TFBCheckBoxState extends State<TFBCheckBox> {
             ),
             Visibility(
                 visible: widget.subTitle != null,
-                child: SizedBox(
+                child: const SizedBox(
                   height: 2,
                 )),
             Visibility(
@@ -98,7 +97,7 @@ class _TFBCheckBoxState extends State<TFBCheckBox> {
         )
       ],
     ).setOnClick(
-        padding: EdgeInsets.all(SizeUtils.padding),
+        padding: const EdgeInsets.all(SizeUtils.padding),
         margin: widget.margin,
         bgColor: widget.bgColor,
         onTap: widget.checked == null
@@ -138,7 +137,7 @@ class CirclePainter extends CustomPainter {
     if (circle) {
       canvas.drawArc(rect, 0.0, 2 * pi, false, paint);
     } else {
-      RRect rRect = RRect.fromRectAndRadius(rect, Radius.circular(2.0));
+      RRect rRect = RRect.fromRectAndRadius(rect, const Radius.circular(2.0));
       canvas.drawRRect(rRect, paint);
     }
   }

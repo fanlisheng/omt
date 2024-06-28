@@ -35,14 +35,14 @@ class GZXDropDownMenu extends StatefulWidget {
   /// Creates a dropdown menu widget.
   /// The widget must be inside the Stack because the widget is a Positioned.
   const GZXDropDownMenu({
-    Key? key,
+    super.key,
     required this.controller,
     required this.menus,
     this.animationMilliseconds = 500,
     this.maskColor = const Color.fromRGBO(0, 0, 0, 0.5),
     this.dropdownMenuChanging,
     this.dropdownMenuChanged,
-  }) : super(key: key);
+  });
 
   @override
   _GZXDropDownMenuState createState() => _GZXDropDownMenuState();
@@ -68,7 +68,7 @@ class _GZXDropDownMenuState extends State<GZXDropDownMenu>
     super.initState();
 
     widget.controller.addListener(_onController);
-    _controller = new AnimationController(
+    _controller = AnimationController(
         duration: Duration(milliseconds: widget.animationMilliseconds),
         vsync: this);
   }
@@ -87,6 +87,7 @@ class _GZXDropDownMenuState extends State<GZXDropDownMenu>
     return _buildDropDownWidget();
   }
 
+  @override
   dispose() {
     _animation?.removeListener(_animationListener);
     _animation?.removeStatusListener(_animationStatusListener);
@@ -116,7 +117,7 @@ class _GZXDropDownMenuState extends State<GZXDropDownMenu>
     _animation?.removeListener(_animationListener);
     _animation?.removeStatusListener(_animationStatusListener);
     _animation =
-        new Tween(begin: 0.0, end: _dropDownHeight).animate(_controller!)
+        Tween(begin: 0.0, end: _dropDownHeight).animate(_controller!)
           ..addListener(_animationListener)
           ..addStatusListener(_animationStatusListener);
 
@@ -168,7 +169,7 @@ class _GZXDropDownMenuState extends State<GZXDropDownMenu>
   Widget _mask() {
     if (_isShowMask) {
       var o = _maskColorOpacity;
-      if (!BaseSysUtils.isNumber('${o}') || BaseSysUtils.equals('NaN', '${o}')) {
+      if (!BaseSysUtils.isNumber('$o') || BaseSysUtils.equals('NaN', '$o')) {
         o = 0;
       } else if (o < 0) {
         o = 0;

@@ -1,7 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:kayo_package/http/_index_http.dart';
 import 'package:kayo_package/kayo_package.dart';
-import 'package:kayo_package/utils/platform_utils.dart';
 import 'package:omt/utils/shared_utils.dart';
 
 ///
@@ -29,9 +26,7 @@ class API extends BaseAPI {
   API._();
 
   factory API._share() {
-    if (_instance == null) {
-      _instance = API._();
-    }
+    _instance ??= API._();
     return _instance!;
   }
 

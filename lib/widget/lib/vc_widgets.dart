@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/common/linkage_data.dart';
@@ -14,14 +13,13 @@ class LinkPage extends StatefulWidget {
   final ValueChanged<int>? onSelectTitleClick;
 
   const LinkPage(
-      {Key? key,
+      {super.key,
       this.nomalColor,
       this.selecteColor,
       this.titles,
       this.datas,
       this.onSelectTitleClick,
-      this.buttonRowKey})
-      : super(key: key);
+      this.buttonRowKey});
 
   @override
   State<StatefulWidget> createState() => _LinkPageState();
@@ -59,7 +57,7 @@ class _LinkPageState extends State<LinkPage> {
   Widget build(BuildContext context) {
     Widget getItem(List<LinkKage> lists) {
       return ListView.builder(
-        padding: EdgeInsets.only(top: 0),
+        padding: const EdgeInsets.only(top: 0),
         itemCount: lists.length,
         itemBuilder: (BuildContext context, int index) {
           LinkKage item = lists[index];
@@ -76,7 +74,7 @@ class _LinkPageState extends State<LinkPage> {
             bgColor: item.hierarchy == 0 ? ColorUtils.colorGray : Colors.white,
             color:
                 select == true ? ColorUtils.colorBlue : ColorUtils.colorBlack,
-            padding: EdgeInsets.only(left: 20, right: 20, top: 13, bottom: 13),
+            padding: const EdgeInsets.only(left: 20, right: 20, top: 13, bottom: 13),
             onTap: () {
               bool can = true;
               for (int i = 0; i < dataArray.length; i++) {
@@ -136,7 +134,7 @@ class _LinkPageState extends State<LinkPage> {
       final box =
           widget.buttonRowKey?.currentContext!.findRenderObject() as RenderBox;
       final dy = box.localToGlobal(Offset(0, box.size.height)).dy;
-      overlayEntry = new OverlayEntry(
+      overlayEntry = OverlayEntry(
         builder: (context) => Positioned.fill(
           top: dy,
           child: Material(
@@ -164,7 +162,7 @@ class _LinkPageState extends State<LinkPage> {
                               width: 107,
                               height: 43,
                               alignment: Alignment.center,
-                              margin: EdgeInsets.only(
+                              margin: const EdgeInsets.only(
                                   left: 20, bottom: 20, top: 15),
                               onTap: () {
                                 dataArray = [];
@@ -185,7 +183,7 @@ class _LinkPageState extends State<LinkPage> {
                                 width: 107,
                                 height: 43,
                                 alignment: Alignment.center,
-                                margin: EdgeInsets.only(
+                                margin: const EdgeInsets.only(
                                     right: 20, bottom: 20, top: 15, left: 12),
                                 onTap: () {
                                   overlayEntry!.remove();
@@ -201,7 +199,7 @@ class _LinkPageState extends State<LinkPage> {
                     ),
                   ),
                 ),
-                Container(
+                SizedBox(
                   height: 180,
                   child: GestureDetector(onTap: () {
                     overlayEntry!.remove();
@@ -215,7 +213,7 @@ class _LinkPageState extends State<LinkPage> {
           ),
         ),
       );
-      Overlay.of(context)!.insert(overlayEntry!);
+      Overlay.of(context).insert(overlayEntry!);
     }
 
     List<Widget> titleWidget() {
@@ -239,7 +237,7 @@ class _LinkPageState extends State<LinkPage> {
                         ? ColorUtils.colorBlue
                         : ColorUtils.colorBlackLite,
                     padding:
-                        EdgeInsets.only(left: 8, right: 8, top: 6, bottom: 4),
+                        const EdgeInsets.only(left: 8, right: 8, top: 6, bottom: 4),
                     size: 12,
                   ),
                   ImageView(
@@ -247,7 +245,7 @@ class _LinkPageState extends State<LinkPage> {
                         currentIndex == i ? 'ic_top_arrow' : 'ic_bottom_arrow'),
                     width: 10,
                     height: 10,
-                    margin: EdgeInsets.only(right: 7.5),
+                    margin: const EdgeInsets.only(right: 7.5),
                   ),
                 ],
               ),
@@ -263,7 +261,7 @@ class _LinkPageState extends State<LinkPage> {
 
     return Container(
       key: widget.buttonRowKey,
-      padding: EdgeInsets.only(top: 10, bottom: 10),
+      padding: const EdgeInsets.only(top: 10, bottom: 10),
       color: Colors.white,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,

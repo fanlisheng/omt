@@ -1,7 +1,10 @@
+import 'dart:ffi';
+
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/user/user_login/user_login_data.dart';
+import 'package:omt/rust/rustlib.dart';
 import 'package:omt/utils/auth_utils.dart';
 import 'package:omt/utils/intent_utils.dart';
 import 'package:omt/utils/shared_utils.dart';
@@ -92,6 +95,14 @@ class UserLoginViewModel extends BaseViewModelRefresh<UserInfoData> {
   login() async {
     var phone = phoneController.text;
     var pwd = pwdController.text;
+
+    if (true) {
+
+      // var dynamicLibrary = DynamicLibrary.open('path');
+      // var nl = NativeLibrary(dynamicLibrary);
+
+      return;
+    }
 
     if (BaseSysUtils.empty(phone)) {
       LoadingUtils.showInfo(data: '请输入账号');

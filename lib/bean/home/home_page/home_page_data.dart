@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:core';
 
-import 'package:omt/generated/json/base/json_convert_content.dart';
 import 'package:omt/generated/json/base/json_field.dart';
 import 'package:omt/generated/json/home_page_data.g.dart';
 

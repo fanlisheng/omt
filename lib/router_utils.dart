@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:kayo_package/views/common/404.dart';
 import 'package:omt/page/home/home_page.dart';
 import 'package:omt/page/user/launcher/launcher_page.dart';
@@ -77,11 +76,11 @@ Route<dynamic> generateRoute(RouteSettings settings, {uniqueId}) {
 
     case RouterPage.HomePage:
       return CupertinoPageRoute(
-          settings: settings, builder: (context) => HomePage());
+          settings: settings, builder: (context) => const HomePage());
 
     case RouterPage.UserLoginPage:
       return CupertinoPageRoute(
-          settings: settings, builder: (context) => UserLoginPage());
+          settings: settings, builder: (context) => const UserLoginPage());
     case RouterPage.KSearchPage:
       return CupertinoPageRoute(
           settings: settings,
@@ -92,45 +91,45 @@ Route<dynamic> generateRoute(RouteSettings settings, {uniqueId}) {
       return CupertinoPageRoute(
           settings: settings,
           builder: (context) {
-            return VideoConfigurationPage();
+            return const VideoConfigurationPage();
           });
     case RouterPage.VideoFramePage:
       return CupertinoPageRoute(
           settings: settings,
           builder: (context) {
-            return VideoFramePage();
+            return const VideoFramePage();
           });
 
     case RouterPage.VideoOperationsCenterPage:
       return CupertinoPageRoute(
           settings: settings,
           builder: (context) {
-            return VideoOperationsCenterPage();
+            return const VideoOperationsCenterPage();
           });
     case RouterPage.CameraBoundPage:
       return CupertinoPageRoute(
           settings: settings,
           builder: (context) {
-            return CameraBoundPage();
+            return const CameraBoundPage();
           });
     case RouterPage.NaviPage:
       return CupertinoPageRoute(
           settings: settings,
           builder: (context) {
-            return NaviPage();
+            return const NaviPage();
           });
 
     case RouterPage.LabelMePage:
       return CupertinoPageRoute(
           settings: settings,
           builder: (context) {
-            return LabelMePage();
+            return const LabelMePage();
           });
     case RouterPage.TerminalPage:
       return CupertinoPageRoute(
           settings: settings,
           builder: (context) {
-            return TerminalPage();
+            return const TerminalPage();
           });
     ///ReplaceRouterGenerateRoute
 
