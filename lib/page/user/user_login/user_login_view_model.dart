@@ -97,7 +97,7 @@ class UserLoginViewModel extends BaseViewModelRefresh<UserInfoData> {
     var phone = phoneController.text;
     var pwd = pwdController.text;
 
-    if (true) {
+    if (false) {
       // var dynamicLibrary = DynamicLibrary.open('path');
       // var nl = NativeLibrary(dynamicLibrary);
       // var greet22 = await getMac();
