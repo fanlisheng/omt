@@ -43,8 +43,10 @@ dependencies:
   xterm: ^4.0.0
   flutter_pty: ^0.4.0
 
-  flutter_rust_bridge: ^2.0.0
+  flutter_rust_bridge: 2.0.0
   ffi: ^2.1.2
+  rust_lib_omt:
+    path: rust_builder
 
 dev_dependencies:
   flutter_test:
@@ -52,18 +54,14 @@ dev_dependencies:
   flutter_lints: ^3.0.0
 
   ffigen: ^12.0.0
+  integration_test:
+    sdk: flutter
 
 
 #dependency_overrides:
 #  intl: 0.18.1
 #  macos_window_utils: ^1.5.0
 
-
-ffigen:
-  output: lib/rustlib/rustlib.dart
-  headers:
-    entry-points:
-      - "rustlib/headers/rustlib.h"
 
 flutter:
 

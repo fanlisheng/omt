@@ -76,7 +76,7 @@ class HttpManager extends BaseHttpManager {
       // 'Access-Control-Allow-Origin': '*',
       // 'Access-Control-Allow-Methods': 'GET,PUT,PATCH,POST,DELETE',
       // 'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept',
-      });
+    });
     return map;
   }
 

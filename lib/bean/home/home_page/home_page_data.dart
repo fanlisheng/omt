@@ -13,7 +13,6 @@ import 'package:omt/generated/json/home_page_data.g.dart';
 ///  Copyright © 2024 .. All rights reserved.
 ///
 
- 
 @JsonSerializable()
 class HomePageData {
   HomePageData();

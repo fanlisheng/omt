@@ -92,8 +92,8 @@ class RadiusUtils {
 
 class TextStyleUtils {
   ///登录注册页标题、导航标题、重要文本
-  static TextStyle? get title =>
-      const TextStyle(color: ColorUtils.colorBlack, fontSize: SizeUtils.fontSize17);
+  static TextStyle? get title => const TextStyle(
+      color: ColorUtils.colorBlack, fontSize: SizeUtils.fontSize17);
 
   static TextStyle? get titleBold => const TextStyle(
       color: ColorUtils.colorBlack,

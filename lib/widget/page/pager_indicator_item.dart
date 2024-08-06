@@ -299,7 +299,7 @@ class _TablePagerIndicatorState extends State<TablePagerIndicator> {
     initData(hand: true);
     List<Widget> pageItems = generatePager();
     return Container(
-      padding: const EdgeInsets.only(top: 10,bottom: 20),
+      padding: const EdgeInsets.only(top: 10, bottom: 20),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [

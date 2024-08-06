@@ -136,14 +136,14 @@ class VideoConfigurationPage extends StatelessWidget {
                               // controller: TextEditingController()
                             ),
                             TfbTitleSub(
-                                title: '网关',
-                                subTitle: '',
-                                // controller: TextEditingController()
+                              title: '网关',
+                              subTitle: '',
+                              // controller: TextEditingController()
                             ),
                             TfbTitleSub(
-                                title: 'DNS',
-                                subTitle: '',
-                                // controller: TextEditingController()
+                              title: 'DNS',
+                              subTitle: '',
+                              // controller: TextEditingController()
                             )
                           ],
                         )),

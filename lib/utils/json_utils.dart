@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:omt/generated/json/base/json_convert_content.dart';
 
-
 class JsonUtils {
   static getMap(var data) {
     if (data is String) {

@@ -81,10 +81,11 @@ class _InputViewState extends State<InputView> {
         TextField(
           onTap: widget.onClick ?? onClick,
           inputFormatters: widget.inputFormatters,
-          style: widget.textStyle ?? TextStyle(
-                  color: widget.textColor,
-                  fontSize: widget.textSize,
-                ),
+          style: widget.textStyle ??
+              TextStyle(
+                color: widget.textColor,
+                fontSize: widget.textSize,
+              ),
           autocorrect: false,
           enabled: widget.editable,
           onEditingComplete: widget.onEditingComplete,

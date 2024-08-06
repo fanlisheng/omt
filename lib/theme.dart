@@ -104,7 +104,7 @@ AccentColor get systemAccentColor {
       'lightest': SystemTheme.accentColor.lightest,
     });
   }
-  if (false){
+  if (false) {
     return Colors.red;
   }
   // Colors.red

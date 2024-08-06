@@ -60,7 +60,8 @@ class _TfbSpinnerNewState extends State<TfbSpinnerNew> {
     super.initState();
   }
 
-  buildDropdownListWidget(IdNameValue? data, void Function(IdNameValue item) itemOnTap) {
+  buildDropdownListWidget(
+      IdNameValue? data, void Function(IdNameValue item) itemOnTap) {
     if (data == null || (data.children?.length ?? 0) == 0) {
       return Container();
     } else {
@@ -154,7 +155,8 @@ class _TfbSpinnerNewState extends State<TfbSpinnerNew> {
           children: <Widget>[
             ...(widget.childrenAboveOfSpinner ?? []),
             Container(
-              padding: widget.padding ?? const EdgeInsets.symmetric(horizontal: 10),
+              padding:
+                  widget.padding ?? const EdgeInsets.symmetric(horizontal: 10),
               margin: widget.margin,
               color: Colors.white,
               height: 43,
@@ -165,8 +167,8 @@ class _TfbSpinnerNewState extends State<TfbSpinnerNew> {
                 height: 32,
                 dividerHeight: 0,
                 // borderColor: Colors.transparent,
-                style:
-                    const TextStyle(fontSize: 13, color: ColorUtils.colorBlackLite),
+                style: const TextStyle(
+                    fontSize: 13, color: ColorUtils.colorBlackLite),
               ),
             ),
             ...(widget.childrenBelowOfSpinner ?? []),

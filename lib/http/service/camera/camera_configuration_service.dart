@@ -156,6 +156,7 @@ class CameraConfigurationService {
       onError: onError,
     );
   }
+
   bind2Point({
     int? instanceId,
     List<String>? code,

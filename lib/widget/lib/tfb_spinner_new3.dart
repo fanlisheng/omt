@@ -255,8 +255,8 @@ class _TfbSpinnerNew3State extends State<TfbSpinnerNew3> {
     }
   }
 
-  ListView buildListView(
-      IdNameValue data, bool children, void Function(IdNameValue item) itemOnTap) {
+  ListView buildListView(IdNameValue data, bool children,
+      void Function(IdNameValue item) itemOnTap) {
     return ListView.separated(
       shrinkWrap: true,
       scrollDirection: Axis.vertical,
@@ -341,8 +341,8 @@ class _TfbSpinnerNew3State extends State<TfbSpinnerNew3> {
             isDense: true,
             contentPadding: const EdgeInsets.only(top: 6),
             hintText: widget.hintText,
-            hintStyle:
-                const TextStyle(fontSize: 12, color: ColorUtils.colorBlackLiteLite),
+            hintStyle: const TextStyle(
+                fontSize: 12, color: ColorUtils.colorBlackLiteLite),
           ),
           textInputAction: TextInputAction.search,
           onSubmitted: (t) {
@@ -434,7 +434,8 @@ class _TfbSpinnerNew3State extends State<TfbSpinnerNew3> {
                         border: true,
                         height: 30,
                         radius: 4,
-                        margin: const EdgeInsets.only(top: 15, bottom: 10, left: 16),
+                        margin: const EdgeInsets.only(
+                            top: 15, bottom: 10, left: 16),
                         borderRadius: BorderRadius.only(
                             topLeft: 4.toRadius(), bottomLeft: 4.toRadius()),
                         borderColor: '#F0F0F0'.toColor(),
@@ -467,7 +468,8 @@ class _TfbSpinnerNew3State extends State<TfbSpinnerNew3> {
                     ],
                   ),
             Container(
-              padding: widget.padding ?? const EdgeInsets.symmetric(horizontal: 10),
+              padding:
+                  widget.padding ?? const EdgeInsets.symmetric(horizontal: 10),
               margin: widget.margin,
               color: Colors.white,
               height: 43,
@@ -478,8 +480,8 @@ class _TfbSpinnerNew3State extends State<TfbSpinnerNew3> {
                 height: 32,
                 dividerHeight: 0,
                 // borderColor: Colors.transparent,
-                style:
-                    const TextStyle(fontSize: 12, color: ColorUtils.colorBlackLite),
+                style: const TextStyle(
+                    fontSize: 12, color: ColorUtils.colorBlackLite),
               ),
             ),
             ...(widget.childrenBelowOfSpinner ?? []),

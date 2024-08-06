@@ -6,7 +6,6 @@ import 'package:omt/widget/lib/drop_menu/src/gzx_dropdown_header.dart';
 import 'package:omt/widget/lib/drop_menu/src/gzx_dropdown_menu.dart';
 import 'package:omt/widget/lib/drop_menu/src/gzx_dropdown_menu_controller.dart';
 
-
 class TfbSpinner extends StatefulWidget {
   ///数据
   final List<IdNameValue> datas;
@@ -68,7 +67,8 @@ class _TfbSpinnerState extends State<TfbSpinner> {
     }
   }
 
-  buildDropdownListWidget(IdNameValue? data, void Function(IdNameValue item) itemOnTap) {
+  buildDropdownListWidget(
+      IdNameValue? data, void Function(IdNameValue item) itemOnTap) {
     if (data == null || (data.children?.length ?? 0) == 0) {
       return Container();
     } else {
@@ -77,8 +77,10 @@ class _TfbSpinnerState extends State<TfbSpinner> {
         scrollDirection: Axis.vertical,
         itemCount: data.children?.length ?? 0,
         // item 的个数
-        separatorBuilder: (BuildContext context, int index) =>
-            Divider(height: 1.0,color: ColorUtils.colorBlackLiteLite.withOpacity(.2),),
+        separatorBuilder: (BuildContext context, int index) => Divider(
+          height: 1.0,
+          color: ColorUtils.colorBlackLiteLite.withOpacity(.2),
+        ),
         // 添加分割线
         itemBuilder: (BuildContext context, int index) {
           IdNameValue item = data.children![index];
@@ -98,11 +100,10 @@ class _TfbSpinnerState extends State<TfbSpinner> {
                     child: Text(
                       item.name ?? '',
                       style: TextStyle(
-                        color: (data.selectSub?.itemId == item.itemId)
-                            ? ColorUtils.colorAccent
-                            : ColorUtils.colorBlackLite,
-                        fontSize: 13
-                      ),
+                          color: (data.selectSub?.itemId == item.itemId)
+                              ? ColorUtils.colorAccent
+                              : ColorUtils.colorBlackLite,
+                          fontSize: 13),
                     ),
                   ),
                   // (data.selectSub?.itemId == item.itemId)
@@ -166,7 +167,8 @@ class _TfbSpinnerState extends State<TfbSpinner> {
           children: <Widget>[
             ...(widget.childrenAboveOfSpinner ?? []),
             Container(
-              padding: widget.padding ?? const EdgeInsets.symmetric(horizontal: 10),
+              padding:
+                  widget.padding ?? const EdgeInsets.symmetric(horizontal: 10),
               margin: widget.margin,
               color: Colors.white,
               height: 43,
@@ -177,8 +179,8 @@ class _TfbSpinnerState extends State<TfbSpinner> {
                 height: 32,
                 dividerHeight: 0,
                 // borderColor: Colors.transparent,
-                style:
-                    const TextStyle(fontSize: 13, color: ColorUtils.colorBlackLite),
+                style: const TextStyle(
+                    fontSize: 13, color: ColorUtils.colorBlackLite),
               ),
             ),
             ...(widget.childrenBelowOfSpinner ?? []),

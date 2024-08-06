@@ -116,10 +116,9 @@ class _GZXDropDownMenuState extends State<GZXDropDownMenu>
 
     _animation?.removeListener(_animationListener);
     _animation?.removeStatusListener(_animationStatusListener);
-    _animation =
-        Tween(begin: 0.0, end: _dropDownHeight).animate(_controller!)
-          ..addListener(_animationListener)
-          ..addStatusListener(_animationStatusListener);
+    _animation = Tween(begin: 0.0, end: _dropDownHeight).animate(_controller!)
+      ..addListener(_animationListener)
+      ..addStatusListener(_animationStatusListener);
 
     if (_isControllerDisposed) return;
 

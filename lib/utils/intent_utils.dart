@@ -44,7 +44,6 @@ class IntentUtils extends BaseIntentUtilsNoBoost {
         routeName: routeName, finish: finish, removeAll: removeAll, data: data);
   }
 
-
   void gotoLogin(BuildContext? context, {bool noAlert = false}) async {
     LoadingUtils.dismiss();
     if (noAlert == true) {

@@ -126,11 +126,12 @@ class KSearchPage extends StatelessWidget {
                     color: Color(0xffFFFFFF),
                     borderRadius: BorderRadius.all(Radius.circular(16))),
                 height: 32,
-                padding:
-                    const EdgeInsets.only(left: 16, top: 8, right: 16, bottom: 8),
+                padding: const EdgeInsets.only(
+                    left: 16, top: 8, right: 16, bottom: 8),
                 child: Text(
                   t,
-                  style: const TextStyle(fontSize: 13, color: Color(0xff575961)),
+                  style:
+                      const TextStyle(fontSize: 13, color: Color(0xff575961)),
                 ),
               ),
               onTap: () {

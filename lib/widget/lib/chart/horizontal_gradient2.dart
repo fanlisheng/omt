@@ -1,5 +1,6 @@
 /// Package import
 library;
+
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/utils/color_utils.dart';
@@ -17,7 +18,8 @@ class HorizontalGradient2 extends StatelessWidget {
   final List<ChartData> datas;
   final String? tooltipFormat;
 
-  const HorizontalGradient2({super.key, required this.datas, this.tooltipFormat});
+  const HorizontalGradient2(
+      {super.key, required this.datas, this.tooltipFormat});
 
   @override
   Widget build(BuildContext context) {

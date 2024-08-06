@@ -3,7 +3,6 @@ import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/common/linkage_data.dart';
 import 'package:omt/utils/color_utils.dart';
 
-
 class LinkPage extends StatefulWidget {
   final Color? nomalColor;
   final Color? selecteColor;
@@ -74,7 +73,8 @@ class _LinkPageState extends State<LinkPage> {
             bgColor: item.hierarchy == 0 ? ColorUtils.colorGray : Colors.white,
             color:
                 select == true ? ColorUtils.colorBlue : ColorUtils.colorBlack,
-            padding: const EdgeInsets.only(left: 20, right: 20, top: 13, bottom: 13),
+            padding:
+                const EdgeInsets.only(left: 20, right: 20, top: 13, bottom: 13),
             onTap: () {
               bool can = true;
               for (int i = 0; i < dataArray.length; i++) {
@@ -236,8 +236,8 @@ class _LinkPageState extends State<LinkPage> {
                     color: currentIndex == i
                         ? ColorUtils.colorBlue
                         : ColorUtils.colorBlackLite,
-                    padding:
-                        const EdgeInsets.only(left: 8, right: 8, top: 6, bottom: 4),
+                    padding: const EdgeInsets.only(
+                        left: 8, right: 8, top: 6, bottom: 4),
                     size: 12,
                   ),
                   ImageView(

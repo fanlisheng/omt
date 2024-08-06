@@ -143,7 +143,9 @@ class CameraBoundPage extends StatelessWidget {
                                     children: [
                                       TextView(
                                         data.ip_address,
-                                        color: data.duplicateIP(model.data,data) != true
+                                        color: data.duplicateIP(
+                                                    model.data, data) !=
+                                                true
                                             ? ColorUtils.colorBlack
                                             : ColorUtils.colorRed,
                                         maxLine: 2,

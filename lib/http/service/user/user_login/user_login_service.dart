@@ -1,4 +1,3 @@
-
 import 'package:omt/http/api.dart';
 // import 'package:omt/utils/shared_utils.dart';
 
@@ -53,6 +52,4 @@ class UserLoginService {
 //     onError: onError,
 //   );
 // }
-
-
 }

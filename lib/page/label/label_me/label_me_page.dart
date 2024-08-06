@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/common/id_name_value.dart';
@@ -160,7 +159,7 @@ class LabelMePage extends StatelessWidget {
                                         model.setRectSelected(index: index);
                                       },
                                     );
-                                   },
+                                  },
                                 ),
                               ),
                             ),

@@ -1,5 +1,3 @@
-
-
 // import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/camera/camera_entity.dart';
@@ -17,7 +15,6 @@ import 'package:omt/widget/picker/id_name_picker.dart';
 ///
 
 class CameraUnBoundViewModel extends BaseViewModelList<CameraInfoEntity> {
-
   CameraHttpEntity? cameraHttpEntity;
 
   List<IdNameValue> points = [];
@@ -37,7 +34,6 @@ class CameraUnBoundViewModel extends BaseViewModelList<CameraInfoEntity> {
       }
     });
   }
-
 
   @override
   bool hasMore() {
@@ -65,7 +61,6 @@ class CameraUnBoundViewModel extends BaseViewModelList<CameraInfoEntity> {
           });
     }
   }
-
 
   void bindDevice(CameraInfoEntity data) {
     IdNamePickerWidget.show(

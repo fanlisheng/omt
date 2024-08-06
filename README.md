@@ -1,3 +1,15 @@
+https://juejin.cn/post/7359577911991730211?searchId=20240628164549F867BBBB40C37B6A1C48
+
+
+cargo install flutter_rust_bridge_codegen
+
+flutter_rust_bridge_codegen integrate
+
+flutter_rust_bridge_codegen generate
+
+
+
+
 # omt
 
 Operation and maintenance tools

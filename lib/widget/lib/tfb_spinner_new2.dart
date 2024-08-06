@@ -62,7 +62,8 @@ class _TfbSpinnerNew2State extends State<TfbSpinnerNew2> {
     super.initState();
   }
 
-  buildDropdownListWidget(IdNameValue? data, void Function(IdNameValue item) itemOnTap) {
+  buildDropdownListWidget(
+      IdNameValue? data, void Function(IdNameValue item) itemOnTap) {
     if (data == null || (data.children?.length ?? 0) == 0) {
       return Container();
     } else {
@@ -106,8 +107,8 @@ class _TfbSpinnerNew2State extends State<TfbSpinnerNew2> {
     }
   }
 
-  ListView buildListView(
-      IdNameValue data, bool children, void Function(IdNameValue item) itemOnTap) {
+  ListView buildListView(IdNameValue data, bool children,
+      void Function(IdNameValue item) itemOnTap) {
     return ListView.separated(
       shrinkWrap: true,
       scrollDirection: Axis.vertical,
@@ -212,7 +213,8 @@ class _TfbSpinnerNew2State extends State<TfbSpinnerNew2> {
           children: <Widget>[
             ...(widget.childrenAboveOfSpinner ?? []),
             Container(
-              padding: widget.padding ?? const EdgeInsets.symmetric(horizontal: 10),
+              padding:
+                  widget.padding ?? const EdgeInsets.symmetric(horizontal: 10),
               margin: widget.margin,
               color: Colors.white,
               height: 43,
@@ -223,8 +225,8 @@ class _TfbSpinnerNew2State extends State<TfbSpinnerNew2> {
                 height: 32,
                 dividerHeight: 0,
                 // borderColor: Colors.transparent,
-                style:
-                    const TextStyle(fontSize: 13, color: ColorUtils.colorBlackLite),
+                style: const TextStyle(
+                    fontSize: 13, color: ColorUtils.colorBlackLite),
               ),
             ),
             ...(widget.childrenBelowOfSpinner ?? []),

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-
 import 'package:kayo_package/kayo_package.dart';
 
 import 'package:flutter/material.dart';
@@ -19,7 +18,8 @@ class LoginFormCode extends StatefulWidget {
   final Color availableColor;
   final Color unavailableColor;
 
-  const LoginFormCode({super.key, 
+  const LoginFormCode({
+    super.key,
     this.countdown = 60,
     this.onTapCallback,
     this.available = false,
@@ -117,7 +117,8 @@ class _LoginFormCodeState extends State<LoginFormCode> {
               '  $_verifyStr  ',
               color: currentColor ?? ColorUtils.colorBlue,
               size: 14,
-              padding: const EdgeInsets.only(left: 10, right: 10, top: 7, bottom: 8),
+              padding:
+                  const EdgeInsets.only(left: 10, right: 10, top: 7, bottom: 8),
               margin: const EdgeInsets.only(right: 25, left: 5),
             ),
           )
@@ -130,7 +131,8 @@ class _LoginFormCodeState extends State<LoginFormCode> {
               border: false,
               // bgColor: '#F0F1F3'.toColor(),
               // borderColor: widget.unavailableColor,
-              padding: const EdgeInsets.only(left: 10, right: 10, top: 7, bottom: 8),
+              padding:
+                  const EdgeInsets.only(left: 10, right: 10, top: 7, bottom: 8),
               margin: const EdgeInsets.only(right: 25, left: 5),
             ),
           );

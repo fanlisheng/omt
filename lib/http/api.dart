@@ -92,7 +92,7 @@ class API extends BaseAPI {
   }
 
   Future<String> get hostCameraConfiguration async {
-     return 'http://10.10.1.93:8001';
+    return 'http://10.10.1.93:8001';
   }
 
   @override

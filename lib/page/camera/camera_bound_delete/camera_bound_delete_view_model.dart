@@ -1,5 +1,3 @@
-
-
 // import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/camera/camera_entity.dart';
@@ -35,7 +33,6 @@ class CameraBoundDeleteViewModel extends BaseViewModelList<CameraInfoEntity> {
       }
     });
   }
-
 
   @override
   bool hasMore() {

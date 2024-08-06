@@ -35,10 +35,10 @@ class _SearchPageState extends State<SearchPage> {
   @override
   void initState() {
     super.initState();
-    startTime =
-        BaseTimeUtils.dateToTimeStr(BaseTimeUtils.getToday(start: true), format: 'MM.dd');
-    endTime =
-        BaseTimeUtils.dateToTimeStr(BaseTimeUtils.getToday(start: false), format: 'MM.dd');
+    startTime = BaseTimeUtils.dateToTimeStr(BaseTimeUtils.getToday(start: true),
+        format: 'MM.dd');
+    endTime = BaseTimeUtils.dateToTimeStr(BaseTimeUtils.getToday(start: false),
+        format: 'MM.dd');
     getHistory();
     controller?.addListener(() {
       if (showResult == false) {
@@ -96,8 +96,8 @@ class _SearchPageState extends State<SearchPage> {
                           color: ColorUtils.colorInputBg,
                           borderRadius: BorderRadius.circular(15),
                         ),
-                        margin:
-                        const EdgeInsets.only(left: 23, right: 0, bottom: 10),
+                        margin: const EdgeInsets.only(
+                            left: 23, right: 0, bottom: 10),
                         // padding:
                         //     EdgeInsets.only(left: 12, right: 15, bottom: 0),
                         height: 30,
@@ -129,15 +129,14 @@ class _SearchPageState extends State<SearchPage> {
                                         DateTimePicker.show(context,
                                             showEnd: true,
                                             onDateTimePick: (start, end) {
-                                              startTime =
-                                                  BaseTimeUtils.dateToTimeStr(
-                                                      start,
-                                                      format: 'MM.dd');
-                                              endTime =
-                                                  BaseTimeUtils.dateToTimeStr(end,
-                                                      format: 'MM.dd');
-                                              setState(() {});
-                                            });
+                                          startTime =
+                                              BaseTimeUtils.dateToTimeStr(start,
+                                                  format: 'MM.dd');
+                                          endTime = BaseTimeUtils.dateToTimeStr(
+                                              end,
+                                              format: 'MM.dd');
+                                          setState(() {});
+                                        });
                                       },
                                     ),
                                     ImageView(
@@ -159,24 +158,24 @@ class _SearchPageState extends State<SearchPage> {
                             ),
                             Expanded(
                                 child: InputView(
-                                  controller: controller,
-                                  textSize: 14,
-                                  hintTextColor: ColorUtils.colorBlackLiteLite,
-                                  hintTextSize: 14,
-                                  hintText: '请输入关键字',
-                                  padding: const EdgeInsets.only(top: 0),
-                                  textColor: ColorUtils.colorBlack,
-                                  onChanged: (value) {},
-                                  onEditingComplete: () {
-                                    if (!BaseSysUtils.empty(controller?.text)) {
-                                      if (!items.contains(controller?.text)) {
-                                        items.add(controller?.text);
-                                        setHistory();
-                                      }
-                                    }
-                                    SysUtils.hideKeyboard(context);
-                                  },
-                                )),
+                              controller: controller,
+                              textSize: 14,
+                              hintTextColor: ColorUtils.colorBlackLiteLite,
+                              hintTextSize: 14,
+                              hintText: '请输入关键字',
+                              padding: const EdgeInsets.only(top: 0),
+                              textColor: ColorUtils.colorBlack,
+                              onChanged: (value) {},
+                              onEditingComplete: () {
+                                if (!BaseSysUtils.empty(controller?.text)) {
+                                  if (!items.contains(controller?.text)) {
+                                    items.add(controller?.text);
+                                    setHistory();
+                                  }
+                                }
+                                SysUtils.hideKeyboard(context);
+                              },
+                            )),
                           ],
                         ),
                       ),
@@ -204,8 +203,8 @@ class _SearchPageState extends State<SearchPage> {
                     children: [
                       TextView(
                         '历史记录',
-                        margin:
-                        const EdgeInsets.only(left: 18, top: 16, bottom: 15),
+                        margin: const EdgeInsets.only(
+                            left: 18, top: 16, bottom: 15),
                         color: ColorUtils.colorBlack,
                         size: 15,
                         fontWeight: FontWeight.bold,
@@ -218,8 +217,8 @@ class _SearchPageState extends State<SearchPage> {
                         width: 14,
                         height: 14,
                         padding: const EdgeInsets.all(10),
-                        margin:
-                        const EdgeInsets.only(right: 8, top: 10, bottom: 15),
+                        margin: const EdgeInsets.only(
+                            right: 8, top: 10, bottom: 15),
                         onClick: () {
                           items.clear();
                           setState(() {});
@@ -252,8 +251,8 @@ class _SearchPageState extends State<SearchPage> {
                         children: [
                           TextView(
                             title,
-                            margin:
-                            const EdgeInsets.only(left: 15, top: 12, right: 15),
+                            margin: const EdgeInsets.only(
+                                left: 15, top: 12, right: 15),
                             size: 14,
                             fontWeight: FontWeight.bold,
                             color: ColorUtils.colorBlack,
@@ -291,7 +290,8 @@ class _SearchPageState extends State<SearchPage> {
           title,
           size: 13,
           color: ColorUtils.colorBlack,
-          padding: const EdgeInsets.only(top: 6, bottom: 6, left: 14, right: 14),
+          padding:
+              const EdgeInsets.only(top: 6, bottom: 6, left: 14, right: 14),
           border: true,
           borderColor: ColorUtils.colorBorder,
           borderWidth: 0.5,

@@ -70,7 +70,8 @@ class VideoOperationsCenterPage extends StatelessWidget {
                     TitleMsgVideoFrame('设备编码：', model.findTheRtsp()?.value,
                         flex: 1),
                   ],
-                ).addContainer(margin: const EdgeInsets.only(top: 12, bottom: 20)),
+                ).addContainer(
+                    margin: const EdgeInsets.only(top: 12, bottom: 20)),
                 row
                     ? Row(
                         mainAxisSize: MainAxisSize.min,
@@ -111,7 +112,7 @@ class VideoOperationsCenterPage extends StatelessWidget {
                         textDarkOnlyOpacity: true,
                         bgColor: ColorUtils.colorAccent,
                         onPressed: () {
-                            model.restartCentralControl();
+                          model.restartCentralControl();
                         }),
                     ButtonView(
                         height: 40,
@@ -173,8 +174,8 @@ class VideoOperationsCenterPage extends StatelessWidget {
           CardView(
               margin: const EdgeInsets.only(top: 16),
               radius: 8,
-              padding:
-                  const EdgeInsets.only(top: 12, bottom: 12, left: 12, right: 12),
+              padding: const EdgeInsets.only(
+                  top: 12, bottom: 12, left: 12, right: 12),
               shadowRadius: 8,
               child: Column(
                 children: [

@@ -25,7 +25,8 @@ final rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
 class NavigationBodyItem extends StatelessWidget {
-  const NavigationBodyItem({super.key, 
+  const NavigationBodyItem({
+    super.key,
     this.header,
     this.content,
   });
@@ -97,7 +98,6 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
       body: const TerminalPage(),
       onTap: () => debugPrint('小工具'),
     ),
-
   ];
   List<NavigationPaneItem> labelMeItems = [
     PaneItemHeader(header: const Text('标注')),
@@ -137,7 +137,6 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
       notifyListeners();
     }
   }
-
 
   @override
   loadData({onSuccess, onCache, onError}) {

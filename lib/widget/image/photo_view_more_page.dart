@@ -32,7 +32,8 @@ class PhotoViewMorePage extends StatefulWidget {
   final List<String>? imageSrc;
   final bool? hasRotationButton;
 
-  PhotoViewMorePage({super.key, 
+  PhotoViewMorePage({
+    super.key,
     this.url,
     this.urls,
     this.src,
@@ -153,7 +154,8 @@ class _PhotoViewMorePageState extends State<PhotoViewMorePage> {
     return Scaffold(
       appBar: showSubTitle || showTitle
           ? AppBar(
-              systemOverlayStyle: const SystemUiOverlayStyle(statusBarBrightness: Brightness.light),
+              systemOverlayStyle: const SystemUiOverlayStyle(
+                  statusBarBrightness: Brightness.light),
               centerTitle: true,
               title: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -223,8 +225,8 @@ class _PhotoViewMorePageState extends State<PhotoViewMorePage> {
                       imgSrc,
                       color: ColorUtils.colorWhite,
                       size: 13,
-                      padding:
-                          const EdgeInsets.only(left: 8, right: 8, top: 2, bottom: 2),
+                      padding: const EdgeInsets.only(
+                          left: 8, right: 8, top: 2, bottom: 2),
                       radius: 30,
                       bgColor: const Color(0x55000000),
                     ))),
@@ -242,7 +244,8 @@ class _PhotoViewMorePageState extends State<PhotoViewMorePage> {
                         width: 44,
                         height: 44,
                         decoration: BoxDecoration(
-                          borderRadius: const BorderRadius.all(Radius.circular(6)),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(6)),
                           color: ColorUtils.colorBlackLiteLite.withOpacity(0.3),
                         ),
                         child: ImageView(
@@ -263,7 +266,8 @@ class _PhotoViewMorePageState extends State<PhotoViewMorePage> {
                         width: 44,
                         height: 44,
                         decoration: BoxDecoration(
-                          borderRadius: const BorderRadius.all(Radius.circular(6)),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(6)),
                           color: ColorUtils.colorBlackLiteLite.withOpacity(0.3),
                         ),
                         child: ImageView(

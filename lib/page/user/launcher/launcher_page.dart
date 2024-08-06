@@ -22,7 +22,7 @@ class LauncherPage extends StatelessWidget {
         model: LauncherViewModel(),
         autoLoadData: true,
         builder: (context, model, child) {
-          return  Container();
+          return Container();
         });
   }
 }

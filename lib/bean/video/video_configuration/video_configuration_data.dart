@@ -14,10 +14,10 @@ import 'package:omt/generated/json/video_configuration_data.g.dart';
 ///
 @JsonSerializable()
 class VideoConfigurationData {
-
   VideoConfigurationData();
 
-  factory VideoConfigurationData.fromJson(Map<String, dynamic> json) => $VideoConfigurationDataFromJson(json);
+  factory VideoConfigurationData.fromJson(Map<String, dynamic> json) =>
+      $VideoConfigurationDataFromJson(json);
 
   Map<String, dynamic> toJson() => $VideoConfigurationDataToJson(this);
 

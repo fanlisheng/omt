@@ -4,10 +4,10 @@ import 'dart:core';
 
 import 'package:omt/generated/json/base/json_convert_content.dart';
 
-
 VideoConfigurationData $VideoConfigurationDataFromJson(
     Map<String, dynamic> json) {
-  final VideoConfigurationData videoConfigurationData = VideoConfigurationData();
+  final VideoConfigurationData videoConfigurationData =
+      VideoConfigurationData();
   return videoConfigurationData;
 }
 
@@ -17,5 +17,4 @@ Map<String, dynamic> $VideoConfigurationDataToJson(
   return data;
 }
 
-extension VideoConfigurationDataExtension on VideoConfigurationData {
-}
+extension VideoConfigurationDataExtension on VideoConfigurationData {}

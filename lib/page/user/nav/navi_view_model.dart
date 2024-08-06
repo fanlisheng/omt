@@ -24,7 +24,6 @@ class NaviViewModel extends BaseViewModelRefresh<dynamic> {
     });
   }
 
-
   @override
   loadData({onSuccess, onCache, onError}) {
     ///网络请求

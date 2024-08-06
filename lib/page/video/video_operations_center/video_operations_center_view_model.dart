@@ -28,7 +28,6 @@ class VideoOperationsCenterViewModel
   List<VideoInfoCamEntity>? rtspList;
   int rtspIndex = 0;
 
-
   @override
   void dispose() {
     player.dispose();

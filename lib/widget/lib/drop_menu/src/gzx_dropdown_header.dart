@@ -121,7 +121,6 @@ class _GZXDropDownHeaderState extends State<GZXDropDownHeader>
     );
   }
 
-
   Widget _menu(GZXDropDownHeaderItem item) {
     int index = widget.items.indexOf(item);
     int menuIndex = widget.controller.menuIndex;

@@ -1,4 +1,3 @@
-
 import 'package:fluent_ui/fluent_ui.dart';
 
 // import 'package:flutter/material.dart';
@@ -126,7 +125,10 @@ class CameraBoundViewModel extends BaseViewModelList<CameraInfoEntity> {
             },
           ),
           FilledButton(
-            child: const Text('取消',style: TextStyle(color: ColorUtils.colorWhite),),
+            child: const Text(
+              '取消',
+              style: TextStyle(color: ColorUtils.colorWhite),
+            ),
             onPressed: () => Navigator.pop(context),
           ),
         ],

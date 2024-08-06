@@ -10,7 +10,11 @@ class TfbSpinnerBottom extends StatefulWidget {
   final ValueChanged<List<IdNameValue>?>? onPick;
 
   const TfbSpinnerBottom(
-      {super.key, this.nomalColor, this.selectedColor, this.datas, this.onPick});
+      {super.key,
+      this.nomalColor,
+      this.selectedColor,
+      this.datas,
+      this.onPick});
 
   @override
   State<StatefulWidget> createState() => _TfbSpinnerBottomState();
@@ -54,8 +58,8 @@ class _TfbSpinnerBottomState extends State<TfbSpinnerBottom> {
                     color: currentIndex == i
                         ? ColorUtils.colorBlue
                         : ColorUtils.colorBlackLite,
-                    padding:
-                        const EdgeInsets.only(left: 8, right: 8, top: 6, bottom: 6),
+                    padding: const EdgeInsets.only(
+                        left: 8, right: 8, top: 6, bottom: 6),
                     size: 12,
                   )),
                   ImageView(

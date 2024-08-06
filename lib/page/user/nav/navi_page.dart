@@ -71,7 +71,7 @@ class NaviPage extends StatelessWidget {
                         colorAlignmentEnd: Alignment.bottomRight,
                         elevation: 0,
                         onPressed: () {
-                       model.onTapItem(e);
+                          model.onTapItem(e);
                         },
                         child: TextView(
                           e.name,

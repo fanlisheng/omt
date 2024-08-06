@@ -40,7 +40,6 @@ class VideoConfigurationViewModel
     });
   }
 
-
   @override
   loadData({onSuccess, onCache, onError}) {
     ///网络请求

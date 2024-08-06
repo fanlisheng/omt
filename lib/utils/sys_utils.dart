@@ -311,8 +311,7 @@ class SysUtils {
     } else if (data > 10000000) {
       var d = data / 100000000;
       var stringAsFixed = d.toStringAsFixed(3);
-      dat =
-          '$stringAsFixed亿'.replaceAll('.00亿', '亿').replaceAll('.000亿', '亿');
+      dat = '$stringAsFixed亿'.replaceAll('.00亿', '亿').replaceAll('.000亿', '亿');
       if (dat.contains('.')) {
         dat = dat.replaceAll('00亿', '亿').replaceAll('0亿', '亿');
       }
@@ -476,7 +475,7 @@ class SysUtils {
     ];
 
     List<Color> colors = [];
-    for(var c in colorList){
+    for (var c in colorList) {
       colors.add(c.toColor());
     }
 

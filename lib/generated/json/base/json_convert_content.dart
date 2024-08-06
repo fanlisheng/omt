@@ -22,7 +22,9 @@ JsonConvert jsonConvert = JsonConvert();
 
 typedef JsonConvertFunction<T> = T Function(Map<String, dynamic> json);
 typedef EnumConvertFunction<T> = T Function(String value);
-typedef ConvertExceptionHandler = void Function(Object error, StackTrace stackTrace);
+typedef ConvertExceptionHandler = void Function(
+    Object error, StackTrace stackTrace);
+
 extension MapSafeExt<K, V> on Map<K, V> {
   T? getOrNull<T>(K? key) {
     if (!containsKey(key) || key == null) {
@@ -80,7 +82,8 @@ class JsonConvert {
       return null;
     }
     try {
-      return value.map((dynamic e) => _asT<T>(e, enumConvert: enumConvert))
+      return value
+          .map((dynamic e) => _asT<T>(e, enumConvert: enumConvert))
           .toList();
     } catch (e, stackTrace) {
       debugPrint('asT<$T> $e $stackTrace');
@@ -97,8 +100,9 @@ class JsonConvert {
       return null;
     }
     try {
-      return (value as List<dynamic>).map((dynamic e) =>
-      _asT<T>(e, enumConvert: enumConvert)!).toList();
+      return (value as List<dynamic>)
+          .map((dynamic e) => _asT<T>(e, enumConvert: enumConvert)!)
+          .toList();
     } catch (e, stackTrace) {
       debugPrint('asT<$T> $e $stackTrace');
       if (onError != null) {
@@ -150,96 +154,137 @@ class JsonConvert {
   //list is returned by type
   static M? _getListChildType<M>(List<Map<String, dynamic>> data) {
     if (<CameraHttpEntity>[] is M) {
-      return data.map<CameraHttpEntity>((Map<String, dynamic> e) =>
-          CameraHttpEntity.fromJson(e)).toList() as M;
+      return data
+          .map<CameraHttpEntity>(
+              (Map<String, dynamic> e) => CameraHttpEntity.fromJson(e))
+          .toList() as M;
     }
     if (<CameraInfoEntity>[] is M) {
-      return data.map<CameraInfoEntity>((Map<String, dynamic> e) =>
-          CameraInfoEntity.fromJson(e)).toList() as M;
+      return data
+          .map<CameraInfoEntity>(
+              (Map<String, dynamic> e) => CameraInfoEntity.fromJson(e))
+          .toList() as M;
     }
     if (<CodeMessageData>[] is M) {
-      return data.map<CodeMessageData>((Map<String, dynamic> e) =>
-          CodeMessageData.fromJson(e)).toList() as M;
+      return data
+          .map<CodeMessageData>(
+              (Map<String, dynamic> e) => CodeMessageData.fromJson(e))
+          .toList() as M;
     }
     if (<CommonPageData>[] is M) {
-      return data.map<CommonPageData>((Map<String, dynamic> e) =>
-          CommonPageData.fromJson(e)).toList() as M;
+      return data
+          .map<CommonPageData>(
+              (Map<String, dynamic> e) => CommonPageData.fromJson(e))
+          .toList() as M;
     }
     if (<IdNameValueEntity>[] is M) {
-      return data.map<IdNameValueEntity>((Map<String, dynamic> e) =>
-          IdNameValueEntity.fromJson(e)).toList() as M;
+      return data
+          .map<IdNameValueEntity>(
+              (Map<String, dynamic> e) => IdNameValueEntity.fromJson(e))
+          .toList() as M;
     }
     if (<IdNameValue>[] is M) {
-      return data.map<IdNameValue>((Map<String, dynamic> e) =>
-          IdNameValue.fromJson(e)).toList() as M;
+      return data
+          .map<IdNameValue>((Map<String, dynamic> e) => IdNameValue.fromJson(e))
+          .toList() as M;
     }
     if (<LinkKage>[] is M) {
-      return data.map<LinkKage>((Map<String, dynamic> e) =>
-          LinkKage.fromJson(e)).toList() as M;
+      return data
+          .map<LinkKage>((Map<String, dynamic> e) => LinkKage.fromJson(e))
+          .toList() as M;
     }
     if (<LinkKageType>[] is M) {
-      return data.map<LinkKageType>((Map<String, dynamic> e) =>
-          LinkKageType.fromJson(e)).toList() as M;
+      return data
+          .map<LinkKageType>(
+              (Map<String, dynamic> e) => LinkKageType.fromJson(e))
+          .toList() as M;
     }
     if (<LocationData>[] is M) {
-      return data.map<LocationData>((Map<String, dynamic> e) =>
-          LocationData.fromJson(e)).toList() as M;
+      return data
+          .map<LocationData>(
+              (Map<String, dynamic> e) => LocationData.fromJson(e))
+          .toList() as M;
     }
     if (<NameValue>[] is M) {
-      return data.map<NameValue>((Map<String, dynamic> e) =>
-          NameValue.fromJson(e)).toList() as M;
+      return data
+          .map<NameValue>((Map<String, dynamic> e) => NameValue.fromJson(e))
+          .toList() as M;
     }
     if (<HomePageData>[] is M) {
-      return data.map<HomePageData>((Map<String, dynamic> e) =>
-          HomePageData.fromJson(e)).toList() as M;
+      return data
+          .map<HomePageData>(
+              (Map<String, dynamic> e) => HomePageData.fromJson(e))
+          .toList() as M;
     }
     if (<UserInfoData>[] is M) {
-      return data.map<UserInfoData>((Map<String, dynamic> e) =>
-          UserInfoData.fromJson(e)).toList() as M;
+      return data
+          .map<UserInfoData>(
+              (Map<String, dynamic> e) => UserInfoData.fromJson(e))
+          .toList() as M;
     }
     if (<UserPermission>[] is M) {
-      return data.map<UserPermission>((Map<String, dynamic> e) =>
-          UserPermission.fromJson(e)).toList() as M;
+      return data
+          .map<UserPermission>(
+              (Map<String, dynamic> e) => UserPermission.fromJson(e))
+          .toList() as M;
     }
     if (<VerInfo>[] is M) {
-      return data.map<VerInfo>((Map<String, dynamic> e) => VerInfo.fromJson(e))
+      return data
+          .map<VerInfo>((Map<String, dynamic> e) => VerInfo.fromJson(e))
           .toList() as M;
     }
     if (<VerInfoRet>[] is M) {
-      return data.map<VerInfoRet>((Map<String, dynamic> e) =>
-          VerInfoRet.fromJson(e)).toList() as M;
+      return data
+          .map<VerInfoRet>((Map<String, dynamic> e) => VerInfoRet.fromJson(e))
+          .toList() as M;
     }
     if (<VideoConnectEntity>[] is M) {
-      return data.map<VideoConnectEntity>((Map<String, dynamic> e) =>
-          VideoConnectEntity.fromJson(e)).toList() as M;
+      return data
+          .map<VideoConnectEntity>(
+              (Map<String, dynamic> e) => VideoConnectEntity.fromJson(e))
+          .toList() as M;
     }
     if (<VideoInfoEntity>[] is M) {
-      return data.map<VideoInfoEntity>((Map<String, dynamic> e) =>
-          VideoInfoEntity.fromJson(e)).toList() as M;
+      return data
+          .map<VideoInfoEntity>(
+              (Map<String, dynamic> e) => VideoInfoEntity.fromJson(e))
+          .toList() as M;
     }
     if (<VideoInfoCamEntity>[] is M) {
-      return data.map<VideoInfoCamEntity>((Map<String, dynamic> e) =>
-          VideoInfoCamEntity.fromJson(e)).toList() as M;
+      return data
+          .map<VideoInfoCamEntity>(
+              (Map<String, dynamic> e) => VideoInfoCamEntity.fromJson(e))
+          .toList() as M;
     }
     if (<VideoInfoRectEntity>[] is M) {
-      return data.map<VideoInfoRectEntity>((Map<String, dynamic> e) =>
-          VideoInfoRectEntity.fromJson(e)).toList() as M;
+      return data
+          .map<VideoInfoRectEntity>(
+              (Map<String, dynamic> e) => VideoInfoRectEntity.fromJson(e))
+          .toList() as M;
     }
     if (<VideoInfoOtherEntity>[] is M) {
-      return data.map<VideoInfoOtherEntity>((Map<String, dynamic> e) =>
-          VideoInfoOtherEntity.fromJson(e)).toList() as M;
+      return data
+          .map<VideoInfoOtherEntity>(
+              (Map<String, dynamic> e) => VideoInfoOtherEntity.fromJson(e))
+          .toList() as M;
     }
     if (<VideoConfigurationData>[] is M) {
-      return data.map<VideoConfigurationData>((Map<String, dynamic> e) =>
-          VideoConfigurationData.fromJson(e)).toList() as M;
+      return data
+          .map<VideoConfigurationData>(
+              (Map<String, dynamic> e) => VideoConfigurationData.fromJson(e))
+          .toList() as M;
     }
     if (<VideoFrameData>[] is M) {
-      return data.map<VideoFrameData>((Map<String, dynamic> e) =>
-          VideoFrameData.fromJson(e)).toList() as M;
+      return data
+          .map<VideoFrameData>(
+              (Map<String, dynamic> e) => VideoFrameData.fromJson(e))
+          .toList() as M;
     }
     if (<VideoOperationsCenterData>[] is M) {
-      return data.map<VideoOperationsCenterData>((Map<String, dynamic> e) =>
-          VideoOperationsCenterData.fromJson(e)).toList() as M;
+      return data
+          .map<VideoOperationsCenterData>(
+              (Map<String, dynamic> e) => VideoOperationsCenterData.fromJson(e))
+          .toList() as M;
     }
 
     debugPrint("$M not found");

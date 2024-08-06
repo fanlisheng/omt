@@ -4,19 +4,16 @@ import 'dart:core';
 
 import 'package:omt/generated/json/base/json_convert_content.dart';
 
-
 UserInfoData $UserInfoDataFromJson(Map<String, dynamic> json) {
   final UserInfoData userInfoData = UserInfoData();
   final String? phone = jsonConvert.convert<String>(json['phone']);
   if (phone != null) {
     userInfoData.phone = phone;
   }
-  final List<
-      UserPermission>? userPermissions = (json['userPermissions'] as List<
-      dynamic>?)
-      ?.map(
-          (e) => jsonConvert.convert<UserPermission>(e) as UserPermission)
-      .toList();
+  final List<UserPermission>? userPermissions =
+      (json['userPermissions'] as List<dynamic>?)
+          ?.map((e) => jsonConvert.convert<UserPermission>(e) as UserPermission)
+          .toList();
   if (userPermissions != null) {
     userInfoData.userPermissions = userPermissions;
   }

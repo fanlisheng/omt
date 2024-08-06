@@ -25,7 +25,13 @@ class PhotoViewPage extends StatelessWidget {
   final Widget? imgDesc;
 
   const PhotoViewPage(
-      {super.key, this.url, this.src, this.file, this.title, this.subTitle, this.imgDesc});
+      {super.key,
+      this.url,
+      this.src,
+      this.file,
+      this.title,
+      this.subTitle,
+      this.imgDesc});
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +63,8 @@ class PhotoViewPage extends StatelessWidget {
     return Scaffold(
       appBar: showSubTitle || showTitle
           ? AppBar(
-              systemOverlayStyle: const SystemUiOverlayStyle(statusBarBrightness: Brightness.light),
+              systemOverlayStyle: const SystemUiOverlayStyle(
+                  statusBarBrightness: Brightness.light),
               centerTitle: true,
               title: Column(
                 mainAxisSize: MainAxisSize.min,

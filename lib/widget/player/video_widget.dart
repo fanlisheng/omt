@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 
-
 class CameraPlayerMKTestWidget extends StatefulWidget {
   final String url;
   const CameraPlayerMKTestWidget(this.url, {super.key});

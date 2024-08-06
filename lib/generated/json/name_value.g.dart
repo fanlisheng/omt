@@ -2,7 +2,6 @@ import 'package:omt/generated/json/base/json_convert_content.dart';
 import 'package:omt/bean/common/name_value.dart';
 import 'dart:ui';
 
-
 NameValue $NameValueFromJson(Map<String, dynamic> json) {
   final NameValue nameValue = NameValue();
   final int? id = jsonConvert.convert<int>(json['id']);

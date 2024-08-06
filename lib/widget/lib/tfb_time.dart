@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/utils/color_utils.dart';
@@ -118,8 +117,8 @@ class _TfbTimePickerState extends State<TfbTimePicker> {
                 borderColor: ColorUtils.colorLine,
                 borderWidth: 1,
                 borderRadius: const BorderRadius.all(Radius.circular(8)),
-                padding:
-                    const EdgeInsets.only(left: 12, top: 1, bottom: 1, right: 12),
+                padding: const EdgeInsets.only(
+                    left: 12, top: 1, bottom: 1, right: 12),
               ),
               Container(
                 width: 8,

@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 
 import 'package:kayo_package/kayo_package.dart';
 
-
 IdNameValueEntity $IdNameValueEntityFromJson(Map<String, dynamic> json) {
   final IdNameValueEntity idNameValueEntity = IdNameValueEntity();
   final int? code = jsonConvert.convert<int>(json['code']);
@@ -15,8 +14,9 @@ IdNameValueEntity $IdNameValueEntityFromJson(Map<String, dynamic> json) {
   if (message != null) {
     idNameValueEntity.message = message;
   }
-  final List<IdNameValue>? data = (json['data'] as List<dynamic>?)?.map(
-          (e) => jsonConvert.convert<IdNameValue>(e) as IdNameValue).toList();
+  final List<IdNameValue>? data = (json['data'] as List<dynamic>?)
+      ?.map((e) => jsonConvert.convert<IdNameValue>(e) as IdNameValue)
+      .toList();
   if (data != null) {
     idNameValueEntity.data = data;
   }
@@ -70,8 +70,8 @@ IdNameValue $IdNameValueFromJson(Map<String, dynamic> json) {
   if (isMultiple != null) {
     idNameValue.isMultiple = isMultiple;
   }
-  final IdNameValue? selectSub = jsonConvert.convert<IdNameValue>(
-      json['selectSub']);
+  final IdNameValue? selectSub =
+      jsonConvert.convert<IdNameValue>(json['selectSub']);
   if (selectSub != null) {
     idNameValue.selectSub = selectSub;
   }
@@ -83,8 +83,9 @@ IdNameValue $IdNameValueFromJson(Map<String, dynamic> json) {
   if (url != null) {
     idNameValue.url = url;
   }
-  final List<int>? ids = (json['ids'] as List<dynamic>?)?.map(
-          (e) => jsonConvert.convert<int>(e) as int).toList();
+  final List<int>? ids = (json['ids'] as List<dynamic>?)
+      ?.map((e) => jsonConvert.convert<int>(e) as int)
+      .toList();
   if (ids != null) {
     idNameValue.ids = ids;
   }
@@ -92,8 +93,9 @@ IdNameValue $IdNameValueFromJson(Map<String, dynamic> json) {
   if (flex != null) {
     idNameValue.flex = flex;
   }
-  final List<IdNameValue>? children = (json['children'] as List<dynamic>?)?.map(
-          (e) => jsonConvert.convert<IdNameValue>(e) as IdNameValue).toList();
+  final List<IdNameValue>? children = (json['children'] as List<dynamic>?)
+      ?.map((e) => jsonConvert.convert<IdNameValue>(e) as IdNameValue)
+      .toList();
   if (children != null) {
     idNameValue.children = children;
   }

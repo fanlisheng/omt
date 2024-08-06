@@ -3,7 +3,6 @@ import 'package:kayo_package/mvvm/base/base_view_model.dart';
 import 'package:omt/utils/intent_utils.dart';
 import 'package:omt/utils/shared_utils.dart';
 
-
 ///
 ///  flutter_ticket
 ///  home_launcher_model.dart
