@@ -29,6 +29,6 @@
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>com.apple.security.files.user-selected.read-write</key>
-     <true/>
+	<true/>
 </dict>
 </plist>

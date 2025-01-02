@@ -55,33 +55,33 @@ extension VideoConnectEntityExtension on VideoConnectEntity {
 
 VideoInfoEntity $VideoInfoEntityFromJson(Map<String, dynamic> json) {
   final VideoInfoEntity videoInfoEntity = VideoInfoEntity();
-  final VideoInfoCamEntity? webcam =
-      jsonConvert.convert<VideoInfoCamEntity>(json['webcam']);
+  final VideoInfoCamEntity? webcam = jsonConvert.convert<VideoInfoCamEntity>(
+      json['webcam']);
   if (webcam != null) {
     videoInfoEntity.webcam = webcam;
   }
-  final VideoInfoRectEntity? rect1 =
-      jsonConvert.convert<VideoInfoRectEntity>(json['rect1']);
+  final VideoInfoRectEntity? rect1 = jsonConvert.convert<VideoInfoRectEntity>(
+      json['rect1']);
   if (rect1 != null) {
     videoInfoEntity.rect1 = rect1;
   }
-  final VideoInfoRectEntity? rect2 =
-      jsonConvert.convert<VideoInfoRectEntity>(json['rect2']);
+  final VideoInfoRectEntity? rect2 = jsonConvert.convert<VideoInfoRectEntity>(
+      json['rect2']);
   if (rect2 != null) {
     videoInfoEntity.rect2 = rect2;
   }
-  final VideoInfoRectEntity? rect3 =
-      jsonConvert.convert<VideoInfoRectEntity>(json['rect3']);
+  final VideoInfoRectEntity? rect3 = jsonConvert.convert<VideoInfoRectEntity>(
+      json['rect3']);
   if (rect3 != null) {
     videoInfoEntity.rect3 = rect3;
   }
-  final VideoInfoRectEntity? rect4 =
-      jsonConvert.convert<VideoInfoRectEntity>(json['rect4']);
+  final VideoInfoRectEntity? rect4 = jsonConvert.convert<VideoInfoRectEntity>(
+      json['rect4']);
   if (rect4 != null) {
     videoInfoEntity.rect4 = rect4;
   }
-  final VideoInfoOtherEntity? other =
-      jsonConvert.convert<VideoInfoOtherEntity>(json['other']);
+  final VideoInfoOtherEntity? other = jsonConvert.convert<VideoInfoOtherEntity>(
+      json['other']);
   if (other != null) {
     videoInfoEntity.other = other;
   }

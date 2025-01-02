@@ -5,6 +5,7 @@ import 'package:omt/page/camera/camera_bound/camera_bound_page.dart';
 import 'package:omt/page/camera/camera_bound_delete/camera_bound_delete_page.dart';
 import 'package:omt/page/camera/camera_unbound/camera_un_bound_page.dart';
 import 'package:omt/page/label/label_me/label_me_page.dart';
+import 'package:omt/page/one_picture/one_picture/one_picture_page.dart';
 import 'package:omt/page/tools/terminal/terminal_page.dart';
 import 'package:omt/page/video/video_configuration/video_configuration_page.dart';
 import 'package:omt/page/video/video_frame/video_frame_page.dart';
@@ -108,6 +109,15 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
       onTap: () => debugPrint('标注'),
     ),
   ];
+  List<NavigationPaneItem> onePictureItems = [
+    PaneItemHeader(header: const Text('一张图')),
+    PaneItem(
+      icon: const Icon(FluentIcons.picture),
+      title: const Text('一张图'),
+      body: const OnePicturePage(),
+      onTap: () => debugPrint('一张图'),
+    ),
+  ];
   List<NavigationPaneItem> items = [];
 
   @override
@@ -124,6 +134,8 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
           items.addAll(toolsItems);
         } else if (value?.id == AuthEnum.menuLabelMe) {
           items.addAll(labelMeItems);
+        }else if (value?.id == AuthEnum.menuOnePicture) {
+          items.addAll(onePictureItems);
         }
         notifyListeners();
       });

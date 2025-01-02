@@ -18,7 +18,6 @@ list(APPEND FLUTTER_PLUGIN_LIST
 list(APPEND FLUTTER_FFI_PLUGIN_LIST
   flutter_pty
   media_kit_native_event_loop
-  rust_lib_omt
 )
 
 set(PLUGIN_BUNDLED_LIBRARIES)

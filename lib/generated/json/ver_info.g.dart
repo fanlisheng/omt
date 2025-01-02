@@ -58,6 +58,7 @@ extension VerInfoRetExtension on VerInfoRet {
   VerInfoRet copyWith({
     VerInfo? data,
   }) {
-    return VerInfoRet()..data = data ?? this.data;
+    return VerInfoRet()
+      ..data = data ?? this.data;
   }
 }

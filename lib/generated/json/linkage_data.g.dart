@@ -23,9 +23,8 @@ LinkKage $LinkKageFromJson(Map<String, dynamic> json) {
   if (hierarchy != null) {
     linkKage.hierarchy = hierarchy;
   }
-  final List<LinkKage>? value = (json['value'] as List<dynamic>?)
-      ?.map((e) => jsonConvert.convert<LinkKage>(e) as LinkKage)
-      .toList();
+  final List<LinkKage>? value = (json['value'] as List<dynamic>?)?.map(
+          (e) => jsonConvert.convert<LinkKage>(e) as LinkKage).toList();
   if (value != null) {
     linkKage.value = value;
   }

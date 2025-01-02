@@ -13,6 +13,7 @@ import 'package:omt/page/video/video_operations_center/video_operations_center_p
 import 'package:omt/page/camera/camera_bound/camera_bound_page.dart';
 import 'package:omt/page/label/label_me/label_me_page.dart';
 import 'package:omt/page/tools/terminal/terminal_page.dart';
+import 'package:omt/page/one_picture/one_picture/one_picture_page.dart';
 
 ///ReplaceRouterPageImport
 
@@ -59,6 +60,9 @@ class RouterPage {
 
   ///终端
   static const String TerminalPage = 'TerminalPage';
+
+  ///一张图
+  static const String OnePicturePage = 'OnePicturePage';
 
   ///ReplaceRouterPageDefine
 }
@@ -132,6 +136,12 @@ Route<dynamic> generateRoute(RouteSettings settings, {uniqueId}) {
             return const TerminalPage();
           });
 
+    case RouterPage.OnePicturePage:
+      return CupertinoPageRoute(
+          settings: settings,
+          builder: (context) {
+            return OnePicturePage();
+          });
     ///ReplaceRouterGenerateRoute
 
     default:

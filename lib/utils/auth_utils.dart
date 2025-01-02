@@ -22,6 +22,9 @@ class AuthEnum {
   ///小工具
   static const int menuTools = 103;
 
+  ///一张图
+  static const int menuOnePicture = 104;
+
   ///数据标注
   static const int menuLabelMe = 9999;
 }

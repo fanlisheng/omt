@@ -4,6 +4,7 @@ import 'package:kayo_package/kayo_package.dart';
 
 import 'package:omt/bean/common/code_data.dart';
 
+
 CameraHttpEntity $CameraHttpEntityFromJson(Map<String, dynamic> json) {
   final CameraHttpEntity cameraHttpEntity = CameraHttpEntity();
   final int? code = jsonConvert.convert<int>(json['code']);
@@ -14,13 +15,14 @@ CameraHttpEntity $CameraHttpEntityFromJson(Map<String, dynamic> json) {
   if (message != null) {
     cameraHttpEntity.message = message;
   }
-  final CommonPageData? page =
-      jsonConvert.convert<CommonPageData>(json['page']);
+  final CommonPageData? page = jsonConvert.convert<CommonPageData>(
+      json['page']);
   if (page != null) {
     cameraHttpEntity.page = page;
   }
   final List<CameraInfoEntity>? data = (json['data'] as List<dynamic>?)
-      ?.map((e) => jsonConvert.convert<CameraInfoEntity>(e) as CameraInfoEntity)
+      ?.map(
+          (e) => jsonConvert.convert<CameraInfoEntity>(e) as CameraInfoEntity)
       .toList();
   if (data != null) {
     cameraHttpEntity.data = data;
@@ -94,8 +96,8 @@ CameraInfoEntity $CameraInfoEntityFromJson(Map<String, dynamic> json) {
   if (ptz_type != null) {
     cameraInfoEntity.ptz_type = ptz_type;
   }
-  final String? channel_info =
-      jsonConvert.convert<String>(json['channel_info']);
+  final String? channel_info = jsonConvert.convert<String>(
+      json['channel_info']);
   if (channel_info != null) {
     cameraInfoEntity.channel_info = channel_info;
   }

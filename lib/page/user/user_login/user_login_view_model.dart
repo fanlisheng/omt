@@ -4,7 +4,6 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/user/user_login/user_login_data.dart';
-import 'package:omt/src/rust/api/simple.dart';
 import 'package:omt/utils/auth_utils.dart';
 import 'package:omt/utils/intent_utils.dart';
 import 'package:omt/utils/log_utils.dart';
@@ -97,14 +96,6 @@ class UserLoginViewModel extends BaseViewModelRefresh<UserInfoData> {
     var phone = phoneController.text;
     var pwd = pwdController.text;
 
-    if (false) {
-      // var dynamicLibrary = DynamicLibrary.open('path');
-      // var nl = NativeLibrary(dynamicLibrary);
-      // var greet22 = await getMac();
-      var greet22 = await countAddSelf();
-      LoadingUtils.showToast(data: '$greet22');
-      return;
-    }
 
     if (BaseSysUtils.empty(phone)) {
       LoadingUtils.showInfo(data: '请输入账号');
@@ -133,7 +124,10 @@ class UserLoginViewModel extends BaseViewModelRefresh<UserInfoData> {
               ..name = '摄像头配置',
             UserPermission()
               ..id = AuthEnum.menuTools
-              ..name = '小工具'
+              ..name = '小工具',
+            UserPermission()
+              ..id = AuthEnum.menuOnePicture
+              ..name = '一张图'
           ];
         }
         break;

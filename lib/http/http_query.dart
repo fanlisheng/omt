@@ -3,6 +3,7 @@ import 'package:omt/http/service/fileService/fileService.dart';
 import 'package:omt/http/service/user/user_login/user_login_service.dart';
 import 'package:omt/http/service/home/home_page/home_page_service.dart';
 import 'package:omt/http/service/video/video_configuration_service.dart';
+import 'package:omt/http/service/one_picture/one_picture/one_picture_service.dart';
 
 ///ReplaceServiceImport
 
@@ -31,6 +32,7 @@ class HttpQuery {
   late VideoConfigurationService videoConfigurationService;
   late CameraConfigurationService cameraConfigurationService;
 
+  late OnePictureService onePictureService;
   ///ReplaceServiceDefine
 
   HttpQuery._() {
@@ -41,6 +43,7 @@ class HttpQuery {
     videoConfigurationService = VideoConfigurationService();
     cameraConfigurationService = CameraConfigurationService();
 
+    onePictureService = OnePictureService();
     ///ReplaceServiceImplementation
   }
 }
