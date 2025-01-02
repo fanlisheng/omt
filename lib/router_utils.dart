@@ -127,10 +127,10 @@ Route<dynamic> generateRoute(RouteSettings settings, {uniqueId}) {
       return CupertinoPageRoute(
           settings: settings,
           builder: (context) {
-            return const LabelMePage();
+            return const LabelMePage(); 
           });
     case RouterPage.TerminalPage:
-      return CupertinoPageRoute(
+          return CupertinoPageRoute(
           settings: settings,
           builder: (context) {
             return const TerminalPage();
