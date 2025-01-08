@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/utils/intent_utils.dart';
 import 'package:omt/utils/sys_utils.dart';
+import '../../../utils/color_utils.dart';
 import 'home_view_model.dart';
 
 ///
@@ -26,7 +27,24 @@ class HomePage extends StatelessWidget {
         builder: (context, model, child) {
           return fu.NavigationView(
             appBar: fu.NavigationAppBar(
-                title: const Text('运维工具'),
+                title: fu.Row(
+                  children: [
+                    ImageView(
+                      src: source("ic_logo"),
+                      width: 22,
+                      height: 22,
+                      margin: const fu.EdgeInsets.only(right: 10)
+                    ),
+                    Text(
+                      "福立盟运维配置客户端",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: "#E9F4F5".toColor(),
+                      ),
+                    ),
+                  ],
+                ),
                 automaticallyImplyLeading: false,
                 actions: SysUtils.appBarAction(context),
                 leading: null),
@@ -40,20 +58,21 @@ class HomePage extends StatelessWidget {
                 model.notifyListeners();
               },
               displayMode: model.displayMode,
+              size: const fu.NavigationPaneSize(openWidth: 160,topHeight: 0),
               indicator: const fu.StickyNavigationIndicator(),
-              header: model.displayMode == fu.PaneDisplayMode.open ||
-                      model.displayMode == fu.PaneDisplayMode.compact
-                  ? TextView('')
-                  : fu.IconButton(
-                      icon: const fu.Icon(
-                        Icons.menu_outlined,
-                        size: 18,
-                      ),
-                      onPressed: () {
-                        model.setDisplayMode(fu.PaneDisplayMode.compact);
-                      },
-                    ),
-              items: model.items,
+              // header: model.displayMode == fu.PaneDisplayMode.open ||
+              //         model.displayMode == fu.PaneDisplayMode.compact
+              //     ? TextView('')
+              //     : fu.IconButton(
+              //         icon: const fu.Icon(
+              //           Icons.menu_outlined,
+              //           size: 18,
+              //         ),
+              //         onPressed: () {
+              //           model.setDisplayMode(fu.PaneDisplayMode.compact);
+              //         },
+              //       ),
+              items: model.homeItems,
               footerItems: SysUtils.useNavi()
                   ? [
                       fu.PaneItemAction(

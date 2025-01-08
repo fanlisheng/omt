@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:kayo_package/views/common/404.dart';
-import 'package:omt/page/home/home_page.dart';
+import 'package:omt/page/home/bind_device/widgets/bind_device_screen.dart';
+import 'package:omt/page/home/device_add/widgets/bind_device_screen.dart';
+import 'package:omt/page/home/home/home_page.dart';
 import 'package:omt/page/user/launcher/launcher_page.dart';
 import 'package:omt/page/user/nav/navi_page.dart';
 import 'package:omt/page/user/user_login/user_login_page.dart';
@@ -63,6 +65,12 @@ class RouterPage {
 
   ///一张图
   static const String OnePicturePage = 'OnePicturePage';
+
+  ///设备绑定
+  static const String DeviceBindPage = 'DeviceBindPage';
+
+  ///设备添加
+  static const String DeviceAddPage = 'DeviceAddPage';
 
   ///ReplaceRouterPageDefine
 }
@@ -127,10 +135,10 @@ Route<dynamic> generateRoute(RouteSettings settings, {uniqueId}) {
       return CupertinoPageRoute(
           settings: settings,
           builder: (context) {
-            return const LabelMePage(); 
+            return const LabelMePage();
           });
     case RouterPage.TerminalPage:
-          return CupertinoPageRoute(
+      return CupertinoPageRoute(
           settings: settings,
           builder: (context) {
             return const TerminalPage();
@@ -142,6 +150,26 @@ Route<dynamic> generateRoute(RouteSettings settings, {uniqueId}) {
           builder: (context) {
             return OnePicturePage();
           });
+
+    case RouterPage.DeviceBindPage:
+      return CupertinoPageRoute(
+          settings: settings,
+          builder: (context) {
+            return BindDeviceScreen(
+              deviceData: arguments["data"],
+            );
+          });
+
+    case RouterPage.DeviceAddPage:
+      return CupertinoPageRoute(
+          settings: settings,
+          builder: (context) {
+            return DeviceAddScreen(
+              id: arguments["id"],
+              deviceType: arguments["type"],
+            );
+          });
+
     ///ReplaceRouterGenerateRoute
 
     default:

@@ -19,7 +19,7 @@ import screen_brightness_macos
 import screen_retriever
 import share_plus
 import shared_preferences_foundation
-import sqflite
+import sqflite_darwin
 import syncfusion_pdfviewer_macos
 import system_theme
 import url_launcher_macos

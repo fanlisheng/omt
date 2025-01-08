@@ -4,6 +4,7 @@ import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/page/camera/camera_bound/camera_bound_page.dart';
 import 'package:omt/page/camera/camera_bound_delete/camera_bound_delete_page.dart';
 import 'package:omt/page/camera/camera_unbound/camera_un_bound_page.dart';
+import 'package:omt/page/home/home/home_page.dart';
 import 'package:omt/page/label/label_me/label_me_page.dart';
 import 'package:omt/page/one_picture/one_picture/one_picture_page.dart';
 import 'package:omt/page/tools/terminal/terminal_page.dart';
@@ -13,6 +14,8 @@ import 'package:omt/page/video/video_operations_center/video_operations_center_p
 import 'package:omt/utils/auth_utils.dart';
 import 'package:omt/utils/shared_utils.dart';
 import 'package:omt/utils/sys_utils.dart';
+
+import '../search_device/widgets/search_device_screen.dart';
 
 ///
 ///  omt
@@ -46,7 +49,78 @@ class NavigationBodyItem extends StatelessWidget {
 
 class HomeViewModel extends BaseViewModelRefresh<dynamic> {
   int topIndex = 0;
-  PaneDisplayMode displayMode = PaneDisplayMode.auto;
+  PaneDisplayMode displayMode = PaneDisplayMode.open;
+
+  List<NavigationPaneItem> get homeItems {
+    return [
+      PaneItemHeader(header: const Text('首页')),
+      PaneItem(
+        icon: PaneImage(
+          name: "home/ic_pane_home",
+          selectedName: 'home/ic_pane_home_s',
+          index: 0,
+          selectedIndex: topIndex,
+        ),
+        title: Text(
+          "首页",
+          style: TextStyle(
+              fontSize: 12,
+              color: 0 == topIndex ? "#F3FFFF".toColor() : "#678384".toColor()),
+        ),
+        body: const SearchDeviceScreen(),
+        onTap: () => debugPrint('首页'),
+      ),
+      PaneItem(
+        icon: PaneImage(
+          name: "home/ic_pane_add",
+          selectedName: 'home/ic_pane_add_s',
+          index: 1,
+          selectedIndex: topIndex,
+        ),
+        title: Text(
+          "安装",
+          style: TextStyle(
+              fontSize: 12,
+              color: 1 == topIndex ? "#F3FFFF".toColor() : "#678384".toColor()),
+        ),
+        body: const VideoFramePage(),
+        onTap: () => debugPrint('安装'),
+      ),
+      PaneItem(
+        icon: PaneImage(
+          name: "home/ic_pane_delete",
+          selectedName: 'home/ic_pane_delete',
+          index: 2,
+          selectedIndex: topIndex,
+        ),
+        title: Text(
+          "拆除",
+          style: TextStyle(
+              fontSize: 12,
+              color: 2 == topIndex ? "#F3FFFF".toColor() : "#678384".toColor()),
+        ),
+        body: const VideoConfigurationPage(),
+        onTap: () => debugPrint('拆除'),
+      ),
+      PaneItem(
+        icon: PaneImage(
+          name: "home/ic_pane_set",
+          selectedName: 'home/ic_pane_set',
+          index: 3,
+          selectedIndex: topIndex,
+        ),
+        title: Text(
+          "设置",
+          style: TextStyle(
+              fontSize: 12,
+              color: 3 == topIndex ? "#F3FFFF".toColor() : "#678384".toColor()),
+        ),
+        body: const VideoOperationsCenterPage(),
+        onTap: () => debugPrint('设置'),
+      ),
+    ];
+  }
+
   List<NavigationPaneItem> videoItems = [
     PaneItemHeader(header: const Text('视频配置')),
     PaneItem(
@@ -68,7 +142,6 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
       onTap: () => debugPrint('操作中心'),
     ),
   ];
-
   List<NavigationPaneItem> cameraItems = [
     PaneItemHeader(header: const Text('摄像头配置')),
     PaneItem(
@@ -90,7 +163,6 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
       onTap: () => debugPrint('绑定到已删除矿区'),
     ),
   ];
-
   List<NavigationPaneItem> toolsItems = [
     PaneItemHeader(header: const Text('小工具')),
     PaneItem(
@@ -134,18 +206,19 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
           items.addAll(toolsItems);
         } else if (value?.id == AuthEnum.menuLabelMe) {
           items.addAll(labelMeItems);
-        }else if (value?.id == AuthEnum.menuOnePicture) {
+        } else if (value?.id == AuthEnum.menuOnePicture) {
           items.addAll(onePictureItems);
         }
         notifyListeners();
       });
     } else {
-      if (AuthUtils.share.hasAuth(authId: AuthEnum.menuVideoConfiguration)) {
-        items.addAll(videoItems);
-      }
-      if (AuthUtils.share.hasAuth(authId: AuthEnum.menuCameraConfiguration)) {
-        items.addAll(cameraItems);
-      }
+      items.addAll(homeItems);
+      // if (AuthUtils.share.hasAuth(authId: AuthEnum.menuVideoConfiguration)) {
+      //   items.addAll(videoItems);
+      // }
+      // if (AuthUtils.share.hasAuth(authId: AuthEnum.menuCameraConfiguration)) {
+      //   items.addAll(cameraItems);
+      // }
       notifyListeners();
     }
   }
@@ -160,3 +233,27 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
     notifyListeners();
   }
 }
+
+class PaneImage extends StatelessWidget {
+  final String name;
+  final String selectedName;
+  final int index;
+  final int selectedIndex;
+
+  const PaneImage(
+      {super.key,
+      required this.name,
+      required this.selectedName,
+      required this.index,
+      required this.selectedIndex});
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset(
+      index == selectedIndex ? source(selectedName) : source(name),
+      width: 18,
+      height: 18,
+    );
+  }
+}
+

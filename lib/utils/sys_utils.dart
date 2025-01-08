@@ -2,7 +2,6 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/common/location_data_entity.dart';
 import 'package:omt/main.dart';
@@ -483,7 +482,7 @@ class SysUtils {
   }
 
   static bool useNavi() {
-    return true;
+    return false;
   }
 
   static String randomString(int length) {
@@ -503,4 +502,5 @@ class SysUtils {
     return 'rtsp://admin:flm2020hb@192.168.101.236:554/Streaming/Channels/101';
     // return 'http://192.168.101.189:3000/a.mkv';
   }
+
 }

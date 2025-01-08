@@ -17,7 +17,9 @@ class ColorUtils {
   static const Color transparent = Color(0x00000000);
 
   static const Color colorBlue = Color(0xFF3D7EFF);
-  static const Color colorGreen = Color(0xFF26CA83);
+  static const Color colorGreen = Color(0xFF3FC6BD);
+  static const Color colorGreenLite = Color(0xFF9BBCBA);
+  static const Color colorGreenLiteLite = Color(0xFFF3FFFF);
   static const Color colorGreenDark = Color(0xFF007319);
   static const Color colorYellow = Color(0xFFFF9137);
   static const Color colorRed = Color(0xFFFF6160);
@@ -66,6 +68,10 @@ class ColorUtils {
   static const Color colorSeparator = Color(0x80E8E8E8);
   static const Color colorGra = Color(0x80FFE8D5);
   static const Color colorGrayLight = Color(0xFFcccccc);
+
+
+  static const Color colorBackground = Color(0xFF3B3F3F);
+  static const Color colorBackgroundLine = Color(0xFF4E5353);
 
   static const MaterialColor primarySwatch = MaterialColor(
     colorPrimaryColor,
@@ -135,3 +141,5 @@ class SizeUtils {
   static const double padding2 = 2;
   static const double padding4 = 4;
 }
+
+
