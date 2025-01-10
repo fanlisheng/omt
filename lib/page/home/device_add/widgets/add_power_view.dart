@@ -3,7 +3,7 @@ import 'package:kayo_package/extension/_index_extension.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/utils/color_utils.dart';
 import 'package:omt/widget/checkbox.dart';
-import '../view_models/bind_device_viewmodel.dart';
+import '../view_models/device_add_viewmodel.dart';
 
 class AddPowerView extends StatefulWidget {
   final DeviceAddViewModel viewModel;

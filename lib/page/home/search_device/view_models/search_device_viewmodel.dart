@@ -5,6 +5,7 @@ import 'package:omt/utils/intent_utils.dart';
 import 'package:omt/utils/mac_address_utils.dart';
 import '../../../../bean/home/home_page/local_device_entity.dart';
 import '../../../../utils/hikvision_utils.dart';
+import '../../device_add/view_models/device_add_viewmodel.dart';
 
 ///
 ///  omt
@@ -61,7 +62,7 @@ class SearchDeviceViewModel extends BaseViewModelRefresh<dynamic> {
   //搜索事件
   searchEventAction() {
     IntentUtils.share.push(context,
-        routeName: RouterPage.DeviceAddPage, data: {"id": 0, "type": 1});
+        routeName: RouterPage.DeviceAddPage, data: {"id": 0, "type": DeviceType.ai});
   }
 
   //开始扫描

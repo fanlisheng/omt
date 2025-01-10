@@ -4,15 +4,16 @@ import 'package:kayo_package/views/widget/base/clickable.dart';
 import '../../utils/color_utils.dart';
 import '../../utils/intent_utils.dart';
 
-
 class DNavigationView extends StatelessWidget {
   final String title;
   final String titlePass;
+  final Widget? rightWidget;
 
   const DNavigationView({
     super.key,
     required this.title,
     required this.titlePass,
+    this.rightWidget,
   });
 
   @override
@@ -28,7 +29,6 @@ class DNavigationView extends StatelessWidget {
               ),
             ),
             padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 10),
-
             child: const Text(
               "返回",
               style: TextStyle(fontSize: 12, color: ColorUtils.colorGreen),
@@ -47,8 +47,8 @@ class DNavigationView extends StatelessWidget {
           ),
         ),
         Text(title,
-            style:
-            const TextStyle(fontSize: 12, color: ColorUtils.colorWhite))
+            style: const TextStyle(fontSize: 12, color: ColorUtils.colorWhite)),
+        (rightWidget == null) ? Container() : rightWidget!,
       ],
     );
   }
