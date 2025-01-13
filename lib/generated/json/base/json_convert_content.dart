@@ -10,6 +10,7 @@ import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/bean/common/linkage_data.dart';
 import 'package:omt/bean/common/location_data_entity.dart';
 import 'package:omt/bean/common/name_value.dart';
+import 'package:omt/bean/home/home_page/camera_device_entity.dart';
 import 'package:omt/bean/home/home_page/home_page_data.dart';
 import 'package:omt/bean/home/home_page/local_device_entity.dart';
 import 'package:omt/bean/one_picture/one_picture/one_picture_data.dart';
@@ -196,6 +197,10 @@ class JsonConvert {
       return data.map<NameValue>((Map<String, dynamic> e) =>
           NameValue.fromJson(e)).toList() as M;
     }
+    if (<CameraDeviceEntity>[] is M) {
+      return data.map<CameraDeviceEntity>((Map<String, dynamic> e) =>
+          CameraDeviceEntity.fromJson(e)).toList() as M;
+    }
     if (<HomePageData>[] is M) {
       return data.map<HomePageData>((Map<String, dynamic> e) =>
           HomePageData.fromJson(e)).toList() as M;
@@ -287,6 +292,7 @@ class JsonConvertClassCollection {
     (LinkKageType).toString(): LinkKageType.fromJson,
     (LocationData).toString(): LocationData.fromJson,
     (NameValue).toString(): NameValue.fromJson,
+    (CameraDeviceEntity).toString(): CameraDeviceEntity.fromJson,
     (HomePageData).toString(): HomePageData.fromJson,
     (LocalDeviceEntity).toString(): LocalDeviceEntity.fromJson,
     (OnePictureData).toString(): OnePictureData.fromJson,

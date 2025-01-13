@@ -10,7 +10,7 @@ import 'package:omt/page/home/device_add/view_models/third_step_viewmodel.dart';
 import 'package:omt/page/home/device_add/widgets/add_power_view.dart';
 import 'package:omt/page/home/device_add/widgets/first_step_view.dart';
 import 'package:omt/page/home/device_add/widgets/second_step_view.dart';
-import 'package:omt/page/home/device_add/widgets/third_step_view.dart';
+import 'package:omt/page/home/device_add/widgets/third_four_step_view.dart';
 import 'package:omt/widget/nav/dnavigation_view.dart';
 import '../../../../utils/color_utils.dart';
 import '../view_models/device_add_viewmodel.dart';
@@ -29,6 +29,12 @@ class DeviceAddScreen extends StatelessWidget {
         model: DeviceAddViewModel(id, deviceType)..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
+          bool complete = //步骤四，步骤三中 ai和 camera 为完成
+              !(model.stepNumber != StepNumber.four ||
+                  (model.stepNumber == StepNumber.third &&
+                      model.deviceType == DeviceType.ai) ||
+                  (model.stepNumber == StepNumber.third &&
+                      model.deviceType == DeviceType.camera));
           return Container(
             color: "#3B3F3F".toColor(),
             child: fu.ScaffoldPage(
@@ -65,14 +71,7 @@ class DeviceAddScreen extends StatelessWidget {
                                 left: 12, right: 12, top: 4, bottom: 4),
                             color: ColorUtils.colorGreen,
                             child: Text(
-                              //步骤四，步骤三中 ai和 camera 为完成
-                              (model.stepNumber == StepNumber.four ||
-                                      (model.stepNumber == StepNumber.third &&
-                                          (model.deviceType == DeviceType.ai ||
-                                              model.deviceType ==
-                                                  DeviceType.camera)))
-                                  ? "添加完成"
-                                  : "下一步",
+                              complete ? "添加完成" : "下一步",
                               style: const TextStyle(
                                   fontSize: 12, color: ColorUtils.colorWhite),
                             ),
@@ -104,9 +103,11 @@ class DeviceAddScreen extends StatelessWidget {
           return SecondStepView(
               model: SecondStepViewModel()..deviceType = model.deviceType);
         case StepNumber.third:
-          return ThirdStepView(
-              model: ThirdStepViewModel()..deviceType = model.deviceType);
+          var a = ThirdFourStepViewModel(deviceType: model.deviceType, stepNumber: model.stepNumber);
+          return ThirdFourStepView(model: a,);
         case StepNumber.four:
+          var a = ThirdFourStepViewModel(deviceType: model.deviceType, stepNumber: model.stepNumber);
+          return ThirdFourStepView(model: a,);
       }
       return FirstStepView(model: model);
     }

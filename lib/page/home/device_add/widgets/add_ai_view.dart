@@ -47,153 +47,154 @@ class AddAiView extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         Expanded(
-            child: ListView(
-          children: model.deviceList.asMap().keys.map((index) {
-            LocalDeviceEntity e = model.deviceList[index];
-            return Container(
-              height: (e.macAddress ?? "").isEmpty ? 140 : 278,
-              margin: const EdgeInsets.only(left: 16, right: 16, bottom: 10),
-              padding: const EdgeInsets.only(
-                  left: 16, right: 16, top: 16, bottom: 16),
-              color: ColorUtils.colorBackgroundLine,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "设备${index + 1}",
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: ColorUtils.colorGreenLiteLite,
-                      fontWeight: FontWeight.w500,
+          child: ListView(
+            children: model.deviceList.asMap().keys.map((index) {
+              LocalDeviceEntity e = model.deviceList[index];
+              return Container(
+                height: (e.macAddress ?? "").isEmpty ? 140 : 278,
+                margin: const EdgeInsets.only(left: 16, right: 16, bottom: 10),
+                padding: const EdgeInsets.only(
+                    left: 16, right: 16, top: 16, bottom: 16),
+                color: ColorUtils.colorBackgroundLine,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "设备${index + 1}",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: ColorUtils.colorGreenLiteLite,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 14),
-                  Row(
-                    children: [
-                      const Text(
-                        "*",
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: ColorUtils.colorRed,
-                        ),
-                      ),
-                      const SizedBox(width: 2),
-                      const Text(
-                        "AI设备IP地址",
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: ColorUtils.colorWhite,
-                        ),
-                      ),
-                      const SizedBox(width: 130),
-                      Visibility(
-                        visible: (e.macAddress ?? "").isNotEmpty,
-                        child: Text(
-                          "已连接客户端",
+                    const SizedBox(height: 14),
+                    Row(
+                      children: [
+                        const Text(
+                          "*",
                           style: TextStyle(
                             fontSize: 12,
-                            color: "21E793".toColor(),
+                            color: ColorUtils.colorRed,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      SizedBox(
-                        width: 280,
-                        height: 32,
-                        child: TextBox(
-                          placeholder: '请输入AI设备IP地址',
-                          controller: model.controllers[index],
-                          style: const TextStyle(
-                            fontSize: 12.0,
+                        const SizedBox(width: 2),
+                        const Text(
+                          "AI设备IP地址",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: ColorUtils.colorWhite,
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 20),
-                      Clickable(
-                        child: Container(
-                          padding: const EdgeInsets.only(
-                              left: 12, right: 12, top: 6, bottom: 6),
-                          color: ColorUtils.colorGreen,
-                          child: const Text(
-                            "连接",
-                            style: TextStyle(
-                                fontSize: 12, color: ColorUtils.colorWhite),
-                          ),
-                        ),
-                        onTap: () {
-                          model.connectEventAction(index);
-                        },
-                      ),
-                    ],
-                  ),
-                  Visibility(
-                    visible: (e.macAddress ?? "").isNotEmpty,
-                    child: Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 20),
-                          DashLine(
-                              height: 1,
-                              width: double.infinity,
-                              color: "#678384".toColor(),
-                              gap: 3),
-                          const SizedBox(height: 20),
-                          const Text(
-                            "AI设备信息",
+                        const SizedBox(width: 130),
+                        Visibility(
+                          visible: (e.macAddress ?? "").isNotEmpty,
+                          child: Text(
+                            "已连接客户端",
                             style: TextStyle(
                               fontSize: 12,
-                              color: ColorUtils.colorGreenLiteLite,
-                              fontWeight: FontWeight.w500,
+                              color: "21E793".toColor(),
                             ),
                           ),
-                          const SizedBox(height: 12),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              RowItemInfoView(
-                                  name: "编码（mac地址）", value: e.macAddress),
-                              RowItemInfoView(
-                                  name: "IOT连接状态", value: e.macAddress),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              RowItemInfoView(
-                                  name: "主程版本", value: e.macAddress),
-                              RowItemInfoView(
-                                  name: "识别版本", value: e.macAddress),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              RowItemInfoView(
-                                  name: "服务器地址", value: e.macAddress),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  )
-                ],
-              ),
-            );
-          }).toList(),
-        )),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: 280,
+                          height: 32,
+                          child: TextBox(
+                            placeholder: '请输入AI设备IP地址',
+                            controller: model.controllers[index],
+                            style: const TextStyle(
+                              fontSize: 12.0,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        Clickable(
+                          child: Container(
+                            padding: const EdgeInsets.only(
+                                left: 12, right: 12, top: 6, bottom: 6),
+                            color: ColorUtils.colorGreen,
+                            child: const Text(
+                              "连接",
+                              style: TextStyle(
+                                  fontSize: 12, color: ColorUtils.colorWhite),
+                            ),
+                          ),
+                          onTap: () {
+                            model.connectEventAction(index);
+                          },
+                        ),
+                      ],
+                    ),
+                    Visibility(
+                      visible: (e.macAddress ?? "").isNotEmpty,
+                      child: Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 20),
+                            DashLine(
+                                height: 1,
+                                width: double.infinity,
+                                color: "#678384".toColor(),
+                                gap: 3),
+                            const SizedBox(height: 20),
+                            const Text(
+                              "AI设备信息",
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: ColorUtils.colorGreenLiteLite,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                RowItemInfoView(
+                                    name: "编码（mac地址）", value: e.macAddress),
+                                RowItemInfoView(
+                                    name: "IOT连接状态", value: e.macAddress),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                RowItemInfoView(
+                                    name: "主程版本", value: e.macAddress),
+                                RowItemInfoView(
+                                    name: "识别版本", value: e.macAddress),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                RowItemInfoView(
+                                    name: "服务器地址", value: e.macAddress),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                          ],
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+        ),
       ],
     );
   }
-
 }
+
 class RowItemInfoView extends StatelessWidget {
   const RowItemInfoView({
     super.key,

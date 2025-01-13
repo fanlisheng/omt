@@ -17,7 +17,8 @@ class AddNvrViewModel extends BaseViewModelRefresh<dynamic> {
 
   final DeviceType deviceType;
   final StepNumber stepNumber;
-  AddNvrViewModel(this.deviceType, this.stepNumber);
+  final bool showInstall;
+  AddNvrViewModel(this.deviceType, this.stepNumber, this.showInstall);
 
   List<LocalDeviceEntity> deviceList = [LocalDeviceEntity()];
 

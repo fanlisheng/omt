@@ -10,17 +10,17 @@ import 'package:omt/utils/sys_utils.dart';
 import '../../../../bean/home/home_page/local_device_entity.dart';
 import 'device_add_viewmodel.dart';
 
-class ThirdStepViewModel extends BaseViewModelRefresh<dynamic> {
-  Function()? subNotifyListeners;
+class ThirdFourStepViewModel extends BaseViewModelRefresh<dynamic> {
 
-  ThirdStepViewModel({this.subNotifyListeners});
+  final DeviceType deviceType;
+  StepNumber stepNumber;
 
-  DeviceType deviceType = DeviceType.camera;
-  StepNumber stepNumber = StepNumber.second;
+  ThirdFourStepViewModel(
+      {required this.deviceType, required this.stepNumber});
 
   List<LocalDeviceEntity> deviceList = [LocalDeviceEntity()];
 
-  IdNameValue? networkEnvSelected ;
+  String selectedNetworkEnv = "";
   List networkEnvList = [];
   @override
   void initState() async {

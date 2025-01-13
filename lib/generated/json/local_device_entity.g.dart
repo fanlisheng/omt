@@ -35,6 +35,10 @@ LocalDeviceEntity $LocalDeviceEntityFromJson(Map<String, dynamic> json) {
   if (text != null) {
     localDeviceEntity.text = text;
   }
+  final bool? selected = jsonConvert.convert<bool>(json['selected']);
+  if (selected != null) {
+    localDeviceEntity.selected = selected;
+  }
   return localDeviceEntity;
 }
 
@@ -48,6 +52,7 @@ Map<String, dynamic> $LocalDeviceEntityToJson(LocalDeviceEntity entity) {
   data['ipAddress'] = entity.ipAddress;
   data['macAddress'] = entity.macAddress;
   data['text'] = entity.text;
+  data['selected'] = entity.selected;
   return data;
 }
 
@@ -61,6 +66,7 @@ extension LocalDeviceEntityExtension on LocalDeviceEntity {
     String? ipAddress,
     String? macAddress,
     String? text,
+    bool? selected,
   }) {
     return LocalDeviceEntity()
       ..domainName = domainName ?? this.domainName
@@ -70,6 +76,7 @@ extension LocalDeviceEntityExtension on LocalDeviceEntity {
       ..port = port ?? this.port
       ..ipAddress = ipAddress ?? this.ipAddress
       ..macAddress = macAddress ?? this.macAddress
-      ..text = text ?? this.text;
+      ..text = text ?? this.text
+      ..selected = selected ?? this.selected;
   }
 }

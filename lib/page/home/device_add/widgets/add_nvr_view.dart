@@ -15,18 +15,19 @@ import '../view_models/add_ai_viewmodel.dart';
 import '../view_models/device_add_viewmodel.dart';
 
 class AddNvrView extends StatelessWidget {
-  final DeviceType deviceType;
-  final StepNumber stepNumber;
+  // final DeviceType deviceType;
+  // final StepNumber stepNumber;
+  AddNvrViewModel model;
 
-  const AddNvrView(this.deviceType, this.stepNumber, {super.key});
+  AddNvrView(this.model, {super.key});
 
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<AddNvrViewModel>(
-        model: AddNvrViewModel(deviceType, stepNumber)..themeNotifier = true,
+        model: model..themeNotifier = true,
         autoLoadData: true,
-        builder: (context, model, child) {
-          return nvrView(model);
+        builder: (context, model1, child) {
+          return nvrView(model1);
         });
   }
 
@@ -51,60 +52,61 @@ class AddNvrView extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(height: 16),
-              // 是否需要安装NVR
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    "*",
-                    style: TextStyle(
-                        fontSize: 12, color: ColorUtils.colorRed),
-                  ),
-                  SizedBox(width: 2),
-                  Text(
-                    "现场是否需要安装NVR",
-                    style: TextStyle(
-                        fontSize: 12,
-                        color: ColorUtils.colorWhite),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Radio(
-                    value: true,
-                    groupValue: model.isNvrNeeded,
-                    activeColor: ColorUtils.colorGreen,
-                    onChanged: (value) {
-                      model.isNvrNeeded = value as bool;
-                      model.notifyListeners();
-                    },
-                  ),
-                  Text("需要",
-                      style: TextStyle(
-                          fontSize: 12,
-                          color: model.isNvrNeeded
-                              ? ColorUtils.colorGreen
-                              : ColorUtils.colorWhite)),
-                  const SizedBox(width: 16),
-                  Radio(
-                    value: false,
-                    groupValue: model.isNvrNeeded,
-                    activeColor: ColorUtils.colorGreen,
-                    onChanged: (value) {
-                      model.isNvrNeeded = value as bool;
-                      model.notifyListeners();
-                    },
-                  ),
-                  Text("不需要",
-                      style: TextStyle(
-                          fontSize: 12,
-                          color: model.isNvrNeeded
-                              ? ColorUtils.colorWhite
-                              : ColorUtils.colorGreen)),
-                ],
-              ),
+              if (model.showInstall) ...[
+                const SizedBox(height: 16),
+                // 是否需要安装NVR
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      "*",
+                      style:
+                          TextStyle(fontSize: 12, color: ColorUtils.colorRed),
+                    ),
+                    SizedBox(width: 2),
+                    Text(
+                      "现场是否需要安装NVR",
+                      style:
+                          TextStyle(fontSize: 12, color: ColorUtils.colorWhite),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Radio(
+                      value: true,
+                      groupValue: model.isNvrNeeded,
+                      activeColor: ColorUtils.colorGreen,
+                      onChanged: (value) {
+                        model.isNvrNeeded = value as bool;
+                        model.notifyListeners();
+                      },
+                    ),
+                    Text("需要",
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: model.isNvrNeeded
+                                ? ColorUtils.colorGreen
+                                : ColorUtils.colorWhite)),
+                    const SizedBox(width: 16),
+                    Radio(
+                      value: false,
+                      groupValue: model.isNvrNeeded,
+                      activeColor: ColorUtils.colorGreen,
+                      onChanged: (value) {
+                        model.isNvrNeeded = value as bool;
+                        model.notifyListeners();
+                      },
+                    ),
+                    Text("不需要",
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: model.isNvrNeeded
+                                ? ColorUtils.colorWhite
+                                : ColorUtils.colorGreen)),
+                  ],
+                ),
+              ],
               const SizedBox(height: 10),
               // NVR IP 地址选择
               if (model.isNvrNeeded) ...[
@@ -135,7 +137,7 @@ class AddNvrView extends StatelessWidget {
                             ),
                             const SizedBox(height: 8),
                             ui.ComboBox<String>(
-                              isExpanded: false,
+                              isExpanded: true,
                               value: model.selectedEntryExit,
                               items: ["共用进出口", "进出口1", "进出口2"]
                                   .map<ui.ComboBoxItem<String>>((e) {
@@ -145,6 +147,9 @@ class AddNvrView extends StatelessWidget {
                                     child: Text(
                                       e,
                                       textAlign: TextAlign.start,
+                                      style: const TextStyle(
+                                          fontSize: 12,
+                                          color: ColorUtils.colorBlackLiteLite),
                                     ),
                                   ),
                                 );
@@ -161,8 +166,9 @@ class AddNvrView extends StatelessWidget {
                                     color: ColorUtils.colorBlackLiteLite),
                               ),
                             ),
+                            const SizedBox(width: 20,),
                           ],
-                        )),
+                        ),),
                     Expanded(
                       flex: 1,
                       child: Column(
