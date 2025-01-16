@@ -8,37 +8,41 @@ class DNavigationView extends StatelessWidget {
   final String title;
   final String titlePass;
   final Widget? rightWidget;
+  final bool? hasReturn;
 
   const DNavigationView({
     super.key,
     required this.title,
     required this.titlePass,
     this.rightWidget,
+    this.hasReturn ,
   });
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Clickable(
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(
-                width: 1,
-                color: ColorUtils.colorGreen,
+        if((hasReturn ?? true) == true)...[
+          Clickable(
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  width: 1,
+                  color: ColorUtils.colorGreen,
+                ),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 10),
+              child: const Text(
+                "返回",
+                style: TextStyle(fontSize: 12, color: ColorUtils.colorGreen),
               ),
             ),
-            padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 10),
-            child: const Text(
-              "返回",
-              style: TextStyle(fontSize: 12, color: ColorUtils.colorGreen),
-            ),
+            onTap: () {
+              IntentUtils.share.pop(context);
+            },
           ),
-          onTap: () {
-            IntentUtils.share.pop(context);
-          },
-        ),
-        const SizedBox(width: 12),
+          const SizedBox(width: 12),
+        ],
         Text(
           titlePass,
           style: TextStyle(

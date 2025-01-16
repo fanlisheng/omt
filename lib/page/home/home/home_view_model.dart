@@ -5,7 +5,9 @@ import 'package:omt/page/camera/camera_bound/camera_bound_page.dart';
 import 'package:omt/page/camera/camera_bound_delete/camera_bound_delete_page.dart';
 import 'package:omt/page/camera/camera_unbound/camera_un_bound_page.dart';
 import 'package:omt/page/home/home/home_page.dart';
+import 'package:omt/page/install/widgets/install_device_screen.dart';
 import 'package:omt/page/label/label_me/label_me_page.dart';
+import 'package:omt/page/label_management/widgets/label_management_screen.dart';
 import 'package:omt/page/one_picture/one_picture/one_picture_page.dart';
 import 'package:omt/page/tools/terminal/terminal_page.dart';
 import 'package:omt/page/video/video_configuration/video_configuration_page.dart';
@@ -15,6 +17,7 @@ import 'package:omt/utils/auth_utils.dart';
 import 'package:omt/utils/shared_utils.dart';
 import 'package:omt/utils/sys_utils.dart';
 
+import '../../dismantle/widgets/dismantle_screen.dart';
 import '../search_device/widgets/search_device_screen.dart';
 
 ///
@@ -53,8 +56,8 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
 
   List<NavigationPaneItem> get homeItems {
     return [
-      PaneItemHeader(header: const Text('首页')),
       PaneItem(
+        key: const ValueKey('/'),
         icon: PaneImage(
           name: "home/ic_pane_home",
           selectedName: 'home/ic_pane_home_s',
@@ -83,7 +86,7 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
               fontSize: 12,
               color: 1 == topIndex ? "#F3FFFF".toColor() : "#678384".toColor()),
         ),
-        body: const VideoFramePage(),
+        body: const InstallDeviceScreen(),
         onTap: () => debugPrint('安装'),
       ),
       PaneItem(
@@ -99,10 +102,10 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
               fontSize: 12,
               color: 2 == topIndex ? "#F3FFFF".toColor() : "#678384".toColor()),
         ),
-        body: const VideoConfigurationPage(),
+        body: const DismantleScreen(),
         onTap: () => debugPrint('拆除'),
       ),
-      PaneItem(
+      PaneItemExpander(
         icon: PaneImage(
           name: "home/ic_pane_set",
           selectedName: 'home/ic_pane_set',
@@ -115,8 +118,21 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
               fontSize: 12,
               color: 3 == topIndex ? "#F3FFFF".toColor() : "#678384".toColor()),
         ),
-        body: const VideoOperationsCenterPage(),
-        onTap: () => debugPrint('设置'),
+        body: Container(),
+        items: [
+          PaneItem(
+            icon: Container(),
+            title: Text(
+              "个设备",
+              style: TextStyle(
+                  fontSize: 12,
+                  color: 4 == topIndex
+                      ? "#F3FFFF".toColor()
+                      : "#678384".toColor()),
+            ),
+            body: const LabelManagementScreen(),
+          ),
+        ],
       ),
     ];
   }
@@ -256,4 +272,3 @@ class PaneImage extends StatelessWidget {
     );
   }
 }
-

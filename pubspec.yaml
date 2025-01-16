@@ -44,7 +44,9 @@ dependencies:
   flutter_pty: ^0.4.1
   multicast_dns: ^0.3.2+7
   xml: ^6.0.1
-#  network_info_plus: ^6.1.2
+  network_info_plus: ^6.1.2
+#  ping_discover_network: ^1.0.1
+  network_tools: ^5.0.5
 
 dev_dependencies:
   flutter_test:

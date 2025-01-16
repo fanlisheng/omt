@@ -40,21 +40,11 @@ class ThirdFourStepView extends StatelessWidget {
       case DeviceType.port:
         return Container();
       case DeviceType.ai:
-        if (model.stepNumber == StepNumber.third) {
-          return AddCameraView(
-            AddCameraViewModel(model.deviceType, model.stepNumber)
-              ..aiDeviceList = model.deviceList,
-          );
-        } else if (model.stepNumber == StepNumber.four) {
-          return fourView(model);
-        } else {
-          return Container();
-        }
       case DeviceType.camera:
         if (model.stepNumber == StepNumber.third) {
           return AddCameraView(
-            AddCameraViewModel(model.deviceType, model.stepNumber)
-              ..aiDeviceList = model.deviceList,
+            deviceType: model.deviceType,
+            stepNumber: model.stepNumber,
           );
         } else if (model.stepNumber == StepNumber.four) {
           return fourView(model);
@@ -82,9 +72,9 @@ class ThirdFourStepView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "第三步：现场网络环境",
-                style: TextStyle(
+              Text(
+                "第${(model.stepNumber == StepNumber.third) ? "三" : "四"}步：现场网络环境",
+                style: const TextStyle(
                   fontSize: 14,
                   color: ColorUtils.colorWhite,
                   fontWeight: FontWeight.w500,

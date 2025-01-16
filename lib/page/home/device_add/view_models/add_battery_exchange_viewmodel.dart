@@ -5,7 +5,8 @@ import 'device_add_viewmodel.dart';
 class AddBatteryExchangeViewModel extends BaseViewModelRefresh<dynamic> {
   final DeviceType deviceType;
   final StepNumber stepNumber;
-  AddBatteryExchangeViewModel(this.deviceType, this.stepNumber);
+  final bool isInstall;//是安装 默认否
+  AddBatteryExchangeViewModel(this.deviceType, this.stepNumber, this.isInstall);
 
   // 容量80
   bool isCapacity80 = true;

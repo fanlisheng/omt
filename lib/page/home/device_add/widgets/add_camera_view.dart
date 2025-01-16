@@ -16,14 +16,18 @@ import '../view_models/add_ai_viewmodel.dart';
 import '../view_models/device_add_viewmodel.dart';
 
 class AddCameraView extends StatelessWidget {
-  final AddCameraViewModel model;
+  final DeviceType deviceType;
+  final StepNumber stepNumber;
+  final bool? isInstall; //是安装 默认否
 
-  const AddCameraView(this.model, {super.key});
+  const AddCameraView({super.key, required this.deviceType, required this.stepNumber, this.isInstall});
+  // final AddCameraViewModel model;
+  // const AddCameraView(this.model, {super.key});
 
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<AddCameraViewModel>(
-        model: model..themeNotifier = true,
+        model: AddCameraViewModel(deviceType,stepNumber,isInstall ?? false)..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
           return cameraView(context, model);

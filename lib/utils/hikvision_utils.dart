@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 import 'package:omt/bean/home/home_page/local_device_entity.dart';
-import 'package:xml/xml.dart' as xml;
+import 'package:xml/xml.dart';
 
-Future<Map<String, String>> hkIsapiInit(String ipAddress) async {
+Future<Map<String, String>?> hkIsapiInit(String ipAddress) async {
   final headers = {
     "Accept": "text/html, application/xhtml+xml, */*",
     "Accept-Language": "zh-CN",
@@ -17,11 +17,12 @@ Future<Map<String, String>> hkIsapiInit(String ipAddress) async {
   final response = await http.get(
     Uri.parse('http://$ipAddress:80/ISAPI/Security/userCheck'),
     headers: headers,
-  );
+  ).timeout(const Duration(seconds: 3));
 
   final authenticate = response.headers['www-authenticate'];
   if (authenticate == null) {
-    throw Exception('Authentication header not found.');
+    // throw Exception('Authentication header not found.');
+    return null;
   }
 
   final realm =
@@ -74,7 +75,12 @@ Future<LocalDeviceEntity?> hikvisionDeviceInfo({
   // required String username,
   // required String password,
 }) async {
+
   final authData = await hkIsapiInit(ipAddress);
+  if (authData == null) {
+    print('Auth data ip: $ipAddress'); // 打印授权数据，确保初始化正常
+    return null;
+  }
 
   final headers = configMd5Headers(
     ipAddress: ipAddress,
@@ -87,37 +93,21 @@ Future<LocalDeviceEntity?> hikvisionDeviceInfo({
     method: 'GET',
   );
 
-  final response = await http.get(
-    Uri.parse('http://$ipAddress:80/ISAPI/System/deviceInfo'),
-    headers: headers,
-  );
+  try {
+    final response = await http.get(
+      Uri.parse('http://$ipAddress:80/ISAPI/System/deviceInfo'),
+      headers: headers,
+    );
 
-  if (response.statusCode == 200) {
-    print("Device Info: ${response.body}");
-    final document = xml.XmlDocument.parse(response.body);
-    final deviceName = document
-            .findAllElements('deviceName')
-            .map((e) => e.text)
-            .firstOrNull ??
-        '';
-    final deviceType = document
-            .findAllElements('deviceType')
-            .map((e) => e.text)
-            .firstOrNull ??
-        '';
-    final macAddress = document
-            .findAllElements('macAddress')
-            .map((e) => e.text)
-            .firstOrNull ??
-        '';
-
-    return LocalDeviceEntity(
-        deviceName: deviceName,
-        deviceType: deviceType,
-        macAddress: macAddress,
-        ipAddress: ipAddress);
-  } else {
-    print("Failed to fetch device info. Status code: ${response.statusCode}");
+    if (response.statusCode == 200) {
+      print('Response: ${response.body}');
+      return LocalDeviceEntity.fromXml(response.body, ipAddress);
+    } else {
+      print('Failed to load data: ${response.statusCode}');
+      return null;
+    }
+  } catch (e) {
+    print('Error in hikvisionDeviceInfo for IP $ipAddress: $e');
     return null;
   }
 }

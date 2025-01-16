@@ -138,52 +138,54 @@ class _DeviceListViewState extends State<DeviceListView> {
               child: deviceShowList1(model.deviceScanData),
             ),
           ),
-          const SizedBox(height: 10),
-          Expanded(
-            flex: 5,
-            child: Container(
-              decoration: BoxDecoration(
-                  border: Border.all(width: 1, color: "#5D6666".toColor())),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      const SizedBox(width: 12),
-                      const Expanded(
-                        child: Text(
-                          "以下设备未绑定大门编号",
-                          style: TextStyle(
-                              fontSize: 12,
-                              color: ColorUtils.colorWhite,
-                              fontWeight: FontWeight.w500),
+          if(model.deviceNoBindingData.isNotEmpty)...[
+            const SizedBox(height: 10),
+            Expanded(
+              flex: 5,
+              child: Container(
+                decoration: BoxDecoration(
+                    border: Border.all(width: 1, color: "#5D6666".toColor())),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        const SizedBox(width: 12),
+                        const Expanded(
+                          child: Text(
+                            "以下设备未绑定大门编号",
+                            style: TextStyle(
+                                fontSize: 12,
+                                color: ColorUtils.colorWhite,
+                                fontWeight: FontWeight.w500),
+                          ),
                         ),
-                      ),
-                      TextView(
-                        "绑定",
-                        bgColor: ColorUtils.colorGreen,
-                        color: BaseColorUtils.white,
-                        textDarkOnlyOpacity: true,
-                        textAlign: TextAlign.center,
-                        padding: const EdgeInsets.only(
-                            top: 3, bottom: 3, left: 24, right: 24),
-                        radius: 0,
-                        onTap: () {
-                          model.bindEventAction();
-                        },
-                      ),
-                      const SizedBox(width: 12),
-                    ],
-                  ),
-                  const SizedBox(width: 2),
-                  Expanded(
-                    child: deviceShowList1(model.deviceNoBindingData),
-                  ),
-                ],
+                        TextView(
+                          "绑定",
+                          bgColor: ColorUtils.colorGreen,
+                          color: BaseColorUtils.white,
+                          textDarkOnlyOpacity: true,
+                          textAlign: TextAlign.center,
+                          padding: const EdgeInsets.only(
+                              top: 3, bottom: 3, left: 24, right: 24),
+                          radius: 0,
+                          onTap: () {
+                            model.bindEventAction();
+                          },
+                        ),
+                        const SizedBox(width: 12),
+                      ],
+                    ),
+                    const SizedBox(width: 2),
+                    Expanded(
+                      child: deviceShowList1(model.deviceNoBindingData),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          )
+            )
+          ],
         ],
       ),
     );
@@ -223,8 +225,7 @@ class _DeviceListViewState extends State<DeviceListView> {
       ),
     );
   }
-
-  //显示图片
+//显示图片
   Widget deviceShowList1(List<LocalDeviceEntity> deviceData) {
     return GridView.builder(
       padding: const EdgeInsets.only(left: 12, right: 12, top: 10, bottom: 10),
@@ -253,7 +254,7 @@ class _DeviceListViewState extends State<DeviceListView> {
                   child: Text(
                     deviceData[index].deviceType ?? "-",
                     style:
-                        const TextStyle(color: ColorUtils.colorWhite),
+                    const TextStyle(color: ColorUtils.colorWhite),
                   ),
                 ),
               ),
@@ -278,3 +279,5 @@ class _DeviceListViewState extends State<DeviceListView> {
     );
   }
 }
+
+

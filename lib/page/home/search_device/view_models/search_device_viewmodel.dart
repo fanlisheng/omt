@@ -1,7 +1,11 @@
 import 'package:kayo_package/kayo_package.dart';
 import 'package:multicast_dns/multicast_dns.dart';
+import 'package:network_info_plus/network_info_plus.dart';
+import 'package:network_tools/network_tools.dart';
 import 'package:omt/router_utils.dart';
+import 'package:omt/utils/device_utils.dart';
 import 'package:omt/utils/intent_utils.dart';
+import 'package:omt/utils/log_utils.dart';
 import 'package:omt/utils/mac_address_utils.dart';
 import '../../../../bean/home/home_page/local_device_entity.dart';
 import '../../../../utils/hikvision_utils.dart';
@@ -41,6 +45,9 @@ class SearchDeviceViewModel extends BaseViewModelRefresh<dynamic> {
   //扫描进度
   double scanRateValue = 0.0;
 
+  //停止扫描
+  bool stopScanning = false;
+
   MDnsClient client = MDnsClient();
 
   @override
@@ -60,9 +67,16 @@ class SearchDeviceViewModel extends BaseViewModelRefresh<dynamic> {
 
   ///点击事件
   //搜索事件
-  searchEventAction() {
-    IntentUtils.share.push(context,
-        routeName: RouterPage.DeviceAddPage, data: {"id": 0, "type": DeviceType.ai});
+  searchEventAction() async {
+    // final result =
+    //     await hikvisionDeviceInfo(ipAddress: "192.168.101.22");
+    // LogUtils.info(msg: result);
+    // discoverService();
+
+    // IntentUtils.share.push(context,
+    //     routeName: RouterPage.DeviceAddPage, data: {"id": 0, "type": DeviceType.ai});
+
+    // scanDevice();
   }
 
   //开始扫描
@@ -71,7 +85,75 @@ class SearchDeviceViewModel extends BaseViewModelRefresh<dynamic> {
     deviceScanData = [];
     scanRateValue = 0.0;
     notifyListeners();
+    stopScanning = false;
+    deviceScanData =
+        await DeviceUtils.scanAndFetchDevicesInfo(shouldStop: _shouldStop);
+    if(stopScanning == true){
+      searchState = DeviceSearchState.notSearched;
+      scanRateValue = 0;
+      deviceScanData = [];
+    }else{
+      scanRateValue = 1.0;
+      searchState = DeviceSearchState.completed;
+    }
+    notifyListeners();
+  }
 
+  // 定义一个停止条件的回调函数
+  bool _shouldStop() {
+    return stopScanning; // 当 stopScanning 为 true 时停止
+  }
+
+  //扫描停止事件
+  scanStopEventAction() async {
+    stopScanning = true;
+  }
+  //重新扫描
+  scanAnewEventAction() {
+    scanStopEventAction();
+    scanStartEventAction();
+  }
+  //绑定
+  bindEventAction() {
+    IntentUtils.share.push(context,
+        routeName: RouterPage.DeviceBindPage,
+        data: {"data": deviceNoBindingData});
+  }
+  //所有服务
+  discoverService() async {
+    final MDnsClient client = MDnsClient();
+    await client.start();
+
+    // 扫描所有服务
+    await for (final PtrResourceRecord ptrA in client.lookup<PtrResourceRecord>(
+        ResourceRecordQuery.serverPointer('_services._dns-sd._udp.local'))) {
+      await for (final PtrResourceRecord ptr
+          in client.lookup<PtrResourceRecord>(
+              ResourceRecordQuery.serverPointer(ptrA.domainName))) {
+        print('开始扫描 service: ${ptrA.domainName}');
+
+        await for (final SrvResourceRecord srv
+            in client.lookup<SrvResourceRecord>(
+                ResourceRecordQuery.service(ptr.domainName))) {
+          print('设备名字: ${srv.target}');
+
+          await for (final IPAddressResourceRecord ip
+              in client.lookup<IPAddressResourceRecord>(
+                  ResourceRecordQuery.addressIPv4(srv.target))) {
+            if (ip.address.address == "192.168.101.22") {
+              print('设备IP是对的');
+              client.stop();
+              return;
+            }
+          }
+        }
+      }
+    }
+
+    client.stop();
+  }
+
+  Future<void> testScan() async {
     client = MDnsClient();
     final List<String> serviceNames = [
       '_psia._tcp.local',
@@ -143,61 +225,6 @@ class SearchDeviceViewModel extends BaseViewModelRefresh<dynamic> {
       notifyListeners();
       print('mDNS client stopped. Final Progress: 100%');
     }
-  }
-
-  //扫描停止事件
-  scanStopEventAction() async {
-    searchState = DeviceSearchState.notSearched;
-    notifyListeners();
-    client.stop();
-    await Future.delayed(Duration(seconds: 1)); // 等待网络缓存清理
-  }
-
-  //重新扫描
-  scanAnewEventAction() {
-    scanStopEventAction();
-    scanStartEventAction();
-  }
-
-  //绑定
-  bindEventAction() {
-    IntentUtils.share.push(context,
-        routeName: RouterPage.DeviceBindPage,
-        data: {"data": deviceNoBindingData});
-  }
-
-  //所有服务
-  discoverService() async {
-    final MDnsClient client = MDnsClient();
-    await client.start();
-
-    // 扫描所有服务
-    await for (final PtrResourceRecord ptrA in client.lookup<PtrResourceRecord>(
-        ResourceRecordQuery.serverPointer('_services._dns-sd._udp.local'))) {
-      await for (final PtrResourceRecord ptr
-          in client.lookup<PtrResourceRecord>(
-              ResourceRecordQuery.serverPointer(ptrA.domainName))) {
-        print('开始扫描 service: ${ptrA.domainName}');
-
-        await for (final SrvResourceRecord srv
-            in client.lookup<SrvResourceRecord>(
-                ResourceRecordQuery.service(ptr.domainName))) {
-          print('设备名字: ${srv.target}');
-
-          await for (final IPAddressResourceRecord ip
-              in client.lookup<IPAddressResourceRecord>(
-                  ResourceRecordQuery.addressIPv4(srv.target))) {
-            if (ip.address.address == "192.168.101.82") {
-              print('设备IP是对的');
-              client.stop();
-              return;
-            }
-          }
-        }
-      }
-    }
-
-    client.stop();
   }
 
 // LocalDeviceEntity getDeviceTypeInfo(LocalDeviceEntity info) {

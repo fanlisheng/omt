@@ -2,11 +2,6 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
-import 'package:omt/bean/common/id_name_value.dart';
-import 'package:omt/utils/hikvision_utils.dart';
-import 'package:omt/utils/log_utils.dart';
-import 'package:omt/utils/shared_utils.dart';
-import 'package:omt/utils/sys_utils.dart';
 import '../../../../bean/home/home_page/local_device_entity.dart';
 import 'device_add_viewmodel.dart';
 
@@ -17,8 +12,9 @@ class AddPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
 
   final DeviceType deviceType;
   final StepNumber stepNumber;
+  final bool isInstall; //是安装 默认否
 
-  AddPowerBoxViewModel(this.deviceType, this.stepNumber);
+  AddPowerBoxViewModel(this.deviceType, this.stepNumber, this.isInstall);
 
   List<LocalDeviceEntity> deviceList = [LocalDeviceEntity()];
 

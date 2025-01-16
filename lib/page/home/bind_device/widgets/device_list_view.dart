@@ -75,7 +75,9 @@ class _DeviceListViewState extends State<DeviceListView> {
                 ),
                 const SizedBox(height: 10),
                 Expanded(
-                  child: deviceShowList1(model),
+                  child: deviceShowList1(model.deviceData, onTap: (index) {
+                    model.selectedItemEventAction(index);
+                  }),
                 ),
               ],
             ),
@@ -85,96 +87,97 @@ class _DeviceListViewState extends State<DeviceListView> {
     );
   }
 
-  //显示图片
-  Widget deviceShowList1(BindDeviceViewModel model) {
-    List<LocalDeviceEntity> deviceData = model.deviceData;
-    return GridView.builder(
-      padding: const EdgeInsets.only(left: 12, right: 12),
-      itemCount: deviceData.length, // 项目的数量
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 6, // 设置每行显示 3 个项
-        crossAxisSpacing: 10, // 列间距
-        mainAxisSpacing: 10, // 行间距
-      ),
-      itemBuilder: (context, index) {
-        return Clickable(
-          child: Stack(
-            children: [
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      width: 1,
-                      color: deviceData[index].selected == true
-                          ? ColorUtils.colorGreen
-                          : "#5D6666".toColor(),
-                    ),
+}
+//显示图片
+Widget deviceShowList1(List<LocalDeviceEntity> deviceData,
+    {Function(int)? onTap}) {
+  return GridView.builder(
+    padding: const EdgeInsets.only(left: 12, right: 12),
+    itemCount: deviceData.length, // 项目的数量
+    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: 6, // 设置每行显示 3 个项
+      crossAxisSpacing: 10, // 列间距
+      mainAxisSpacing: 10, // 行间距
+    ),
+    itemBuilder: (context, index) {
+      return Clickable(
+        onTap: onTap != null
+            ? () {
+          onTap(index);
+        }
+            : null,
+        child: Stack(
+          children: [
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    width: 1,
                     color: deviceData[index].selected == true
-                        ? "#5D6666".toColor()
-                        : ColorUtils.transparent,
+                        ? ColorUtils.colorGreen
+                        : "#5D6666".toColor(),
                   ),
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 8),
-                      Expanded(
-                        flex: 5,
-                        child: ImageView(src: source('home/ic_device')),
+                  color: deviceData[index].selected == true
+                      ? "#5D6666".toColor()
+                      : ColorUtils.transparent,
+                ),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 8),
+                    Expanded(
+                      flex: 5,
+                      child: ImageView(src: source('home/ic_device')),
+                    ),
+                    const SizedBox(height: 4),
+                    Expanded(
+                      flex: 2,
+                      child: FittedBox(
+                        fit: BoxFit.contain,
+                        child: Text(
+                          deviceData[index].deviceType ?? "-",
+                          style:
+                          const TextStyle(color: ColorUtils.colorWhite),
+                        ),
                       ),
-                      const SizedBox(height: 4),
-                      Expanded(
-                        flex: 2,
-                        child: FittedBox(
-                          fit: BoxFit.contain,
+                    ),
+                    Expanded(
+                      flex: 2,
+                      child: FittedBox(
+                        fit: BoxFit.contain,
+                        child: Container(
+                          margin: const EdgeInsets.only(
+                              left: 2, right: 2, bottom: 4),
                           child: Text(
-                            deviceData[index].deviceType ?? "-",
+                            deviceData[index].ipAddress ?? "",
                             style: const TextStyle(
-                                color: ColorUtils.colorWhite),
+                                color: ColorUtils.colorWhite, fontSize: 10),
                           ),
                         ),
                       ),
-                      Expanded(
-                        flex: 2,
-                        child: FittedBox(
-                          fit: BoxFit.contain,
-                          child: Container(
-                            margin: const EdgeInsets.only(
-                                left: 2, right: 2, bottom: 4),
-                            child: Text(
-                              deviceData[index].ipAddress ?? "",
-                              style: const TextStyle(
-                                  color: ColorUtils.colorWhite,
-                                  fontSize: 10),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-              Visibility(
-                visible: deviceData[index].selected ?? false,
-                child: Positioned(
-                  top: 2,
-                  right: 2,
-                  width: 16,
-                  height: 16,
-                  child: ImageView(
-                    src: source("home/ic_device_selected"),
-                  ),
+            ),
+            Visibility(
+              visible: deviceData[index].selected ?? false,
+              child: Positioned(
+                top: 2,
+                right: 2,
+                width: 16,
+                height: 16,
+                child: ImageView(
+                  src: source("home/ic_device_selected"),
                 ),
               ),
-            ],
-          ),
-          onTap: () {
-            model.selectedItemEventAction(index);
-          },
-        );
-      },
-    );
-  }
+            ),
+          ],
+        ),
+      );
+    },
+  );
 }

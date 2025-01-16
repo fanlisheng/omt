@@ -30,11 +30,10 @@ class HomePage extends StatelessWidget {
                 title: fu.Row(
                   children: [
                     ImageView(
-                      src: source("ic_logo"),
-                      width: 22,
-                      height: 22,
-                      margin: const fu.EdgeInsets.only(right: 10)
-                    ),
+                        src: source("ic_logo"),
+                        width: 22,
+                        height: 22,
+                        margin: const fu.EdgeInsets.only(right: 10)),
                     Text(
                       "福立盟运维配置客户端",
                       style: TextStyle(
@@ -58,7 +57,7 @@ class HomePage extends StatelessWidget {
                 model.notifyListeners();
               },
               displayMode: model.displayMode,
-              size: const fu.NavigationPaneSize(openWidth: 160,topHeight: 0),
+              size: const fu.NavigationPaneSize(openWidth: 160, topHeight: 0),
               indicator: const fu.StickyNavigationIndicator(),
               // header: model.displayMode == fu.PaneDisplayMode.open ||
               //         model.displayMode == fu.PaneDisplayMode.compact

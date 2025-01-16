@@ -13,13 +13,13 @@ import '../view_models/device_add_viewmodel.dart';
 class AddAiView extends StatelessWidget {
   final DeviceType deviceType;
   final StepNumber stepNumber;
-
-  const AddAiView(this.deviceType, this.stepNumber, {super.key});
+  final bool? isInstall; //是安装 默认否
+  const AddAiView(this.deviceType, this.stepNumber, {super.key, this.isInstall});
 
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<AddAiViewModel>(
-        model: AddAiViewModel(deviceType, stepNumber)..themeNotifier = true,
+        model: AddAiViewModel(deviceType, stepNumber,isInstall ?? false)..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
           return aiView(model);

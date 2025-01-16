@@ -15,16 +15,20 @@ import '../view_models/add_ai_viewmodel.dart';
 import '../view_models/device_add_viewmodel.dart';
 
 class AddNvrView extends StatelessWidget {
-  // final DeviceType deviceType;
-  // final StepNumber stepNumber;
-  AddNvrViewModel model;
+  final DeviceType deviceType;
+  final StepNumber stepNumber;
+  final bool? showInstall;
 
-  AddNvrView(this.model, {super.key});
+  const AddNvrView(
+      {super.key, required this.deviceType, required this.stepNumber, this.showInstall});
+
+  // AddNvrViewModel model;
+  // AddNvrView(this.model, {super.key});
 
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<AddNvrViewModel>(
-        model: model..themeNotifier = true,
+        model: AddNvrViewModel(deviceType, stepNumber,showInstall ?? false)..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model1, child) {
           return nvrView(model1);
@@ -44,9 +48,9 @@ class AddNvrView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "第二步：添加Nvr设备",
-                style: TextStyle(
+               Text(
+                "第${(model.showInstall == false) ? "二" : "四"}步：添加Nvr设备",
+                style: const TextStyle(
                   fontSize: 14,
                   color: ColorUtils.colorGreenLiteLite,
                   fontWeight: FontWeight.w500,
@@ -114,61 +118,64 @@ class AddNvrView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                        flex: 1,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "*",
-                                  style: TextStyle(
-                                      fontSize: 12, color: ColorUtils.colorRed),
-                                ),
-                                SizedBox(width: 2),
-                                Text(
-                                  "进/出口",
-                                  style: TextStyle(
-                                      fontSize: 12,
-                                      color: ColorUtils.colorWhite),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            ui.ComboBox<String>(
-                              isExpanded: true,
-                              value: model.selectedEntryExit,
-                              items: ["共用进出口", "进出口1", "进出口2"]
-                                  .map<ui.ComboBoxItem<String>>((e) {
-                                return ui.ComboBoxItem<String>(
-                                  value: e,
-                                  child: SizedBox(
-                                    child: Text(
-                                      e,
-                                      textAlign: TextAlign.start,
-                                      style: const TextStyle(
-                                          fontSize: 12,
-                                          color: ColorUtils.colorBlackLiteLite),
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                              onChanged: (a) {
-                                model.selectedEntryExit = a!;
-                                model.notifyListeners();
-                              },
-                              placeholder: const Text(
-                                "请选择进/出口",
-                                textAlign: TextAlign.start,
+                      flex: 1,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                "*",
                                 style: TextStyle(
-                                    fontSize: 12,
-                                    color: ColorUtils.colorBlackLiteLite),
+                                    fontSize: 12, color: ColorUtils.colorRed),
                               ),
+                              SizedBox(width: 2),
+                              Text(
+                                "进/出口",
+                                style: TextStyle(
+                                    fontSize: 12, color: ColorUtils.colorWhite),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          ui.ComboBox<String>(
+                            isExpanded: true,
+                            value: model.selectedEntryExit,
+                            items: ["共用进出口", "进出口1", "进出口2"]
+                                .map<ui.ComboBoxItem<String>>((e) {
+                              return ui.ComboBoxItem<String>(
+                                value: e,
+                                child: SizedBox(
+                                  child: Text(
+                                    e,
+                                    textAlign: TextAlign.start,
+                                    style: const TextStyle(
+                                        fontSize: 12,
+                                        color: ColorUtils.colorBlackLiteLite),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (a) {
+                              model.selectedEntryExit = a!;
+                              model.notifyListeners();
+                            },
+                            placeholder: const Text(
+                              "请选择进/出口",
+                              textAlign: TextAlign.start,
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  color: ColorUtils.colorBlackLiteLite),
                             ),
-                            const SizedBox(width: 20,),
-                          ],
-                        ),),
+                          ),
+                          const SizedBox(
+                            width: 20,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 20),
                     Expanded(
                       flex: 1,
                       child: Column(

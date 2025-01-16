@@ -14,7 +14,8 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
 
   final DeviceType deviceType;
   final StepNumber stepNumber;
-  AddAiViewModel(this.deviceType, this.stepNumber);
+  final bool isInstall; //是安装 默认否
+  AddAiViewModel(this.deviceType, this.stepNumber, this.isInstall);
 
   List<LocalDeviceEntity> deviceList = [LocalDeviceEntity()];
 
@@ -48,13 +49,15 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
       LocalDeviceEntity? a =
           await hikvisionDeviceInfo(ipAddress: controllers[index].text);
       if (a != null) {
-        deviceList.insert(0, a);
-        controllers.add(TextEditingController());
+        if(isInstall){//可能有多个
+          deviceList.insert(0, a);
+          controllers.add(TextEditingController());
+        }else{//只有一个
+          deviceList = [a];
+        }
       }
       notifyListeners();
-      // if (subNotifyListeners != null) {
-      //   subNotifyListeners!();
-      // }
+
     } else {
       LoadingUtils.showToast(data: '请输入正确的IP地址');
     }

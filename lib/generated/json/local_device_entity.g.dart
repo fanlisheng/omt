@@ -1,5 +1,7 @@
 import 'package:omt/generated/json/base/json_convert_content.dart';
 import 'package:omt/bean/home/home_page/local_device_entity.dart';
+import 'package:xml/xml.dart';
+
 
 LocalDeviceEntity $LocalDeviceEntityFromJson(Map<String, dynamic> json) {
   final LocalDeviceEntity localDeviceEntity = LocalDeviceEntity();

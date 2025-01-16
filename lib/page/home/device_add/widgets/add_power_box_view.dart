@@ -4,6 +4,7 @@ import 'package:kayo_package/extension/_index_extension.dart';
 import 'package:kayo_package/mvvm/base/provider_widget.dart';
 import 'package:kayo_package/views/widget/base/clickable.dart';
 import 'package:kayo_package/views/widget/base/dash_line.dart';
+import 'package:omt/page/home/device_add/widgets/add_camera_view.dart';
 import 'package:omt/page/home/device_add/widgets/second_step_view.dart';
 import 'package:omt/utils/color_utils.dart';
 
@@ -16,13 +17,14 @@ import 'add_ai_view.dart';
 class AddPowerBoxView extends StatelessWidget {
   final DeviceType deviceType;
   final StepNumber stepNumber;
+  final bool? isInstall; //是安装 默认否
 
-  const AddPowerBoxView(this.deviceType, this.stepNumber, {super.key});
+  const AddPowerBoxView(this.deviceType, this.stepNumber, {super.key, this.isInstall});
 
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<AddPowerBoxViewModel>(
-        model: AddPowerBoxViewModel(deviceType, stepNumber)
+        model: AddPowerBoxViewModel(deviceType, stepNumber, isInstall ?? false)
           ..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
@@ -47,9 +49,9 @@ class AddPowerBoxView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "第二步：添加AI设备",
-                style: TextStyle(
+               Text(
+                "第${(model.isInstall == false) ? "二" : "五"}步：添加电源箱",
+                style: const TextStyle(
                   fontSize: 14,
                   color: ColorUtils.colorGreenLiteLite,
                   fontWeight: FontWeight.w500,
@@ -108,117 +110,73 @@ class AddPowerBoxView extends StatelessWidget {
               ),
               if (model.isPowerBoxNeeded == true) ...[
                 const SizedBox(height: 10),
-                Row(
+                EquallyRow(one: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                        flex: 1,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "*",
-                                  style: TextStyle(
-                                      fontSize: 12, color: ColorUtils.colorRed),
-                                ),
-                                SizedBox(width: 2),
-                                Text(
-                                  "进/出口",
-                                  style: TextStyle(
-                                      fontSize: 12,
-                                      color: ColorUtils.colorWhite),
-                                ),
-                              ],
+                    const RowTitle(name: "进/出口"),
+                    const SizedBox(height: 8),
+                    ui.ComboBox<String>(
+                      isExpanded: true,
+                      value: model.selectedEntryExit,
+                      items: model.entryExitList
+                          .map<ui.ComboBoxItem<String>>((e) {
+                        return ui.ComboBoxItem<String>(
+                          value: e,
+                          child: SizedBox(
+                            child: Text(
+                              e,
+                              textAlign: TextAlign.start,
                             ),
-                            const SizedBox(height: 8),
-                            ui.ComboBox<String>(
-                              isExpanded: false,
-                              value: model.selectedEntryExit,
-                              items: model.entryExitList
-                                  .map<ui.ComboBoxItem<String>>((e) {
-                                return ui.ComboBoxItem<String>(
-                                  value: e,
-                                  child: SizedBox(
-                                    width: 300,
-                                    child: Text(
-                                      e,
-                                      textAlign: TextAlign.start,
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                              onChanged: (a) {
-                                model.selectedEntryExit = a!;
-                                model.notifyListeners();
-                              },
-                              placeholder: const Text(
-                                "请选择进/出口",
-                                textAlign: TextAlign.start,
-                                style: TextStyle(
-                                    fontSize: 12,
-                                    color: ColorUtils.colorBlackLiteLite),
-                              ),
-                            ),
-                          ],
-                        )),
-                    Expanded(
-                        flex: 1,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "*",
-                                  style: TextStyle(
-                                      fontSize: 12, color: ColorUtils.colorRed),
-                                ),
-                                SizedBox(width: 2),
-                                Text(
-                                  "电源箱编码",
-                                  style: TextStyle(
-                                      fontSize: 12,
-                                      color: ColorUtils.colorWhite),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            ui.ComboBox<String>(
-                              isExpanded: false,
-                              value: model.selectedPowerBoxCoding,
-                              items: model.powerBoxCodingList
-                                  .map<ui.ComboBoxItem<String>>((e) {
-                                return ui.ComboBoxItem<String>(
-                                  value: e,
-                                  child: SizedBox(
-                                    width: 300,
-                                    child: Text(
-                                      e,
-                                      textAlign: TextAlign.start,
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                              onChanged: (a) {
-                                model.selectedPowerBoxCoding = a!;
-                                model.notifyListeners();
-                              },
-                              placeholder: const Text(
-                                "请选择电源箱编码",
-                                textAlign: TextAlign.start,
-                                style: TextStyle(
-                                    fontSize: 12,
-                                    color: ColorUtils.colorBlackLiteLite),
-                              ),
-                            ),
-                          ],
-                        )),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (a) {
+                        model.selectedEntryExit = a!;
+                        model.notifyListeners();
+                      },
+                      placeholder: const Text(
+                        "请选择进/出口",
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: ColorUtils.colorBlackLiteLite),
+                      ),
+                    ),
                   ],
-                ),
+                ), two: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const RowTitle(name: "电源箱编码"),
+                    const SizedBox(height: 8),
+                    ui.ComboBox<String>(
+                      isExpanded: true,
+                      value: model.selectedPowerBoxCoding,
+                      items: model.powerBoxCodingList
+                          .map<ui.ComboBoxItem<String>>((e) {
+                        return ui.ComboBoxItem<String>(
+                          value: e,
+                          child: SizedBox(
+                            child: Text(
+                              e,
+                              textAlign: TextAlign.start,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (a) {
+                        model.selectedPowerBoxCoding = a!;
+                        model.notifyListeners();
+                      },
+                      placeholder: const Text(
+                        "请选择电源箱编码",
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: ColorUtils.colorBlackLiteLite),
+                      ),
+                    ),
+                  ],
+                )),
               ]
             ],
           ),

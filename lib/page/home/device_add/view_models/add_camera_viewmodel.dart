@@ -11,8 +11,8 @@ import 'device_add_viewmodel.dart';
 class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
   final DeviceType deviceType;
   final StepNumber stepNumber;
-
-  AddCameraViewModel(this.deviceType, this.stepNumber);
+  final bool isInstall; //是安装 默认否
+  AddCameraViewModel(this.deviceType, this.stepNumber, this.isInstall);
 
   List<LocalDeviceEntity> aiDeviceList = [];
   String selectedAiIp = "";
@@ -51,6 +51,9 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
   //完成
   completeEventAction() {
     deviceList.first.readOnly = true;
+    if(isInstall){
+      deviceList.add(CameraDeviceEntity());
+    }
     notifyListeners();
   }
 

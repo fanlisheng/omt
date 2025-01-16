@@ -22,8 +22,8 @@ class SecondStepView extends StatelessWidget {
       case DeviceType.camera:
         return AddAiView(model.deviceType, model.stepNumber);
       case DeviceType.nvr:
-        var a = AddNvrViewModel(model.deviceType, model.stepNumber, false);
-        return AddNvrView(a);
+        return AddNvrView(
+            deviceType: model.deviceType, stepNumber: model.stepNumber);
       case DeviceType.powerBox:
         return AddPowerBoxView(model.deviceType, model.stepNumber);
       case DeviceType.battery:
