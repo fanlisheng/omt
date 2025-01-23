@@ -16,9 +16,11 @@ import 'package:omt/page/video/video_operations_center/video_operations_center_p
 import 'package:omt/utils/auth_utils.dart';
 import 'package:omt/utils/shared_utils.dart';
 import 'package:omt/utils/sys_utils.dart';
+import 'package:omt/widget/combobox.dart';
 
 import '../../dismantle/widgets/dismantle_screen.dart';
 import '../search_device/widgets/search_device_screen.dart';
+import 'keep_alive_page.dart';
 
 ///
 ///  omt
@@ -70,7 +72,9 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
               fontSize: 12,
               color: 0 == topIndex ? "#F3FFFF".toColor() : "#678384".toColor()),
         ),
-        body: const SearchDeviceScreen(),
+        body: const KeepAlivePage(
+          child: SearchDeviceScreen(),
+        ),
         onTap: () => debugPrint('首页'),
       ),
       PaneItem(
@@ -86,7 +90,9 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
               fontSize: 12,
               color: 1 == topIndex ? "#F3FFFF".toColor() : "#678384".toColor()),
         ),
-        body: const InstallDeviceScreen(),
+        body: const KeepAlivePage(
+          child: InstallDeviceScreen(),
+        ),
         onTap: () => debugPrint('安装'),
       ),
       PaneItem(
@@ -102,7 +108,9 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
               fontSize: 12,
               color: 2 == topIndex ? "#F3FFFF".toColor() : "#678384".toColor()),
         ),
-        body: const DismantleScreen(),
+        body: const KeepAlivePage(
+          child: DismantleScreen(),
+        ),
         onTap: () => debugPrint('拆除'),
       ),
       PaneItemExpander(
@@ -130,7 +138,9 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
                       ? "#F3FFFF".toColor()
                       : "#678384".toColor()),
             ),
-            body: const LabelManagementScreen(),
+            body: const KeepAlivePage(
+              child: LabelManagementScreen(),
+            ),
           ),
         ],
       ),

@@ -4,7 +4,7 @@ import 'package:kayo_package/kayo_package.dart';
 import 'package:kayo_package/utils/base_color_utils.dart';
 import 'package:kayo_package/views/widget/base/image_view.dart';
 import 'package:kayo_package/views/widget/base/text_view.dart';
-import '../../../../bean/home/home_page/local_device_entity.dart';
+import '../../../../bean/home/home_page/device_entity.dart';
 import '../../../../utils/color_utils.dart';
 import '../view_models/bind_device_viewmodel.dart';
 
@@ -89,7 +89,7 @@ class _DeviceListViewState extends State<DeviceListView> {
 
 }
 //显示图片
-Widget deviceShowList1(List<LocalDeviceEntity> deviceData,
+Widget deviceShowList1(List<DeviceEntity> deviceData,
     {Function(int)? onTap}) {
   return GridView.builder(
     padding: const EdgeInsets.only(left: 12, right: 12),
@@ -138,7 +138,7 @@ Widget deviceShowList1(List<LocalDeviceEntity> deviceData,
                       child: FittedBox(
                         fit: BoxFit.contain,
                         child: Text(
-                          deviceData[index].deviceType ?? "-",
+                          deviceData[index].deviceTypeText ?? "-",
                           style:
                           const TextStyle(color: ColorUtils.colorWhite),
                         ),
@@ -152,7 +152,7 @@ Widget deviceShowList1(List<LocalDeviceEntity> deviceData,
                           margin: const EdgeInsets.only(
                               left: 2, right: 2, bottom: 4),
                           child: Text(
-                            deviceData[index].ipAddress ?? "",
+                            deviceData[index].ip ?? "",
                             style: const TextStyle(
                                 color: ColorUtils.colorWhite, fontSize: 10),
                           ),

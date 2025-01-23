@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/services.dart';
 import 'package:omt/generated/json/base/json_convert_content.dart';
 
 class JsonUtils {
@@ -75,5 +76,10 @@ class JsonUtils {
       return JsonConvert.fromJsonAsT<T>(map);
 //      return await Future.value(JsonConvert.fromJsonAsT<T>(common.map));
     }
+  }
+
+  Future<Map<String, dynamic>> loadLocalJson(String name) async {
+    String jsonString = await rootBundle.loadString('assets/$name.json');
+    return json.decode(jsonString);
   }
 }

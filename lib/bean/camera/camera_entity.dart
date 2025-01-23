@@ -2,9 +2,7 @@ import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/common/code_data.dart';
 import 'package:omt/generated/json/base/json_field.dart';
 import 'dart:convert';
-
 import 'package:omt/generated/json/camera_entity.g.dart';
-export 'package:omt/generated/json/Video_Connect_entity.g.dart';
 
 @JsonSerializable()
 class CameraHttpEntity {

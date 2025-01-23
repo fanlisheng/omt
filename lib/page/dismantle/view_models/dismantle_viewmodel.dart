@@ -1,8 +1,9 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
-import 'package:omt/bean/home/home_page/local_device_entity.dart';
 import 'package:omt/utils/dialog_utils.dart';
+
+import '../../../bean/home/home_page/device_entity.dart';
 
 class DismantleViewModel extends BaseViewModelRefresh<dynamic> {
   //实例
@@ -18,8 +19,8 @@ class DismantleViewModel extends BaseViewModelRefresh<dynamic> {
   String selectedDismantleCause = "请选择拆除原因";
   List dismantleCauseList = ["业主通知", "运营通知", "其它"];
   //设备数据
-  List<LocalDeviceEntity> dismantleDeviceList = [];
-  List<LocalDeviceEntity> noDismantleDeviceList = [];
+  List<DeviceEntity> dismantleDeviceList = [];
+  List<DeviceEntity> noDismantleDeviceList = [];
 
   TextEditingController controller = TextEditingController();
 
@@ -75,12 +76,12 @@ class DismantleViewModel extends BaseViewModelRefresh<dynamic> {
     //selected == false 是点击选中的设备
 
     if (selected == false) {
-      LocalDeviceEntity a = dismantleDeviceList[index];
+      DeviceEntity a = dismantleDeviceList[index];
       a.selected = false;
       dismantleDeviceList.remove(a);
       noDismantleDeviceList.add(a);
     } else {
-      LocalDeviceEntity a = noDismantleDeviceList[index];
+      DeviceEntity a = noDismantleDeviceList[index];
       a.selected = true;
       noDismantleDeviceList.remove(a);
       dismantleDeviceList.add(a);

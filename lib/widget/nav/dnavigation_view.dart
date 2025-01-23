@@ -1,5 +1,9 @@
 import 'package:flutter/widgets.dart';
+import 'package:go_router/go_router.dart';
+import 'package:kayo_package/kayo_package_utils.dart';
 import 'package:kayo_package/views/widget/base/clickable.dart';
+import 'package:omt/routing/routes.dart';
+import 'package:omt/test.dart';
 
 import '../../utils/color_utils.dart';
 import '../../utils/intent_utils.dart';
@@ -15,14 +19,14 @@ class DNavigationView extends StatelessWidget {
     required this.title,
     required this.titlePass,
     this.rightWidget,
-    this.hasReturn ,
+    this.hasReturn,
   });
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        if((hasReturn ?? true) == true)...[
+        if ((hasReturn ?? true) == true) ...[
           Clickable(
             child: Container(
               decoration: BoxDecoration(
@@ -38,7 +42,12 @@ class DNavigationView extends StatelessWidget {
               ),
             ),
             onTap: () {
-              IntentUtils.share.pop(context);
+              // IntentUtils.share.pop(context);
+              GoRouter.of(context).pop();
+              // KayoPackage.share.navigatorKey.currentState!.canPop();
+              // if (KayoPackage.share.navigatorKey.currentState!.canPop() != false) {
+              //   KayoPackage.share.navigatorKey.currentState!.canPop();
+              // }
             },
           ),
           const SizedBox(width: 12),

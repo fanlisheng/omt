@@ -11,6 +11,7 @@ import 'package:omt/page/home/device_add/widgets/add_camera_view.dart';
 import 'package:omt/page/home/device_add/widgets/add_nvr_view.dart';
 import 'package:omt/page/home/device_add/widgets/add_power_box_view.dart';
 import 'package:omt/utils/color_utils.dart';
+import '../../../widget/combobox.dart';
 import '../../../widget/nav/dnavigation_view.dart';
 import '../view_models/install_device_viewmodel.dart';
 
@@ -26,7 +27,7 @@ class InstallDeviceScreen extends StatelessWidget {
           return Container(
             color: "#3B3F3F".toColor(),
             child: fu.ScaffoldPage(
-              header:  fu.PageHeader(
+              header: fu.PageHeader(
                 title: DNavigationView(
                   title: "安装",
                   titlePass: "",
@@ -60,7 +61,7 @@ class InstallDeviceScreen extends StatelessWidget {
                                 left: 12, right: 12, top: 4, bottom: 4),
                             color: ColorUtils.colorGreen,
                             child: Text(
-                                model.currentStep == 6 ? "添加完成" : "下一步",
+                              model.currentStep == 6 ? "添加完成" : "下一步",
                               style: const TextStyle(
                                   fontSize: 12, color: ColorUtils.colorWhite),
                             ),
@@ -97,12 +98,13 @@ class InstallDeviceScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          margin: const EdgeInsets.only(left: 16, right: 16,top: 10,bottom: 20),
+          margin:
+              const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 20),
           padding:
-          const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 16),
+              const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 16),
           color: ColorUtils.colorBackgroundLine,
           width: double.infinity,
-          child:  Column(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
@@ -114,14 +116,16 @@ class InstallDeviceScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              const EquallyRow(one: RowTitle(name: "实例"), two: RowTitle(name: "大门编号"),),
+              const EquallyRow(
+                one: RowTitle(name: "实例"),
+                two: RowTitle(name: "大门编号"),
+              ),
               const SizedBox(height: 10),
               EquallyRow(
                 one: ComboBox<String>(
                   isExpanded: true,
                   value: model.selectedInstall,
-                  items: model.installList
-                      .map<ComboBoxItem<String>>((e) {
+                  items: model.installList.map<ComboBoxItem<String>>((e) {
                     return ComboBoxItem<String>(
                       value: e,
                       child: Text(
@@ -142,23 +146,20 @@ class InstallDeviceScreen extends StatelessWidget {
                     "请选择实例",
                     textAlign: TextAlign.start,
                     style: TextStyle(
-                        fontSize: 12,
-                        color: ColorUtils.colorBlackLiteLite),
+                        fontSize: 12, color: ColorUtils.colorBlackLiteLite),
                   ),
                 ),
                 two: ComboBox<String>(
                   isExpanded: true,
                   value: model.selectedGateNumber,
-                  items: model.gateNumberList
-                      .map<ComboBoxItem<String>>((e) {
+                  items: model.gateNumberList.map<ComboBoxItem<String>>((e) {
                     return ComboBoxItem<String>(
                       value: e,
                       child: Text(
                         e,
                         textAlign: TextAlign.start,
                         style: const TextStyle(
-                            fontSize: 12,
-                            color: ColorUtils.colorGreenLiteLite),
+                            fontSize: 12, color: ColorUtils.colorGreenLiteLite),
                       ),
                     );
                   }).toList(),
@@ -170,11 +171,26 @@ class InstallDeviceScreen extends StatelessWidget {
                     "请选择大门编号",
                     textAlign: TextAlign.start,
                     style: TextStyle(
-                        fontSize: 12,
-                        color: ColorUtils.colorBlackLiteLite),
+                        fontSize: 12, color: ColorUtils.colorBlackLiteLite),
                   ),
                 ),
               ),
+              const SizedBox(height: 20),
+              const RowTitle(name: "标签",isMust: false),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: MultiSelectComboBox(
+                      availableTags: model.availableTags,
+                      initialSelectedTags: model.selectedTags,
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 20,
+                  )
+                ],
+              )
             ],
           ),
         ),
@@ -221,7 +237,7 @@ class InstallDeviceScreen extends StatelessWidget {
                             : ColorUtils.colorGreenLiteLite,
                         child: Text(
                           '${index + 1}',
-                          style:  TextStyle(
+                          style: TextStyle(
                             color: (index < model.currentStep)
                                 ? ColorUtils.colorWhite
                                 : ColorUtils.colorBlackLite,
@@ -276,15 +292,22 @@ class InstallDeviceScreen extends StatelessWidget {
       case 1:
         return stepOneView(model);
       case 2:
-        return const AddAiView(DeviceType.ai,StepNumber.second);
+        return const AddAiView(DeviceType.ai, StepNumber.second);
       case 3:
-        return const AddCameraView(deviceType: DeviceType.camera,stepNumber: StepNumber.third);
+        return const AddCameraView(
+            deviceType: DeviceType.camera, stepNumber: StepNumber.third);
       case 4:
-        return const AddNvrView(deviceType: DeviceType.nvr,stepNumber: StepNumber.third,showInstall: true);
+        return const AddNvrView(
+            deviceType: DeviceType.nvr,
+            stepNumber: StepNumber.third,
+            showInstall: true);
       case 5:
-        return const AddPowerBoxView(DeviceType.powerBox, StepNumber.second, isInstall: true );
+        return const AddPowerBoxView(DeviceType.powerBox, StepNumber.second,
+            isInstall: true);
       case 6:
-        return const AddBatteryExchangeView(DeviceType.battery, StepNumber.second, isInstall: true);
+        return const AddBatteryExchangeView(
+            DeviceType.battery, StepNumber.second,
+            isInstall: true);
       default:
         return Container();
     }

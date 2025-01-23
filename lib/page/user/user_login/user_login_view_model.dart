@@ -41,6 +41,9 @@ class UserLoginViewModel extends BaseViewModelRefresh<UserInfoData> {
 
   int i = 0;
 
+  String selectedProject = "成都项目";
+  List<String> projectList = ["成都项目"];
+
   @override
   void initState() async {
     super.initState();
@@ -95,7 +98,6 @@ class UserLoginViewModel extends BaseViewModelRefresh<UserInfoData> {
   login() async {
     var phone = phoneController.text;
     var pwd = pwdController.text;
-
 
     if (BaseSysUtils.empty(phone)) {
       LoadingUtils.showInfo(data: '请输入账号');

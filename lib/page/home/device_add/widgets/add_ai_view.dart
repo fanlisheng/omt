@@ -6,7 +6,7 @@ import 'package:kayo_package/views/widget/base/dash_line.dart';
 import 'package:omt/page/home/device_add/widgets/second_step_view.dart';
 import 'package:omt/utils/color_utils.dart';
 
-import '../../../../bean/home/home_page/local_device_entity.dart';
+import '../../../../bean/home/home_page/device_entity.dart';
 import '../view_models/add_ai_viewmodel.dart';
 import '../view_models/device_add_viewmodel.dart';
 
@@ -49,9 +49,9 @@ class AddAiView extends StatelessWidget {
         Expanded(
           child: ListView(
             children: model.deviceList.asMap().keys.map((index) {
-              LocalDeviceEntity e = model.deviceList[index];
+              DeviceEntity e = model.deviceList[index];
               return Container(
-                height: (e.macAddress ?? "").isEmpty ? 140 : 278,
+                height: (e.mac ?? "").isEmpty ? 140 : 278,
                 margin: const EdgeInsets.only(left: 16, right: 16, bottom: 10),
                 padding: const EdgeInsets.only(
                     left: 16, right: 16, top: 16, bottom: 16),
@@ -87,7 +87,7 @@ class AddAiView extends StatelessWidget {
                         ),
                         const SizedBox(width: 130),
                         Visibility(
-                          visible: (e.macAddress ?? "").isNotEmpty,
+                          visible: (e.mac ?? "").isNotEmpty,
                           child: Text(
                             "已连接客户端",
                             style: TextStyle(
@@ -131,7 +131,7 @@ class AddAiView extends StatelessWidget {
                       ],
                     ),
                     Visibility(
-                      visible: (e.macAddress ?? "").isNotEmpty,
+                      visible: (e.mac ?? "").isNotEmpty,
                       child: Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -156,9 +156,9 @@ class AddAiView extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 RowItemInfoView(
-                                    name: "编码（mac地址）", value: e.macAddress),
+                                    name: "编码（mac地址）", value: e.mac),
                                 RowItemInfoView(
-                                    name: "IOT连接状态", value: e.macAddress),
+                                    name: "IOT连接状态", value: e.mac),
                               ],
                             ),
                             const SizedBox(height: 12),
@@ -166,9 +166,9 @@ class AddAiView extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 RowItemInfoView(
-                                    name: "主程版本", value: e.macAddress),
+                                    name: "主程版本", value: e.mac),
                                 RowItemInfoView(
-                                    name: "识别版本", value: e.macAddress),
+                                    name: "识别版本", value: e.mac),
                               ],
                             ),
                             const SizedBox(height: 12),
@@ -176,7 +176,7 @@ class AddAiView extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 RowItemInfoView(
-                                    name: "服务器地址", value: e.macAddress),
+                                    name: "服务器地址", value: e.mac),
                               ],
                             ),
                             const SizedBox(height: 12),

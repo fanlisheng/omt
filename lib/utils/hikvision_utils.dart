@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
-import 'package:omt/bean/home/home_page/local_device_entity.dart';
 import 'package:xml/xml.dart';
+
+import '../bean/home/home_page/device_entity.dart';
 
 Future<Map<String, String>?> hkIsapiInit(String ipAddress) async {
   final headers = {
@@ -70,7 +71,7 @@ Map<String, String> configMd5Headers({
   };
 }
 
-Future<LocalDeviceEntity?> hikvisionDeviceInfo({
+Future<DeviceEntity?> hikvisionDeviceInfo({
   required String ipAddress,
   // required String username,
   // required String password,
@@ -101,7 +102,7 @@ Future<LocalDeviceEntity?> hikvisionDeviceInfo({
 
     if (response.statusCode == 200) {
       print('Response: ${response.body}');
-      return LocalDeviceEntity.fromXml(response.body, ipAddress);
+      return DeviceEntity.fromXml(response.body, ipAddress);
     } else {
       print('Failed to load data: ${response.statusCode}');
       return null;

@@ -1,6 +1,8 @@
+import 'package:go_router/go_router.dart';
 import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
+import 'package:omt/routing/routes.dart';
 
-import '../../../../bean/home/home_page/local_device_entity.dart';
+import '../../../../bean/home/home_page/device_entity.dart';
 
 enum BindDevicePageState {
   idle, // 空闲状态，没有请求
@@ -11,7 +13,7 @@ enum BindDevicePageState {
 
 class BindDeviceViewModel extends BaseViewModelRefresh<dynamic> {
   //扫描出的设备数据
-  final List<LocalDeviceEntity> deviceData;
+  final List<DeviceEntity> deviceData;
 
   BindDeviceViewModel(this.deviceData);
 
@@ -40,7 +42,7 @@ class BindDeviceViewModel extends BaseViewModelRefresh<dynamic> {
     'Bambino',
   ];
   //页面状态
-  BindDevicePageState pageState = BindDevicePageState.loading;
+  BindDevicePageState pageState = BindDevicePageState.idle;
 
   @override
   void initState() async {
@@ -84,7 +86,9 @@ class BindDeviceViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   //绑定设备
-  bingingEventAction() {}
+  bingingEventAction() {
+    context!.pop();
+  }
 
   //成功返回
   goBackEventAction() {}

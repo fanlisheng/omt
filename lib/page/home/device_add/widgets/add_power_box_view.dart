@@ -7,8 +7,6 @@ import 'package:kayo_package/views/widget/base/dash_line.dart';
 import 'package:omt/page/home/device_add/widgets/add_camera_view.dart';
 import 'package:omt/page/home/device_add/widgets/second_step_view.dart';
 import 'package:omt/utils/color_utils.dart';
-
-import '../../../../bean/home/home_page/local_device_entity.dart';
 import '../view_models/add_ai_viewmodel.dart';
 import '../view_models/add_power_box_viewmodel.dart';
 import '../view_models/device_add_viewmodel.dart';

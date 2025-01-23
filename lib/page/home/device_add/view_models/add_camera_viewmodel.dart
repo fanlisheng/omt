@@ -5,7 +5,7 @@ import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:omt/bean/home/home_page/camera_device_entity.dart';
-import 'package:omt/bean/home/home_page/local_device_entity.dart';
+import '../../../../bean/home/home_page/device_entity.dart';
 import 'device_add_viewmodel.dart';
 
 class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
@@ -14,7 +14,7 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
   final bool isInstall; //是安装 默认否
   AddCameraViewModel(this.deviceType, this.stepNumber, this.isInstall);
 
-  List<LocalDeviceEntity> aiDeviceList = [];
+  List<DeviceEntity> aiDeviceList = [];
   String selectedAiIp = "";
   List<CameraDeviceEntity> deviceList = [CameraDeviceEntity()];
 

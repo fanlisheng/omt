@@ -13,6 +13,18 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
   String selectedGateNumber = "";
   List gateNumberList = [];
 
+  List<String> availableTags = [
+    '标签1',
+    '标签2',
+    '标签3',
+    '标签4',
+    '标签5',
+    '标签6',
+    '标签7',
+    '标签9'
+  ];
+  List<String> selectedTags = [];
+
   @override
   void initState() async {
     super.initState();

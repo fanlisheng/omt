@@ -1,10 +1,8 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:omt/generated/json/base/json_field.dart';
-import 'package:omt/generated/json/camera_device_entity.g.dart';
 import 'dart:convert';
-export 'package:omt/generated/json/camera_device_entity.g.dart';
 
-@JsonSerializable()
+// @JsonSerializable()
 //
 class CameraDeviceEntity {
 
@@ -40,10 +38,7 @@ class CameraDeviceEntity {
       this.id,
       this.isOpen,
       });
-
-  factory CameraDeviceEntity.fromJson(Map<String, dynamic> json) => $CameraDeviceEntityFromJson(json);
-
-	Map<String, dynamic> toJson() => $CameraDeviceEntityToJson(this);
+  
 
 	@override
 	String toString() {

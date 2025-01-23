@@ -20,12 +20,14 @@ class DialogUtils {
           FilledButton(
             onPressed: () {
               Navigator.pop(context, '确定');
-
               // 这里可以增加删除逻辑
             },
             child: Text(
               deleteText,
-              style: const TextStyle(color: ColorUtils.colorGreenLiteLite),
+              style: const TextStyle(
+                color: ColorUtils.colorGreenLiteLite,
+                fontSize: 12.0,
+              ),
             ),
           ),
           Button(
@@ -34,11 +36,76 @@ class DialogUtils {
             },
             child: Text(
               cancelText,
-              style: const TextStyle(color: ColorUtils.colorGreenLiteLite),
+              style: const TextStyle(
+                color: ColorUtils.colorGreenLiteLite,
+                fontSize: 12.0,
+              ),
             ),
           ),
         ],
       ),
     );
+  }
+
+  static Future<String?> showInputDialog({
+    required BuildContext context,
+    required String title,
+    required String placeholder,
+    String text = "",
+    String deleteText = '确定',
+    String cancelText = '取消',
+  }) async {
+    final TextEditingController textController = TextEditingController();
+    if (text.isNotEmpty){
+      textController.text = text;
+    }
+      return await showDialog<String>(
+        context: context,
+        builder: (context) => ContentDialog(
+          title: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 18.0,
+            ),
+          ),
+          content: SizedBox(
+            height: 40,
+            child: TextBox(
+              placeholder: placeholder,
+              controller: textController,
+              style: const TextStyle(
+                fontSize: 14.0,
+              ),
+            ),
+          ),
+          actions: [
+            FilledButton(
+              onPressed: () {
+                Navigator.pop(context, textController.text);
+                // 这里可以增加删除逻辑
+              },
+              child: Text(
+                deleteText,
+                style: const TextStyle(
+                  color: ColorUtils.colorGreenLiteLite,
+                  fontSize: 12.0,
+                ),
+              ),
+            ),
+            Button(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text(
+                cancelText,
+                style: const TextStyle(
+                  color: ColorUtils.colorGreenLiteLite,
+                  fontSize: 12.0,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
   }
 }

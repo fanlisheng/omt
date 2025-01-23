@@ -91,7 +91,7 @@ class _FilterViewState extends State<FilterView> {
     required List<String> options,
     required void Function(String) onSelected,
   }) {
-    bool simpleDisabled = model.searchState != DeviceSearchState.completed;
+    bool simpleDisabled = model.searchState == DeviceSearchState.searching;
     LogUtils.info(msg: simpleDisabled,tag:  "========");
     return LayoutBuilder(builder: (context, constraints) {
       return Container(

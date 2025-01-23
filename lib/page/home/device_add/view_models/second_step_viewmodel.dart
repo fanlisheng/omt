@@ -7,7 +7,7 @@ import 'package:omt/utils/hikvision_utils.dart';
 import 'package:omt/utils/log_utils.dart';
 import 'package:omt/utils/shared_utils.dart';
 import 'package:omt/utils/sys_utils.dart';
-import '../../../../bean/home/home_page/local_device_entity.dart';
+import '../../../../bean/home/home_page/device_entity.dart';
 import 'device_add_viewmodel.dart';
 
 class SecondStepViewModel extends BaseViewModelRefresh<dynamic> {
@@ -18,7 +18,7 @@ class SecondStepViewModel extends BaseViewModelRefresh<dynamic> {
   DeviceType deviceType = DeviceType.camera;
   StepNumber stepNumber = StepNumber.second;
 
-  List<LocalDeviceEntity> deviceList = [LocalDeviceEntity()];
+  List<DeviceEntity> deviceList = [DeviceEntity()];
 
   ///ai
   // 创建一个 TextEditingController 列表来动态管理每个 TextField 的内容
@@ -48,7 +48,7 @@ class SecondStepViewModel extends BaseViewModelRefresh<dynamic> {
   //连接
   connectEventAction(int index) async {
     if (SysUtils.isIPAddress(controllers[index].text)) {
-      LocalDeviceEntity? a =
+      DeviceEntity? a =
           await hikvisionDeviceInfo(ipAddress: controllers[index].text);
       if (a != null) {
         deviceList.insert(0, a);

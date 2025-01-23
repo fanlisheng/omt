@@ -11,7 +11,6 @@ import 'package:omt/page/home/device_add/view_models/add_camera_viewmodel.dart';
 import 'package:omt/page/home/device_add/widgets/second_step_view.dart';
 import 'package:omt/utils/color_utils.dart';
 
-import '../../../../bean/home/home_page/local_device_entity.dart';
 import '../view_models/add_ai_viewmodel.dart';
 import '../view_models/device_add_viewmodel.dart';
 
@@ -181,9 +180,9 @@ class AddCameraView extends StatelessWidget {
                               items: model.aiDeviceList
                                   .map<ComboBoxItem<String>>((e) {
                                 return ComboBoxItem<String>(
-                                  value: e.ipAddress,
+                                  value: e.ip,
                                   child: Text(
-                                    e.ipAddress ?? "",
+                                    e.ip ?? "",
                                     textAlign: TextAlign.start,
                                     style: const TextStyle(
                                         fontSize: 12,

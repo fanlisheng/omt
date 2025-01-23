@@ -1,15 +1,15 @@
+import 'package:go_router/go_router.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:multicast_dns/multicast_dns.dart';
-import 'package:network_info_plus/network_info_plus.dart';
-import 'package:network_tools/network_tools.dart';
+import 'package:omt/bean/home/home_page/device_entity.dart';
+import 'package:omt/http/http_manager.dart';
+import 'package:omt/http/http_query.dart';
+import 'package:omt/http/service/home/home_page/home_page_service.dart';
 import 'package:omt/router_utils.dart';
+import 'package:omt/routing/routes.dart';
 import 'package:omt/utils/device_utils.dart';
 import 'package:omt/utils/intent_utils.dart';
-import 'package:omt/utils/log_utils.dart';
-import 'package:omt/utils/mac_address_utils.dart';
-import '../../../../bean/home/home_page/local_device_entity.dart';
-import '../../../../utils/hikvision_utils.dart';
-import '../../device_add/view_models/device_add_viewmodel.dart';
+import '../../../../bean/common/id_name_value.dart';
 
 ///
 ///  omt
@@ -25,7 +25,7 @@ enum DeviceSearchState {
   completed, // 搜索完成
 }
 
-class SearchDeviceViewModel extends BaseViewModelRefresh<dynamic> {
+class SearchDeviceViewModel extends BaseViewModel {
   //设备搜索状态
   DeviceSearchState searchState = DeviceSearchState.notSearched;
 
@@ -37,10 +37,10 @@ class SearchDeviceViewModel extends BaseViewModelRefresh<dynamic> {
   String deviceStatistics = "设备统计：1个AI设备 / 一个摄像头 / 一个NVR / 一个路由器";
 
   //扫描出的设备数据
-  List<LocalDeviceEntity> deviceScanData = [];
+  List<DeviceEntity> deviceScanData = [];
 
   //没有绑定的数据
-  List<LocalDeviceEntity> deviceNoBindingData = [];
+  List<DeviceEntity> deviceNoBindingData = [];
 
   //扫描进度
   double scanRateValue = 0.0;
@@ -53,6 +53,8 @@ class SearchDeviceViewModel extends BaseViewModelRefresh<dynamic> {
   @override
   void initState() async {
     super.initState();
+    HttpQuery.share.homePageService
+        .getInstanceList("", onSuccess: (List<IdNameValue>? a) {});
   }
 
   @override
@@ -60,14 +62,10 @@ class SearchDeviceViewModel extends BaseViewModelRefresh<dynamic> {
     super.dispose();
   }
 
-  @override
-  loadData({onSuccess, onCache, onError}) {
-    ///网络请求
-  }
-
   ///点击事件
   //搜索事件
   searchEventAction() async {
+    context!.go(Routes.bindDevice, extra: deviceNoBindingData);
     // final result =
     //     await hikvisionDeviceInfo(ipAddress: "192.168.101.22");
     // LogUtils.info(msg: result);
@@ -88,13 +86,21 @@ class SearchDeviceViewModel extends BaseViewModelRefresh<dynamic> {
     stopScanning = false;
     deviceScanData =
         await DeviceUtils.scanAndFetchDevicesInfo(shouldStop: _shouldStop);
-    if(stopScanning == true){
+    if (stopScanning == true) {
       searchState = DeviceSearchState.notSearched;
       scanRateValue = 0;
       deviceScanData = [];
-    }else{
+    } else {
       scanRateValue = 1.0;
       searchState = DeviceSearchState.completed;
+      deviceNoBindingData = deviceScanData;
+      //扫描完成,上传请求
+      // HttpQuery.share.homePageService.deviceScan(deviceScanData,
+      //     onSuccess: (List<DeviceEntity>? deviceList) {
+      //   scanRateValue = 1.0;
+      //   searchState = DeviceSearchState.completed;
+      //   notifyListeners();
+      // });
     }
     notifyListeners();
   }
@@ -108,17 +114,21 @@ class SearchDeviceViewModel extends BaseViewModelRefresh<dynamic> {
   scanStopEventAction() async {
     stopScanning = true;
   }
+
   //重新扫描
   scanAnewEventAction() {
     scanStopEventAction();
     scanStartEventAction();
   }
+
   //绑定
   bindEventAction() {
-    IntentUtils.share.push(context,
-        routeName: RouterPage.DeviceBindPage,
-        data: {"data": deviceNoBindingData});
+    context!.go(Routes.bindDevice, extra: deviceNoBindingData);
+    // IntentUtils.share.push(context,
+    //     routeName: RouterPage.DeviceBindPage,
+    //     data: {"data": deviceNoBindingData});
   }
+
   //所有服务
   discoverService() async {
     final MDnsClient client = MDnsClient();
@@ -151,80 +161,6 @@ class SearchDeviceViewModel extends BaseViewModelRefresh<dynamic> {
     }
 
     client.stop();
-  }
-
-  Future<void> testScan() async {
-    client = MDnsClient();
-    final List<String> serviceNames = [
-      '_psia._tcp.local',
-      '_workstation._tcp.local'
-    ]; // 服务名称列表
-    final Set<String> seenDevices = {}; // 用于记录已处理设备
-
-    try {
-      print('Starting mDNS client...');
-      await client.start();
-
-      // 遍历每个服务名称
-      for (final serviceName in serviceNames) {
-        await for (final PtrResourceRecord ptr
-            in client.lookup<PtrResourceRecord>(
-                ResourceRecordQuery.serverPointer(serviceName))) {
-          print('Found service: ${ptr.domainName}');
-
-          await for (final SrvResourceRecord srv
-              in client.lookup<SrvResourceRecord>(
-                  ResourceRecordQuery.service(ptr.domainName))) {
-            print('Device hostname: ${srv.target}, port: ${srv.port}');
-
-            await for (final IPAddressResourceRecord ip
-                in client.lookup<IPAddressResourceRecord>(
-                    ResourceRecordQuery.addressIPv4(srv.target))) {
-              // 标准化设备字段
-              final String target = srv.target.replaceAll(".local", "");
-              final String ipAddress = ip.address.address;
-              final String deviceKey = '$target-$ipAddress';
-
-              // 检查是否已经处理过
-              if (seenDevices.contains(deviceKey)) {
-                continue; // 忽略已记录设备
-              }
-              seenDevices.add(deviceKey);
-
-              if (serviceName == '_psia._tcp.local') {
-                // 使用 hikvisionDeviceInfo 处理 HIKVISION 设备
-                final result =
-                    await hikvisionDeviceInfo(ipAddress: ip.address.address);
-                if (result != null) {
-                  deviceScanData.add(result);
-                }
-              } else {
-                String? macAddress =
-                    MacAddressHelper.getMacAddressWithString(ptr.domainName);
-                // 默认的设备处理逻辑
-                deviceScanData.add(
-                  LocalDeviceEntity(
-                      deviceType: target,
-                      target: ptr.domainName,
-                      ipAddress: ip.address.address,
-                      macAddress: macAddress),
-                );
-              }
-              deviceNoBindingData = deviceScanData;
-              print('Device name: $target, IP address: ${ip.address}');
-            }
-          }
-        }
-      }
-    } catch (e) {
-      print('Error: $e');
-    } finally {
-      client.stop();
-      searchState = DeviceSearchState.completed;
-      scanRateValue = 1.0;
-      notifyListeners();
-      print('mDNS client stopped. Final Progress: 100%');
-    }
   }
 
 // LocalDeviceEntity getDeviceTypeInfo(LocalDeviceEntity info) {

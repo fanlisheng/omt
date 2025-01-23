@@ -12,13 +12,13 @@ import 'package:omt/page/home/bind_device/widgets/state_view.dart';
 import 'package:omt/utils/intent_utils.dart';
 import 'package:omt/widget/nav/dnavigation_view.dart';
 import 'package:window_manager/window_manager.dart';
-import '../../../../bean/home/home_page/local_device_entity.dart';
+import '../../../../bean/home/home_page/device_entity.dart';
 import '../../../../utils/color_utils.dart';
 import '../../search_device/widgets/filter_view.dart';
 import '../view_models/bind_device_viewmodel.dart';
 
 class BindDeviceScreen extends StatelessWidget {
-  final List<LocalDeviceEntity> deviceData;
+  final List<DeviceEntity> deviceData;
 
   const BindDeviceScreen({super.key, required this.deviceData});
 

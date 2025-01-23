@@ -4,7 +4,7 @@ import 'package:kayo_package/kayo_package.dart';
 import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
 import 'package:omt/utils/hikvision_utils.dart';
 import 'package:omt/utils/sys_utils.dart';
-import '../../../../bean/home/home_page/local_device_entity.dart';
+import '../../../../bean/home/home_page/device_entity.dart';
 import 'device_add_viewmodel.dart';
 
 class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
@@ -17,7 +17,7 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
   final bool isInstall; //是安装 默认否
   AddAiViewModel(this.deviceType, this.stepNumber, this.isInstall);
 
-  List<LocalDeviceEntity> deviceList = [LocalDeviceEntity()];
+  List<DeviceEntity> deviceList = [DeviceEntity()];
 
   ///ai
   // 创建一个 TextEditingController 列表来动态管理每个 TextField 的内容
@@ -46,7 +46,7 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
   //连接
   connectEventAction(int index) async {
     if (SysUtils.isIPAddress(controllers[index].text)) {
-      LocalDeviceEntity? a =
+      DeviceEntity? a =
           await hikvisionDeviceInfo(ipAddress: controllers[index].text);
       if (a != null) {
         if(isInstall){//可能有多个

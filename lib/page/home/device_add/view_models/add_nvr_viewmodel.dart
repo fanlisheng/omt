@@ -2,12 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
-import 'package:omt/bean/common/id_name_value.dart';
-import 'package:omt/utils/hikvision_utils.dart';
-import 'package:omt/utils/log_utils.dart';
-import 'package:omt/utils/shared_utils.dart';
-import 'package:omt/utils/sys_utils.dart';
-import '../../../../bean/home/home_page/local_device_entity.dart';
+import '../../../../bean/home/home_page/device_entity.dart';
 import 'device_add_viewmodel.dart';
 
 class AddNvrViewModel extends BaseViewModelRefresh<dynamic> {
@@ -20,7 +15,7 @@ class AddNvrViewModel extends BaseViewModelRefresh<dynamic> {
   final bool showInstall;
   AddNvrViewModel(this.deviceType, this.stepNumber, this.showInstall);
 
-  List<LocalDeviceEntity> deviceList = [LocalDeviceEntity()];
+  List<DeviceEntity> deviceList = [DeviceEntity()];
 
   ///nvr
   // 是否需要安装NVR

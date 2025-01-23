@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kayo_package/extension/_index_extension.dart';
 import 'package:kayo_package/kayo_package.dart';
-import 'package:omt/bean/home/home_page/local_device_entity.dart';
+import 'package:omt/bean/home/home_page/device_entity.dart';
 import 'package:omt/page/home/search_device/view_models/search_device_viewmodel.dart';
 import '../../../../utils/color_utils.dart';
 
@@ -226,7 +226,7 @@ class _DeviceListViewState extends State<DeviceListView> {
     );
   }
 //显示图片
-  Widget deviceShowList1(List<LocalDeviceEntity> deviceData) {
+  Widget deviceShowList1(List<DeviceEntity> deviceData) {
     return GridView.builder(
       padding: const EdgeInsets.only(left: 12, right: 12, top: 10, bottom: 10),
       itemCount: deviceData.length, // 项目的数量
@@ -252,7 +252,7 @@ class _DeviceListViewState extends State<DeviceListView> {
                 child: FittedBox(
                   fit: BoxFit.contain,
                   child: Text(
-                    deviceData[index].deviceType ?? "-",
+                    deviceData[index].deviceTypeText ?? "-",
                     style:
                     const TextStyle(color: ColorUtils.colorWhite),
                   ),
@@ -265,7 +265,7 @@ class _DeviceListViewState extends State<DeviceListView> {
                   child: Container(
                     margin: const EdgeInsets.only(left: 2, right: 2, bottom: 4),
                     child: Text(
-                      deviceData[index].ipAddress ?? "",
+                      deviceData[index].ip ?? "",
                       style: const TextStyle(
                           color: ColorUtils.colorWhite, fontSize: 10),
                     ),

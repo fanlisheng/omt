@@ -2,8 +2,10 @@ import 'package:fluent_ui/fluent_ui.dart' as fu;
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:kayo_package/mvvm/base/provider_widget.dart';
+import 'package:omt/bean/common/id_name_value.dart';
 
 import 'package:omt/utils/color_utils.dart';
+import 'package:omt/utils/dialog_utils.dart';
 import '../../../widget/nav/dnavigation_view.dart';
 import '../view_models/label_management_viewmodel.dart';
 
@@ -43,8 +45,21 @@ class LabelManagementScreen extends StatelessWidget {
                 style: const fu.ButtonStyle(
                     backgroundColor:
                         fu.WidgetStatePropertyAll(ColorUtils.colorGreen)),
-                onPressed: () {
-                  model.addEventAction();
+                onPressed: () async {
+                  String? result = await DialogUtils.showInputDialog(
+                      context: model.context!,
+                      title: "添加标签",
+                      placeholder: '请输入标签的名字');
+                  if (result == null || result.isEmpty) {
+                    result;
+                  }
+                  String? result2 = await DialogUtils.showContentDialog(
+                      context: model.context!,
+                      title: "添加标签",
+                      content: "将添加\"$result\"标签,添加后暂时只能修改不能删除,您要添加它吗？");
+                  if (result2 == '确定') {
+                    model.addEventAction(result!);
+                  }
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -94,16 +109,12 @@ class LabelManagementScreen extends StatelessWidget {
           Expanded(
             child: Container(
               padding: const EdgeInsets.only(
-                  left: 16, right: 16, top: 10, bottom: 10),
+                  left: 10, right: 10, top: 10, bottom: 10),
               color: ColorUtils.colorBackgroundLine,
               width: double.infinity,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("NVR信息",
-                      style:
-                          TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
-                  const SizedBox(height: 8),
                   Expanded(
                     child: SingleChildScrollView(
                       child: SizedBox(
@@ -124,25 +135,44 @@ class LabelManagementScreen extends StatelessWidget {
                                 label:
                                     Text("操作", style: TextStyle(fontSize: 12))),
                           ],
-                          rows: model.nvrInfo.asMap().keys.map((index) {
-                            Map<String, String> info = model.nvrInfo[index];
+                          rows: model.dataList.asMap().keys.map((index) {
+                            IdNameValue info = model.dataList[index];
                             return DataRow(
                                 color: WidgetStateProperty.all(index % 2 == 0
                                     ? "#4E5353".toColor()
                                     : "#3B3F3F".toColor()),
                                 cells: [
                                   DataCell(Text(
-                                    info["序列号"]!,
+                                    info.id.toString(),
                                     style: const TextStyle(fontSize: 12),
                                   )),
                                   DataCell(Text(
-                                    info["名称"]!,
+                                    info.name ?? "-",
                                     style: const TextStyle(fontSize: 12),
                                   )),
                                   DataCell(
                                     OutlinedButton(
-                                      onPressed: () {
-                                        model.editEventAction(index);
+                                      onPressed: () async {
+                                        String? result =
+                                            await DialogUtils.showInputDialog(
+                                                context: model.context!,
+                                                title: "修改标签",
+                                                placeholder: '请输入修改标签的名字',
+                                                text: info.name!);
+                                        if (result != null &&
+                                            result.isNotEmpty &&
+                                            info.id != null) {
+                                          String? result2 = await DialogUtils
+                                              .showContentDialog(
+                                                  context: model.context!,
+                                                  title: "修改标签",
+                                                  content:
+                                                      "将修改\"${info.name}\"修改为\"$result\",您要修改吗");
+                                          if (result2 == '确定') {
+                                            model.editEventAction(
+                                                info.id!, result);
+                                          }
+                                        }
                                       },
                                       style: ButtonStyle(
                                         minimumSize:
@@ -184,7 +214,6 @@ class LabelManagementScreen extends StatelessWidget {
                 ],
               ),
             ),
-
           ),
           const SizedBox(height: 10),
           Row(
@@ -194,7 +223,7 @@ class LabelManagementScreen extends StatelessWidget {
                 style: TextStyle(color: Colors.white),
               ),
               Text(
-                model.nvrInfo.length.toString(),
+                model.dataList.length.toString(),
                 style: const TextStyle(
                   color: ColorUtils.colorGreen,
                 ),
