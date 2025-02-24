@@ -3,8 +3,9 @@ import 'package:omt/utils/device_utils.dart';
 import 'package:xml/xml.dart';
 
 import '../../../generated/json/base/json_field.dart';
+import '../../../generated/json/device_entity.g.dart';
 
-// @JsonSerializable()
+@JsonSerializable()
 class DeviceEntity {
   @JSONField(name: "device_type")
   int? deviceType;
@@ -23,10 +24,10 @@ class DeviceEntity {
       this.mac,
       this.selected});
 
-  // factory DeviceEntity.fromJson(Map<String, dynamic> json) =>
-  //     $DeviceEntityFromJson(json);
-  //
-  // Map<String, dynamic> toJson() => $DeviceEntityToJson(this);
+  factory DeviceEntity.fromJson(Map<String, dynamic> json) =>
+      $DeviceEntityFromJson(json);
+
+  Map<String, dynamic> toJson() => $DeviceEntityToJson(this);
 
   factory DeviceEntity.fromXml(String xmlString, String ip) {
     final document = XmlDocument.parse(xmlString);

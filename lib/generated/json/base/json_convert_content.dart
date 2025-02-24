@@ -10,6 +10,13 @@ import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/bean/common/linkage_data.dart';
 import 'package:omt/bean/common/location_data_entity.dart';
 import 'package:omt/bean/common/name_value.dart';
+import 'package:omt/bean/home/home_page/device_detail_ai_entity.dart';
+import 'package:omt/bean/home/home_page/device_detail_camera_entity.dart';
+import 'package:omt/bean/home/home_page/device_detail_exchange_entity.dart';
+import 'package:omt/bean/home/home_page/device_detail_nvr_entity.dart';
+import 'package:omt/bean/home/home_page/device_detail_power_box_entity.dart';
+import 'package:omt/bean/home/home_page/device_detail_power_entity.dart';
+import 'package:omt/bean/home/home_page/device_entity.dart';
 import 'package:omt/bean/home/home_page/home_page_data.dart';
 import 'package:omt/bean/one_picture/one_picture/one_picture_data.dart';
 import 'package:omt/bean/user/user_login/user_login_data.dart';
@@ -195,6 +202,71 @@ class JsonConvert {
       return data.map<NameValue>((Map<String, dynamic> e) =>
           NameValue.fromJson(e)).toList() as M;
     }
+    if (<DeviceDetailAiEntity>[] is M) {
+      return data.map<DeviceDetailAiEntity>((Map<String, dynamic> e) =>
+          DeviceDetailAiEntity.fromJson(e)).toList() as M;
+    }
+    if (<DeviceDetailAiData>[] is M) {
+      return data.map<DeviceDetailAiData>((Map<String, dynamic> e) =>
+          DeviceDetailAiData.fromJson(e)).toList() as M;
+    }
+    if (<DeviceDetailCameraEntity>[] is M) {
+      return data.map<DeviceDetailCameraEntity>((Map<String, dynamic> e) =>
+          DeviceDetailCameraEntity.fromJson(e)).toList() as M;
+    }
+    if (<DeviceDetailCameraData>[] is M) {
+      return data.map<DeviceDetailCameraData>((Map<String, dynamic> e) =>
+          DeviceDetailCameraData.fromJson(e)).toList() as M;
+    }
+    if (<DeviceDetailCameraDataPhoto>[] is M) {
+      return data.map<DeviceDetailCameraDataPhoto>((Map<String, dynamic> e) =>
+          DeviceDetailCameraDataPhoto.fromJson(e)).toList() as M;
+    }
+    if (<DeviceDetailExchangeEntity>[] is M) {
+      return data.map<DeviceDetailExchangeEntity>((Map<String, dynamic> e) =>
+          DeviceDetailExchangeEntity.fromJson(e)).toList() as M;
+    }
+    if (<DeviceDetailExchangeData>[] is M) {
+      return data.map<DeviceDetailExchangeData>((Map<String, dynamic> e) =>
+          DeviceDetailExchangeData.fromJson(e)).toList() as M;
+    }
+    if (<DeviceDetailNvrEntity>[] is M) {
+      return data.map<DeviceDetailNvrEntity>((Map<String, dynamic> e) =>
+          DeviceDetailNvrEntity.fromJson(e)).toList() as M;
+    }
+    if (<DeviceDetailNvrData>[] is M) {
+      return data.map<DeviceDetailNvrData>((Map<String, dynamic> e) =>
+          DeviceDetailNvrData.fromJson(e)).toList() as M;
+    }
+    if (<DeviceDetailNvrDataChannels>[] is M) {
+      return data.map<DeviceDetailNvrDataChannels>((Map<String, dynamic> e) =>
+          DeviceDetailNvrDataChannels.fromJson(e)).toList() as M;
+    }
+    if (<DeviceDetailPowerBoxEntity>[] is M) {
+      return data.map<DeviceDetailPowerBoxEntity>((Map<String, dynamic> e) =>
+          DeviceDetailPowerBoxEntity.fromJson(e)).toList() as M;
+    }
+    if (<DeviceDetailPowerBoxData>[] is M) {
+      return data.map<DeviceDetailPowerBoxData>((Map<String, dynamic> e) =>
+          DeviceDetailPowerBoxData.fromJson(e)).toList() as M;
+    }
+    if (<DeviceDetailPowerBoxDataDcInterfaces>[] is M) {
+      return data.map<DeviceDetailPowerBoxDataDcInterfaces>((
+          Map<String, dynamic> e) =>
+          DeviceDetailPowerBoxDataDcInterfaces.fromJson(e)).toList() as M;
+    }
+    if (<DeviceDetailPowerEntity>[] is M) {
+      return data.map<DeviceDetailPowerEntity>((Map<String, dynamic> e) =>
+          DeviceDetailPowerEntity.fromJson(e)).toList() as M;
+    }
+    if (<DeviceDetailPowerData>[] is M) {
+      return data.map<DeviceDetailPowerData>((Map<String, dynamic> e) =>
+          DeviceDetailPowerData.fromJson(e)).toList() as M;
+    }
+    if (<DeviceEntity>[] is M) {
+      return data.map<DeviceEntity>((Map<String, dynamic> e) =>
+          DeviceEntity.fromJson(e)).toList() as M;
+    }
     if (<HomePageData>[] is M) {
       return data.map<HomePageData>((Map<String, dynamic> e) =>
           HomePageData.fromJson(e)).toList() as M;
@@ -282,6 +354,27 @@ class JsonConvertClassCollection {
     (LinkKageType).toString(): LinkKageType.fromJson,
     (LocationData).toString(): LocationData.fromJson,
     (NameValue).toString(): NameValue.fromJson,
+    (DeviceDetailAiEntity).toString(): DeviceDetailAiEntity.fromJson,
+    (DeviceDetailAiData).toString(): DeviceDetailAiData.fromJson,
+    (DeviceDetailCameraEntity).toString(): DeviceDetailCameraEntity.fromJson,
+    (DeviceDetailCameraData).toString(): DeviceDetailCameraData.fromJson,
+    (DeviceDetailCameraDataPhoto).toString(): DeviceDetailCameraDataPhoto
+        .fromJson,
+    (DeviceDetailExchangeEntity).toString(): DeviceDetailExchangeEntity
+        .fromJson,
+    (DeviceDetailExchangeData).toString(): DeviceDetailExchangeData.fromJson,
+    (DeviceDetailNvrEntity).toString(): DeviceDetailNvrEntity.fromJson,
+    (DeviceDetailNvrData).toString(): DeviceDetailNvrData.fromJson,
+    (DeviceDetailNvrDataChannels).toString(): DeviceDetailNvrDataChannels
+        .fromJson,
+    (DeviceDetailPowerBoxEntity).toString(): DeviceDetailPowerBoxEntity
+        .fromJson,
+    (DeviceDetailPowerBoxData).toString(): DeviceDetailPowerBoxData.fromJson,
+    (DeviceDetailPowerBoxDataDcInterfaces)
+        .toString(): DeviceDetailPowerBoxDataDcInterfaces.fromJson,
+    (DeviceDetailPowerEntity).toString(): DeviceDetailPowerEntity.fromJson,
+    (DeviceDetailPowerData).toString(): DeviceDetailPowerData.fromJson,
+    (DeviceEntity).toString(): DeviceEntity.fromJson,
     (HomePageData).toString(): HomePageData.fromJson,
     (OnePictureData).toString(): OnePictureData.fromJson,
     (UserInfoData).toString(): UserInfoData.fromJson,

@@ -3,6 +3,7 @@ import 'package:kayo_package/extension/_index_extension.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/home/home_page/device_entity.dart';
 import 'package:omt/page/home/search_device/view_models/search_device_viewmodel.dart';
+import 'package:omt/utils/device_utils.dart';
 import '../../../../utils/color_utils.dart';
 
 class DeviceListView extends StatefulWidget {
@@ -78,7 +79,7 @@ class _DeviceListViewState extends State<DeviceListView> {
                       children: [
                         Expanded(
                           child: LinearProgressIndicator(
-                            value: model.scanRateValue == 1 ? 1 : null,
+                            value: model.searchState == DeviceSearchState.completed ? 1 : null,
                             // 进度值，0.5表示50%
                             backgroundColor: "#676B6B".toColor(),
                             // 进度条的背景颜色
@@ -90,7 +91,7 @@ class _DeviceListViewState extends State<DeviceListView> {
                           ),
                         ),
                         Visibility(
-                          visible: model.scanRateValue == 1.0,
+                          visible: model.searchState == DeviceSearchState.completed,
                           child: ImageView(
                             src: source("home/ic_complete"),
                             width: 20,
@@ -138,7 +139,7 @@ class _DeviceListViewState extends State<DeviceListView> {
               child: deviceShowList1(model.deviceScanData),
             ),
           ),
-          if(model.deviceNoBindingData.isNotEmpty)...[
+          if (model.deviceNoBindingData.isNotEmpty) ...[
             const SizedBox(height: 10),
             Expanded(
               flex: 5,
@@ -198,7 +199,7 @@ class _DeviceListViewState extends State<DeviceListView> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Text(
-            "您可以通过选择实例或扫描设备查看同一局域网内的设备",
+            "您可以通过先选择实例，再扫描设备，查看同一局域网内的所选实例绑定的设备",
             style: TextStyle(
               color: Color(0xFFA7C3C2),
               fontSize: 12,
@@ -208,8 +209,8 @@ class _DeviceListViewState extends State<DeviceListView> {
           const SizedBox(height: 10),
           TextView(
             "扫描设备",
-            bgColor: ColorUtils.colorGreen,
-            color: BaseColorUtils.white,
+            bgColor: model.selectedInstance != null ? ColorUtils.colorGreen : ColorUtils.colorGreen.withOpacity(0.2) ,
+            color: model.selectedInstance != null ? BaseColorUtils.white : BaseColorUtils.white.withOpacity(0.2) ,
             textDarkOnlyOpacity: true,
             textAlign: TextAlign.center,
             padding: const EdgeInsets.symmetric(
@@ -217,14 +218,15 @@ class _DeviceListViewState extends State<DeviceListView> {
               vertical: 6,
             ),
             radius: 0,
-            onTap: () {
+            onTap:model.selectedInstance != null ? () {
               model.scanStartEventAction();
-            },
+            } : null,
           ),
         ],
       ),
     );
   }
+
 //显示图片
   Widget deviceShowList1(List<DeviceEntity> deviceData) {
     return GridView.builder(
@@ -244,7 +246,9 @@ class _DeviceListViewState extends State<DeviceListView> {
               SizedBox(height: 8),
               Expanded(
                 flex: 5,
-                child: ImageView(src: source('home/ic_device')),
+                child: ImageView(
+                    src: source(DeviceUtils.getDeviceImage(
+                        deviceData[index].deviceTypeText ?? ""))),
               ),
               SizedBox(height: 4),
               Expanded(
@@ -253,8 +257,7 @@ class _DeviceListViewState extends State<DeviceListView> {
                   fit: BoxFit.contain,
                   child: Text(
                     deviceData[index].deviceTypeText ?? "-",
-                    style:
-                    const TextStyle(color: ColorUtils.colorWhite),
+                    style: const TextStyle(color: ColorUtils.colorWhite),
                   ),
                 ),
               ),
@@ -279,5 +282,3 @@ class _DeviceListViewState extends State<DeviceListView> {
     );
   }
 }
-
-

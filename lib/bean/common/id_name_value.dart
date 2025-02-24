@@ -82,6 +82,6 @@ class IdNameValue {
 
   @override
   String toString() {
-    return jsonEncode(this);
+    return name ?? "";
   }
 }

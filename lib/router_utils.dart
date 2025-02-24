@@ -2,7 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:kayo_package/views/common/404.dart';
 import 'package:omt/page/home/bind_device/widgets/bind_device_screen.dart';
 import 'package:omt/page/home/device_add/widgets/device_add_screen.dart';
+import 'package:omt/page/home/device_detail/widgets/device_detail_screen.dart';
 import 'package:omt/page/home/home/home_page.dart';
+import 'package:omt/page/home/photo_detail/widgets/photo_detail_screen.dart';
+import 'package:omt/page/home/photo_preview/widgets/photo_preview_screen.dart';
 import 'package:omt/page/user/launcher/launcher_page.dart';
 import 'package:omt/page/user/nav/navi_page.dart';
 import 'package:omt/page/user/user_login/user_login_page.dart';
@@ -71,6 +74,15 @@ class RouterPage {
 
   ///设备添加
   static const String DeviceAddPage = 'DeviceAddPage';
+
+  ///设备详情
+  static const String DeviceDetailScreen = 'DeviceDetailScreen';
+
+  ///图片预览
+  static const String PhotoPreviewScreen = 'PhotoPreviewScreen';
+
+  ///照片预览详情
+  static const String PhotoDetailScreen = 'PhotoDetailScreen';
 
   ///ReplaceRouterPageDefine
 }
@@ -168,6 +180,29 @@ Route<dynamic> generateRoute(RouteSettings settings, {uniqueId}) {
               id: arguments["id"],
               deviceType: arguments["type"],
             );
+          });
+
+    case RouterPage.DeviceDetailScreen:
+      return CupertinoPageRoute(
+          settings: settings,
+          builder: (context) {
+            return DeviceDetailScreen(
+              viewModel: arguments["data"],
+            );
+          });
+
+    case RouterPage.PhotoPreviewScreen:
+      return CupertinoPageRoute(
+          settings: settings,
+          builder: (context) {
+            return PhotoPreviewScreen();
+          });
+
+      case RouterPage.PhotoDetailScreen:
+      return CupertinoPageRoute(
+          settings: settings,
+          builder: (context) {
+            return PhotoDetailScreen();
           });
 
     ///ReplaceRouterGenerateRoute

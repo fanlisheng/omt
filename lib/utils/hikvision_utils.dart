@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
@@ -15,10 +16,12 @@ Future<Map<String, String>?> hkIsapiInit(String ipAddress) async {
     "Connection": "Keep-Alive",
   };
 
-  final response = await http.get(
-    Uri.parse('http://$ipAddress:80/ISAPI/Security/userCheck'),
-    headers: headers,
-  ).timeout(const Duration(seconds: 3));
+  final response = await http
+      .get(
+        Uri.parse('http://$ipAddress:80/ISAPI/Security/userCheck'),
+        headers: headers,
+      )
+      .timeout(const Duration(seconds: 3));
 
   final authenticate = response.headers['www-authenticate'];
   if (authenticate == null) {
@@ -76,7 +79,6 @@ Future<DeviceEntity?> hikvisionDeviceInfo({
   // required String username,
   // required String password,
 }) async {
-
   final authData = await hkIsapiInit(ipAddress);
   if (authData == null) {
     print('Auth data ip: $ipAddress'); // 打印授权数据，确保初始化正常
@@ -95,10 +97,12 @@ Future<DeviceEntity?> hikvisionDeviceInfo({
   );
 
   try {
-    final response = await http.get(
-      Uri.parse('http://$ipAddress:80/ISAPI/System/deviceInfo'),
-      headers: headers,
-    );
+    final response = await http
+        .get(
+          Uri.parse('http://$ipAddress:80/ISAPI/System/deviceInfo'),
+          headers: headers,
+        )
+        .timeout(const Duration(seconds: 1));
 
     if (response.statusCode == 200) {
       print('Response: ${response.body}');
@@ -107,6 +111,9 @@ Future<DeviceEntity?> hikvisionDeviceInfo({
       print('Failed to load data: ${response.statusCode}');
       return null;
     }
+  } on TimeoutException catch (_) {
+    print('Request timed out for IP $ipAddress');
+    return null;
   } catch (e) {
     print('Error in hikvisionDeviceInfo for IP $ipAddress: $e');
     return null;

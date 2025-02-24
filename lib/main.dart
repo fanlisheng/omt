@@ -10,7 +10,7 @@ import 'package:media_kit/media_kit.dart';
 import 'package:network_tools/network_tools.dart';
 import 'package:omt/http/api.dart';
 import 'package:omt/router_utils.dart';
-import 'package:omt/test.dart';
+import 'package:omt/test/test.dart';
 import 'package:omt/theme.dart';
 import 'package:omt/utils/color_utils.dart';
 import 'package:omt/utils/intent_utils.dart';
@@ -80,7 +80,7 @@ void main() async {
         // await windowManager.setTitle('');
       }
 
-      await windowManager.setMinimumSize(const Size(800, 600));
+      await windowManager.setMinimumSize(const Size(1050, 716));
       await windowManager.show();
       await windowManager.center(animate: true);
       await windowManager.setPreventClose(true);
@@ -88,6 +88,13 @@ void main() async {
       await windowManager.setMovable(true);
     });
   }
+
+  API.share.init();
+
+
+  // Widget appPage = const MyApp();
+  // runApp(appPage);
+  // return;
 
   if (PlatformUtils.isAndroid || PlatformUtils.isIOS) {
     runMockApp(KeyboardRootWidget(child: homePage));

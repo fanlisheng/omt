@@ -16,7 +16,7 @@ class SecondStepView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     switch (model.deviceType) {
-      case DeviceType.port:
+      case DeviceType.power:
         return Container();
       case DeviceType.ai:
       case DeviceType.camera:

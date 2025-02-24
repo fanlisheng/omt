@@ -6,6 +6,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:omt/http/service/home/home_page/home_page_service.dart';
 import 'package:omt/page/home/bind_device/widgets/bind_device_screen.dart';
+import 'package:omt/page/home/device_detail/view_models/device_detail_viewmodel.dart';
+import 'package:omt/page/home/device_detail/widgets/device_detail_screen.dart';
 import 'package:omt/page/home/home/home_page.dart';
 import 'package:omt/page/home/search_device/widgets/search_device_screen.dart';
 import 'package:omt/page/user/user_login/user_login_page.dart';
@@ -18,30 +20,38 @@ import 'routes.dart';
 ///
 /// Listens to changes in [AuthTokenRepository] to redirect the user
 /// to /login when the user logs out.
-GoRouter router() => GoRouter(
-  initialLocation: Routes.home, // 设置初始路由
-  routes: [
-    GoRoute(
-      path: Routes.login,
-      builder: (context, state) => const UserLoginPage(),
-    ),
-    GoRoute(
-      path: Routes.home,
-      builder: (context, state) => const SearchDeviceScreen(), // NavigationPane 包裹的页面
-      routes: [
-        GoRoute(
-          path: Routes.bindDevice,
-          builder: (context, state) {
-            // 接收参数
-            final deviceData = state.extra as List<DeviceEntity>? ?? [];
-            return BindDeviceScreen(deviceData: deviceData);
-          },
-        ),
-      ],
-    ),
-  ],
-);
-
+// GoRouter router() => GoRouter(
+//       initialLocation: Routes.home, // 设置初始路由
+//       routes: [
+//         GoRoute(
+//           path: Routes.login,
+//           builder: (context, state) => const UserLoginPage(),
+//         ),
+//         GoRoute(
+//           path: Routes.home,
+//           builder: (context, state) => const SearchDeviceScreen(),
+//           // NavigationPane 包裹的页面
+//           routes: [
+//             GoRoute(
+//               path: Routes.deviceBind,
+//               builder: (context, state) {
+//                 // 接收参数
+//                 final deviceData = state.extra as List<DeviceEntity>? ?? [];
+//                 return BindDeviceScreen(deviceData: deviceData);
+//               },
+//             ),
+//             GoRoute(
+//               path: Routes.deviceDetail,
+//               builder: (context, state) {
+//                 final deviceDetailViewModel =
+//                     state.extra as DeviceDetailViewModel;
+//                 return DeviceDetailScreen(viewModel: deviceDetailViewModel);
+//               },
+//             ),
+//           ],
+//         ),
+//       ],
+//     );
 
 // From https://github.com/flutter/packages/blob/main/packages/go_router/example/lib/redirection.dart
 // Future<String?> _redirect(BuildContext context, GoRouterState state) async {

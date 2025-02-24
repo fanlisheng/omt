@@ -3,6 +3,7 @@ import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
 import 'package:omt/routing/routes.dart';
 
 import '../../../../bean/home/home_page/device_entity.dart';
+import '../../../../http/http_query.dart';
 
 enum BindDevicePageState {
   idle, // 空闲状态，没有请求
@@ -94,5 +95,10 @@ class BindDeviceViewModel extends BaseViewModelRefresh<dynamic> {
   goBackEventAction() {}
 
   //手动绑定
-  handBindingEventAction() {}
+  handBindingEventAction() {
+    HttpQuery.share.homePageService.bindGate(1,1,deviceData,onSuccess: (m){
+
+    });
+
+  }
 }

@@ -37,7 +37,7 @@ class ThirdFourStepView extends StatelessWidget {
     print(
         'contentView : stepNumber = ${model.stepNumber}, deviceType = ${model.deviceType}');
     switch (model.deviceType) {
-      case DeviceType.port:
+      case DeviceType.power:
         return Container();
       case DeviceType.ai:
       case DeviceType.camera:

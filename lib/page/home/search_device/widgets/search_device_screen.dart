@@ -37,16 +37,16 @@ class SearchDeviceScreen extends StatelessWidget {
                   FilterView(viewModel: model),
                   // 中间扫描按钮部分
                   Expanded(
-                    child:
-                    DeviceListView(viewModel: model),
+                    child: DeviceListView(viewModel: model),
                   ),
                   // 底部统计栏部分
                   Container(
                     height: 40,
-                    margin: const EdgeInsets.only(left: 20,right: 20,bottom: 15),
+                    margin:
+                        const EdgeInsets.only(left: 20, right: 20, bottom: 15),
                     color: const Color(0xFF4E5353), // 深灰色背景
                     child: Row(
-                      children:  [
+                      children: [
                         const SizedBox(width: 16),
                         const Text(
                           '设备统计：',
@@ -54,7 +54,9 @@ class SearchDeviceScreen extends StatelessWidget {
                         ),
                         Text(
                           model.deviceStatistics,
-                          style: const TextStyle(color: ColorUtils.colorGreen,),
+                          style: const TextStyle(
+                            color: ColorUtils.colorGreen,
+                          ),
                         ),
                       ],
                     ),

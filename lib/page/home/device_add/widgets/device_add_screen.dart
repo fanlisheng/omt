@@ -93,7 +93,7 @@ class DeviceAddScreen extends StatelessWidget {
 
   Widget contentView(DeviceAddViewModel model) {
     //如果是电源信息
-    if (model.deviceType == DeviceType.port) {
+    if (model.deviceType == DeviceType.power) {
       return portView(model);
     } else {
       switch (model.stepNumber) {

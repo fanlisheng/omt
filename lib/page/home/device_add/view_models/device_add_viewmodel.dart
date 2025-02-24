@@ -6,7 +6,7 @@ import 'package:omt/page/home/device_add/view_models/third_step_viewmodel.dart';
 import 'package:omt/utils/log_utils.dart';
 
 enum DeviceType {
-  port, // 电源
+  power, // 电源
   ai, // ai
   camera, //摄像头
   nvr,

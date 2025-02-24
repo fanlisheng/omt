@@ -30,6 +30,7 @@ dependencies:
   go_router: ^14.6.3
   file_picker: ^8.0.0+1
   file_selector: ^1.0.3
+  flutter_markdown: ^0.6.13
 
   flutter_acrylic: ^1.1.3 #只支持桌面
   window_manager: ^0.3.8 #只支持桌面

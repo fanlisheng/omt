@@ -7,6 +7,7 @@ import 'package:omt/page/home/device_add/widgets/second_step_view.dart';
 import 'package:omt/utils/color_utils.dart';
 
 import '../../../../bean/home/home_page/device_entity.dart';
+import '../../device_detail/widgets/detail_ai_view.dart';
 import '../view_models/add_ai_viewmodel.dart';
 import '../view_models/device_add_viewmodel.dart';
 
@@ -195,34 +196,34 @@ class AddAiView extends StatelessWidget {
   }
 }
 
-class RowItemInfoView extends StatelessWidget {
-  const RowItemInfoView({
-    super.key,
-    required this.name,
-    this.value,
-  });
-
-  final String name;
-  final String? value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      flex: 1,
-      child: Row(
-        children: [
-          Text(
-            name,
-            style: TextStyle(color: "A7C3C2".toColor(), fontSize: 12),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            value ?? "无",
-            style: const TextStyle(
-                color: ColorUtils.colorGreenLiteLite, fontSize: 12),
-          ),
-        ],
-      ),
-    );
-  }
-}
+// class RowItemInfoView extends StatelessWidget {
+//   const RowItemInfoView({
+//     super.key,
+//     required this.name,
+//     this.value,
+//   });
+//
+//   final String name;
+//   final String? value;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Expanded(
+//       flex: 1,
+//       child: Row(
+//         children: [
+//           Text(
+//             name,
+//             style: TextStyle(color: "A7C3C2".toColor(), fontSize: 12),
+//           ),
+//           const SizedBox(width: 8),
+//           Text(
+//             value ?? "无",
+//             style: const TextStyle(
+//                 color: ColorUtils.colorGreenLiteLite, fontSize: 12),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }

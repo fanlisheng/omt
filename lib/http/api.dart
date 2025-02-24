@@ -31,7 +31,7 @@ class API extends BaseAPI {
   }
 
   @override
-  bool get isEnv => false;
+  bool get isEnv => true;
 
   @override
   init() async {
@@ -44,7 +44,7 @@ class API extends BaseAPI {
         ? 'http://183.224.113.211:8003/'
         // ? 'http://192.168.101.184:8001/'
         // : 'http://221.237.108.38:8043/'
-        : 'http://192.168.101.184:8001/');
+        : 'http://192.168.101.131:8080/');
 
     await SharedUtils.setHostWeb(isEnv == false
         ? 'http://183.224.113.211:9001/'
