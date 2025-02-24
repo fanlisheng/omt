@@ -22,7 +22,8 @@ import '../../device_add/view_models/device_add_viewmodel.dart';
 import '../view_models/detail_camera_viewmodel.dart';
 
 class DetailCameraView extends StatelessWidget {
-  const DetailCameraView({super.key});
+  final String nodeCode;
+  const DetailCameraView({super.key, required this.nodeCode});
 
   // final AddCameraViewModel model;
   // const AddCameraView(this.model, {super.key});
@@ -30,7 +31,7 @@ class DetailCameraView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<DetailCameraViewModel>(
-        model: DetailCameraViewModel()..themeNotifier = true,
+        model: DetailCameraViewModel(nodeCode)..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
           return cameraView(context, model);

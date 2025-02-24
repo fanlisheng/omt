@@ -10,9 +10,8 @@ import '../../../../http/http_query.dart';
 import '../../device_add/view_models/device_add_viewmodel.dart';
 
 class DetailAiViewModel extends BaseViewModelRefresh<dynamic> {
-  // Function()? subNotifyListeners;
-
-  // AiAddViewModel({this.subNotifyListeners});
+  final String nodeCode;
+  DetailAiViewModel(this.nodeCode);
 
   DeviceDetailAiData deviceInfo = DeviceDetailAiData();
 
@@ -20,7 +19,7 @@ class DetailAiViewModel extends BaseViewModelRefresh<dynamic> {
   void initState() async {
     super.initState();
     HttpQuery.share.homePageService.deviceDetailAi(
-        nodeCode: "562#6175-2#2-4#1",
+        nodeCode: nodeCode,
         onSuccess: (DeviceDetailAiData? a) {
           deviceInfo = a ?? DeviceDetailAiData();
           notifyListeners();

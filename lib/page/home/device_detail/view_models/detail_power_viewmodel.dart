@@ -9,10 +9,8 @@ import '../../../../http/http_query.dart';
 import '../../device_add/view_models/device_add_viewmodel.dart';
 
 class DetailPowerViewModel extends BaseViewModelRefresh<dynamic> {
-  // Function()? subNotifyListeners;
-
-  // AiAddViewModel({this.subNotifyListeners});
-
+  final String nodeCode;
+  DetailPowerViewModel(this.nodeCode);
 
   DeviceDetailPowerData deviceInfo = DeviceDetailPowerData();
 
@@ -20,7 +18,7 @@ class DetailPowerViewModel extends BaseViewModelRefresh<dynamic> {
   void initState() async {
     super.initState();
     HttpQuery.share.homePageService.deviceDetailPower(
-        nodeCode: "562#6175-2#2-4#1",
+        nodeCode: nodeCode,
         onSuccess: (DeviceDetailPowerData? a) {
           deviceInfo = a ?? DeviceDetailPowerData();
           notifyListeners();

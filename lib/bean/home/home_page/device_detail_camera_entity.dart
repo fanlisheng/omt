@@ -42,7 +42,7 @@ class DeviceDetailCameraData {
 	@JSONField(name: "camera_code")
 	String? cameraCode;
 	@JSONField(name: "camera_status")
-	List<DeviceDetailCameraDataPhoto>? cameraStatus;
+	List<String>? cameraStatus;
 	@JSONField(name: "last_bg_photos")
 	List<DeviceDetailCameraDataPhoto>? lastBgPhotos;
 	@JSONField(name: "last_snap_photos")

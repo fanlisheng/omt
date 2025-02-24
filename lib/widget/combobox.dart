@@ -11,6 +11,7 @@ class FComboBox<T> extends StatelessWidget {
   final TextStyle? itemStyle;
   final TextStyle? placeholderStyle;
   final Color? bgColor;
+  final bool disabled;
 
   const FComboBox({
     super.key,
@@ -21,46 +22,46 @@ class FComboBox<T> extends StatelessWidget {
     this.itemStyle,
     this.placeholderStyle,
     this.bgColor,
+    this.disabled = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color:  bgColor ?? ColorUtils.transparent, // 动态设置背景颜色
-        borderRadius: BorderRadius.circular(4.0),
-      ),
-      child: ui.ComboBox<T>(
-        isExpanded: true,
-        value: selectedValue,
-        items: items
-            .map<ui.ComboBoxItem<T>>(
-              (item) => ui.ComboBoxItem<T>(
-            value: item,
-            child: Text(
-              item.toString(),
-              textAlign: TextAlign.start,
-              style: itemStyle ??
-                  const TextStyle(
-                    fontSize: 12,
-                    // color: ColorUtils.colorGreenLiteLite,
-                  ),
-            ),
-          ),
-        )
-            .toList(),
-        onChanged: onChanged,
-        placeholder: Text(
-          placeholder,
-          textAlign: TextAlign.start,
-          style: placeholderStyle ??
-              const TextStyle(
-                fontSize: 12,
-                // color: ColorUtils.colorBlackLiteLite,
-              ),
+        decoration: BoxDecoration(
+          color: bgColor ?? ColorUtils.transparent, // 动态设置背景颜色
+          borderRadius: BorderRadius.circular(4.0),
         ),
-      )
-    );
+        child: ui.ComboBox<T>(
+          isExpanded: true,
+          value: selectedValue,
+          items: items
+              .map<ui.ComboBoxItem<T>>(
+                (item) => ui.ComboBoxItem<T>(
+                  value: item,
+                  child: Text(
+                    item.toString(),
+                    textAlign: TextAlign.start,
+                    style: itemStyle ??
+                        const TextStyle(
+                          fontSize: 12,
+                          // color: ColorUtils.colorGreenLiteLite,
+                        ),
+                  ),
+                ),
+              )
+              .toList(),
+          onChanged: disabled ? null : onChanged,
+          placeholder: Text(
+            placeholder,
+            textAlign: TextAlign.start,
+            style: placeholderStyle ??
+                const TextStyle(
+                  fontSize: 12,
+                  // color: ColorUtils.colorBlackLiteLite,
+                ),
+          ),
+        ));
   }
 }
 

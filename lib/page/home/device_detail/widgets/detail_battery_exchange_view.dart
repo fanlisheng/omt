@@ -9,16 +9,14 @@ import '../view_models/detail_battery_exchange_viewmodel.dart';
 import 'detail_ai_view.dart';
 
 class DetailBatteryExchangeView extends StatelessWidget {
+  final String nodeCode;
 
-  const DetailBatteryExchangeView(
-      {super.key});
+  const DetailBatteryExchangeView({super.key, required this.nodeCode});
 
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<DetailBatteryExchangeViewModel>(
-        model: DetailBatteryExchangeViewModel(
-            )
-          ..themeNotifier = true,
+        model: DetailBatteryExchangeViewModel(nodeCode)..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
           return contentView(model);
@@ -50,24 +48,31 @@ class DetailBatteryExchangeView extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  RowItemInfoView(name: "实例", value: model.deviceInfo.instanceName),
-                  RowItemInfoView(name: "大门编号", value: model.deviceInfo.gateName),
+                  RowItemInfoView(
+                      name: "实例", value: model.deviceInfo.instanceName),
+                  RowItemInfoView(
+                      name: "大门编号", value: model.deviceInfo.gateName),
                 ],
               ),
               const SizedBox(height: 12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  RowItemInfoView(name: "进/出口", value: model.deviceInfo.passName),
-                  RowItemInfoView(name: "标签", value: model.deviceInfo.labelName),
+                  RowItemInfoView(
+                      name: "进/出口", value: model.deviceInfo.passName),
+                  RowItemInfoView(
+                      name: "标签", value: model.deviceInfo.labelName),
                 ],
               ),
               const SizedBox(height: 12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  RowItemInfoView(name: "交换机接口数量", value: "${model.deviceInfo.interfaceNum}"),
-                  RowItemInfoView(name: "交换机供电方式", value: model.deviceInfo.powerMethod),
+                  RowItemInfoView(
+                      name: "交换机接口数量",
+                      value: "${model.deviceInfo.interfaceNum}"),
+                  RowItemInfoView(
+                      name: "交换机供电方式", value: model.deviceInfo.powerMethod),
                 ],
               ),
               const SizedBox(height: 12),
@@ -77,5 +82,4 @@ class DetailBatteryExchangeView extends StatelessWidget {
       ],
     );
   }
-
 }

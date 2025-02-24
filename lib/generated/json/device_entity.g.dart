@@ -66,3 +66,45 @@ extension DeviceEntityExtension on DeviceEntity {
       ..selected = selected ?? this.selected;
   }
 }
+
+DeviceScanEntity $DeviceScanEntityFromJson(Map<String, dynamic> json) {
+  final DeviceScanEntity deviceScanEntity = DeviceScanEntity();
+  final String? instanceId = jsonConvert.convert<String>(json['instance_id']);
+  if (instanceId != null) {
+    deviceScanEntity.instanceId = instanceId;
+  }
+  final List<DeviceEntity>? devices = (json['devices'] as List<dynamic>?)?.map(
+          (e) => jsonConvert.convert<DeviceEntity>(e) as DeviceEntity).toList();
+  if (devices != null) {
+    deviceScanEntity.devices = devices;
+  }
+  final List<DeviceEntity>? unboundDevices = (json['unbound_devices'] as List<
+      dynamic>?)?.map(
+          (e) => jsonConvert.convert<DeviceEntity>(e) as DeviceEntity).toList();
+  if (unboundDevices != null) {
+    deviceScanEntity.unboundDevices = unboundDevices;
+  }
+  return deviceScanEntity;
+}
+
+Map<String, dynamic> $DeviceScanEntityToJson(DeviceScanEntity entity) {
+  final Map<String, dynamic> data = <String, dynamic>{};
+  data['instance_id'] = entity.instanceId;
+  data['devices'] = entity.devices?.map((v) => v.toJson()).toList();
+  data['unbound_devices'] =
+      entity.unboundDevices?.map((v) => v.toJson()).toList();
+  return data;
+}
+
+extension DeviceScanEntityExtension on DeviceScanEntity {
+  DeviceScanEntity copyWith({
+    String? instanceId,
+    List<DeviceEntity>? devices,
+    List<DeviceEntity>? unboundDevices,
+  }) {
+    return DeviceScanEntity()
+      ..instanceId = instanceId ?? this.instanceId
+      ..devices = devices ?? this.devices
+      ..unboundDevices = unboundDevices ?? this.unboundDevices;
+  }
+}

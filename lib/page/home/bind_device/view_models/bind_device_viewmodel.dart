@@ -42,6 +42,7 @@ class BindDeviceViewModel extends BaseViewModelRefresh<dynamic> {
     'Balinese',
     'Bambino',
   ];
+
   //页面状态
   BindDevicePageState pageState = BindDevicePageState.idle;
 
@@ -96,9 +97,7 @@ class BindDeviceViewModel extends BaseViewModelRefresh<dynamic> {
 
   //手动绑定
   handBindingEventAction() {
-    HttpQuery.share.homePageService.bindGate(1,1,deviceData,onSuccess: (m){
-
-    });
-
+    HttpQuery.share.homePageService.bindGate(
+        instanceId: 1, gateId: 1, deviceList: deviceData, onSuccess: (m) {});
   }
 }

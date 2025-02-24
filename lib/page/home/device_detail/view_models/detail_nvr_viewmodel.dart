@@ -9,9 +9,9 @@ import '../../../../http/http_query.dart';
 import '../../device_add/view_models/device_add_viewmodel.dart';
 
 class DetailNvrViewModel extends BaseViewModelRefresh<dynamic> {
-  // Function()? subNotifyListeners;
+  final String nodeCode;
 
-  // AiAddViewModel({this.subNotifyListeners});
+  DetailNvrViewModel(this.nodeCode);
 
   DeviceDetailNvrData deviceInfo = DeviceDetailNvrData();
 
@@ -19,7 +19,7 @@ class DetailNvrViewModel extends BaseViewModelRefresh<dynamic> {
   void initState() async {
     super.initState();
     HttpQuery.share.homePageService.deviceDetailNvr(
-        nodeCode: "562#6175-2#2-4#1",
+        nodeCode: nodeCode,
         onSuccess: (DeviceDetailNvrData? a) {
           deviceInfo = a ?? DeviceDetailNvrData();
 

@@ -35,7 +35,9 @@ class HomePageService {
 
   get _instanceList => '${API.share.host}api/entity/instance/list';
 
-  get _gateList => '${API.share.host}/api/gate/list';
+  get _gateList => '${API.share.host}api/entity/gate/list';
+
+  get _inOutList => '${API.share.host}api/entity/pass/list';
 
   get _deviceScan => '${API.share.host}api/device/scan';
 
@@ -53,7 +55,8 @@ class HomePageService {
 
   get _deviceDetailCamera => '${API.share.host}api/device/camera/detail';
 
-  getInstanceList(String areaCode, {
+  getInstanceList(
+    String areaCode, {
     required ValueChanged<List<IdNameValue>?>? onSuccess,
     ValueChanged<List<IdNameValue>?>? onCache,
     ValueChanged<String>? onError,
@@ -88,15 +91,32 @@ class HomePageService {
     );
   }
 
+  getInOutList({
+    required ValueChanged<List<IdNameValue>?>? onSuccess,
+    ValueChanged<List<IdNameValue>?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<List<IdNameValue>>(
+      await _inOutList,
+      {},
+      method: 'GET',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
   deviceScan({
     required String instanceId,
     required List<DeviceEntity> deviceList,
-    required ValueChanged<List<DeviceEntity>?>? onSuccess,
-    ValueChanged<List<DeviceEntity>?>? onCache,
+    required ValueChanged<DeviceScanEntity?>? onSuccess,
+    ValueChanged<DeviceScanEntity?>? onCache,
     ValueChanged<String>? onError,
   }) async {
     List devices = [];
-    for (DeviceEntity device in deviceList){
+    for (DeviceEntity device in deviceList) {
       devices.add({
         "device_type": device.deviceType ?? 0,
         "ip": device.ip ?? "",
@@ -105,7 +125,7 @@ class HomePageService {
       });
     }
 
-    HttpManager.share.doHttpPost<List<DeviceEntity>>(
+    HttpManager.share.doHttpPost<DeviceScanEntity>(
       await _deviceScan,
       {"instance_id": instanceId, "devices": devices},
       method: 'POST',
@@ -117,13 +137,23 @@ class HomePageService {
     );
   }
 
-  bindGate(int instanceId,
-      int gateId,
-      List<DeviceEntity> deviceList, {
-        required ValueChanged<CodeMessageData?> onSuccess,
-        ValueChanged<CodeMessageData?>? onCache,
-        ValueChanged<String>? onError,
-      }) async {
+  bindGate({
+    required int instanceId,
+    required int gateId,
+    required List<DeviceEntity> deviceList,
+    required ValueChanged<CodeMessageData?> onSuccess,
+    ValueChanged<CodeMessageData?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    List devices = [];
+    for (DeviceEntity device in deviceList) {
+      devices.add({
+        "device_type": device.deviceType ?? 0,
+        "ip": device.ip ?? "",
+        "device_code": device.deviceCode ?? "",
+        "mac": device.mac ?? ""
+      });
+    }
     HttpManager.share.doHttpPost<CodeMessageData>(
       await _bindGate,
       {"instance_id": instanceId, "gate_id": gateId, "devices": deviceList},

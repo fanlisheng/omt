@@ -12,14 +12,15 @@ import '../../device_add/view_models/device_add_viewmodel.dart';
 import '../view_models/detail_ai_viewmodel.dart';
 
 class DetailAiView extends StatelessWidget {
+  final String nodeCode;
   const DetailAiView({
-    super.key,
+    super.key, required this.nodeCode,
   });
 
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<DetailAiViewModel>(
-        model: DetailAiViewModel()..themeNotifier = true,
+        model: DetailAiViewModel(nodeCode)..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
           return aiView(model);

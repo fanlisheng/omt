@@ -28,6 +28,7 @@ class _FilterViewState extends State<FilterView> {
   }
 
   Container buildContainer(SearchDeviceViewModel model, BuildContext context2) {
+    bool disabled = model.searchState == DeviceSearchState.searching;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       height: 34,
@@ -145,6 +146,7 @@ class _FilterViewState extends State<FilterView> {
               child: FComboBox<IdNameValue>(
                   selectedValue: model.selectedDoor,
                   items: model.doorList,
+                  disabled: disabled,
                   onChanged: (a) {
                     model.selectedDoor = a;
                     model.notifyListeners();
@@ -168,6 +170,7 @@ class _FilterViewState extends State<FilterView> {
               child: FComboBox<IdNameValue>(
                   selectedValue: model.selectedInOut,
                   items: model.inOutList,
+                  disabled: disabled,
                   onChanged: (a) {
                     model.selectedInOut = a;
                     model.notifyListeners();

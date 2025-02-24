@@ -267,6 +267,10 @@ class JsonConvert {
       return data.map<DeviceEntity>((Map<String, dynamic> e) =>
           DeviceEntity.fromJson(e)).toList() as M;
     }
+    if (<DeviceScanEntity>[] is M) {
+      return data.map<DeviceScanEntity>((Map<String, dynamic> e) =>
+          DeviceScanEntity.fromJson(e)).toList() as M;
+    }
     if (<HomePageData>[] is M) {
       return data.map<HomePageData>((Map<String, dynamic> e) =>
           HomePageData.fromJson(e)).toList() as M;
@@ -375,6 +379,7 @@ class JsonConvertClassCollection {
     (DeviceDetailPowerEntity).toString(): DeviceDetailPowerEntity.fromJson,
     (DeviceDetailPowerData).toString(): DeviceDetailPowerData.fromJson,
     (DeviceEntity).toString(): DeviceEntity.fromJson,
+    (DeviceScanEntity).toString(): DeviceScanEntity.fromJson,
     (HomePageData).toString(): HomePageData.fromJson,
     (OnePictureData).toString(): OnePictureData.fromJson,
     (UserInfoData).toString(): UserInfoData.fromJson,

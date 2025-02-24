@@ -75,12 +75,10 @@ DeviceDetailCameraData $DeviceDetailCameraDataFromJson(
   if (cameraCode != null) {
     deviceDetailCameraData.cameraCode = cameraCode;
   }
-  final List<
-      DeviceDetailCameraDataPhoto>? cameraStatus = (json['camera_status'] as List<
-      dynamic>?)?.map(
-          (e) =>
-      jsonConvert.convert<DeviceDetailCameraDataPhoto>(
-          e) as DeviceDetailCameraDataPhoto).toList();
+  final List<String>? cameraStatus = (json['camera_status'] as List<dynamic>?)
+      ?.map(
+          (e) => jsonConvert.convert<String>(e) as String)
+      .toList();
   if (cameraStatus != null) {
     deviceDetailCameraData.cameraStatus = cameraStatus;
   }
@@ -128,7 +126,7 @@ Map<String, dynamic> $DeviceDetailCameraDataToJson(
   data['camera_type_text'] = entity.cameraTypeText;
   data['control_status_text'] = entity.controlStatusText;
   data['camera_code'] = entity.cameraCode;
-  data['camera_status'] = entity.cameraStatus?.map((v) => v.toJson()).toList();
+  data['camera_status'] = entity.cameraStatus;
   data['last_bg_photos'] = entity.lastBgPhotos?.map((v) => v.toJson()).toList();
   data['last_snap_photos'] =
       entity.lastSnapPhotos?.map((v) => v.toJson()).toList();
@@ -149,7 +147,7 @@ extension DeviceDetailCameraDataExtension on DeviceDetailCameraData {
     String? cameraTypeText,
     String? controlStatusText,
     String? cameraCode,
-    List<DeviceDetailCameraDataPhoto>? cameraStatus,
+    List<String>? cameraStatus,
     List<DeviceDetailCameraDataPhoto>? lastBgPhotos,
     List<DeviceDetailCameraDataPhoto>? lastSnapPhotos,
     DeviceDetailCameraDataPhoto? dayBasicPhoto,

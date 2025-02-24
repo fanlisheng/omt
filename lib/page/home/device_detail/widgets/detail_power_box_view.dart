@@ -15,12 +15,13 @@ import '../view_models/detail_power_box_viewmodel.dart';
 import 'detail_ai_view.dart';
 
 class DetailPowerBoxView extends StatelessWidget {
-  const DetailPowerBoxView({super.key});
+  final String nodeCode;
+  const DetailPowerBoxView({super.key, required this.nodeCode});
 
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<DetailPowerBoxViewModel>(
-        model: DetailPowerBoxViewModel()..themeNotifier = true,
+        model: DetailPowerBoxViewModel(nodeCode)..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
           return powerBoxView(model);

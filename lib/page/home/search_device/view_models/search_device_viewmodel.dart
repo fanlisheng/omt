@@ -44,7 +44,7 @@ class SearchDeviceViewModel extends BaseViewModel {
   IdNameValue? selectedInOut;
 
   //设备统计字段
-  String deviceStatistics = "设备统计：1个AI设备 / 一个摄像头 / 一个NVR / 一个路由器";
+  String deviceStatistics = "";
 
   //扫描出的设备数据
   List<DeviceEntity> deviceScanData = [];
@@ -82,9 +82,22 @@ class SearchDeviceViewModel extends BaseViewModel {
       }
       notifyListeners();
     });
+
     HttpQuery.share.homePageService.getInstanceList("510101",
         onSuccess: (List<IdNameValue>? a) {
       instanceList = a ?? [];
+      notifyListeners();
+    });
+
+    HttpQuery.share.homePageService.getGateList(
+        onSuccess: (List<IdNameValue>? a) {
+      doorList = a ?? [];
+      notifyListeners();
+    });
+
+    HttpQuery.share.homePageService.getInOutList(
+        onSuccess: (List<IdNameValue>? a) {
+      inOutList = a ?? [];
       notifyListeners();
     });
   }
@@ -99,7 +112,11 @@ class SearchDeviceViewModel extends BaseViewModel {
   ///点击事件
   //搜索事件
   searchEventAction() async {
-    DeviceDetailViewModel model = DeviceDetailViewModel(0, DeviceType.camera);
+    DeviceDetailViewModel model = DeviceDetailViewModel(
+      id: 0,
+      deviceType: DeviceType.camera,
+      nodeCode: '562#6175-2#2-4#1',
+    );
 
     // GoRouter.of(context!).push(Routes.deviceDetail, extra: model);
     // GoRouter.of(context!).push('/navigation/navigation_view');
@@ -136,9 +153,13 @@ class SearchDeviceViewModel extends BaseViewModel {
           // instanceId: selectedInstance?.id ?? 0,
           instanceId: "562#6175",
           deviceList: deviceScanData,
-          onSuccess: (List<DeviceEntity>? deviceList) {
+          onSuccess: (DeviceScanEntity? scanData) {
             // scanRateValue = 1.0;
             searchState = DeviceSearchState.completed;
+            deviceStatistics =
+                _generateDeviceStatistics(scanData?.devices ?? []);
+            deviceScanData = scanData?.devices ?? [];
+            deviceNoBindingData = scanData?.unboundDevices ?? [];
             notifyListeners();
           },
           onError: (e) {
@@ -223,4 +244,33 @@ class SearchDeviceViewModel extends BaseViewModel {
 //   }
 //   return info;
 // }
+
+  String _generateDeviceStatistics(List<DeviceEntity>? deviceList) {
+    if (deviceList == null || deviceList.isEmpty) return "无设备";
+
+    // 定义设备类型对应关系
+    final deviceTypeMap = {
+      6: "路由器",
+      8: "NVR",
+      10: "AI设备",
+      11: "摄像头",
+    };
+
+    // 统计设备数量
+    Map<int, int> deviceCount = {};
+    for (var device in deviceList) {
+      if (deviceTypeMap.containsKey(device.deviceType)) {
+        deviceCount[device.deviceType!] =
+            (deviceCount[device.deviceType] ?? 0) + 1;
+      }
+    }
+
+    // 生成统计字符串
+    List<String> stats = deviceCount.entries.map((entry) {
+      String deviceName = deviceTypeMap[entry.key]!;
+      return "${entry.value}个$deviceName";
+    }).toList();
+
+    return "${stats.join(" / ")}";
+  }
 }

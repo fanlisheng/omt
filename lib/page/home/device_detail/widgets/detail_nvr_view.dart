@@ -16,7 +16,8 @@ import '../view_models/detail_nvr_viewmodel.dart';
 import 'detail_ai_view.dart';
 
 class DetailNvrView extends StatelessWidget {
-  const DetailNvrView({super.key});
+  final String nodeCode;
+  const DetailNvrView({super.key, required this.nodeCode});
 
   // AddNvrViewModel model;
   // AddNvrView(this.model, {super.key});
@@ -24,7 +25,7 @@ class DetailNvrView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<DetailNvrViewModel>(
-        model: DetailNvrViewModel()..themeNotifier = true,
+        model: DetailNvrViewModel(nodeCode)..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model1, child) {
           return nvrView(model1);
