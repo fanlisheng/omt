@@ -13,6 +13,8 @@ PODS:
   - flutter_volume_controller (0.0.1):
     - FlutterMacOS
   - FlutterMacOS (1.0.0)
+  - get_mac_address (0.0.1):
+    - FlutterMacOS
   - macos_window_utils (1.0.0):
     - FlutterMacOS
   - media_kit_libs_macos_video (1.0.4):
@@ -60,6 +62,7 @@ DEPENDENCIES:
   - flutter_pty (from `Flutter/ephemeral/.symlinks/plugins/flutter_pty/macos`)
   - flutter_volume_controller (from `Flutter/ephemeral/.symlinks/plugins/flutter_volume_controller/macos`)
   - FlutterMacOS (from `Flutter/ephemeral`)
+  - get_mac_address (from `Flutter/ephemeral/.symlinks/plugins/get_mac_address/macos`)
   - macos_window_utils (from `Flutter/ephemeral/.symlinks/plugins/macos_window_utils/macos`)
   - media_kit_libs_macos_video (from `Flutter/ephemeral/.symlinks/plugins/media_kit_libs_macos_video/macos`)
   - media_kit_native_event_loop (from `Flutter/ephemeral/.symlinks/plugins/media_kit_native_event_loop/macos`)
@@ -97,6 +100,8 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/flutter_volume_controller/macos
   FlutterMacOS:
     :path: Flutter/ephemeral
+  get_mac_address:
+    :path: Flutter/ephemeral/.symlinks/plugins/get_mac_address/macos
   macos_window_utils:
     :path: Flutter/ephemeral/.symlinks/plugins/macos_window_utils/macos
   media_kit_libs_macos_video:
@@ -140,6 +145,7 @@ SPEC CHECKSUMS:
   flutter_pty: 41b6f848ade294be726a6b94cdd4a67c3bc52f59
   flutter_volume_controller: 25d09126b0d695560f11c80b1311d5063fed882f
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
+  get_mac_address: 2110e6dbb325301a71aad411b4f3560ba95d328c
   macos_window_utils: 933f91f64805e2eb91a5bd057cf97cd097276663
   media_kit_libs_macos_video: b3e2bbec2eef97c285f2b1baa7963c67c753fb82
   media_kit_native_event_loop: 81fd5b45192b72f8b5b69eaf5b540f45777eb8d5

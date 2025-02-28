@@ -9,6 +9,10 @@ UserInfoData $UserInfoDataFromJson(Map<String, dynamic> json) {
   if (phone != null) {
     userInfoData.phone = phone;
   }
+  final String? token = jsonConvert.convert<String>(json['token']);
+  if (token != null) {
+    userInfoData.token = token;
+  }
   final List<
       UserPermission>? userPermissions = (json['userPermissions'] as List<
       dynamic>?)
@@ -24,6 +28,7 @@ UserInfoData $UserInfoDataFromJson(Map<String, dynamic> json) {
 Map<String, dynamic> $UserInfoDataToJson(UserInfoData entity) {
   final Map<String, dynamic> data = <String, dynamic>{};
   data['phone'] = entity.phone;
+  data['token'] = entity.token;
   data['userPermissions'] =
       entity.userPermissions?.map((v) => v.toJson()).toList();
   return data;
@@ -32,10 +37,12 @@ Map<String, dynamic> $UserInfoDataToJson(UserInfoData entity) {
 extension UserInfoDataExtension on UserInfoData {
   UserInfoData copyWith({
     String? phone,
+    String? token,
     List<UserPermission>? userPermissions,
   }) {
     return UserInfoData()
       ..phone = phone ?? this.phone
+      ..token = token ?? this.token
       ..userPermissions = userPermissions ?? this.userPermissions;
   }
 }

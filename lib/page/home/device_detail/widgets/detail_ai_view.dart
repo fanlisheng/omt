@@ -176,6 +176,7 @@ class RowItemInfoView extends StatelessWidget {
     return Expanded(
       flex: 1,
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
             width: 102,
@@ -196,11 +197,11 @@ class RowItemInfoView extends StatelessWidget {
                   color: stateColor ?? ColorUtils.colorRed),
             ),
           ),
-          Text(
+          Expanded(child: Text(
             a,
             style: const TextStyle(
                 color: ColorUtils.colorGreenLiteLite, fontSize: 12),
-          ),
+          ),),
           if ((buttonName ?? "").isNotEmpty) ...[
             const SizedBox(width: 12),
             Clickable(

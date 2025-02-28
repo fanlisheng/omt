@@ -13,6 +13,7 @@ class DNavigationView extends StatelessWidget {
   final String titlePass;
   final Widget? rightWidget;
   final bool? hasReturn;
+  final GestureTapCallback? onTap;
 
   const DNavigationView({
     super.key,
@@ -20,6 +21,7 @@ class DNavigationView extends StatelessWidget {
     required this.titlePass,
     this.rightWidget,
     this.hasReturn,
+    this.onTap,
   });
 
   @override
@@ -28,6 +30,15 @@ class DNavigationView extends StatelessWidget {
       children: [
         if ((hasReturn ?? true) == true) ...[
           Clickable(
+            onTap: onTap ??
+                () {
+                  IntentUtils.share.pop(context);
+                  // GoRouter.of(context).pop();
+                  // KayoPackage.share.navigatorKey.currentState!.canPop();
+                  // if (KayoPackage.share.navigatorKey.currentState!.canPop() != false) {
+                  //   KayoPackage.share.navigatorKey.currentState!.canPop();
+                  // }
+                },
             child: Container(
               decoration: BoxDecoration(
                 border: Border.all(
@@ -41,14 +52,6 @@ class DNavigationView extends StatelessWidget {
                 style: TextStyle(fontSize: 12, color: ColorUtils.colorGreen),
               ),
             ),
-            onTap: () {
-              IntentUtils.share.pop(context);
-              // GoRouter.of(context).pop();
-              // KayoPackage.share.navigatorKey.currentState!.canPop();
-              // if (KayoPackage.share.navigatorKey.currentState!.canPop() != false) {
-              //   KayoPackage.share.navigatorKey.currentState!.canPop();
-              // }
-            },
           ),
           const SizedBox(width: 12),
         ],

@@ -31,7 +31,7 @@ class DeviceUtils {
 
     // // 2. 获取并发任务，分批处理
     List<Future<void>> pingTasks = [];
-    const batchSize = 50; // 每批次同时处理的数量
+    const batchSize = 70; // 每批次同时处理的数量
     for (int i = 1; i < 255; i++) {
       String ip = "$subnet.$i";
       pingTasks.add(pingDevice(ip, shouldStop));
@@ -74,7 +74,7 @@ class DeviceUtils {
               ip: ip,
               mac: mac,
               deviceTypeText: "路由器",
-              deviceType: getDeviceType("路由器"),
+              deviceType: getDeviceTypeInt("路由器"),
               deviceCode: ""));
         } else {
           if (deviceTypeText.isNotEmpty) {
@@ -82,7 +82,7 @@ class DeviceUtils {
                 ip: ip,
                 mac: mac,
                 deviceTypeText: deviceTypeText,
-                deviceType: getDeviceType(deviceTypeText),
+                deviceType: getDeviceTypeInt(deviceTypeText),
                 deviceCode: "");
             if (deviceTypeText == "AI设备") {
               String deviceCode = mac.replaceAll(":", "");
@@ -228,13 +228,21 @@ class DeviceUtils {
   };
 
   /// 获取设备类型（根据设备名称）
-  static int getDeviceType(String deviceTypeText) {
+  static int getDeviceTypeInt(String deviceTypeText) {
     return _deviceTypeMap[deviceTypeText] ?? 0;
   }
 
+  static String getDeviceTypeString(int deviceType) {
+    final entry = _deviceTypeMap.entries.firstWhere(
+      (element) => element.value == deviceType,
+      orElse: () => const MapEntry('', -1), // 如果没有找到对应的 value，返回空的 MapEntry
+    );
+    return entry.key.isNotEmpty ? entry.key : "-"; // 如果找到 key，则返回，否则返回 null
+  }
+
   /// 获取设备图片路径
-  static String getDeviceImage(String deviceTypeText) {
-    return _deviceImageMap[deviceTypeText] ?? "";
+  static String getDeviceImage(int deviceType) {
+    return _deviceImageMap[getDeviceTypeString(deviceType)] ?? "";
   }
 
   /// 获取设备类型名称

@@ -41,7 +41,7 @@ class HomePageService {
 
   get _deviceScan => '${API.share.host}api/device/scan';
 
-  get _bindGate => '${API.share.host}/api/device/bind_gate';
+  get _bindGate => '${API.share.host}api/device/bind_gate';
 
   get _deviceDetailAi => '${API.share.host}api/device/ai_device/detail';
 
@@ -55,14 +55,19 @@ class HomePageService {
 
   get _deviceDetailCamera => '${API.share.host}api/device/camera/detail';
 
+  get _cameraPhotoList => '${API.share.host}api/device/camera/snap_list';
+
+  get _setCameraBasicPhoto =>
+      '${API.share.host}api/device/camera/set_basic_photo';
+
   getInstanceList(
     String areaCode, {
-    required ValueChanged<List<IdNameValue>?>? onSuccess,
-    ValueChanged<List<IdNameValue>?>? onCache,
+    required ValueChanged<List<StrIdNameValue>?>? onSuccess,
+    ValueChanged<List<StrIdNameValue>?>? onCache,
     ValueChanged<String>? onError,
   }) async {
     String url = await _instanceList;
-    HttpManager.share.doHttpPost<List<IdNameValue>>(
+    HttpManager.share.doHttpPost<List<StrIdNameValue>>(
       url,
       {"area_code": areaCode},
       method: 'GET',
@@ -138,7 +143,7 @@ class HomePageService {
   }
 
   bindGate({
-    required int instanceId,
+    required String instanceId,
     required int gateId,
     required List<DeviceEntity> deviceList,
     required ValueChanged<CodeMessageData?> onSuccess,
@@ -156,10 +161,10 @@ class HomePageService {
     }
     HttpManager.share.doHttpPost<CodeMessageData>(
       await _bindGate,
-      {"instance_id": instanceId, "gate_id": gateId, "devices": deviceList},
+      {"instance_id": instanceId, "gate_id": gateId, "devices": devices},
       method: 'POST',
-      autoHideDialog: true,
-      autoShowDialog: true,
+      autoHideDialog: false,
+      autoShowDialog: false,
       onSuccess: onSuccess,
       onCache: onCache,
       onError: onError,
@@ -277,6 +282,53 @@ class HomePageService {
       {
         "node_code": nodeCode,
       },
+      method: 'POST',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  cameraPhotoList({
+    required int page,
+    required String deviceCode,
+    required int type,
+    required List<String> snapAts,
+    required ValueChanged<DeviceDetailCameraSnapList?>? onSuccess,
+    ValueChanged<DeviceDetailCameraSnapList?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<DeviceDetailCameraSnapList>(
+      await _cameraPhotoList,
+      {
+        "page": page,
+        "limit": 8,
+        "device_code": deviceCode,
+        "type": type,
+        "snap_ats": snapAts,
+      },
+      method: 'POST',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  setCameraBasicPhoto({
+    required String deviceCode,
+    required int type,
+    required String url,
+    required ValueChanged<CodeMessageData?>? onSuccess,
+    ValueChanged<CodeMessageData?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<CodeMessageData>(
+      await _setCameraBasicPhoto,
+      {"device_code": deviceCode, "type": type, "url": url},
       method: 'POST',
       autoHideDialog: true,
       autoShowDialog: true,

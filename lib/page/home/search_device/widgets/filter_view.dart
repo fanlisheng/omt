@@ -67,7 +67,7 @@ class _FilterViewState extends State<FilterView> {
             flex: 2, // 0.5 的比例
             child: Expanded(
               flex: 2, // 0.5 的比例
-              child: AutoSuggestBox<IdNameValue>(
+              child: AutoSuggestBox<StrIdNameValue>(
                 key: model.asgbKey,
                 enabled: model.searchState != DeviceSearchState.searching,
                 placeholder: "请选择",
@@ -80,8 +80,8 @@ class _FilterViewState extends State<FilterView> {
                   }
                 },
                 items: model.instanceList
-                    .map<AutoSuggestBoxItem<IdNameValue>>(
-                      (instance) => AutoSuggestBoxItem<IdNameValue>(
+                    .map<AutoSuggestBoxItem<StrIdNameValue>>(
+                      (instance) => AutoSuggestBoxItem<StrIdNameValue>(
                           value: instance,
                           label: instance.name ?? "",
                           onFocusChange: (focused) {

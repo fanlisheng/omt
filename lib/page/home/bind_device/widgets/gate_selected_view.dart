@@ -1,5 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:kayo_package/extension/_index_extension.dart';
+import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/utils/color_utils.dart';
 import '../view_models/bind_device_viewmodel.dart';
 
@@ -67,17 +68,17 @@ class _GateSelectedViewState extends State<GateSelectedView> {
               spacing: 10.0,
               runSpacing: 10.0,
               children: [
-                ComboBox<String>(
+                ComboBox<IdNameValue>(
                   isExpanded: false,
-                  value: model.gateNo,
-                  items: model.gates.map<ComboBoxItem<String>>((e) {
-                    return ComboBoxItem<String>(
+                  value: model.selectedDoor,
+                  items: model.doorList.map<ComboBoxItem<IdNameValue>>((e) {
+                    return ComboBoxItem<IdNameValue>(
                       value: e,
-                      child: Text(e),
+                      child: Text(e.name ?? ""),
                     );
                   }).toList(),
                   onChanged: (color) {
-                    model.gateNo = color;
+                    model.selectedDoor = color;
                     model.notifyListeners();
                   },
                   placeholder: const Text(

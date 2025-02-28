@@ -23,6 +23,7 @@ import '../view_models/detail_camera_viewmodel.dart';
 
 class DetailCameraView extends StatelessWidget {
   final String nodeCode;
+
   const DetailCameraView({super.key, required this.nodeCode});
 
   // final AddCameraViewModel model;
@@ -52,7 +53,7 @@ class DetailCameraView extends StatelessWidget {
           color: ColorUtils.colorBackgroundLine,
           width: double.infinity,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,27 +182,25 @@ class DetailCameraView extends StatelessWidget {
                                         photo.snapAt ?? ""),
                                     const SizedBox(height: 10),
                                   ]),
-                        ]
-
-                        else if (model.photoCurrentIndex == 1 &&
+                        ] else if (model.photoCurrentIndex == 1 &&
                             (model.deviceInfo.lastSnapPhotos ?? [])
                                 .isNotEmpty) ...[
                           const SizedBox(height: 22),
                           ...model.deviceInfo.lastSnapPhotos!
                               .where((photo) =>
-                          photo.url != null &&
-                              photo.url!.isNotEmpty) // 过滤掉 url 为空的项
+                                  photo.url != null &&
+                                  photo.url!.isNotEmpty) // 过滤掉 url 为空的项
                               .take(2) // 只取前两个
                               .expand((photo) => [
-                            imageTimeView(model.context!, photo.url!,
-                                photo.snapAt ?? ""),
-                            const SizedBox(height: 10),
-                          ]),
+                                    imageTimeView(model.context!, photo.url!,
+                                        photo.snapAt ?? ""),
+                                    const SizedBox(height: 10),
+                                  ]),
                         ]
                       ],
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 20),
                 ],
               ),
               const SizedBox(height: 12),
@@ -284,8 +283,7 @@ class DetailCameraView extends StatelessWidget {
             ),
             Clickable(
               onTap: () {
-                IntentUtils.share.push(model.context!,
-                    routeName: RouterPage.PhotoPreviewScreen);
+                model.gotoPhotoPreviewScreen();
               },
               child: Container(
                 padding: const EdgeInsets.only(
@@ -309,7 +307,7 @@ class DetailCameraView extends StatelessWidget {
   Widget _videoView(DetailCameraViewModel model) {
     // 获取屏幕尺寸
     final screenSize = MediaQuery.of(model.context!).size;
-    final width = screenSize.width * 0.54;
+    final width = (screenSize.width - 160) * 0.54;
     final height = screenSize.height * 0.43;
     return SizedBox(
       width: width,
@@ -326,51 +324,63 @@ class DetailCameraView extends StatelessWidget {
   NameValue getException(int exception) {
     return NameValue(value: "在线无数据", valueColor: "#FF4D4F");
   }
-}
 
-Widget imageTimeView(BuildContext context, String url, String leftStr,
-    {String? rightStr}) {
-  final screenSize = MediaQuery.of(context).size;
-  return Container(
-    // color: "#5B6565".toColor(),
-    width: 234 / 1050 * screenSize.width,
-    // width: 234 ,
-    // height:131 / 800 * screenSize.height + 30,
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ImageView(
-          url:  url,
-          // src: source(''),
-          // width: 234,
-          // height: 131,
-        ),
-        Container(
-          width: 234 / 1050 * screenSize.width,
-          // width: 234 ,
-          height: 130,
-          color: ColorUtils.colorGreenLiteLite,
-        ),
-        const SizedBox(
-          height: 3,
-        ),
-        Row(
-          children: [
-            Expanded(
+  Widget imageTimeView(BuildContext context, String? url, String leftStr,
+      {String? rightStr , GestureTapCallback? onTap}) {
+    final screenSize = MediaQuery.of(context).size;
+    return Clickable(
+      // color: "#5B6565".toColor(),
+      width: 234 / (1050 - 160) * screenSize.width,
+      // width: 234 ,
+      height: screenSize.height * 0.43 / 2,
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: (url ?? "").isNotEmpty
+                ? ImageView(
+              url: url,
+              // src: source(''),
+              // width: 234,
+              // height: 131,
+            )
+                : const Center(
               child: Text(
-                leftStr,
-                style: const TextStyle(
+                "没有照片",
+                style: TextStyle(
                     fontSize: 12, color: ColorUtils.colorGreenLiteLite),
               ),
             ),
-            Text(
-              rightStr ?? "",
-              style: const TextStyle(
-                  fontSize: 12, color: ColorUtils.colorGreenLiteLite),
-            ),
-          ],
-        )
-      ],
-    ),
-  );
+          ),
+          // Container(
+          //   width: 234 / (1050 - 160) * screenSize.width,
+          //   // width: 234 ,
+          //   color: ColorUtils.colorGreenLiteLite,
+          // ),
+          const SizedBox(
+            height: 3,
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  leftStr,
+                  style: const TextStyle(
+                      fontSize: 12, color: ColorUtils.colorGreenLiteLite),
+                ),
+              ),
+              Text(
+                rightStr ?? "",
+                style: const TextStyle(
+                    fontSize: 12, color: ColorUtils.colorGreenLiteLite),
+              ),
+            ],
+          )
+        ],
+      ),
+    );
+  }
 }
+
+

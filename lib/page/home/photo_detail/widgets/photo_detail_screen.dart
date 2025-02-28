@@ -6,22 +6,47 @@ import 'package:kayo_package/utils/base_time_utils.dart';
 import 'package:kayo_package/views/widget/base/clickable.dart';
 import 'package:omt/page/home/device_detail/widgets/detail_ai_view.dart';
 import 'package:omt/widget/combobox.dart';
+import '../../../../bean/home/home_page/device_detail_camera_entity.dart';
 import '../../../../widget/nav/dnavigation_view.dart';
 import '../../../../widget/pagination/pagination_view.dart';
 import '../../device_detail/widgets/detail_camera_view.dart';
 import '../../../../utils/color_utils.dart';
 import '../view_models/photo_detail_viewmodel.dart';
 
+class PhotoDetailScreenData {
+  final int index;
+  final int total;
+  final int? page;
+  final int? limit;
+  final String? deviceCode;
+  final int? type;
+  final List<String>? snapAts;
+  final List<DeviceDetailCameraDataPhoto> photoData;
+
+  PhotoDetailScreenData( {
+    required this.index,
+    required this.total,
+    required this.photoData,
+    this.page,
+    this.limit,
+    this.deviceCode,
+    this.type,
+    this.snapAts,
+  });
+}
+
 class PhotoDetailScreen extends StatelessWidget {
   // final int pageIndex;
-  // final int photoIndex;
+  final PhotoDetailScreenData pageNeedData;
+
+  const PhotoDetailScreen({super.key, required this.pageNeedData});
 
   // const PhotoDetailScreen({super.key, required this.pageIndex, required this.photoIndex});
 
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<PhotoDetailViewModel>(
-        model: PhotoDetailViewModel()..themeNotifier = true,
+        model: PhotoDetailViewModel(pageNeedData)..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
           return Container(
@@ -50,10 +75,9 @@ class PhotoDetailScreen extends StatelessWidget {
       margin: const EdgeInsets.all(16),
       color: "#4E5353".toColor(),
       child: Container(
-       margin : const EdgeInsets.all(10.0),
+        margin: const EdgeInsets.all(10.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-
           children: [
             const SizedBox(height: 10),
             const Text(
@@ -79,12 +103,14 @@ class PhotoDetailScreen extends StatelessWidget {
                 ),
                 const SizedBox(width: 30),
                 infoItem(
-                  "设备名称:",
-                  "工控机V2B_出",
+                  "抓拍时间:",
+                  model.images[model.currentImageIndex].snapAt ?? '',
                 ),
                 Expanded(child: Container()),
                 Clickable(
-                  onTap: model.toggleTheme,
+                  onTap: (){
+                    model.setBasicPhoto(type: 1);
+                  },
                   child: Container(
                     decoration: BoxDecoration(
                       borderRadius: const BorderRadius.all(Radius.circular(4)),
@@ -97,7 +123,9 @@ class PhotoDetailScreen extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 Clickable(
-                  onTap: model.toggleTheme,
+                  onTap: (){
+                    model.setBasicPhoto(type: 2);
+                  },
                   child: Container(
                     decoration: BoxDecoration(
                       borderRadius: const BorderRadius.all(Radius.circular(4)),
@@ -112,42 +140,56 @@ class PhotoDetailScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             // 图片显示
-            Expanded(child: Center(child: Row(
-              children: [
-                const SizedBox(width: 24),
-                Clickable(
-                  onTap: model.previousImage,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.all(Radius.circular(4)),
-                      color: "#5E6363".toColor(),
+            Expanded(
+              child: Center(
+                child: Row(
+                  children: [
+                    const SizedBox(width: 24),
+                    Clickable(
+                      onTap: model.previousImage,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(4)),
+                          color: "#5E6363".toColor(),
+                        ),
+                        width: 40,
+                        height: 56,
+                        child: const Icon(FluentIcons.chevron_left, size: 18.0),
+                      ),
                     ),
-                    width: 40,
-                    height: 56,
-                    child: const Icon(FluentIcons.chevron_left, size: 18.0),
-                  ),
-                ),
-                const SizedBox(width: 45),
-                Expanded(
-                  child: Image.asset(model.images[model.currentImageIndex]),
-                ),
-                // 显示当前图片
-                const SizedBox(width: 45),
-                Clickable(
-                  onTap: model.nextImage,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.all(Radius.circular(4)),
-                      color: "#5E6363".toColor(),
+                    const SizedBox(width: 45),
+                    if (model.images.length >
+                        model.currentImageIndex)
+                      Expanded(
+                        // Image.network(model.pageNeedData
+                        //     .photoData[model.pageNeedData.index].url ??
+                        //     ""),
+                        child: ImageView(
+                          url: model.images[model.currentImageIndex].url ??
+                              "",
+                        ),
+                      ),
+                    // 显示当前图片
+                    const SizedBox(width: 45),
+                    Clickable(
+                      onTap: model.nextImage,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(4)),
+                          color: "#5E6363".toColor(),
+                        ),
+                        width: 40,
+                        height: 56,
+                        child: const Icon(FluentIcons.chevron_right, size: 18),
+                      ),
                     ),
-                    width: 40,
-                    height: 56,
-                    child: const Icon(FluentIcons.chevron_right, size: 18),
-                  ),
+                    SizedBox(width: 24),
+                  ],
                 ),
-                SizedBox(width: 24),
-              ],
-            ),),),
+              ),
+            ),
             const SizedBox(height: 30),
           ],
         ),

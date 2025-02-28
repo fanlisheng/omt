@@ -36,10 +36,10 @@ class SearchDeviceViewModel extends BaseViewModel {
   //设备搜索状态
   DeviceSearchState searchState = DeviceSearchState.notSearched;
 
-  List<IdNameValue> instanceList = [];
+  List<StrIdNameValue> instanceList = [];
   List<IdNameValue> doorList = [];
   List<IdNameValue> inOutList = [];
-  IdNameValue? selectedInstance;
+  StrIdNameValue? selectedInstance;
   IdNameValue? selectedDoor;
   IdNameValue? selectedInOut;
 
@@ -83,8 +83,8 @@ class SearchDeviceViewModel extends BaseViewModel {
       notifyListeners();
     });
 
-    HttpQuery.share.homePageService.getInstanceList("510101",
-        onSuccess: (List<IdNameValue>? a) {
+    HttpQuery.share.homePageService.getInstanceList("5101",
+        onSuccess: (List<StrIdNameValue>? a) {
       instanceList = a ?? [];
       notifyListeners();
     });
@@ -115,7 +115,8 @@ class SearchDeviceViewModel extends BaseViewModel {
     DeviceDetailViewModel model = DeviceDetailViewModel(
       id: 0,
       deviceType: DeviceType.camera,
-      nodeCode: '562#6175-2#2-4#1',
+      // nodeCode: '124#12812-2#2-3#1-11#0',
+      nodeCode: '124#12812-2#2-3#1-11#0',
     );
 
     // GoRouter.of(context!).push(Routes.deviceDetail, extra: model);
@@ -137,24 +138,26 @@ class SearchDeviceViewModel extends BaseViewModel {
 
   //开始扫描
   scanStartEventAction() async {
+    deviceStatistics = "";
     deviceScanData = [];
+    deviceNoBindingData = [];
     searchState = DeviceSearchState.searching;
     stopScanning = false;
     notifyListeners();
 
     deviceScanData =
         await DeviceUtils.scanAndFetchDevicesInfo(shouldStop: _shouldStop);
+
     if (stopScanning == true) {
       searchState = DeviceSearchState.notSearched;
       deviceScanData = [];
     } else {
       //扫描完成,上传请求
       HttpQuery.share.homePageService.deviceScan(
-          // instanceId: selectedInstance?.id ?? 0,
-          instanceId: "562#6175",
+          instanceId: selectedInstance?.id ?? "",
+          // instanceId: "562#6175",
           deviceList: deviceScanData,
           onSuccess: (DeviceScanEntity? scanData) {
-            // scanRateValue = 1.0;
             searchState = DeviceSearchState.completed;
             deviceStatistics =
                 _generateDeviceStatistics(scanData?.devices ?? []);
@@ -164,6 +167,9 @@ class SearchDeviceViewModel extends BaseViewModel {
           },
           onError: (e) {
             searchState = DeviceSearchState.completed;
+            deviceStatistics = "";
+            deviceScanData = [];
+            deviceNoBindingData = [];
             notifyListeners();
           });
     }
@@ -188,10 +194,16 @@ class SearchDeviceViewModel extends BaseViewModel {
 
   //绑定
   bindEventAction() {
-    context!.go(Routes.deviceBind, extra: deviceNoBindingData);
-    // IntentUtils.share.push(context,
-    //     routeName: RouterPage.DeviceBindPage,
-    //     data: {"data": deviceNoBindingData});
+    IntentUtils.share
+        .push(context, routeName: RouterPage.DeviceBindPage, data: {
+      "deviceData": deviceNoBindingData,
+      "doorList": doorList,
+      "instance": selectedInstance
+    })?.then((a){
+      if (IntentUtils.share.isResultOk(a)) {
+        scanAnewEventAction();
+      }
+    });
   }
 
   //所有服务

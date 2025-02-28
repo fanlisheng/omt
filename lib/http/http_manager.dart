@@ -28,7 +28,7 @@ class HttpManager extends BaseHttpManager {
 
   @override
   Future<Map<String, dynamic>> getBaseHeader() async {
-    // var userLoginInfo = await SharedUtils.getUserInfo();
+    var userLoginInfo = await SharedUtils.getUserInfo();
     final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
@@ -59,11 +59,11 @@ class HttpManager extends BaseHttpManager {
     }
 
     Map<String, dynamic> map = {};
-    // if (!BaseSysUtils.empty(userLoginInfo?.token)) {
-    //   map.addAll({
-    //     'Authorization': 'Bearer ${userLoginInfo?.token ?? ''}',
-    //   });
-    // }
+    if (!BaseSysUtils.empty(userLoginInfo?.token)) {
+      map.addAll({
+        'Authorization': 'Bearer ${userLoginInfo?.token ?? ''}',
+      });
+    }
     map.addAll({
       'Type': 'mobile',
       'Platform': 'zt',

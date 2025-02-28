@@ -2,8 +2,10 @@ import 'package:go_router/go_router.dart';
 import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
 import 'package:omt/routing/routes.dart';
 
+import '../../../../bean/common/id_name_value.dart';
 import '../../../../bean/home/home_page/device_entity.dart';
 import '../../../../http/http_query.dart';
+import '../../../../utils/intent_utils.dart';
 
 enum BindDevicePageState {
   idle, // 空闲状态，没有请求
@@ -14,9 +16,11 @@ enum BindDevicePageState {
 
 class BindDeviceViewModel extends BaseViewModelRefresh<dynamic> {
   //扫描出的设备数据
-  final List<DeviceEntity> deviceData;
+  List<DeviceEntity> deviceData;
+  final StrIdNameValue instance;
+  final List<IdNameValue> doorList;
 
-  BindDeviceViewModel(this.deviceData);
+  BindDeviceViewModel(this.deviceData, this.instance, this.doorList);
 
   //全选中
   bool selected = false;
@@ -25,23 +29,25 @@ class BindDeviceViewModel extends BaseViewModelRefresh<dynamic> {
   int selectedCount = 0;
 
   //大门号
-  String? gateNo;
-  List gates = <String>[
-    'Abyssinian',
-    'Aegean',
-    'American Bobtail',
-    'American Curl',
-    'American Ringtail',
-    'American Shorthair',
-    'American Wirehair',
-    'Aphrodite Giant',
-    'Arabian Mau',
-    'Asian cat',
-    'Asian Semi-longhair',
-    'Australian Mist',
-    'Balinese',
-    'Bambino',
-  ];
+  IdNameValue? selectedDoor;
+
+  // String? gateNo;
+  // List gates = <String>[
+  //   'Abyssinian',
+  //   'Aegean',
+  //   'American Bobtail',
+  //   'American Curl',
+  //   'American Ringtail',
+  //   'American Shorthair',
+  //   'American Wirehair',
+  //   'Aphrodite Giant',
+  //   'Arabian Mau',
+  //   'Asian cat',
+  //   'Asian Semi-longhair',
+  //   'Australian Mist',
+  //   'Balinese',
+  //   'Bambino',
+  // ];
 
   //页面状态
   BindDevicePageState pageState = BindDevicePageState.idle;
@@ -89,15 +95,39 @@ class BindDeviceViewModel extends BaseViewModelRefresh<dynamic> {
 
   //绑定设备
   bingingEventAction() {
-    context!.pop();
+    request();
   }
 
   //成功返回
-  goBackEventAction() {}
+  goBackEventAction() {
+    // context!.pop();
+    IntentUtils.share.popResultOk(context!);
+  }
 
   //手动绑定
   handBindingEventAction() {
+    request();
+  }
+
+  void request() {
+    pageState = BindDevicePageState.loading;
+    notifyListeners();
+    List<DeviceEntity> selectedDevices = [];
+    if (deviceData.isNotEmpty) {
+      selectedDevices =
+          deviceData.where((device) => device.selected ?? false).toList();
+    }
     HttpQuery.share.homePageService.bindGate(
-        instanceId: 1, gateId: 1, deviceList: deviceData, onSuccess: (m) {});
+        instanceId: instance.id ?? "",
+        gateId: selectedDoor?.id ?? 0,
+        deviceList: selectedDevices,
+        onSuccess: (m) {
+          pageState = BindDevicePageState.success;
+          notifyListeners();
+        },
+        onError: (e) {
+          pageState = BindDevicePageState.failure;
+          notifyListeners();
+        });
   }
 }

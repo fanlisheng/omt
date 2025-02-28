@@ -36,7 +36,7 @@ class DeviceEntity {
     final deviceInfoElement = document.findElements('DeviceInfo').first;
     String deviceTypeText =
         deviceInfoElement.findElements('deviceType').first.text;
-    int deviceType = DeviceUtils.getDeviceType(deviceTypeText);
+    int deviceType = DeviceUtils.getDeviceTypeInt(deviceTypeText);
     String mac = deviceInfoElement.findElements('macAddress').first.text;
     String deviceCode = deviceInfoElement.findElements('deviceID').first.text;
 

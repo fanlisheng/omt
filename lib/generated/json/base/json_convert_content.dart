@@ -186,6 +186,10 @@ class JsonConvert {
       return data.map<IdNameValue>((Map<String, dynamic> e) =>
           IdNameValue.fromJson(e)).toList() as M;
     }
+    if (<StrIdNameValue>[] is M) {
+      return data.map<StrIdNameValue>((Map<String, dynamic> e) =>
+          StrIdNameValue.fromJson(e)).toList() as M;
+    }
     if (<LinkKage>[] is M) {
       return data.map<LinkKage>((Map<String, dynamic> e) =>
           LinkKage.fromJson(e)).toList() as M;
@@ -218,9 +222,17 @@ class JsonConvert {
       return data.map<DeviceDetailCameraData>((Map<String, dynamic> e) =>
           DeviceDetailCameraData.fromJson(e)).toList() as M;
     }
+    if (<DeviceDetailCameraSnapList>[] is M) {
+      return data.map<DeviceDetailCameraSnapList>((Map<String, dynamic> e) =>
+          DeviceDetailCameraSnapList.fromJson(e)).toList() as M;
+    }
     if (<DeviceDetailCameraDataPhoto>[] is M) {
       return data.map<DeviceDetailCameraDataPhoto>((Map<String, dynamic> e) =>
           DeviceDetailCameraDataPhoto.fromJson(e)).toList() as M;
+    }
+    if (<PageData>[] is M) {
+      return data.map<PageData>((Map<String, dynamic> e) =>
+          PageData.fromJson(e)).toList() as M;
     }
     if (<DeviceDetailExchangeEntity>[] is M) {
       return data.map<DeviceDetailExchangeEntity>((Map<String, dynamic> e) =>
@@ -354,6 +366,7 @@ class JsonConvertClassCollection {
     (CommonPageData).toString(): CommonPageData.fromJson,
     (IdNameValueEntity).toString(): IdNameValueEntity.fromJson,
     (IdNameValue).toString(): IdNameValue.fromJson,
+    (StrIdNameValue).toString(): StrIdNameValue.fromJson,
     (LinkKage).toString(): LinkKage.fromJson,
     (LinkKageType).toString(): LinkKageType.fromJson,
     (LocationData).toString(): LocationData.fromJson,
@@ -362,8 +375,11 @@ class JsonConvertClassCollection {
     (DeviceDetailAiData).toString(): DeviceDetailAiData.fromJson,
     (DeviceDetailCameraEntity).toString(): DeviceDetailCameraEntity.fromJson,
     (DeviceDetailCameraData).toString(): DeviceDetailCameraData.fromJson,
+    (DeviceDetailCameraSnapList).toString(): DeviceDetailCameraSnapList
+        .fromJson,
     (DeviceDetailCameraDataPhoto).toString(): DeviceDetailCameraDataPhoto
         .fromJson,
+    (PageData).toString(): PageData.fromJson,
     (DeviceDetailExchangeEntity).toString(): DeviceDetailExchangeEntity
         .fromJson,
     (DeviceDetailExchangeData).toString(): DeviceDetailExchangeData.fromJson,

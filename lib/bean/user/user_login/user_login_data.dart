@@ -15,6 +15,7 @@ import 'package:omt/generated/json/user_login_data.g.dart';
 @JsonSerializable()
 class UserInfoData {
   String? phone;
+  String? token;
   List<UserPermission>? userPermissions;
 
   UserInfoData();
