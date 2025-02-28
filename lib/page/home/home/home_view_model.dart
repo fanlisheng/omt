@@ -142,6 +142,20 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
               child: LabelManagementScreen(),
             ),
           ),
+          PaneItem(
+            icon: Container(),
+            title: Text(
+              "一张图",
+              style: TextStyle(
+                  fontSize: 12,
+                  color: 5 == topIndex
+                      ? "#F3FFFF".toColor()
+                      : "#678384".toColor()),
+            ),
+            body: const KeepAlivePage(
+              child: OnePicturePage(),
+            ),
+          ),
         ],
       ),
     ];
