@@ -99,8 +99,8 @@ class DetailNvrView extends StatelessWidget {
                         label: Text("信号状态", style: TextStyle(fontSize: 12))),
                     DataColumn(
                         label: Text("更新时间", style: TextStyle(fontSize: 12))),
-                    DataColumn(
-                        label: Text("操作", style: TextStyle(fontSize: 12))),
+                    // DataColumn(
+                    //     label: Text("操作", style: TextStyle(fontSize: 12))),
                   ],
                   rows: (model.deviceInfo.channels ?? [])
                       .asMap()
@@ -129,31 +129,31 @@ class DetailNvrView extends StatelessWidget {
                               style: const TextStyle(fontSize: 12))),
                           DataCell(Text(info?.updatedAt ?? "",
                               style: const TextStyle(fontSize: 12))),
-                          DataCell(
-                            OutlinedButton(
-                              onPressed: () {
-                                model.removeChannelAction(info!);
-                              },
-                              style: ButtonStyle(
-                                padding: const WidgetStatePropertyAll(
-                                  EdgeInsets.symmetric(
-                                      vertical: 0.0, horizontal: 16),
-                                ),
-                                shape: WidgetStatePropertyAll(
-                                  //圆角
-                                  RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(5)),
-                                ),
-                                side: const WidgetStatePropertyAll(BorderSide(
-                                    color: ColorUtils.colorRed, width: 1.0)),
-                              ),
-                              child: const Text(
-                                "删除通道",
-                                style: TextStyle(
-                                    fontSize: 12, color: ColorUtils.colorRed),
-                              ),
-                            ),
-                          ),
+                          // DataCell(
+                          //   OutlinedButton(
+                          //     onPressed: () {
+                          //       model.removeChannelAction(info!);
+                          //     },
+                          //     style: ButtonStyle(
+                          //       padding: const WidgetStatePropertyAll(
+                          //         EdgeInsets.symmetric(
+                          //             vertical: 0.0, horizontal: 16),
+                          //       ),
+                          //       shape: WidgetStatePropertyAll(
+                          //         //圆角
+                          //         RoundedRectangleBorder(
+                          //             borderRadius: BorderRadius.circular(5)),
+                          //       ),
+                          //       side: const WidgetStatePropertyAll(BorderSide(
+                          //           color: ColorUtils.colorRed, width: 1.0)),
+                          //     ),
+                          //     child: const Text(
+                          //       "删除通道",
+                          //       style: TextStyle(
+                          //           fontSize: 12, color: ColorUtils.colorRed),
+                          //     ),
+                          //   ),
+                          // ),
                         ]);
                   }).toList(),
                 ),

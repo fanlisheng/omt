@@ -76,35 +76,68 @@ class DetailCameraView extends StatelessWidget {
                             const SizedBox(
                               width: 10,
                             ),
-                            Container(
-                              decoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(2)),
-                                  border: Border.all(
-                                    width: 1,
-                                    color: (getException(0).valueColor ?? "")
-                                        .toColor(),
-                                  ),
-                                  color: (getException(0).valueColor ?? "")
-                                      .toColor()
-                                      .withOpacity(0.1)),
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 2, horizontal: 6),
-                              child: Text(
-                                getException(0).value ?? "",
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: (getException(0).valueColor ?? "")
-                                      .toColor(),
-                                ),
-                              ),
-                            ),
+                            Flexible(
+                              child: Row(
+                                  mainAxisSize:
+                                      MainAxisSize.min, // 让 Row 根据内容自适应宽度
+                                  children:
+                                      (model.deviceInfo.cameraStatus ?? [])
+                                          .map((item) {
+                                    return Container(
+                                      margin: const EdgeInsets.only(right: 8),
+                                      // 每个 Container 之间添加间距
+                                      decoration: BoxDecoration(
+                                        borderRadius: const BorderRadius.all(
+                                            Radius.circular(2)),
+                                        border: Border.all(
+                                          width: 1,
+                                          color: "#FF4D4F".toColor(),
+                                        ),
+                                        color: "#FF4D4F"
+                                            .toColor()
+                                            .withOpacity(0.1),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 2, horizontal: 6),
+                                      child: Text(
+                                        item,
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: "#FF4D4F".toColor(),
+                                        ),
+                                      ),
+                                    );
+                                  }).toList()),
+                            )
+                            // Container(
+                            //   decoration: BoxDecoration(
+                            //       borderRadius: const BorderRadius.all(
+                            //           Radius.circular(2)),
+                            //       border: Border.all(
+                            //         width: 1,
+                            //         color: (getException(0).valueColor ?? "")
+                            //             .toColor(),
+                            //       ),
+                            //       color: (getException(0).valueColor ?? "")
+                            //           .toColor()
+                            //           .withOpacity(0.1)),
+                            //   padding: const EdgeInsets.symmetric(
+                            //       vertical: 2, horizontal: 6),
+                            //   child: Text(
+                            //     getException(0).value ?? "",
+                            //     style: TextStyle(
+                            //       fontSize: 10,
+                            //       color: (getException(0).valueColor ?? "")
+                            //           .toColor(),
+                            //     ),
+                            //   ),
+                            // ),
                           ],
                         ),
                         const SizedBox(height: 10),
-                        const Text(
-                          "这里显示设备名称",
-                          style: TextStyle(
+                        Text(
+                          model.deviceInfo.name ?? "-",
+                          style: const TextStyle(
                             fontSize: 12,
                             color: ColorUtils.colorGreenLiteLite,
                             fontWeight: FontWeight.w500,
@@ -263,21 +296,21 @@ class DetailCameraView extends StatelessWidget {
         ),
         Row(
           children: [
-            const SizedBox(
-              width: 16,
-            ),
-            Clickable(
-              onTap: () {},
-              child: Container(
-                padding: const EdgeInsets.only(
-                    left: 25, right: 25, top: 6, bottom: 6),
-                color: ColorUtils.colorGreen,
-                child: const Text(
-                  "重启主程",
-                  style: TextStyle(fontSize: 12, color: ColorUtils.colorWhite),
-                ),
-              ),
-            ),
+            // const SizedBox(
+            //   width: 16,
+            // ),
+            // Clickable(
+            //   onTap: () {},
+            //   child: Container(
+            //     padding: const EdgeInsets.only(
+            //         left: 25, right: 25, top: 6, bottom: 6),
+            //     color: ColorUtils.colorGreen,
+            //     child: const Text(
+            //       "重启主程",
+            //       style: TextStyle(fontSize: 12, color: ColorUtils.colorWhite),
+            //     ),
+            //   ),
+            // ),
             const SizedBox(
               width: 16,
             ),
@@ -326,7 +359,7 @@ class DetailCameraView extends StatelessWidget {
   }
 
   Widget imageTimeView(BuildContext context, String? url, String leftStr,
-      {String? rightStr , GestureTapCallback? onTap}) {
+      {String? rightStr, GestureTapCallback? onTap}) {
     final screenSize = MediaQuery.of(context).size;
     return Clickable(
       // color: "#5B6565".toColor(),
@@ -340,18 +373,18 @@ class DetailCameraView extends StatelessWidget {
           Expanded(
             child: (url ?? "").isNotEmpty
                 ? ImageView(
-              url: url,
-              // src: source(''),
-              // width: 234,
-              // height: 131,
-            )
+                    url: url,
+                    // src: source(''),
+                    // width: 234,
+                    // height: 131,
+                  )
                 : const Center(
-              child: Text(
-                "没有照片",
-                style: TextStyle(
-                    fontSize: 12, color: ColorUtils.colorGreenLiteLite),
-              ),
-            ),
+                    child: Text(
+                      "没有照片",
+                      style: TextStyle(
+                          fontSize: 12, color: ColorUtils.colorGreenLiteLite),
+                    ),
+                  ),
           ),
           // Container(
           //   width: 234 / (1050 - 160) * screenSize.width,
@@ -382,5 +415,3 @@ class DetailCameraView extends StatelessWidget {
     );
   }
 }
-
-

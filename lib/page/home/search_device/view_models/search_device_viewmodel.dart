@@ -113,10 +113,9 @@ class SearchDeviceViewModel extends BaseViewModel {
   //搜索事件
   searchEventAction() async {
     DeviceDetailViewModel model = DeviceDetailViewModel(
-      id: 0,
-      deviceType: DeviceType.camera,
+      deviceType: DeviceType.power,
       // nodeCode: '124#12812-2#2-3#1-11#0',
-      nodeCode: '124#12812-2#2-3#1-11#0',
+      nodeCode: '124#12812-2#7-4#1',
     );
 
     // GoRouter.of(context!).push(Routes.deviceDetail, extra: model);
@@ -199,7 +198,7 @@ class SearchDeviceViewModel extends BaseViewModel {
       "deviceData": deviceNoBindingData,
       "doorList": doorList,
       "instance": selectedInstance
-    })?.then((a){
+    })?.then((a) {
       if (IntentUtils.share.isResultOk(a)) {
         scanAnewEventAction();
       }
@@ -283,6 +282,6 @@ class SearchDeviceViewModel extends BaseViewModel {
       return "${entry.value}个$deviceName";
     }).toList();
 
-    return "${stats.join(" / ")}";
+    return stats.join(" / ");
   }
 }
