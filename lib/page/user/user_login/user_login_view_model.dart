@@ -3,7 +3,7 @@ import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-// import 'package:get_mac_address/get_mac_address.dart';
+import 'package:get_mac_address/get_mac_address.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/user/user_login/user_login_data.dart';
 import 'package:omt/http/http_manager.dart';
@@ -52,7 +52,7 @@ class UserLoginViewModel extends BaseViewModelRefresh<UserInfoData> {
   String selectedProject = "成都项目";
   List<String> projectList = ["成都项目"];
 
-  // final _getMacAddressPlugin = GetMacAddress();
+  final _getMacAddressPlugin = GetMacAddress();
   String _macAddress = '';
 
   @override
@@ -268,9 +268,8 @@ class UserLoginViewModel extends BaseViewModelRefresh<UserInfoData> {
   Future<void> initPlatformState() async {
     String macAddress;
     try {
-      // macAddress =
-      //     await _getMacAddressPlugin.getMacAddress() ?? '';
-      macAddress = "";
+      macAddress =
+          await _getMacAddressPlugin.getMacAddress() ?? 'Unknown mac address';
     } on PlatformException {
       macAddress = '';
     }
