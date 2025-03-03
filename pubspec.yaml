@@ -37,9 +37,9 @@ dependencies:
 
   #  dart_vlc_ffi: ^0.2.0+1 #不支持web https://github.com/alexmercerind/dart_vlc?tab=readme-ov-file
   #  dart_vlc: ^0.4.0
-  media_kit: ^1.1.10+1  # 全能
+#  media_kit: ^1.1.10+1  # 全能
   media_kit_video: ^1.2.4
-  media_kit_libs_video: ^1.0.4
+#  media_kit_libs_video: ^1.0.4
   dart_ping: ^9.0.1
   xterm: ^4.0.0
   flutter_pty: ^0.4.1

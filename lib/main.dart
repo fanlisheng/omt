@@ -39,7 +39,8 @@ void main() async {
       statusBarColor: Colors.transparent,
       statusBarBrightness: Brightness.light);
   SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
-  MediaKit.ensureInitialized();
+  // MediaKit.ensureInitialized();
+  print('MediaKit initialized');
   KayoPackage.share.init(
       enableDark: true,
       onTapToolbarBack: (context) {
