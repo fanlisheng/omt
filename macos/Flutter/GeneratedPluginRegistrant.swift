@@ -11,7 +11,6 @@ import file_picker
 import file_selector_macos
 import flutter_localization
 import flutter_volume_controller
-import get_mac_address
 import macos_window_utils
 import media_kit_libs_macos_video
 import media_kit_video
@@ -36,7 +35,6 @@ func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   FileSelectorPlugin.register(with: registry.registrar(forPlugin: "FileSelectorPlugin"))
   FlutterLocalizationPlugin.register(with: registry.registrar(forPlugin: "FlutterLocalizationPlugin"))
   FlutterVolumeControllerPlugin.register(with: registry.registrar(forPlugin: "FlutterVolumeControllerPlugin"))
-  GetMacAddressPlugin.register(with: registry.registrar(forPlugin: "GetMacAddressPlugin"))
   MacOSWindowUtilsPlugin.register(with: registry.registrar(forPlugin: "MacOSWindowUtilsPlugin"))
   MediaKitLibsMacosVideoPlugin.register(with: registry.registrar(forPlugin: "MediaKitLibsMacosVideoPlugin"))
   MediaKitVideoPlugin.register(with: registry.registrar(forPlugin: "MediaKitVideoPlugin"))
