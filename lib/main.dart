@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:media_kit/media_kit.dart';
-import 'package:network_tools/network_tools.dart';
 import 'package:omt/http/api.dart';
 import 'package:omt/router_utils.dart';
 import 'package:omt/test/test.dart';
@@ -32,7 +31,6 @@ bool get isDesktop {
 }
 
 void main() async {
-  await configureNetworkTools('build', enableDebugging: true);
 
   KeyboardNumber.register();
   KeyboardCarNum.register();

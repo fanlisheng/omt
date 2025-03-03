@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:network_info_plus/network_info_plus.dart';
-import 'package:network_tools/network_tools.dart';
 import 'package:omt/page/home/device_add/view_models/device_add_viewmodel.dart';
 import 'package:omt/utils/hikvision_utils.dart';
 import 'package:ping_discover_network_forked/ping_discover_network_forked.dart';
