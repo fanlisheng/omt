@@ -18,6 +18,7 @@ import 'package:omt/utils/shared_utils.dart';
 import 'package:omt/utils/sys_utils.dart';
 import 'package:omt/widget/combobox.dart';
 
+import '../../../test/select_detail_page.dart';
 import '../../dismantle/widgets/dismantle_screen.dart';
 import '../search_device/widgets/search_device_screen.dart';
 import 'keep_alive_page.dart';
@@ -76,6 +77,26 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
           child: SearchDeviceScreen(),
         ),
         onTap: () => debugPrint('首页'),
+      ),
+
+      PaneItem(
+        key: const ValueKey('/'),
+        icon: PaneImage(
+          name: "home/ic_pane_add",
+          selectedName: 'home/ic_pane_add_s',
+          index: 0,
+          selectedIndex: topIndex,
+        ),
+        title: Text(
+          "测试详情",
+          style: TextStyle(
+              fontSize: 12,
+              color: 0 == topIndex ? "#F3FFFF".toColor() : "#678384".toColor()),
+        ),
+        body: const KeepAlivePage(
+          child: SelectDetailPage(),
+        ),
+        onTap: () => debugPrint('测试详情'),
       ),
       // PaneItem(
       //   icon: PaneImage(

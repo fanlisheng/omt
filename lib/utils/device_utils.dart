@@ -183,6 +183,46 @@ class DeviceUtils {
     return DeviceUtils().macDeviceTypeMap[macPrefix] ?? "";
   }
 
+  static Future<String?> getCurrentDeviceMacAddress() async {
+    ProcessResult result;
+
+    try {
+      if (Platform.isMacOS) {
+        // macOS: 使用 networksetup 或 ifconfig 获取当前设备的 MAC
+        result = await Process.run('ifconfig', ['en0']); // en0 通常是 Wi-Fi 接口
+        String output = result.stdout.toString();
+        RegExp macRegExp = RegExp(r'ether\s([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}');
+        Match? match = macRegExp.firstMatch(output);
+        if (match != null) {
+          return match.group(0)!.replaceAll('ether ', '').trim();
+        }
+      } else if (Platform.isLinux) {
+        // Linux: 使用 ip 或 ifconfig 获取 MAC
+        result = await Process.run('ip', ['link', 'show']);
+        String output = result.stdout.toString();
+        RegExp macRegExp = RegExp(r'link/ether\s([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}');
+        Match? match = macRegExp.firstMatch(output);
+        if (match != null) {
+          return match.group(0)!.replaceAll('link/ether ', '').trim();
+        }
+      } else if (Platform.isWindows) {
+        // Windows: 使用 getmac 或 ipconfig 获取 MAC
+        result = await Process.run('getmac', []);
+        String output = result.stdout.toString();
+        RegExp macRegExp = RegExp(r'([0-9A-Fa-f]{2}-){5}[0-9A-Fa-f]{2}');
+        Match? match = macRegExp.firstMatch(output);
+        if (match != null) {
+          return match.group(0)!.replaceAll('-', ':');
+        }
+      } else {
+        throw Exception("不支持的平台");
+      }
+    } catch (e) {
+      print("获取 MAC 地址失败: $e");
+    }
+    return null;
+  }
+
   /// 获取本机 IP 的子网前缀（如 192.168.1）
   static Future<String?> getSubnet() async {
     for (var interface in await NetworkInterface.list()) {
