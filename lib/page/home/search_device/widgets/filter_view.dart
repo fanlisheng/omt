@@ -65,66 +65,63 @@ class _FilterViewState extends State<FilterView> {
           //         placeholder: "请选择实例")),
           Expanded(
             flex: 2, // 0.5 的比例
-            child: Expanded(
-              flex: 2, // 0.5 的比例
-              child: AutoSuggestBox<StrIdNameValue>(
-                key: model.asgbKey,
-                enabled: model.searchState != DeviceSearchState.searching,
-                placeholder: "请选择",
-                focusNode: model.focusNode,
-                controller: model.controller,
-                onChanged: (text, reason) {
-                  if (reason == TextChangedReason.cleared) {
-                    model.selectedInstance = null;
-                    model.notifyListeners();
-                  }
-                },
-                items: model.instanceList
-                    .map<AutoSuggestBoxItem<StrIdNameValue>>(
-                      (instance) => AutoSuggestBoxItem<StrIdNameValue>(
-                          value: instance,
-                          label: instance.name ?? "",
-                          onFocusChange: (focused) {
-                            if (focused) debugPrint('Focused ${instance.name}');
-                          },
-                          onSelected: () {
-                            model.selectedInstance = instance;
-                            model.notifyListeners();
-                          }),
-                    )
-                    .toList(),
-                itemBuilder:
-                    (BuildContext context, AutoSuggestBoxItem<dynamic> item) {
-                  return InkWell(
-                    child: Container(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Wrap(
-                        runAlignment: WrapAlignment.center,
-                        children: [
-                          Text(
-                            item.value?.name ?? "", // 假设你想展示 item 的某个字段
-                            style: const TextStyle(fontSize: 12),
-                            maxLines: 2,
-                          ),
-                        ],
-                      ),
-                    ),
-                    onTap: () {
-                      if (item.onSelected != null) {
-                        model.focusNode.unfocus();
-                        item.onSelected!();
-                      }
+            child: AutoSuggestBox<StrIdNameValue>(
+              key: model.asgbKey,
+              enabled: model.searchState != DeviceSearchState.searching,
+              placeholder: "请选择",
+              focusNode: model.focusNode,
+              controller: model.controller,
+              onChanged: (text, reason) {
+                if (reason == TextChangedReason.cleared) {
+                  model.selectedInstance = null;
+                  model.notifyListeners();
+                }
+              },
+              items: model.instanceList
+                  .map<AutoSuggestBoxItem<StrIdNameValue>>(
+                    (instance) => AutoSuggestBoxItem<StrIdNameValue>(
+                    value: instance,
+                    label: instance.name ?? "",
+                    onFocusChange: (focused) {
+                      if (focused) debugPrint('Focused ${instance.name}');
                     },
-                  );
-                },
-                onSelected: (item) {
-                  setState(() => model.selectedInstance = item.value);
-                },
-                onOverlayVisibilityChanged: (visible) {
-                  debugPrint('Overlay is visible: $visible');
-                  setState(() {});
-                },
-              ),
+                    onSelected: () {
+                      model.selectedInstance = instance;
+                      model.notifyListeners();
+                    }),
+              )
+                  .toList(),
+              itemBuilder:
+                  (BuildContext context, AutoSuggestBoxItem<dynamic> item) {
+                return InkWell(
+                  child: Container(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Wrap(
+                      runAlignment: WrapAlignment.center,
+                      children: [
+                        Text(
+                          item.value?.name ?? "", // 假设你想展示 item 的某个字段
+                          style: const TextStyle(fontSize: 12),
+                          maxLines: 2,
+                        ),
+                      ],
+                    ),
+                  ),
+                  onTap: () {
+                    if (item.onSelected != null) {
+                      model.focusNode.unfocus();
+                      item.onSelected!();
+                    }
+                  },
+                );
+              },
+              onSelected: (item) {
+                setState(() => model.selectedInstance = item.value);
+              },
+              onOverlayVisibilityChanged: (visible) {
+                debugPrint('Overlay is visible: $visible');
+                setState(() {});
+              },
             ),
           ),
 

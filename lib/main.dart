@@ -39,7 +39,7 @@ void main() async {
       statusBarColor: Colors.transparent,
       statusBarBrightness: Brightness.light);
   SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
-  // MediaKit.ensureInitialized();
+  MediaKit.ensureInitialized();
   print('MediaKit initialized');
   KayoPackage.share.init(
       enableDark: true,
@@ -52,14 +52,14 @@ void main() async {
   Widget homePage = const MyHomePage();
 
   if (isDesktop || kIsWeb) {
-    WidgetsFlutterBinding.ensureInitialized();
+    await WidgetsFlutterBinding.ensureInitialized();
   }
   if (!kIsWeb &&
       [
         TargetPlatform.windows,
         TargetPlatform.android,
       ].contains(defaultTargetPlatform)) {
-    SystemTheme.accentColor.load();
+    await SystemTheme.accentColor.load();
   }
 
   if (isDesktop) {
