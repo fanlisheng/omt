@@ -7,18 +7,15 @@ import '../../../../http/http_query.dart';
 import '../../device_add/view_models/device_add_viewmodel.dart';
 
 class DeviceDetailViewModel extends BaseViewModelRefresh<dynamic> {
-  final int id;
+  final int? id;
   late final DeviceType deviceType;
   final String nodeCode;
 
   DeviceDetailViewModel({
-    required this.id,
+    this.id,
     required this.deviceType,
     required this.nodeCode,
   });
-
-
-
 
   @override
   void initState() async {

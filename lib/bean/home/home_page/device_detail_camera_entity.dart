@@ -23,6 +23,7 @@ class DeviceDetailCameraEntity {
 
 @JsonSerializable()
 class DeviceDetailCameraData {
+  String? name;
   @JSONField(name: "instance_name")
   String? instanceName;
   @JSONField(name: "gate_name")

@@ -21,47 +21,56 @@ class DetailPowerView extends StatelessWidget {
         });
   }
 
-  Widget contentView(DetailPowerViewModel model) {
-    return Container(
-      margin: const EdgeInsets.only(left: 16, right: 16, bottom: 58),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "电源信息",
-            style: TextStyle(
-              fontSize: 14,
-              color: ColorUtils.colorGreenLiteLite,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Column contentView(DetailPowerViewModel model) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: const EdgeInsets.only(left: 16, right: 16),
+          padding:
+          const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 16),
+          color: ColorUtils.colorBackgroundLine,
+          width: double.infinity,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              RowItemInfoView(name: "实例", value: model.deviceInfo.instanceName),
-              RowItemInfoView(name: "大门编号", value: model.deviceInfo.gateName),
+              const Text(
+                "电源信息",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: ColorUtils.colorGreenLiteLite,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  RowItemInfoView(name: "实例", value: model.deviceInfo.instanceName),
+                  RowItemInfoView(name: "大门编号", value: model.deviceInfo.gateName),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  RowItemInfoView(name: "进/出口", value: model.deviceInfo.passName),
+                  RowItemInfoView(name: "标签", value: model.deviceInfo.labelName),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  RowItemInfoView(name: "现场接电方式", value: model.deviceInfo.powerType),
+                  RowItemInfoView(name: "电池容量", value: "${model.deviceInfo.batteryCapacity}"),
+                ],
+              ),
+              const SizedBox(height: 12),
             ],
           ),
-          const SizedBox(height: 12),
-           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              RowItemInfoView(name: "进/出口", value: model.deviceInfo.passName),
-              RowItemInfoView(name: "标签", value: model.deviceInfo.labelName),
-            ],
-          ),
-          const SizedBox(height: 12),
-           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              RowItemInfoView(name: "现场接电方式", value: model.deviceInfo.powerType),
-              RowItemInfoView(name: "电池容量", value: "${model.deviceInfo.batteryCapacity}"),
-            ],
-          ),
-          const SizedBox(height: 12),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

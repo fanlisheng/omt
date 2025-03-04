@@ -31,6 +31,10 @@ extension DeviceDetailCameraEntityExtension on DeviceDetailCameraEntity {
 DeviceDetailCameraData $DeviceDetailCameraDataFromJson(
     Map<String, dynamic> json) {
   final DeviceDetailCameraData deviceDetailCameraData = DeviceDetailCameraData();
+  final String? name = jsonConvert.convert<String>(json['name']);
+  if (name != null) {
+    deviceDetailCameraData.name = name;
+  }
   final String? instanceName = jsonConvert.convert<String>(
       json['instance_name']);
   if (instanceName != null) {
@@ -116,6 +120,7 @@ DeviceDetailCameraData $DeviceDetailCameraDataFromJson(
 Map<String, dynamic> $DeviceDetailCameraDataToJson(
     DeviceDetailCameraData entity) {
   final Map<String, dynamic> data = <String, dynamic>{};
+  data['name'] = entity.name;
   data['instance_name'] = entity.instanceName;
   data['gate_name'] = entity.gateName;
   data['pass_name'] = entity.passName;
@@ -137,6 +142,7 @@ Map<String, dynamic> $DeviceDetailCameraDataToJson(
 
 extension DeviceDetailCameraDataExtension on DeviceDetailCameraData {
   DeviceDetailCameraData copyWith({
+    String? name,
     String? instanceName,
     String? gateName,
     String? passName,
@@ -154,6 +160,7 @@ extension DeviceDetailCameraDataExtension on DeviceDetailCameraData {
     DeviceDetailCameraDataPhoto? nightBasicPhoto,
   }) {
     return DeviceDetailCameraData()
+      ..name = name ?? this.name
       ..instanceName = instanceName ?? this.instanceName
       ..gateName = gateName ?? this.gateName
       ..passName = passName ?? this.passName

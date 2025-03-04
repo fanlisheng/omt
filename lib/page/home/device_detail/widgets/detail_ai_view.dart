@@ -13,8 +13,10 @@ import '../view_models/detail_ai_viewmodel.dart';
 
 class DetailAiView extends StatelessWidget {
   final String nodeCode;
+
   const DetailAiView({
-    super.key, required this.nodeCode,
+    super.key,
+    required this.nodeCode,
   });
 
   @override
@@ -83,18 +85,18 @@ class DetailAiView extends StatelessWidget {
                   RowItemInfoView(
                     name: "主程版本",
                     value: model.deviceInfo.programVersion,
-                    buttonName: "升级",
-                    buttonAction: () {
-                      LogUtils.info(msg: "点击--主程版本-升级");
-                    },
+                    // buttonName: "升级",
+                    // buttonAction: () {
+                    //   LogUtils.info(msg: "点击--主程版本-升级");
+                    // },
                   ),
                   RowItemInfoView(
                     name: "识别版本",
                     value: model.deviceInfo.identityVersion,
-                    buttonName: "升级",
-                    buttonAction: () {
-                      LogUtils.info(msg: "点击--识别版本-升级");
-                    },
+                    // buttonName: "升级",
+                    // buttonAction: () {
+                    //   LogUtils.info(msg: "点击--识别版本-升级");
+                    // },
                   ),
                 ],
               ),
@@ -108,7 +110,9 @@ class DetailAiView extends StatelessWidget {
                     name: "IOT连接状态",
                     value: model.deviceInfo.iotConnectStatus,
                     hasState: true,
-                    stateColor: model.deviceInfo.iotConnectStatus == "连接成功" ? ColorUtils.colorGreen : ColorUtils.colorRed,
+                    stateColor: model.deviceInfo.iotConnectStatus == "连接成功"
+                        ? ColorUtils.colorGreen
+                        : ColorUtils.colorRed,
                   ),
                 ],
               ),
@@ -124,18 +128,18 @@ class DetailAiView extends StatelessWidget {
             const SizedBox(
               width: 16,
             ),
-            Clickable(
-              onTap: () {},
-              child: Container(
-                padding: const EdgeInsets.only(
-                    left: 25, right: 25, top: 6, bottom: 6),
-                color: ColorUtils.colorGreen,
-                child: const Text(
-                  "重启主程",
-                  style: TextStyle(fontSize: 12, color: ColorUtils.colorWhite),
-                ),
-              ),
-            ),
+            // Clickable(
+            //   onTap: () {},
+            //   child: Container(
+            //     padding: const EdgeInsets.only(
+            //         left: 25, right: 25, top: 6, bottom: 6),
+            //     color: ColorUtils.colorGreen,
+            //     child: const Text(
+            //       "重启主程",
+            //       style: TextStyle(fontSize: 12, color: ColorUtils.colorWhite),
+            //     ),
+            //   ),
+            // ),
             const SizedBox(
               width: 16,
             ),
@@ -191,17 +195,23 @@ class RowItemInfoView extends StatelessWidget {
             child: Container(
               width: 6,
               height: 6,
-              margin: const EdgeInsets.only( right:  5),
+              margin: const EdgeInsets.only(right: 5,top: 6),
               decoration: BoxDecoration(
                   borderRadius: const BorderRadius.all(Radius.circular(3)),
                   color: stateColor ?? ColorUtils.colorRed),
             ),
           ),
-          Expanded(child: Text(
-            a,
-            style: const TextStyle(
-                color: ColorUtils.colorGreenLiteLite, fontSize: 12),
-          ),),
+          Flexible(
+            child: Text(
+              a,
+              style: const TextStyle(
+                color: ColorUtils.colorGreenLiteLite,
+                fontSize: 12,
+              ),
+              overflow: TextOverflow.ellipsis, // 长文本截断显示省略号
+              maxLines: 2, // 限制单行
+            ),
+          ),
           if ((buttonName ?? "").isNotEmpty) ...[
             const SizedBox(width: 12),
             Clickable(
@@ -209,7 +219,7 @@ class RowItemInfoView extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.only(
                     left: 12, right: 12, top: 2, bottom: 2),
-                color:  ColorUtils.colorGreen,
+                color: ColorUtils.colorGreen,
                 child: Text(
                   buttonName ?? "",
                   style: const TextStyle(
@@ -217,7 +227,7 @@ class RowItemInfoView extends StatelessWidget {
                 ),
               ),
             ),
-          ]
+          ],
         ],
       ),
     );
