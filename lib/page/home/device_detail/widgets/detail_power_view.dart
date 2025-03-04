@@ -8,12 +8,13 @@ import '../view_models/detail_power_viewmodel.dart';
 import 'detail_ai_view.dart';
 
 class DetailPowerView extends StatelessWidget {
-  const DetailPowerView({super.key});
+  final String nodeCode;
+  const DetailPowerView({super.key, required this.nodeCode});
 
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<DetailPowerViewModel>(
-        model: DetailPowerViewModel()..themeNotifier = true,
+        model: DetailPowerViewModel(nodeCode)..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
           return contentView(model);

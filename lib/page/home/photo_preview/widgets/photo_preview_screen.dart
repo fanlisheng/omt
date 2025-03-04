@@ -4,21 +4,40 @@ import 'package:kayo_package/extension/_index_extension.dart';
 import 'package:kayo_package/mvvm/base/provider_widget.dart';
 import 'package:kayo_package/utils/base_time_utils.dart';
 import 'package:kayo_package/views/widget/base/clickable.dart';
+import 'package:kayo_package/views/widget/base/image_view.dart';
 import 'package:omt/router_utils.dart';
 import 'package:omt/widget/combobox.dart';
+import '../../../../bean/home/home_page/device_detail_camera_entity.dart';
+import '../../../../utils/image_utils.dart';
 import '../../../../utils/intent_utils.dart';
 import '../../../../widget/nav/dnavigation_view.dart';
+import '../../../../widget/pagination/image_display_page.dart';
 import '../../../../widget/pagination/pagination_view.dart';
 import '../../device_detail/widgets/detail_camera_view.dart';
 import '../../photo_detail/view_models/photo_detail_viewmodel.dart';
 import '../../../../utils/color_utils.dart';
 import '../view_models/photo_preview_viewmodel.dart';
 
+class PhotoPreviewScreenData {
+  final String deviceCode;
+  DeviceDetailCameraDataPhoto? dayBasicPhoto;
+  DeviceDetailCameraDataPhoto? nightBasicPhoto;
+
+  PhotoPreviewScreenData({required this.deviceCode,
+    required this.dayBasicPhoto,
+    required this.nightBasicPhoto});
+}
+
 class PhotoPreviewScreen extends StatelessWidget {
+  final PhotoPreviewScreenData photoPreviewScreenData;
+
+  PhotoPreviewScreen({required this.photoPreviewScreenData, super.key});
+
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<PhotoPreviewViewModel>(
-        model: PhotoPreviewViewModel()..themeNotifier = true,
+        model: PhotoPreviewViewModel(photoPreviewScreenData)
+          ..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
           return Container(
@@ -45,7 +64,7 @@ class PhotoPreviewScreen extends StatelessWidget {
                           child: Container(
                             decoration: BoxDecoration(
                               borderRadius:
-                                  const BorderRadius.all(Radius.circular(1)),
+                              const BorderRadius.all(Radius.circular(1)),
                               color: "#5E6363".toColor(),
                             ),
                             width: 34,
@@ -56,6 +75,8 @@ class PhotoPreviewScreen extends StatelessWidget {
                           onTap: () {
                             model.selectedDateTime = model.selectedDateTime
                                 .subtract(const Duration(days: 1));
+                            model.gridViewKey.currentState
+                                ?.loadData(refresh: true);
                             model.notifyListeners();
                           },
                         ),
@@ -65,7 +86,7 @@ class PhotoPreviewScreen extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(horizontal: 12),
                             decoration: BoxDecoration(
                               borderRadius:
-                                  const BorderRadius.all(Radius.circular(1)),
+                              const BorderRadius.all(Radius.circular(1)),
                               color: "#5E6363".toColor(),
                             ),
                             height: 34,
@@ -90,11 +111,19 @@ class PhotoPreviewScreen extends StatelessWidget {
                               context: context,
                               initialDate: model.selectedDateTime,
                               firstDate:
-                                  DateTime(model.selectedDateTime.year - 100),
+                              DateTime(model.selectedDateTime.year - 100),
                               lastDate: DateTime.now(),
+                              builder: (BuildContext context, Widget? child) {
+                                return Container(
+                                  color: ColorUtils.colorBlack,
+                                  child: child,
+                                );
+                              },
                             );
                             if (newTime != null) {
                               model.selectedDateTime = newTime;
+                              model.gridViewKey.currentState
+                                  ?.loadData(refresh: true);
                               model.notifyListeners();
                             }
                           },
@@ -104,7 +133,7 @@ class PhotoPreviewScreen extends StatelessWidget {
                           child: Container(
                             decoration: BoxDecoration(
                               borderRadius:
-                                  const BorderRadius.all(Radius.circular(1)),
+                              const BorderRadius.all(Radius.circular(1)),
                               color: "#5E6363".toColor(),
                             ),
                             width: 34,
@@ -115,8 +144,12 @@ class PhotoPreviewScreen extends StatelessWidget {
                           onTap: () {
                             DateTime tomorrow = model.selectedDateTime
                                 .add(const Duration(days: 1));
-                            if (tomorrow.day <= DateTime.now().day) {
+                            if (tomorrow.day <= DateTime
+                                .now()
+                                .day) {
                               model.selectedDateTime = tomorrow;
+                              model.gridViewKey.currentState
+                                  ?.loadData(refresh: true);
                               model.notifyListeners();
                             }
                           },
@@ -124,6 +157,9 @@ class PhotoPreviewScreen extends StatelessWidget {
                       ],
                     ),
                   ),
+                  onTap: model.isSetBasicPhoto ? () {
+                    IntentUtils.share.popResultOk(context);
+                  } : null,
                 ),
               ),
               content: contentView(model),
@@ -134,6 +170,7 @@ class PhotoPreviewScreen extends StatelessWidget {
 
   Widget contentView(PhotoPreviewViewModel model) {
     return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 28),
       child: Column(
         children: [
           const SizedBox(
@@ -144,22 +181,39 @@ class PhotoPreviewScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                child: imageTimeView(model.context!,"", "日间基准照片"),
-                padding:
-                    EdgeInsets.only(left: 10, right: 10, top: 7, bottom: 6),
+                padding: const EdgeInsets.only(
+                    left: 10, right: 10, top: 7, bottom: 6),
                 color: "#5B6565".toColor(),
+                child: imageTimeView(
+                    model.context!,
+                    model.photoPreviewScreenData.dayBasicPhoto?.url,
+                    "日间基准照片", onTap: () {
+                  ImageUtils.share.showBigImg(
+                    model.context!,
+                    url: ImageUtils.share.getImageUrl(
+                      url: model.photoPreviewScreenData.dayBasicPhoto?.url,
+                    ),
+                  );
+                }),
               ),
               const SizedBox(
                 width: 20,
               ),
               Container(
-                child: imageTimeView(
-                  model.context!,"",
-                  "夜间基准照片",
-                ),
-                padding:
-                    EdgeInsets.only(left: 10, right: 10, top: 7, bottom: 6),
+                padding: const EdgeInsets.only(
+                    left: 10, right: 10, top: 7, bottom: 6),
                 color: "#5B6565".toColor(),
+                child: imageTimeView(
+                    model.context!,
+                    model.photoPreviewScreenData.nightBasicPhoto?.url,
+                    "夜间基准照片", onTap: () {
+                  ImageUtils.share.showBigImg(
+                    model.context!,
+                    url: ImageUtils.share.getImageUrl(
+                      url: model.photoPreviewScreenData.nightBasicPhoto?.url,
+                    ),
+                  );
+                }),
               ),
             ],
           ),
@@ -167,25 +221,116 @@ class PhotoPreviewScreen extends StatelessWidget {
             height: 25,
           ),
           Expanded(
-              flex: 26,
-              child: PaginationGridView(
-                itemWidget: Clickable(
+            flex: 26,
+            child:
+            // ImageDisplayPage<DeviceDetailCameraDataPhoto>(
+            //
+            //   fetchData: (page ,index){
+            //     return model.fetchData(page,index);
+            //   },
+            //   // onDataReloaded: (page , index){
+            //   //
+            //   // },
+            //   itemWidgetBuilder: (c, item) {
+            //     // 使用自定义的 Widget 来展示图片
+            //     return Clickable(
+            //       child: Container(
+            //         padding: const EdgeInsets.only(
+            //             left: 10, right: 10, top: 7, bottom: 6),
+            //         color: "#5B6565".toColor(),
+            //         child: imageTimeView(c, item.url, item.typeText ?? "",
+            //             rightStr: item.snapAt),
+            //       ),
+            //       onTap: () {
+            //         IntentUtils.share
+            //             .push(c, routeName: RouterPage.PhotoDetailScreen);
+            //       },
+            //     );
+            //   },
+            // ),
+            PaginationGridView<DeviceDetailCameraDataPhoto>(
+              // items: model.photoData,
+              key: model.gridViewKey,
+              fetchData: model.fetchData,
+              itemWidgetBuilder: (c, index, item) {
+                print("itemWidgetBuilder - 构建项: $item");
+
+                return Clickable(
                   child: Container(
-                    child: imageTimeView(model.context!, "","背景照片",
-                        rightStr: "2024-10-20 10:32"),
-                    padding:
-                        EdgeInsets.only(left: 10, right: 10, top: 7, bottom: 6),
+                    padding: const EdgeInsets.only(
+                        left: 10, right: 10, top: 7, bottom: 6),
                     color: "#5B6565".toColor(),
+                    child: imageTimeView(c, item.url, item.typeText ?? "",
+                        rightStr: item.snapAt),
                   ),
                   onTap: () {
-                    IntentUtils.share.push(model.context!,
-                        routeName: RouterPage.PhotoDetailScreen);
+                    model.clickPhotoWith(index);
                   },
-                ),
-              ))
+                );
+              },
+            ),
+          ),
         ],
       ),
-      margin: const EdgeInsets.symmetric(horizontal: 28),
+    );
+  }
+
+  Widget imageTimeView(BuildContext context, String? url, String leftStr,
+      {String? rightStr, GestureTapCallback? onTap}) {
+    final screenSize = MediaQuery
+        .of(context)
+        .size;
+    return Clickable(
+      // color: "#5B6565".toColor(),
+      width: 234 / (1050 - 160) * screenSize.width,
+      // width: 234 ,
+      height: screenSize.height * 0.43 / 2,
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: (url ?? "").isNotEmpty
+                ? ImageView(
+              url: url,
+              // src: source(''),
+              // width: 234,
+              // height: 131,
+            )
+                : const Center(
+              child: Text(
+                "没有照片",
+                style: TextStyle(
+                    fontSize: 12, color: ColorUtils.colorGreenLiteLite),
+              ),
+            ),
+          ),
+          // Container(
+          //   width: 234 / (1050 - 160) * screenSize.width,
+          //   // width: 234 ,
+          //   color: ColorUtils.colorGreenLiteLite,
+          // ),
+          const SizedBox(
+            height: 3,
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  leftStr,
+                  style: const TextStyle(
+                      fontSize: 12, color: ColorUtils.colorGreenLiteLite),
+                ),
+              ),
+              Text(
+                rightStr ?? "",
+                style: const TextStyle(
+                    fontSize: 12, color: ColorUtils.colorGreenLiteLite),
+              ),
+            ],
+          )
+        ],
+      ),
     );
   }
 }

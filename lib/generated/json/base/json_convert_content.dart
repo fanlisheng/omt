@@ -186,6 +186,10 @@ class JsonConvert {
       return data.map<IdNameValue>((Map<String, dynamic> e) =>
           IdNameValue.fromJson(e)).toList() as M;
     }
+    if (<StrIdNameValue>[] is M) {
+      return data.map<StrIdNameValue>((Map<String, dynamic> e) =>
+          StrIdNameValue.fromJson(e)).toList() as M;
+    }
     if (<LinkKage>[] is M) {
       return data.map<LinkKage>((Map<String, dynamic> e) =>
           LinkKage.fromJson(e)).toList() as M;
@@ -218,9 +222,17 @@ class JsonConvert {
       return data.map<DeviceDetailCameraData>((Map<String, dynamic> e) =>
           DeviceDetailCameraData.fromJson(e)).toList() as M;
     }
+    if (<DeviceDetailCameraSnapList>[] is M) {
+      return data.map<DeviceDetailCameraSnapList>((Map<String, dynamic> e) =>
+          DeviceDetailCameraSnapList.fromJson(e)).toList() as M;
+    }
     if (<DeviceDetailCameraDataPhoto>[] is M) {
       return data.map<DeviceDetailCameraDataPhoto>((Map<String, dynamic> e) =>
           DeviceDetailCameraDataPhoto.fromJson(e)).toList() as M;
+    }
+    if (<PageData>[] is M) {
+      return data.map<PageData>((Map<String, dynamic> e) =>
+          PageData.fromJson(e)).toList() as M;
     }
     if (<DeviceDetailExchangeEntity>[] is M) {
       return data.map<DeviceDetailExchangeEntity>((Map<String, dynamic> e) =>
@@ -267,6 +279,10 @@ class JsonConvert {
       return data.map<DeviceEntity>((Map<String, dynamic> e) =>
           DeviceEntity.fromJson(e)).toList() as M;
     }
+    if (<DeviceScanEntity>[] is M) {
+      return data.map<DeviceScanEntity>((Map<String, dynamic> e) =>
+          DeviceScanEntity.fromJson(e)).toList() as M;
+    }
     if (<HomePageData>[] is M) {
       return data.map<HomePageData>((Map<String, dynamic> e) =>
           HomePageData.fromJson(e)).toList() as M;
@@ -278,20 +294,6 @@ class JsonConvert {
     if (<OnePictureDataData>[] is M) {
       return data.map<OnePictureDataData>((Map<String, dynamic> e) =>
           OnePictureDataData.fromJson(e)).toList() as M;
-    }
-    if (<OnePictureDataDataChildren>[] is M) {
-      return data.map<OnePictureDataDataChildren>((Map<String, dynamic> e) =>
-          OnePictureDataDataChildren.fromJson(e)).toList() as M;
-    }
-    if (<OnePictureDataDataChildrenChildren>[] is M) {
-      return data.map<OnePictureDataDataChildrenChildren>((
-          Map<String, dynamic> e) =>
-          OnePictureDataDataChildrenChildren.fromJson(e)).toList() as M;
-    }
-    if (<OnePictureDataDataChildrenChildrenChildren>[] is M) {
-      return data.map<OnePictureDataDataChildrenChildrenChildren>((
-          Map<String, dynamic> e) =>
-          OnePictureDataDataChildrenChildrenChildren.fromJson(e)).toList() as M;
     }
     if (<UserInfoData>[] is M) {
       return data.map<UserInfoData>((Map<String, dynamic> e) =>
@@ -368,6 +370,7 @@ class JsonConvertClassCollection {
     (CommonPageData).toString(): CommonPageData.fromJson,
     (IdNameValueEntity).toString(): IdNameValueEntity.fromJson,
     (IdNameValue).toString(): IdNameValue.fromJson,
+    (StrIdNameValue).toString(): StrIdNameValue.fromJson,
     (LinkKage).toString(): LinkKage.fromJson,
     (LinkKageType).toString(): LinkKageType.fromJson,
     (LocationData).toString(): LocationData.fromJson,
@@ -376,8 +379,11 @@ class JsonConvertClassCollection {
     (DeviceDetailAiData).toString(): DeviceDetailAiData.fromJson,
     (DeviceDetailCameraEntity).toString(): DeviceDetailCameraEntity.fromJson,
     (DeviceDetailCameraData).toString(): DeviceDetailCameraData.fromJson,
+    (DeviceDetailCameraSnapList).toString(): DeviceDetailCameraSnapList
+        .fromJson,
     (DeviceDetailCameraDataPhoto).toString(): DeviceDetailCameraDataPhoto
         .fromJson,
+    (PageData).toString(): PageData.fromJson,
     (DeviceDetailExchangeEntity).toString(): DeviceDetailExchangeEntity
         .fromJson,
     (DeviceDetailExchangeData).toString(): DeviceDetailExchangeData.fromJson,
@@ -393,15 +399,10 @@ class JsonConvertClassCollection {
     (DeviceDetailPowerEntity).toString(): DeviceDetailPowerEntity.fromJson,
     (DeviceDetailPowerData).toString(): DeviceDetailPowerData.fromJson,
     (DeviceEntity).toString(): DeviceEntity.fromJson,
+    (DeviceScanEntity).toString(): DeviceScanEntity.fromJson,
     (HomePageData).toString(): HomePageData.fromJson,
     (OnePictureDataEntity).toString(): OnePictureDataEntity.fromJson,
     (OnePictureDataData).toString(): OnePictureDataData.fromJson,
-    (OnePictureDataDataChildren).toString(): OnePictureDataDataChildren
-        .fromJson,
-    (OnePictureDataDataChildrenChildren)
-        .toString(): OnePictureDataDataChildrenChildren.fromJson,
-    (OnePictureDataDataChildrenChildrenChildren)
-        .toString(): OnePictureDataDataChildrenChildrenChildren.fromJson,
     (UserInfoData).toString(): UserInfoData.fromJson,
     (UserPermission).toString(): UserPermission.fromJson,
     (VerInfo).toString(): VerInfo.fromJson,

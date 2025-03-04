@@ -1,73 +1,155 @@
+import 'package:fluent_ui/fluent_ui.dart' as ui;
 import 'package:flutter/material.dart';
 
-// PaginationGridView 负责数据和分页逻辑
-class PaginationGridView extends StatefulWidget {
-  final Widget? itemWidget;
 
-  const PaginationGridView({super.key, this.itemWidget});
+class PaginationGridView<T> extends StatefulWidget {
+  final Future<(List<T>, int)> Function(int page, int itemsPerPage) fetchData;
+  final Widget Function(BuildContext context,int index ,T item) itemWidgetBuilder;
+
+  const PaginationGridView({
+    super.key,
+    required this.fetchData,
+    required this.itemWidgetBuilder,
+  });
 
   @override
-  _PaginationGridViewState createState() => _PaginationGridViewState();
+  PaginationGridViewState<T> createState() => PaginationGridViewState<T>();
 }
 
-class _PaginationGridViewState extends State<PaginationGridView> {
-  final List<String> imageUrls = List.generate(40, (index) => '图片 $index');
-  int currentPage = 1;
-  final int itemsPerPage = 8;
+class PaginationGridViewState<T> extends State<PaginationGridView<T>>
+    with AutomaticKeepAliveClientMixin {
+  static const int _itemsPerPage = 8;
+  int _currentPage = 1;
+  final List<T> _items = [];
+  bool _isLoading = false;
+  int _totalItems = 0; // 动态存储总数
 
-  // 获取当前页显示的图片
-  List<String> get currentPageImages {
-    final startIndex = (currentPage - 1) * itemsPerPage;
-    final endIndex = (currentPage * itemsPerPage) > imageUrls.length
-        ? imageUrls.length
-        : currentPage * itemsPerPage;
-    return imageUrls.sublist(startIndex, endIndex);
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    loadData();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  Future<void> loadData({bool refresh = false}) async {
+    if (_isLoading) return;
+
+    setState(() => _isLoading = true);
+
+    if (refresh) {
+      _currentPage = 1;
+      _items.clear();
+    }
+
+    try {
+      int startIndex = (_currentPage - 1) * _itemsPerPage;
+      if (startIndex >= _totalItems && _totalItems > 0) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('已到达最后一页')),
+          );
+        }
+      } else if (startIndex >= _items.length || refresh) {
+        final (data, total) = await widget.fetchData(_currentPage, _itemsPerPage);
+        if (mounted) {
+          setState(() {
+            if (refresh) _items.clear(); // 刷新时清空
+            _items.addAll(data);
+            _totalItems = total; // 更新总数
+          });
+        }
+      }
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('加载失败: $error')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  List<T> getItems(){
+    return _items;
+  }
+
+  int getCurrentPage(){
+    return _currentPage;
   }
 
   void _nextPage() {
-    if (currentPage < (imageUrls.length / itemsPerPage).ceil()) {
+    int nextStartIndex = _currentPage * _itemsPerPage;
+    if (nextStartIndex >= _totalItems && _totalItems > 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('已到达最后一页')),
+      );
+    } else {
       setState(() {
-        currentPage++;
+        _currentPage++;
       });
+      loadData();
     }
   }
 
   void _previousPage() {
-    if (currentPage > 1) {
+    if (_currentPage > 1) {
       setState(() {
-        currentPage--;
+        _currentPage--;
       });
     }
   }
 
+  List<T> _getCurrentPageItems() {
+    final startIndex = (_currentPage - 1) * _itemsPerPage;
+    final endIndex = (startIndex + _itemsPerPage).clamp(0, _totalItems);
+    if (startIndex >= _items.length || startIndex >= _totalItems) return [];
+    return _items.sublist(startIndex, endIndex.clamp(0, _items.length));
+  }
+
   @override
   Widget build(BuildContext context) {
-    final totalPages = (imageUrls.length / itemsPerPage).ceil();
+    super.build(context);
+    final currentItems = _getCurrentPageItems();
+    final totalPages = (_totalItems / _itemsPerPage).ceil();
 
     return Column(
       children: [
-        // 图片网格显示
         Expanded(
-          child: Container(
-              child: GridView.builder(
+          child: currentItems.isEmpty && !_isLoading
+              ? const Center(child: Text('暂无数据'))
+              : GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-                crossAxisSpacing: 8.0,
-                mainAxisSpacing: 8.0,
-                childAspectRatio: 200 / 135),
-            itemCount: currentPageImages.length,
-            itemBuilder: (context, index) {
-              return widget.itemWidget ??
-                  ItemWidget(item: currentPageImages[index]);
-            },
-          )),
+              crossAxisCount: 4,
+              crossAxisSpacing: 8.0,
+              mainAxisSpacing: 8.0,
+              childAspectRatio: 200 / 135,
+            ),
+            itemCount: currentItems.length,
+            itemBuilder: (context, index) =>
+                widget.itemWidgetBuilder(context, index, currentItems[index]),
+          ),
         ),
-        // 分页控件
+        if (_isLoading)
+          const Padding(
+            padding: EdgeInsets.all(16.0),
+            child: CircularProgressIndicator(),
+          ),
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: PaginationWidget(
-            currentPage: currentPage,
+            currentPage: _currentPage,
             totalPages: totalPages,
+            totalItems: _totalItems,
             onPrevious: _previousPage,
             onNext: _nextPage,
           ),
@@ -77,31 +159,17 @@ class _PaginationGridViewState extends State<PaginationGridView> {
   }
 }
 
-// ItemWidget 用于展示每一项
-class ItemWidget extends StatelessWidget {
-  final String item;
-
-  ItemWidget({required this.item});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 5,
-      child: Center(child: Text(item)),
-    );
-  }
-}
-
-// PaginationWidget 负责分页控制
 class PaginationWidget extends StatelessWidget {
   final int currentPage;
   final int totalPages;
+  final int totalItems;
   final VoidCallback onPrevious;
   final VoidCallback onNext;
 
-  PaginationWidget({
+  const PaginationWidget({
     required this.currentPage,
     required this.totalPages,
+    required this.totalItems,
     required this.onPrevious,
     required this.onNext,
   });
@@ -111,14 +179,14 @@ class PaginationWidget extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text('共 40 条'),
+        Text('共 $totalItems 条'),
         IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: currentPage > 1 ? onPrevious : null,
         ),
         Text('$currentPage / $totalPages'),
         IconButton(
-          icon: Icon(Icons.arrow_forward),
+          icon: const Icon(Icons.arrow_forward),
           onPressed: currentPage < totalPages ? onNext : null,
         ),
       ],

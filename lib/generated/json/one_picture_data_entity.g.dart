@@ -1,5 +1,13 @@
 import 'package:omt/generated/json/base/json_convert_content.dart';
 import 'package:omt/bean/one_picture/one_picture/one_picture_data_entity.dart';
+import 'package:flutter/material.dart';
+
+import 'package:kayo_package/extension/_index_extension.dart';
+
+import 'package:kayo_package/kayo_package.dart';
+
+import 'package:omt/utils/color_utils.dart';
+
 
 OnePictureDataEntity $OnePictureDataEntityFromJson(Map<String, dynamic> json) {
   final OnePictureDataEntity onePictureDataEntity = OnePictureDataEntity();
@@ -99,11 +107,45 @@ OnePictureDataData $OnePictureDataDataFromJson(Map<String, dynamic> json) {
   if (mac != null) {
     onePictureDataData.mac = mac;
   }
-  final List<OnePictureDataDataChildren>? children = (json['children'] as List<
-      dynamic>?)?.map(
+  final bool? sameTypeData = jsonConvert.convert<bool>(json['sameTypeData']);
+  if (sameTypeData != null) {
+    onePictureDataData.sameTypeData = sameTypeData;
+  }
+  final bool? ignore = jsonConvert.convert<bool>(json['ignore']);
+  if (ignore != null) {
+    onePictureDataData.ignore = ignore;
+  }
+  final List<OnePictureDataData>? nextList = (json['nextList'] as List<
+      dynamic>?)
+      ?.map(
           (e) =>
-      jsonConvert.convert<OnePictureDataDataChildren>(
-          e) as OnePictureDataDataChildren).toList();
+      jsonConvert.convert<OnePictureDataData>(e) as OnePictureDataData)
+      .toList();
+  if (nextList != null) {
+    onePictureDataData.nextList = nextList;
+  }
+  final String? lineColor = jsonConvert.convert<String>(json['lineColor']);
+  if (lineColor != null) {
+    onePictureDataData.lineColor = lineColor;
+  }
+  final String? errorTxt = jsonConvert.convert<String>(json['errorTxt']);
+  if (errorTxt != null) {
+    onePictureDataData.errorTxt = errorTxt;
+  }
+  final bool? showArrow = jsonConvert.convert<bool>(json['showArrow']);
+  if (showArrow != null) {
+    onePictureDataData.showArrow = showArrow;
+  }
+  final bool? showBorder = jsonConvert.convert<bool>(json['showBorder']);
+  if (showBorder != null) {
+    onePictureDataData.showBorder = showBorder;
+  }
+  final List<OnePictureDataData>? children = (json['children'] as List<
+      dynamic>?)
+      ?.map(
+          (e) =>
+      jsonConvert.convert<OnePictureDataData>(e) as OnePictureDataData)
+      .toList();
   if (children != null) {
     onePictureDataData.children = children;
   }
@@ -121,7 +163,14 @@ Map<String, dynamic> $OnePictureDataDataToJson(OnePictureDataData entity) {
   data['device_code'] = entity.deviceCode;
   data['ip'] = entity.ip;
   data['mac'] = entity.mac;
-  data['children'] = entity.children?.map((v) => v.toJson()).toList();
+  data['sameTypeData'] = entity.sameTypeData;
+  data['ignore'] = entity.ignore;
+  data['nextList'] = entity.nextList.map((v) => v.toJson()).toList();
+  data['lineColor'] = entity.lineColor;
+  data['errorTxt'] = entity.errorTxt;
+  data['showArrow'] = entity.showArrow;
+  data['showBorder'] = entity.showBorder;
+  data['children'] = entity.children.map((v) => v.toJson()).toList();
   return data;
 }
 
@@ -136,7 +185,16 @@ extension OnePictureDataDataExtension on OnePictureDataData {
     String? deviceCode,
     String? ip,
     String? mac,
-    List<OnePictureDataDataChildren>? children,
+    bool? sameTypeData,
+    bool? ignore,
+    IconData? iconData,
+    String? icon,
+    List<OnePictureDataData>? nextList,
+    String? lineColor,
+    String? errorTxt,
+    bool? showArrow,
+    bool? showBorder,
+    List<OnePictureDataData>? children,
   }) {
     return OnePictureDataData()
       ..id = id ?? this.id
@@ -148,284 +206,15 @@ extension OnePictureDataDataExtension on OnePictureDataData {
       ..deviceCode = deviceCode ?? this.deviceCode
       ..ip = ip ?? this.ip
       ..mac = mac ?? this.mac
-      ..children = children ?? this.children;
-  }
-}
-
-OnePictureDataDataChildren $OnePictureDataDataChildrenFromJson(
-    Map<String, dynamic> json) {
-  final OnePictureDataDataChildren onePictureDataDataChildren = OnePictureDataDataChildren();
-  final String? id = jsonConvert.convert<String>(json['id']);
-  if (id != null) {
-    onePictureDataDataChildren.id = id;
-  }
-  final String? name = jsonConvert.convert<String>(json['name']);
-  if (name != null) {
-    onePictureDataDataChildren.name = name;
-  }
-  final String? nodeCode = jsonConvert.convert<String>(json['node_code']);
-  if (nodeCode != null) {
-    onePictureDataDataChildren.nodeCode = nodeCode;
-  }
-  final int? type = jsonConvert.convert<int>(json['type']);
-  if (type != null) {
-    onePictureDataDataChildren.type = type;
-  }
-  final String? typeText = jsonConvert.convert<String>(json['type_text']);
-  if (typeText != null) {
-    onePictureDataDataChildren.typeText = typeText;
-  }
-  final String? desc = jsonConvert.convert<String>(json['desc']);
-  if (desc != null) {
-    onePictureDataDataChildren.desc = desc;
-  }
-  final String? deviceCode = jsonConvert.convert<String>(json['device_code']);
-  if (deviceCode != null) {
-    onePictureDataDataChildren.deviceCode = deviceCode;
-  }
-  final String? ip = jsonConvert.convert<String>(json['ip']);
-  if (ip != null) {
-    onePictureDataDataChildren.ip = ip;
-  }
-  final String? mac = jsonConvert.convert<String>(json['mac']);
-  if (mac != null) {
-    onePictureDataDataChildren.mac = mac;
-  }
-  final List<
-      OnePictureDataDataChildrenChildren>? children = (json['children'] as List<
-      dynamic>?)?.map(
-          (e) =>
-      jsonConvert.convert<OnePictureDataDataChildrenChildren>(
-          e) as OnePictureDataDataChildrenChildren).toList();
-  if (children != null) {
-    onePictureDataDataChildren.children = children;
-  }
-  return onePictureDataDataChildren;
-}
-
-Map<String, dynamic> $OnePictureDataDataChildrenToJson(
-    OnePictureDataDataChildren entity) {
-  final Map<String, dynamic> data = <String, dynamic>{};
-  data['id'] = entity.id;
-  data['name'] = entity.name;
-  data['node_code'] = entity.nodeCode;
-  data['type'] = entity.type;
-  data['type_text'] = entity.typeText;
-  data['desc'] = entity.desc;
-  data['device_code'] = entity.deviceCode;
-  data['ip'] = entity.ip;
-  data['mac'] = entity.mac;
-  data['children'] = entity.children?.map((v) => v.toJson()).toList();
-  return data;
-}
-
-extension OnePictureDataDataChildrenExtension on OnePictureDataDataChildren {
-  OnePictureDataDataChildren copyWith({
-    String? id,
-    String? name,
-    String? nodeCode,
-    int? type,
-    String? typeText,
-    String? desc,
-    String? deviceCode,
-    String? ip,
-    String? mac,
-    List<OnePictureDataDataChildrenChildren>? children,
-  }) {
-    return OnePictureDataDataChildren()
-      ..id = id ?? this.id
-      ..name = name ?? this.name
-      ..nodeCode = nodeCode ?? this.nodeCode
-      ..type = type ?? this.type
-      ..typeText = typeText ?? this.typeText
-      ..desc = desc ?? this.desc
-      ..deviceCode = deviceCode ?? this.deviceCode
-      ..ip = ip ?? this.ip
-      ..mac = mac ?? this.mac
-      ..children = children ?? this.children;
-  }
-}
-
-OnePictureDataDataChildrenChildren $OnePictureDataDataChildrenChildrenFromJson(
-    Map<String, dynamic> json) {
-  final OnePictureDataDataChildrenChildren onePictureDataDataChildrenChildren = OnePictureDataDataChildrenChildren();
-  final String? id = jsonConvert.convert<String>(json['id']);
-  if (id != null) {
-    onePictureDataDataChildrenChildren.id = id;
-  }
-  final String? name = jsonConvert.convert<String>(json['name']);
-  if (name != null) {
-    onePictureDataDataChildrenChildren.name = name;
-  }
-  final String? nodeCode = jsonConvert.convert<String>(json['node_code']);
-  if (nodeCode != null) {
-    onePictureDataDataChildrenChildren.nodeCode = nodeCode;
-  }
-  final int? type = jsonConvert.convert<int>(json['type']);
-  if (type != null) {
-    onePictureDataDataChildrenChildren.type = type;
-  }
-  final String? typeText = jsonConvert.convert<String>(json['type_text']);
-  if (typeText != null) {
-    onePictureDataDataChildrenChildren.typeText = typeText;
-  }
-  final String? desc = jsonConvert.convert<String>(json['desc']);
-  if (desc != null) {
-    onePictureDataDataChildrenChildren.desc = desc;
-  }
-  final String? deviceCode = jsonConvert.convert<String>(json['device_code']);
-  if (deviceCode != null) {
-    onePictureDataDataChildrenChildren.deviceCode = deviceCode;
-  }
-  final String? ip = jsonConvert.convert<String>(json['ip']);
-  if (ip != null) {
-    onePictureDataDataChildrenChildren.ip = ip;
-  }
-  final String? mac = jsonConvert.convert<String>(json['mac']);
-  if (mac != null) {
-    onePictureDataDataChildrenChildren.mac = mac;
-  }
-  final List<
-      OnePictureDataDataChildrenChildrenChildren>? children = (json['children'] as List<
-      dynamic>?)?.map(
-          (e) =>
-      jsonConvert.convert<OnePictureDataDataChildrenChildrenChildren>(
-          e) as OnePictureDataDataChildrenChildrenChildren).toList();
-  if (children != null) {
-    onePictureDataDataChildrenChildren.children = children;
-  }
-  return onePictureDataDataChildrenChildren;
-}
-
-Map<String, dynamic> $OnePictureDataDataChildrenChildrenToJson(
-    OnePictureDataDataChildrenChildren entity) {
-  final Map<String, dynamic> data = <String, dynamic>{};
-  data['id'] = entity.id;
-  data['name'] = entity.name;
-  data['node_code'] = entity.nodeCode;
-  data['type'] = entity.type;
-  data['type_text'] = entity.typeText;
-  data['desc'] = entity.desc;
-  data['device_code'] = entity.deviceCode;
-  data['ip'] = entity.ip;
-  data['mac'] = entity.mac;
-  data['children'] = entity.children?.map((v) => v.toJson()).toList();
-  return data;
-}
-
-extension OnePictureDataDataChildrenChildrenExtension on OnePictureDataDataChildrenChildren {
-  OnePictureDataDataChildrenChildren copyWith({
-    String? id,
-    String? name,
-    String? nodeCode,
-    int? type,
-    String? typeText,
-    String? desc,
-    String? deviceCode,
-    String? ip,
-    String? mac,
-    List<OnePictureDataDataChildrenChildrenChildren>? children,
-  }) {
-    return OnePictureDataDataChildrenChildren()
-      ..id = id ?? this.id
-      ..name = name ?? this.name
-      ..nodeCode = nodeCode ?? this.nodeCode
-      ..type = type ?? this.type
-      ..typeText = typeText ?? this.typeText
-      ..desc = desc ?? this.desc
-      ..deviceCode = deviceCode ?? this.deviceCode
-      ..ip = ip ?? this.ip
-      ..mac = mac ?? this.mac
-      ..children = children ?? this.children;
-  }
-}
-
-OnePictureDataDataChildrenChildrenChildren $OnePictureDataDataChildrenChildrenChildrenFromJson(
-    Map<String, dynamic> json) {
-  final OnePictureDataDataChildrenChildrenChildren onePictureDataDataChildrenChildrenChildren = OnePictureDataDataChildrenChildrenChildren();
-  final String? id = jsonConvert.convert<String>(json['id']);
-  if (id != null) {
-    onePictureDataDataChildrenChildrenChildren.id = id;
-  }
-  final String? name = jsonConvert.convert<String>(json['name']);
-  if (name != null) {
-    onePictureDataDataChildrenChildrenChildren.name = name;
-  }
-  final String? nodeCode = jsonConvert.convert<String>(json['node_code']);
-  if (nodeCode != null) {
-    onePictureDataDataChildrenChildrenChildren.nodeCode = nodeCode;
-  }
-  final int? type = jsonConvert.convert<int>(json['type']);
-  if (type != null) {
-    onePictureDataDataChildrenChildrenChildren.type = type;
-  }
-  final String? typeText = jsonConvert.convert<String>(json['type_text']);
-  if (typeText != null) {
-    onePictureDataDataChildrenChildrenChildren.typeText = typeText;
-  }
-  final String? desc = jsonConvert.convert<String>(json['desc']);
-  if (desc != null) {
-    onePictureDataDataChildrenChildrenChildren.desc = desc;
-  }
-  final String? deviceCode = jsonConvert.convert<String>(json['device_code']);
-  if (deviceCode != null) {
-    onePictureDataDataChildrenChildrenChildren.deviceCode = deviceCode;
-  }
-  final String? ip = jsonConvert.convert<String>(json['ip']);
-  if (ip != null) {
-    onePictureDataDataChildrenChildrenChildren.ip = ip;
-  }
-  final String? mac = jsonConvert.convert<String>(json['mac']);
-  if (mac != null) {
-    onePictureDataDataChildrenChildrenChildren.mac = mac;
-  }
-  final List<dynamic>? children = (json['children'] as List<dynamic>?)?.map(
-          (e) => e).toList();
-  if (children != null) {
-    onePictureDataDataChildrenChildrenChildren.children = children;
-  }
-  return onePictureDataDataChildrenChildrenChildren;
-}
-
-Map<String, dynamic> $OnePictureDataDataChildrenChildrenChildrenToJson(
-    OnePictureDataDataChildrenChildrenChildren entity) {
-  final Map<String, dynamic> data = <String, dynamic>{};
-  data['id'] = entity.id;
-  data['name'] = entity.name;
-  data['node_code'] = entity.nodeCode;
-  data['type'] = entity.type;
-  data['type_text'] = entity.typeText;
-  data['desc'] = entity.desc;
-  data['device_code'] = entity.deviceCode;
-  data['ip'] = entity.ip;
-  data['mac'] = entity.mac;
-  data['children'] = entity.children;
-  return data;
-}
-
-extension OnePictureDataDataChildrenChildrenChildrenExtension on OnePictureDataDataChildrenChildrenChildren {
-  OnePictureDataDataChildrenChildrenChildren copyWith({
-    String? id,
-    String? name,
-    String? nodeCode,
-    int? type,
-    String? typeText,
-    String? desc,
-    String? deviceCode,
-    String? ip,
-    String? mac,
-    List<dynamic>? children,
-  }) {
-    return OnePictureDataDataChildrenChildrenChildren()
-      ..id = id ?? this.id
-      ..name = name ?? this.name
-      ..nodeCode = nodeCode ?? this.nodeCode
-      ..type = type ?? this.type
-      ..typeText = typeText ?? this.typeText
-      ..desc = desc ?? this.desc
-      ..deviceCode = deviceCode ?? this.deviceCode
-      ..ip = ip ?? this.ip
-      ..mac = mac ?? this.mac
+      ..sameTypeData = sameTypeData ?? this.sameTypeData
+      ..ignore = ignore ?? this.ignore
+      ..iconData = iconData ?? this.iconData
+      ..icon = icon ?? this.icon
+      ..nextList = nextList ?? this.nextList
+      ..lineColor = lineColor ?? this.lineColor
+      ..errorTxt = errorTxt ?? this.errorTxt
+      ..showArrow = showArrow ?? this.showArrow
+      ..showBorder = showBorder ?? this.showBorder
       ..children = children ?? this.children;
   }
 }

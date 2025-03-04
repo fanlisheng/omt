@@ -80,12 +80,14 @@ void main() async {
         // await windowManager.setTitle('');
       }
 
-      await windowManager.setMinimumSize(const Size(1050, 716));
-      await windowManager.show();
-      await windowManager.center(animate: true);
+      await windowManager.setMinimumSize(const Size(1050, 718));
+      await windowManager.setMaximumSize(const Size(1050, 718));
+      // await windowManager.setResizable(false);
       await windowManager.setPreventClose(true);
       await windowManager.setSkipTaskbar(false);
       await windowManager.setMovable(true);
+      await windowManager.center(animate: true);
+      await windowManager.show();
     });
   }
 

@@ -4,6 +4,9 @@ import 'package:omt/bean/home/home_page/device_detail_exchange_entity.dart';
 import '../../../../http/http_query.dart';
 
 class DetailBatteryExchangeViewModel extends BaseViewModelRefresh<dynamic> {
+  final String nodeCode;
+
+  DetailBatteryExchangeViewModel(this.nodeCode);
 
   DeviceDetailExchangeData deviceInfo = DeviceDetailExchangeData();
 
@@ -11,7 +14,7 @@ class DetailBatteryExchangeViewModel extends BaseViewModelRefresh<dynamic> {
   void initState() async {
     super.initState();
     HttpQuery.share.homePageService.deviceDetailExchange(
-        nodeCode: "562#6175-2#2-4#1",
+        nodeCode: nodeCode,
         onSuccess: (DeviceDetailExchangeData? a) {
           deviceInfo = a ?? DeviceDetailExchangeData();
           notifyListeners();

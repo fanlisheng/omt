@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:omt/generated/json/base/json_convert_content.dart';
 import 'package:omt/utils/device_utils.dart';
 import 'package:xml/xml.dart';
@@ -34,7 +36,7 @@ class DeviceEntity {
     final deviceInfoElement = document.findElements('DeviceInfo').first;
     String deviceTypeText =
         deviceInfoElement.findElements('deviceType').first.text;
-    int deviceType = DeviceUtils.getDeviceType(deviceTypeText);
+    int deviceType = DeviceUtils.getDeviceTypeInt(deviceTypeText);
     String mac = deviceInfoElement.findElements('macAddress').first.text;
     String deviceCode = deviceInfoElement.findElements('deviceID').first.text;
 
@@ -46,5 +48,25 @@ class DeviceEntity {
       deviceCode: deviceCode,
     );
     return a;
+  }
+}
+
+@JsonSerializable()
+class DeviceScanEntity {
+  @JSONField(name: "instance_id")
+  String? instanceId;
+  List<DeviceEntity>? devices;
+  @JSONField(name: "unbound_devices")
+  List<DeviceEntity>? unboundDevices;
+
+  DeviceScanEntity();
+
+  factory DeviceScanEntity.fromJson(Map<String, dynamic> json) => $DeviceScanEntityFromJson(json);
+
+  Map<String, dynamic> toJson() => $DeviceScanEntityToJson(this);
+
+  @override
+  String toString() {
+    return jsonEncode(this);
   }
 }

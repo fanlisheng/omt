@@ -18,6 +18,8 @@ class ColorUtils {
 
   static const Color colorBlue = Color(0xFF3D7EFF);
   static const Color colorGreen = Color(0xFF3FC6BD);
+  static const Color colorBrown = Color(0xFF8B4513);
+  static const Color colorBlueLight = Color(0xFF03A9F4);
   static const Color colorGreenLite = Color(0xFF9BBCBA);
   static const Color colorGreenLiteLite = Color(0xFFF3FFFF);
   static const Color colorGreenDark = Color(0xFF007319);

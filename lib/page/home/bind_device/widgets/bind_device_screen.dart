@@ -11,6 +11,7 @@ import 'package:omt/page/home/bind_device/widgets/state_view.dart';
 import 'package:omt/utils/intent_utils.dart';
 import 'package:omt/widget/nav/dnavigation_view.dart';
 import 'package:window_manager/window_manager.dart';
+import '../../../../bean/common/id_name_value.dart';
 import '../../../../bean/home/home_page/device_entity.dart';
 import '../../../../utils/color_utils.dart';
 import '../../search_device/widgets/filter_view.dart';
@@ -18,22 +19,34 @@ import '../view_models/bind_device_viewmodel.dart';
 
 class BindDeviceScreen extends StatelessWidget {
   final List<DeviceEntity> deviceData;
+  final StrIdNameValue instance;
+  final List<IdNameValue> doorList;
 
-  const BindDeviceScreen({super.key, required this.deviceData});
+  const BindDeviceScreen(
+      {super.key,
+      required this.deviceData,
+      required this.instance,
+      required this.doorList});
 
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<BindDeviceViewModel>(
-        model: BindDeviceViewModel(deviceData)..themeNotifier = true,
+        model: BindDeviceViewModel(deviceData, instance, doorList)
+          ..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
           return Container(
             color: "#3B3F3F".toColor(),
             child: fu.ScaffoldPage(
-              header: const fu.PageHeader(
+              header: fu.PageHeader(
                 title: DNavigationView(
                   title: "绑定",
                   titlePass: "首页 / ",
+                  onTap: model.pageState == BindDevicePageState.success
+                      ? () {
+                          IntentUtils.share.popResultOk(context!);
+                        }
+                      : null,
                 ),
               ),
               content: contentView(model),
@@ -91,7 +104,7 @@ class BindDeviceScreen extends StatelessWidget {
                   const EdgeInsets.only(left: 25, right: 25, top: 6, bottom: 6),
               color: ColorUtils.colorGreen,
               child: const Text(
-                "绑定设备",
+                "绑定",
                 style: TextStyle(fontSize: 12, color: ColorUtils.colorWhite),
               ),
             ),

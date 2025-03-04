@@ -150,3 +150,41 @@ extension IdNameValueExtension on IdNameValue {
       ..count = count ?? this.count;
   }
 }
+
+StrIdNameValue $StrIdNameValueFromJson(Map<String, dynamic> json) {
+  final StrIdNameValue strIdNameValue = StrIdNameValue();
+  final String? id = jsonConvert.convert<String>(json['id']);
+  if (id != null) {
+    strIdNameValue.id = id;
+  }
+  final String? name = jsonConvert.convert<String>(json['name']);
+  if (name != null) {
+    strIdNameValue.name = name;
+  }
+  final String? value = jsonConvert.convert<String>(json['value']);
+  if (value != null) {
+    strIdNameValue.value = value;
+  }
+  return strIdNameValue;
+}
+
+Map<String, dynamic> $StrIdNameValueToJson(StrIdNameValue entity) {
+  final Map<String, dynamic> data = <String, dynamic>{};
+  data['id'] = entity.id;
+  data['name'] = entity.name;
+  data['value'] = entity.value;
+  return data;
+}
+
+extension StrIdNameValueExtension on StrIdNameValue {
+  StrIdNameValue copyWith({
+    String? id,
+    String? name,
+    String? value,
+  }) {
+    return StrIdNameValue()
+      ..id = id ?? this.id
+      ..name = name ?? this.name
+      ..value = value ?? this.value;
+  }
+}

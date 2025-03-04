@@ -67,63 +67,77 @@ class DeviceDetailScreen extends StatelessWidget {
 
     switch (model.deviceType) {
       case DeviceType.ai:
-        return const DetailAiView();
+        return DetailAiView(
+          nodeCode: model.nodeCode,
+        );
       case DeviceType.camera:
-        return const DetailCameraView();
+        return DetailCameraView(
+          nodeCode: model.nodeCode,
+        );
       case DeviceType.powerBox:
-        return const DetailPowerBoxView();
+        return DetailPowerBoxView(
+          nodeCode: model.nodeCode,
+        );
       case DeviceType.nvr:
-        return const DetailNvrView();
+        return DetailNvrView(
+          nodeCode: model.nodeCode,
+        );
       case DeviceType.power:
-        return const DetailPowerView();
+        return DetailPowerView(
+          nodeCode: model.nodeCode,
+        );
       case DeviceType.battery:
       case DeviceType.exchange:
-        return const DetailBatteryExchangeView();
+        return DetailBatteryExchangeView(
+          nodeCode: model.nodeCode,
+        );
     }
   }
 
-  Widget portView(DeviceDetailViewModel model) {
-    return Column(
-      spacing: 0,
-      children: [
-        Expanded(
-          child: Container(
-            margin: const EdgeInsets.only(left: 16, right: 16),
-            color: ColorUtils.colorBackgroundLine,
-            child: const Column(
-              children: [
-                DetailPowerView(),
-              ],
-            ),
-          ),
-        ),
-        bottomView(model),
-      ],
-    );
-  }
+  // Widget portView(DeviceDetailViewModel model) {
+  //   return Column(
+  //     spacing: 0,
+  //     children: [
+  //       Expanded(
+  //         child: Container(
+  //           margin: const EdgeInsets.only(left: 16, right: 16),
+  //           color: ColorUtils.colorBackgroundLine,
+  //           child: Column(
+  //             children: [
+  //               DetailPowerView(
+  //                 nodeCode: model.nodeCode,
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //       bottomView(model),
+  //     ],
+  //   );
+  // }
 
-  Widget bottomView(DeviceDetailViewModel model) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Clickable(
-            child: Container(
-              padding:
-                  const EdgeInsets.only(left: 25, right: 25, top: 6, bottom: 6),
-              color: ColorUtils.colorGreen,
-              child: const Text(
-                "确定",
-                style: TextStyle(fontSize: 12, color: ColorUtils.colorWhite),
-              ),
-            ),
-            onTap: () {
-              model.confirmPowerEventAction();
-            },
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget bottomView(DeviceDetailViewModel model) {
+  //   return Container(
+  //     margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.center,
+  //       children: [
+  //         Clickable(
+  //           child: Container(
+  //             padding:
+  //                 const EdgeInsets.only(left: 25, right: 25, top: 6, bottom: 6),
+  //             color: ColorUtils.colorGreen,
+  //             child: const Text(
+  //               "确定",
+  //               style: TextStyle(fontSize: 12, color: ColorUtils.colorWhite),
+  //             ),
+  //           ),
+  //           onTap: () {
+  //             model.confirmPowerEventAction();
+  //           },
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 }

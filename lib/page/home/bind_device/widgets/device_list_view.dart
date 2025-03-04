@@ -34,7 +34,7 @@ class _DeviceListViewState extends State<DeviceListView> {
           Container(
             decoration: BoxDecoration(
                 border: Border.all(width: 1, color: "#5D6666".toColor())),
-            height: 165,
+            height: 215,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -92,7 +92,7 @@ class _DeviceListViewState extends State<DeviceListView> {
 Widget deviceShowList1(List<DeviceEntity> deviceData,
     {Function(int)? onTap}) {
   return GridView.builder(
-    padding: const EdgeInsets.only(left: 12, right: 12),
+    padding: const EdgeInsets.only(left: 12, right: 12, top: 10, bottom: 10),
     itemCount: deviceData.length, // 项目的数量
     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
       crossAxisCount: 6, // 设置每行显示 3 个项

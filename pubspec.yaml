@@ -48,6 +48,7 @@ dependencies:
   network_info_plus: ^6.1.2
   ping_discover_network_forked: ^0.0.1
   network_tools: ^5.0.5
+  get_mac_address: ^0.0.2
   graphview:
     git:
       url: https://gitee.com/kayoxu/graphview.git

@@ -28,6 +28,7 @@ class _FilterViewState extends State<FilterView> {
   }
 
   Container buildContainer(SearchDeviceViewModel model, BuildContext context2) {
+    bool disabled = model.searchState == DeviceSearchState.searching;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       height: 34,
@@ -66,7 +67,7 @@ class _FilterViewState extends State<FilterView> {
             flex: 2, // 0.5 的比例
             child: Expanded(
               flex: 2, // 0.5 的比例
-              child: AutoSuggestBox<IdNameValue>(
+              child: AutoSuggestBox<StrIdNameValue>(
                 key: model.asgbKey,
                 enabled: model.searchState != DeviceSearchState.searching,
                 placeholder: "请选择",
@@ -79,8 +80,8 @@ class _FilterViewState extends State<FilterView> {
                   }
                 },
                 items: model.instanceList
-                    .map<AutoSuggestBoxItem<IdNameValue>>(
-                      (instance) => AutoSuggestBoxItem<IdNameValue>(
+                    .map<AutoSuggestBoxItem<StrIdNameValue>>(
+                      (instance) => AutoSuggestBoxItem<StrIdNameValue>(
                           value: instance,
                           label: instance.name ?? "",
                           onFocusChange: (focused) {
@@ -145,6 +146,7 @@ class _FilterViewState extends State<FilterView> {
               child: FComboBox<IdNameValue>(
                   selectedValue: model.selectedDoor,
                   items: model.doorList,
+                  disabled: disabled,
                   onChanged: (a) {
                     model.selectedDoor = a;
                     model.notifyListeners();
@@ -168,6 +170,7 @@ class _FilterViewState extends State<FilterView> {
               child: FComboBox<IdNameValue>(
                   selectedValue: model.selectedInOut,
                   items: model.inOutList,
+                  disabled: disabled,
                   onChanged: (a) {
                     model.selectedInOut = a;
                     model.notifyListeners();

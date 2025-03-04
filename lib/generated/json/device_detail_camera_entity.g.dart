@@ -75,12 +75,10 @@ DeviceDetailCameraData $DeviceDetailCameraDataFromJson(
   if (cameraCode != null) {
     deviceDetailCameraData.cameraCode = cameraCode;
   }
-  final List<
-      DeviceDetailCameraDataPhoto>? cameraStatus = (json['camera_status'] as List<
-      dynamic>?)?.map(
-          (e) =>
-      jsonConvert.convert<DeviceDetailCameraDataPhoto>(
-          e) as DeviceDetailCameraDataPhoto).toList();
+  final List<String>? cameraStatus = (json['camera_status'] as List<dynamic>?)
+      ?.map(
+          (e) => jsonConvert.convert<String>(e) as String)
+      .toList();
   if (cameraStatus != null) {
     deviceDetailCameraData.cameraStatus = cameraStatus;
   }
@@ -128,7 +126,7 @@ Map<String, dynamic> $DeviceDetailCameraDataToJson(
   data['camera_type_text'] = entity.cameraTypeText;
   data['control_status_text'] = entity.controlStatusText;
   data['camera_code'] = entity.cameraCode;
-  data['camera_status'] = entity.cameraStatus?.map((v) => v.toJson()).toList();
+  data['camera_status'] = entity.cameraStatus;
   data['last_bg_photos'] = entity.lastBgPhotos?.map((v) => v.toJson()).toList();
   data['last_snap_photos'] =
       entity.lastSnapPhotos?.map((v) => v.toJson()).toList();
@@ -149,7 +147,7 @@ extension DeviceDetailCameraDataExtension on DeviceDetailCameraData {
     String? cameraTypeText,
     String? controlStatusText,
     String? cameraCode,
-    List<DeviceDetailCameraDataPhoto>? cameraStatus,
+    List<String>? cameraStatus,
     List<DeviceDetailCameraDataPhoto>? lastBgPhotos,
     List<DeviceDetailCameraDataPhoto>? lastSnapPhotos,
     DeviceDetailCameraDataPhoto? dayBasicPhoto,
@@ -174,6 +172,78 @@ extension DeviceDetailCameraDataExtension on DeviceDetailCameraData {
   }
 }
 
+DeviceDetailCameraSnapList $DeviceDetailCameraSnapListFromJson(
+    Map<String, dynamic> json) {
+  final DeviceDetailCameraSnapList deviceDetailCameraSnapList = DeviceDetailCameraSnapList();
+  final String? code = jsonConvert.convert<String>(json['code']);
+  if (code != null) {
+    deviceDetailCameraSnapList.code = code;
+  }
+  final String? message = jsonConvert.convert<String>(json['message']);
+  if (message != null) {
+    deviceDetailCameraSnapList.message = message;
+  }
+  final List<DeviceDetailCameraDataPhoto>? data = (json['data'] as List<
+      dynamic>?)?.map(
+          (e) =>
+      jsonConvert.convert<DeviceDetailCameraDataPhoto>(
+          e) as DeviceDetailCameraDataPhoto).toList();
+  if (data != null) {
+    deviceDetailCameraSnapList.data = data;
+  }
+  final String? status = jsonConvert.convert<String>(json['status']);
+  if (status != null) {
+    deviceDetailCameraSnapList.status = status;
+  }
+  final String? details = jsonConvert.convert<String>(json['details']);
+  if (details != null) {
+    deviceDetailCameraSnapList.details = details;
+  }
+  final PageData? page = jsonConvert.convert<PageData>(json['page']);
+  if (page != null) {
+    deviceDetailCameraSnapList.page = page;
+  }
+  final String? requestId = jsonConvert.convert<String>(json['request_id']);
+  if (requestId != null) {
+    deviceDetailCameraSnapList.requestId = requestId;
+  }
+  return deviceDetailCameraSnapList;
+}
+
+Map<String, dynamic> $DeviceDetailCameraSnapListToJson(
+    DeviceDetailCameraSnapList entity) {
+  final Map<String, dynamic> data = <String, dynamic>{};
+  data['code'] = entity.code;
+  data['message'] = entity.message;
+  data['data'] = entity.data?.map((v) => v.toJson()).toList();
+  data['status'] = entity.status;
+  data['details'] = entity.details;
+  data['page'] = entity.page?.toJson();
+  data['request_id'] = entity.requestId;
+  return data;
+}
+
+extension DeviceDetailCameraSnapListExtension on DeviceDetailCameraSnapList {
+  DeviceDetailCameraSnapList copyWith({
+    String? code,
+    String? message,
+    List<DeviceDetailCameraDataPhoto>? data,
+    String? status,
+    String? details,
+    PageData? page,
+    String? requestId,
+  }) {
+    return DeviceDetailCameraSnapList()
+      ..code = code ?? this.code
+      ..message = message ?? this.message
+      ..data = data ?? this.data
+      ..status = status ?? this.status
+      ..details = details ?? this.details
+      ..page = page ?? this.page
+      ..requestId = requestId ?? this.requestId;
+  }
+}
+
 DeviceDetailCameraDataPhoto $DeviceDetailCameraDataPhotoFromJson(
     Map<String, dynamic> json) {
   final DeviceDetailCameraDataPhoto deviceDetailCameraDataPhoto = DeviceDetailCameraDataPhoto();
@@ -193,6 +263,10 @@ DeviceDetailCameraDataPhoto $DeviceDetailCameraDataPhotoFromJson(
   if (snapAt != null) {
     deviceDetailCameraDataPhoto.snapAt = snapAt;
   }
+  final String? typeText = jsonConvert.convert<String>(json['type_text']);
+  if (typeText != null) {
+    deviceDetailCameraDataPhoto.typeText = typeText;
+  }
   return deviceDetailCameraDataPhoto;
 }
 
@@ -203,6 +277,7 @@ Map<String, dynamic> $DeviceDetailCameraDataPhotoToJson(
   data['updated_by'] = entity.updatedBy;
   data['updated_at'] = entity.updatedAt;
   data['snap_at'] = entity.snapAt;
+  data['type_text'] = entity.typeText;
   return data;
 }
 
@@ -212,11 +287,51 @@ extension DeviceDetailCameraDataPhotoExtension on DeviceDetailCameraDataPhoto {
     String? updatedBy,
     String? updatedAt,
     String? snapAt,
+    String? typeText,
   }) {
     return DeviceDetailCameraDataPhoto()
       ..url = url ?? this.url
       ..updatedBy = updatedBy ?? this.updatedBy
       ..updatedAt = updatedAt ?? this.updatedAt
-      ..snapAt = snapAt ?? this.snapAt;
+      ..snapAt = snapAt ?? this.snapAt
+      ..typeText = typeText ?? this.typeText;
+  }
+}
+
+PageData $PageDataFromJson(Map<String, dynamic> json) {
+  final PageData pageData = PageData();
+  final int? total = jsonConvert.convert<int>(json['total']);
+  if (total != null) {
+    pageData.total = total;
+  }
+  final int? page = jsonConvert.convert<int>(json['page']);
+  if (page != null) {
+    pageData.page = page;
+  }
+  final int? limit = jsonConvert.convert<int>(json['limit']);
+  if (limit != null) {
+    pageData.limit = limit;
+  }
+  return pageData;
+}
+
+Map<String, dynamic> $PageDataToJson(PageData entity) {
+  final Map<String, dynamic> data = <String, dynamic>{};
+  data['total'] = entity.total;
+  data['page'] = entity.page;
+  data['limit'] = entity.limit;
+  return data;
+}
+
+extension PageDataExtension on PageData {
+  PageData copyWith({
+    int? total,
+    int? page,
+    int? limit,
+  }) {
+    return PageData()
+      ..total = total ?? this.total
+      ..page = page ?? this.page
+      ..limit = limit ?? this.limit;
   }
 }

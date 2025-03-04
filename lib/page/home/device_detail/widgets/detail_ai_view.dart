@@ -12,14 +12,15 @@ import '../../device_add/view_models/device_add_viewmodel.dart';
 import '../view_models/detail_ai_viewmodel.dart';
 
 class DetailAiView extends StatelessWidget {
+  final String nodeCode;
   const DetailAiView({
-    super.key,
+    super.key, required this.nodeCode,
   });
 
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<DetailAiViewModel>(
-        model: DetailAiViewModel()..themeNotifier = true,
+        model: DetailAiViewModel(nodeCode)..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
           return aiView(model);
@@ -175,6 +176,7 @@ class RowItemInfoView extends StatelessWidget {
     return Expanded(
       flex: 1,
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
             width: 102,
@@ -195,11 +197,11 @@ class RowItemInfoView extends StatelessWidget {
                   color: stateColor ?? ColorUtils.colorRed),
             ),
           ),
-          Text(
+          Expanded(child: Text(
             a,
             style: const TextStyle(
                 color: ColorUtils.colorGreenLiteLite, fontSize: 12),
-          ),
+          ),),
           if ((buttonName ?? "").isNotEmpty) ...[
             const SizedBox(width: 12),
             Clickable(

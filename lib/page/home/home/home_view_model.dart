@@ -77,42 +77,42 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
         ),
         onTap: () => debugPrint('首页'),
       ),
-      PaneItem(
-        icon: PaneImage(
-          name: "home/ic_pane_add",
-          selectedName: 'home/ic_pane_add_s',
-          index: 1,
-          selectedIndex: topIndex,
-        ),
-        title: Text(
-          "安装",
-          style: TextStyle(
-              fontSize: 12,
-              color: 1 == topIndex ? "#F3FFFF".toColor() : "#678384".toColor()),
-        ),
-        body: const KeepAlivePage(
-          child: InstallDeviceScreen(),
-        ),
-        onTap: () => debugPrint('安装'),
-      ),
-      PaneItem(
-        icon: PaneImage(
-          name: "home/ic_pane_delete",
-          selectedName: 'home/ic_pane_delete',
-          index: 2,
-          selectedIndex: topIndex,
-        ),
-        title: Text(
-          "拆除",
-          style: TextStyle(
-              fontSize: 12,
-              color: 2 == topIndex ? "#F3FFFF".toColor() : "#678384".toColor()),
-        ),
-        body: const KeepAlivePage(
-          child: DismantleScreen(),
-        ),
-        onTap: () => debugPrint('拆除'),
-      ),
+      // PaneItem(
+      //   icon: PaneImage(
+      //     name: "home/ic_pane_add",
+      //     selectedName: 'home/ic_pane_add_s',
+      //     index: 1,
+      //     selectedIndex: topIndex,
+      //   ),
+      //   title: Text(
+      //     "安装",
+      //     style: TextStyle(
+      //         fontSize: 12,
+      //         color: 1 == topIndex ? "#F3FFFF".toColor() : "#678384".toColor()),
+      //   ),
+      //   body: const KeepAlivePage(
+      //     child: InstallDeviceScreen(),
+      //   ),
+      //   onTap: () => debugPrint('安装'),
+      // ),
+      // PaneItem(
+      //   icon: PaneImage(
+      //     name: "home/ic_pane_delete",
+      //     selectedName: 'home/ic_pane_delete',
+      //     index: 2,
+      //     selectedIndex: topIndex,
+      //   ),
+      //   title: Text(
+      //     "拆除",
+      //     style: TextStyle(
+      //         fontSize: 12,
+      //         color: 2 == topIndex ? "#F3FFFF".toColor() : "#678384".toColor()),
+      //   ),
+      //   body: const KeepAlivePage(
+      //     child: DismantleScreen(),
+      //   ),
+      //   onTap: () => debugPrint('拆除'),
+      // ),
       PaneItemExpander(
         icon: PaneImage(
           name: "home/ic_pane_set",
@@ -128,20 +128,20 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
         ),
         body: Container(),
         items: [
-          PaneItem(
-            icon: Container(),
-            title: Text(
-              "个设备",
-              style: TextStyle(
-                  fontSize: 12,
-                  color: 4 == topIndex
-                      ? "#F3FFFF".toColor()
-                      : "#678384".toColor()),
-            ),
-            body: const KeepAlivePage(
-              child: LabelManagementScreen(),
-            ),
-          ),
+          // PaneItem(
+          //   icon: Container(),
+          //   title: Text(
+          //     "个设备",
+          //     style: TextStyle(
+          //         fontSize: 12,
+          //         color: 4 == topIndex
+          //             ? "#F3FFFF".toColor()
+          //             : "#678384".toColor()),
+          //   ),
+          //   body: const KeepAlivePage(
+          //     child: LabelManagementScreen(),
+          //   ),
+          // ),
           PaneItem(
             icon: Container(),
             title: Text(

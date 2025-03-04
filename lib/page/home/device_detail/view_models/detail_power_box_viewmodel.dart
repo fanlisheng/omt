@@ -8,9 +8,9 @@ import '../../../../http/http_query.dart';
 import '../../device_add/view_models/device_add_viewmodel.dart';
 
 class DetailPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
-  // Function()? subNotifyListeners;
+  final String nodeCode;
 
-  // AiAddViewModel({this.subNotifyListeners});
+  DetailPowerBoxViewModel(this.nodeCode);
 
   String selectedPowerBoxCoding = "";
   List powerBoxCodingList = ["1", "2"];
@@ -23,7 +23,7 @@ class DetailPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
   void initState() async {
     super.initState();
     HttpQuery.share.homePageService.deviceDetailPowerBox(
-        nodeCode: "562#6175-2#2-4#1",
+        nodeCode: nodeCode,
         onSuccess: (DeviceDetailPowerBoxData? a) {
           deviceInfo = a ?? DeviceDetailPowerBoxData();
           notifyListeners();

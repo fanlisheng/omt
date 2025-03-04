@@ -79,7 +79,10 @@ class _DeviceListViewState extends State<DeviceListView> {
                       children: [
                         Expanded(
                           child: LinearProgressIndicator(
-                            value: model.searchState == DeviceSearchState.completed ? 1 : null,
+                            value:
+                                model.searchState == DeviceSearchState.completed
+                                    ? 1
+                                    : null,
                             // 进度值，0.5表示50%
                             backgroundColor: "#676B6B".toColor(),
                             // 进度条的背景颜色
@@ -91,7 +94,8 @@ class _DeviceListViewState extends State<DeviceListView> {
                           ),
                         ),
                         Visibility(
-                          visible: model.searchState == DeviceSearchState.completed,
+                          visible:
+                              model.searchState == DeviceSearchState.completed,
                           child: ImageView(
                             src: source("home/ic_complete"),
                             width: 20,
@@ -209,8 +213,12 @@ class _DeviceListViewState extends State<DeviceListView> {
           const SizedBox(height: 10),
           TextView(
             "扫描设备",
-            bgColor: model.selectedInstance != null ? ColorUtils.colorGreen : ColorUtils.colorGreen.withOpacity(0.2) ,
-            color: model.selectedInstance != null ? BaseColorUtils.white : BaseColorUtils.white.withOpacity(0.2) ,
+            bgColor: model.selectedInstance != null
+                ? ColorUtils.colorGreen
+                : ColorUtils.colorGreen.withOpacity(0.2),
+            color: model.selectedInstance != null
+                ? BaseColorUtils.white
+                : BaseColorUtils.white.withOpacity(0.2),
             textDarkOnlyOpacity: true,
             textAlign: TextAlign.center,
             padding: const EdgeInsets.symmetric(
@@ -218,9 +226,11 @@ class _DeviceListViewState extends State<DeviceListView> {
               vertical: 6,
             ),
             radius: 0,
-            onTap:model.selectedInstance != null ? () {
-              model.scanStartEventAction();
-            } : null,
+            onTap: model.selectedInstance != null
+                ? () {
+                    model.scanStartEventAction();
+                  }
+                : null,
           ),
         ],
       ),
@@ -248,7 +258,7 @@ class _DeviceListViewState extends State<DeviceListView> {
                 flex: 5,
                 child: ImageView(
                     src: source(DeviceUtils.getDeviceImage(
-                        deviceData[index].deviceTypeText ?? ""))),
+                        deviceData[index].deviceType ?? 0))),
               ),
               SizedBox(height: 4),
               Expanded(
@@ -256,7 +266,8 @@ class _DeviceListViewState extends State<DeviceListView> {
                 child: FittedBox(
                   fit: BoxFit.contain,
                   child: Text(
-                    deviceData[index].deviceTypeText ?? "-",
+                    DeviceUtils.getDeviceTypeString(deviceData[index].deviceType ?? 0)
+                    ,
                     style: const TextStyle(color: ColorUtils.colorWhite),
                   ),
                 ),

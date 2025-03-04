@@ -31,7 +31,7 @@ class DeviceUtils {
 
     // // 2. 获取并发任务，分批处理
     List<Future<void>> pingTasks = [];
-    const batchSize = 50; // 每批次同时处理的数量
+    const batchSize = 70; // 每批次同时处理的数量
     for (int i = 1; i < 255; i++) {
       String ip = "$subnet.$i";
       pingTasks.add(pingDevice(ip, shouldStop));
@@ -74,7 +74,7 @@ class DeviceUtils {
               ip: ip,
               mac: mac,
               deviceTypeText: "路由器",
-              deviceType: getDeviceType("路由器"),
+              deviceType: getDeviceTypeInt("路由器"),
               deviceCode: ""));
         } else {
           if (deviceTypeText.isNotEmpty) {
@@ -82,7 +82,7 @@ class DeviceUtils {
                 ip: ip,
                 mac: mac,
                 deviceTypeText: deviceTypeText,
-                deviceType: getDeviceType(deviceTypeText),
+                deviceType: getDeviceTypeInt(deviceTypeText),
                 deviceCode: "");
             if (deviceTypeText == "AI设备") {
               String deviceCode = mac.replaceAll(":", "");
@@ -198,54 +198,55 @@ class DeviceUtils {
 
   // device_type：设备类型
   // 5:电源箱；6：路由器；8：NVR；9：交换机；10：AI设备（工控机）；11：摄像头；
-  static int getDeviceType(String deviceTypeText) {
-    if (deviceTypeText == "电源箱") {
-      return 5;
-    } else if (deviceTypeText == "路由器") {
-      return 6;
-    } else if (deviceTypeText == "NVR") {
-      return 8;
-    } else if (deviceTypeText == "交换机") {
-      return 9;
-    } else if (deviceTypeText == "AI设备") {
-      return 10;
-    } else if (deviceTypeText == "摄像头") {
-      return 11;
-    } else {
-      return 0;
-    }
+// 设备类型映射
+  static const Map<String, int> _deviceTypeMap = {
+    "电源箱": 5,
+    "路由器": 6,
+    "NVR": 8,
+    "交换机": 9,
+    "AI设备": 10,
+    "摄像头": 11,
+  };
+
+  // 设备类型名称映射
+  static const Map<DeviceType, String> _deviceTypeNameMap = {
+    DeviceType.ai: "AI设备",
+    DeviceType.power: "电源",
+    DeviceType.nvr: "NVR",
+    DeviceType.powerBox: "电源箱",
+    DeviceType.battery: "电池",
+    DeviceType.exchange: "交换机",
+    DeviceType.camera: "摄像头",
+  };
+
+  // 设备图片映射
+  static const Map<String, String> _deviceImageMap = {
+    "NVR": "home/ic_device_nvr",
+    "AI设备": "home/ic_device_ai",
+    "摄像头": "home/ic_device_camera",
+    "路由器": "home/ic_device_router",
+  };
+
+  /// 获取设备类型（根据设备名称）
+  static int getDeviceTypeInt(String deviceTypeText) {
+    return _deviceTypeMap[deviceTypeText] ?? 0;
   }
 
-  static String getDeviceImage(String deviceTypeText) {
-    if (deviceTypeText == "NVR") {
-      return "home/ic_device_nvr";
-    } else if (deviceTypeText == "AI设备") {
-      return "home/ic_device_ai";
-    } else if (deviceTypeText == "摄像头") {
-      return "home/ic_device_camera";
-    } else if (deviceTypeText == "路由器") {
-      return "home/ic_device_router";
-    } else {
-      return "";
-    }
+  static String getDeviceTypeString(int deviceType) {
+    final entry = _deviceTypeMap.entries.firstWhere(
+      (element) => element.value == deviceType,
+      orElse: () => const MapEntry('', -1), // 如果没有找到对应的 value，返回空的 MapEntry
+    );
+    return entry.key.isNotEmpty ? entry.key : "-"; // 如果找到 key，则返回，否则返回 null
   }
 
+  /// 获取设备图片路径
+  static String getDeviceImage(int deviceType) {
+    return _deviceImageMap[getDeviceTypeString(deviceType)] ?? "";
+  }
+
+  /// 获取设备类型名称
   static String getDeviceTypeName(DeviceType type) {
-    switch (type) {
-      case DeviceType.ai:
-        return "AI设备";
-      case DeviceType.power:
-        return "电源";
-      case DeviceType.nvr:
-        return "NVR";
-      case DeviceType.powerBox:
-        return "电源箱";
-      case DeviceType.battery:
-        return "电池";
-      case DeviceType.exchange:
-        return "交换机";
-      case DeviceType.camera:
-        return "摄像头";
-    }
+    return _deviceTypeNameMap[type] ?? "未知设备";
   }
 }

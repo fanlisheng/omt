@@ -85,3 +85,22 @@ class IdNameValue {
     return name ?? "";
   }
 }
+
+
+@JsonSerializable()
+class StrIdNameValue {
+  String? id;
+  String? name;
+  String? value;
+
+  StrIdNameValue({
+    this.id,
+    this.name,
+    this.value,
+  });
+
+  factory StrIdNameValue.fromJson(Map<String, dynamic> json) =>
+      $StrIdNameValueFromJson(json);
+
+  	Map<String, dynamic> toJson() => $StrIdNameValueToJson(this);
+}

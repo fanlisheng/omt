@@ -168,7 +168,9 @@ Route<dynamic> generateRoute(RouteSettings settings, {uniqueId}) {
           settings: settings,
           builder: (context) {
             return BindDeviceScreen(
-              deviceData: arguments["data"],
+              deviceData: arguments["deviceData"],
+              doorList: arguments["doorList"],
+              instance: arguments["instance"],
             );
           });
 
@@ -195,14 +197,18 @@ Route<dynamic> generateRoute(RouteSettings settings, {uniqueId}) {
       return CupertinoPageRoute(
           settings: settings,
           builder: (context) {
-            return PhotoPreviewScreen();
+            return PhotoPreviewScreen(
+              photoPreviewScreenData: arguments["data"],
+            );
           });
 
-      case RouterPage.PhotoDetailScreen:
+    case RouterPage.PhotoDetailScreen:
       return CupertinoPageRoute(
           settings: settings,
           builder: (context) {
-            return PhotoDetailScreen();
+            return PhotoDetailScreen(
+              pageNeedData: arguments["data"],
+            );
           });
 
     ///ReplaceRouterGenerateRoute
