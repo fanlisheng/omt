@@ -2,9 +2,9 @@ name: Build Flutter Windows App
 
 on:
   push:
-    branches: [ main ]  # 当推送到 main 分支时触发
+    branches: [ master ]  # 当推送到 main 分支时触发
   pull_request:
-    branches: [ main ]  # 当有 PR 到 main 分支时触发
+    branches: [ master ]  # 当有 PR 到 main 分支时触发
 
 jobs:
   build-windows:
