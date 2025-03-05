@@ -61,8 +61,8 @@ class UserLoginViewModel extends BaseViewModelRefresh<UserInfoData> {
     super.initState();
     initPlatformState();
 
-    phoneController = TextEditingController(text: 'admin');
-    pwdController = TextEditingController(text: '123456');
+    phoneController = TextEditingController();
+    pwdController = TextEditingController();
     canLogin = !BaseSysUtils.empty(phoneController.text) &&
         !BaseSysUtils.empty(pwdController.text);
     canClear = !BaseSysUtils.empty(phoneController.text);

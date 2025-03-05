@@ -21,22 +21,37 @@ jobs:
 
       - name: Get dependencies
         run: flutter pub get
+        shell: cmd
 
       - name: Build Windows app
-        run: flutter build windows --release
+        run: |
+          flutter build windows --release
+          if not exist "build\windows\runner\Release" (
+            echo "Error: Build directory build\windows\runner\Release not found!"
+            exit 1
+          )
+        shell: cmd
+
+      - name: Check and copy plugin dependencies
+        run: |
+          if exist "windows_deps\system_theme_plugin.dll" (
+            copy "windows_deps\system_theme_plugin.dll" "build\windows\runner\Release\"
+            if errorlevel 1 (
+              echo "Error: Failed to copy system_theme_plugin.dll"
+              exit 1
+            )
+          ) else (
+            echo "Error: system_theme_plugin.dll not found in windows_deps"
+            exit 1
+          )
+        shell: cmd
+
+      - name: Verify build directory contents
+        run: dir "build\windows\runner\Release\"
+        shell: cmd
 
       - name: Upload Windows build
         uses: actions/upload-artifact@v4
         with:
           name: windows-app
           path: build/windows/runner/Release/
-
-      - name: Copy plugin dependencies
-        run: |
-          if exist "windows_deps\system_theme_plugin.dll" (
-            copy "windows_deps\system_theme_plugin.dll" "build\windows\runner\Release\"
-          ) else (
-            echo "Error: system_theme_plugin.dll not found in windows_deps"
-            exit 1
-          )
-        shell: cmd

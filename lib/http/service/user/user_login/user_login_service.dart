@@ -36,10 +36,10 @@ class UserLoginService {
     HttpManager.share.doHttpPost<Map>(
       await _login,
       {
-        // "phone": phone,
-        // BaseSysUtils.getMd5(password),
-        "phone": "15196612685",
-        "password": "585b8aeb3e295e4c15becdc9088f9d63",
+        "phone": phone,
+        "password": BaseSysUtils.getMd5(password),
+        // "phone": "15196612685",
+        // "password": "585b8aeb3e295e4c15becdc9088f9d63",
         "platform_id": platformId ?? 1,
         "mac": mac
       },
