@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:kayo_package/kayo_package.dart';
 import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
 import 'package:omt/routing/routes.dart';
 
@@ -55,6 +56,9 @@ class BindDeviceViewModel extends BaseViewModelRefresh<dynamic> {
   @override
   void initState() async {
     super.initState();
+    for (var e in deviceData) {
+      e.selected = false;
+    }
   }
 
   @override
@@ -95,6 +99,11 @@ class BindDeviceViewModel extends BaseViewModelRefresh<dynamic> {
 
   //绑定设备
   bingingEventAction() {
+    if (selectedDoor == null || (selectedDoor?.id ?? 0) <= 0) {
+      LoadingUtils.showToast(data:"未选择大门或大门编号不正确");
+      return;
+    }
+
     request();
   }
 

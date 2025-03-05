@@ -7,6 +7,7 @@ import 'package:ping_discover_network_forked/ping_discover_network_forked.dart';
 
 import '../bean/home/home_page/device_entity.dart';
 
+
 class DeviceUtils {
   /// MAC 地址前缀映射设备类型
   Map<String, String> macDeviceTypeMap = {
@@ -199,7 +200,8 @@ class DeviceUtils {
         // Linux: 使用 ip 或 ifconfig 获取 MAC
         result = await Process.run('ip', ['link', 'show']);
         String output = result.stdout.toString();
-        RegExp macRegExp = RegExp(r'link/ether\s([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}');
+        RegExp macRegExp =
+            RegExp(r'link/ether\s([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}');
         Match? match = macRegExp.firstMatch(output);
         if (match != null) {
           return match.group(0)!.replaceAll('link/ether ', '').trim();
@@ -256,6 +258,7 @@ class DeviceUtils {
     DeviceType.battery: "电池",
     DeviceType.exchange: "交换机",
     DeviceType.camera: "摄像头",
+    DeviceType.router: "路由器",
   };
 
   // 设备图片映射
@@ -264,6 +267,15 @@ class DeviceUtils {
     "AI设备": "home/ic_device_ai",
     "摄像头": "home/ic_device_camera",
     "路由器": "home/ic_device_router",
+  };
+
+  static const Map<int, DeviceType> _intToDeviceTypeMap = {
+    5: DeviceType.powerBox,
+    6: DeviceType.router, // 如果没有 router，需补充到 DeviceType 枚举
+    8: DeviceType.nvr,
+    9: DeviceType.exchange,
+    10: DeviceType.ai,
+    11: DeviceType.camera,
   };
 
   /// 获取设备类型（根据设备名称）
@@ -287,5 +299,9 @@ class DeviceUtils {
   /// 获取设备类型名称
   static String getDeviceTypeName(DeviceType type) {
     return _deviceTypeNameMap[type] ?? "未知设备";
+  }
+
+  static DeviceType? getDeviceTypeFromInt(int value) {
+    return _intToDeviceTypeMap[value];
   }
 }

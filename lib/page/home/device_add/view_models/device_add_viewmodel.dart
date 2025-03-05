@@ -13,6 +13,7 @@ enum DeviceType {
   battery, // 电池
   powerBox, //电源箱
   exchange, //交互机
+  router, //路由器
 }
 
 //

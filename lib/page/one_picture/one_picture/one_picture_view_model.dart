@@ -5,7 +5,12 @@ import 'package:omt/bean/one_picture/one_picture/one_picture_data_entity.dart';
 import 'package:omt/generated/json/base/json_convert_content.dart';
 import 'package:omt/http/http_query.dart';
 import 'package:omt/utils/color_utils.dart';
+import 'package:omt/utils/device_utils.dart';
 import 'package:omt/utils/json_utils.dart';
+
+import '../../../router_utils.dart';
+import '../../../utils/intent_utils.dart';
+import '../../home/device_detail/view_models/device_detail_viewmodel.dart';
 
 ///
 ///  omt
@@ -17,6 +22,12 @@ import 'package:omt/utils/json_utils.dart';
 ///
 
 class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
+  final String? instanceId;
+  final int? gateId;
+  final int? passId;
+
+  OnePictureViewModel(this.instanceId, this.gateId, this.passId);
+
   final Graph graph = Graph();
 
   SugiyamaConfiguration builder = SugiyamaConfiguration()
@@ -46,10 +57,14 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
   @override
   loadData({onSuccess, onCache, onError}) async {
     // var userInfo = await SharedUtils.getUserInfo();
+    if (instanceId == null) {
+      return;
+    }
     HttpQuery.share.onePictureService.deviceTree(
-        instanceId: "124#12812",
-        gateId: null,
-        passId: null,
+        // instanceId: "124#12812",
+        instanceId: instanceId!,
+        gateId: gateId,
+        passId: passId,
         onSuccess: (data) {
           currentIndex = 0;
           onePictureHttpData = data;
@@ -366,7 +381,19 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
   }
 
   void onTapItem(OnePictureDataData? data) {
-    print('onTapItem ${data?.id}');
+    if (data == null ||
+        (data.nodeCode ?? "").isEmpty ||
+        DeviceUtils.getDeviceTypeFromInt(data.type ?? 0) == null) {
+      return;
+    }
+    print('onTapItem ${data.id}');
+    DeviceDetailViewModel model = DeviceDetailViewModel(
+      deviceType: DeviceUtils.getDeviceTypeFromInt(data.type ?? 0)!,
+      nodeCode: data.nodeCode!,
+      // nodeCode: '124#12812-2#2-3#1-11#0',
+    );
+    IntentUtils.share.push(context,
+        routeName: RouterPage.DeviceDetailScreen, data: {"data": model});
   }
 
   void onTapItemNew(OnePictureDataData? data) {

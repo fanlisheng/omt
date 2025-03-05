@@ -64,7 +64,6 @@ class DeviceDetailScreen extends StatelessWidget {
     // } else {
     //   return Container();
     // }
-
     switch (model.deviceType) {
       case DeviceType.ai:
         return DetailAiView(
@@ -91,6 +90,9 @@ class DeviceDetailScreen extends StatelessWidget {
         return DetailBatteryExchangeView(
           nodeCode: model.nodeCode,
         );
+      case DeviceType.router:
+        // TODO: Handle this case.
+        throw UnimplementedError();
     }
   }
 

@@ -181,3 +181,98 @@ Widget deviceShowList1(List<DeviceEntity> deviceData,
     },
   );
 }
+
+//显示图片
+Widget deviceShowList2(
+    List<DeviceEntity> deviceData, {
+      Function(int)? onTap,
+    }) {
+  return SingleChildScrollView(
+    padding: const EdgeInsets.only(left: 12, right: 12, top: 10, bottom: 10),
+    child: Wrap(
+      spacing: 10, // 水平间距
+      runSpacing: 10, // 垂直间距
+      children: List.generate(deviceData.length, (index) {
+        return Clickable(
+          onTap: onTap != null
+              ? () {
+            onTap(index);
+          }
+              : null,
+          child: Container(
+            width: 100, // 固定宽度
+            height: 150, // 固定高度
+            decoration: BoxDecoration(
+              border: Border.all(
+                width: 1,
+                color: deviceData[index].selected == true
+                    ? ColorUtils.colorGreen
+                    : "#5D6666".toColor(),
+              ),
+              color: deviceData[index].selected == true
+                  ? "#5D6666".toColor()
+                  : ColorUtils.transparent,
+            ),
+            child: Stack(
+              children: [
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 8),
+                      Expanded(
+                        flex: 5,
+                        child: ImageView(src: source('home/ic_device')),
+                      ),
+                      const SizedBox(height: 4),
+                      Expanded(
+                        flex: 2,
+                        child: FittedBox(
+                          fit: BoxFit.contain,
+                          child: Text(
+                            deviceData[index].deviceTypeText ?? "-",
+                            style: const TextStyle(color: ColorUtils.colorWhite),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 2,
+                        child: FittedBox(
+                          fit: BoxFit.contain,
+                          child: Container(
+                            margin: const EdgeInsets.only(
+                                left: 2, right: 2, bottom: 4),
+                            child: Text(
+                              deviceData[index].ip ?? "",
+                              style: const TextStyle(
+                                  color: ColorUtils.colorWhite, fontSize: 10),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Visibility(
+                  visible: deviceData[index].selected ?? false,
+                  child: Positioned(
+                    top: 2,
+                    right: 2,
+                    width: 16,
+                    height: 16,
+                    child: ImageView(
+                      src: source("home/ic_device_selected"),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }),
+    ),
+  );
+}

@@ -17,14 +17,37 @@ import 'package:graphview/GraphView.dart';
 ///
 
 class OnePicturePage extends StatelessWidget {
-  const OnePicturePage({Key? key}) : super(key: key);
+  final String? instanceId;
+  final int? gateId;
+  final int? passId;
+
+  const OnePicturePage({super.key, this.instanceId, this.gateId, this.passId});
 
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<OnePictureViewModel>(
-        model: OnePictureViewModel(),
+        model: OnePictureViewModel(instanceId, gateId, passId),
         autoLoadData: true,
         builder: (context, model, child) {
+          return InteractiveViewer(
+              constrained: false,
+              boundaryMargin: const EdgeInsets.all(100),
+              minScale: 0.01,
+              maxScale: 5.6,
+              child: model.graph.nodeCount() == 0
+                  ? Container()
+                  : GraphView(
+                graph: model.graph,
+                algorithm: SugiyamaAlgorithm(model.builder),
+                paint: Paint()
+                  ..color = Colors.green
+                  ..strokeWidth = 1
+                  ..style = PaintingStyle.stroke,
+                builder: (Node node) {
+                  var a = node.key!.value as String?;
+                  return rectangleWidget(model, a);
+                },
+              ));
           return ToolBar(
             title: '一张图',
             elevation: 0,
@@ -340,7 +363,7 @@ class OnePicturePage extends StatelessWidget {
                       }).toList(),
                     ),
                   ).addRightIcon(
-                      onTap: data.ignore!=true
+                      onTap: data.ignore != true
                           ? null
                           : () {
                               model.onTapItemNew(data);

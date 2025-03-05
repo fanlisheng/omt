@@ -29,6 +29,8 @@ class SecondStepView extends StatelessWidget {
       case DeviceType.battery:
       case DeviceType.exchange:
         return AddBatteryExchangeView(model.deviceType, model.stepNumber);
+      case DeviceType.router:
+        throw UnimplementedError();
     }
     return Container();
   }

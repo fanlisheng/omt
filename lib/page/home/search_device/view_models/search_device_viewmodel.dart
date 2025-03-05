@@ -16,6 +16,7 @@ import 'package:omt/utils/device_utils.dart';
 import 'package:omt/utils/intent_utils.dart';
 import 'package:omt/utils/log_utils.dart';
 import '../../../../bean/common/id_name_value.dart';
+import '../../../../bean/one_picture/one_picture/one_picture_data_entity.dart';
 import '../../device_detail/view_models/device_detail_viewmodel.dart';
 
 ///
@@ -30,6 +31,7 @@ enum DeviceSearchState {
   notSearched, // 没搜索过
   searching, // 搜索中
   completed, // 搜索完成
+  onePicturePage, // 搜索完成
 }
 
 class SearchDeviceViewModel extends BaseViewModel {
@@ -62,6 +64,8 @@ class SearchDeviceViewModel extends BaseViewModel {
   TextEditingController controller = TextEditingController();
   bool isClear = false;
   final asgbKey = GlobalKey<AutoSuggestBoxState>();
+
+  OnePictureDataData? onePictureHttpData;
 
   @override
   void initState() async {
@@ -112,17 +116,17 @@ class SearchDeviceViewModel extends BaseViewModel {
   ///点击事件
   //搜索事件
   searchEventAction() async {
-    DeviceDetailViewModel model = DeviceDetailViewModel(
-      deviceType: DeviceType.power,
-      // nodeCode: '124#12812-2#2-3#1-11#0',
-      nodeCode: '124#12812-2#7-4#1',
-    );
+    // DeviceDetailViewModel model = DeviceDetailViewModel(
+    //   deviceType: DeviceType.power,
+    //   // nodeCode: '124#12812-2#2-3#1-11#0',
+    //   nodeCode: '124#12812-2#7-4#1',
+    // );
 
     // GoRouter.of(context!).push(Routes.deviceDetail, extra: model);
     // GoRouter.of(context!).push('/navigation/navigation_view');
 
-    IntentUtils.share.push(context,
-        routeName: RouterPage.DeviceDetailScreen, data: {"data": model});
+    // IntentUtils.share.push(context,
+    //     routeName: RouterPage.DeviceDetailScreen, data: {"data": model});
 
     // final result =
     //     await hikvisionDeviceInfo(ipAddress: "192.168.101.22");
@@ -133,6 +137,36 @@ class SearchDeviceViewModel extends BaseViewModel {
     //     routeName: RouterPage.DeviceAddPage, data: {"id": 0, "type": DeviceType.ai});
 
     // scanDevice();
+    if (selectedInstance == null || (selectedInstance?.id ?? "").isEmpty) {
+      return;
+    }
+    deviceNoBindingData = [
+      DeviceEntity(deviceType: 6, ip: "192.168.101.5"),
+      DeviceEntity(deviceType: 6, ip: "192.168.101.5"),
+      DeviceEntity(deviceType: 6, ip: "192.168.101.5"),
+      DeviceEntity(deviceType: 6, ip: "192.168.101.5"),
+      DeviceEntity(deviceType: 6, ip: "192.168.101.5"),
+      DeviceEntity(deviceType: 6, ip: "192.168.101.5"),
+      DeviceEntity(deviceType: 6, ip: "192.168.101.5"),
+      DeviceEntity(deviceType: 6, ip: "192.168.101.5"),
+      DeviceEntity(deviceType: 6, ip: "192.168.101.5"),
+      DeviceEntity(deviceType: 6, ip: "192.168.101.5"),
+      DeviceEntity(deviceType: 6, ip: "192.168.101.5"),
+    ];
+    searchState = DeviceSearchState.onePicturePage;
+    notifyListeners();
+    // HttpQuery.share.onePictureService.deviceTree(
+    //     instanceId: "124#12812",
+    //     // instanceId: selectedInstance!.id!,
+    //     gateId: selectedDoor?.id,
+    //     passId: selectedInOut?.id,
+    //     onSuccess: (data) {
+    //       onePictureHttpData = data;
+    //       searchState = DeviceSearchState.onePicturePage;
+    //       notifyListeners();
+    //     },
+    //     onCache: (data) {},
+    //     onError: (e) {});
   }
 
   //开始扫描

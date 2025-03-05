@@ -57,6 +57,8 @@ class ThirdFourStepView extends StatelessWidget {
       case DeviceType.battery:
       case DeviceType.exchange:
         return fourView(model);
+      case DeviceType.router:
+        throw UnimplementedError();
     }
   }
 
