@@ -38,6 +38,8 @@ class UserLoginService {
       {
         "phone": phone,
         "password": BaseSysUtils.getMd5(password),
+        // "phone": "18180821779",
+        // "password": "585b8aeb3e295e4c15becdc9088f9d63",
         // "phone": "15196612685",
         // "password": "585b8aeb3e295e4c15becdc9088f9d63",
         "platform_id": platformId ?? 1,

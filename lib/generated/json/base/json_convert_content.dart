@@ -18,7 +18,7 @@ import 'package:omt/bean/home/home_page/device_detail_power_box_entity.dart';
 import 'package:omt/bean/home/home_page/device_detail_power_entity.dart';
 import 'package:omt/bean/home/home_page/device_entity.dart';
 import 'package:omt/bean/home/home_page/home_page_data.dart';
-import 'package:omt/bean/one_picture/one_picture/one_picture_data.dart';
+import 'package:omt/bean/one_picture/one_picture/one_picture_data_entity.dart';
 import 'package:omt/bean/user/user_login/user_login_data.dart';
 import 'package:omt/bean/user/ver_info.dart';
 import 'package:omt/bean/video/video_configuration/Video_Connect_entity.dart';
@@ -287,9 +287,13 @@ class JsonConvert {
       return data.map<HomePageData>((Map<String, dynamic> e) =>
           HomePageData.fromJson(e)).toList() as M;
     }
-    if (<OnePictureData>[] is M) {
-      return data.map<OnePictureData>((Map<String, dynamic> e) =>
-          OnePictureData.fromJson(e)).toList() as M;
+    if (<OnePictureDataEntity>[] is M) {
+      return data.map<OnePictureDataEntity>((Map<String, dynamic> e) =>
+          OnePictureDataEntity.fromJson(e)).toList() as M;
+    }
+    if (<OnePictureDataData>[] is M) {
+      return data.map<OnePictureDataData>((Map<String, dynamic> e) =>
+          OnePictureDataData.fromJson(e)).toList() as M;
     }
     if (<UserInfoData>[] is M) {
       return data.map<UserInfoData>((Map<String, dynamic> e) =>
@@ -397,7 +401,8 @@ class JsonConvertClassCollection {
     (DeviceEntity).toString(): DeviceEntity.fromJson,
     (DeviceScanEntity).toString(): DeviceScanEntity.fromJson,
     (HomePageData).toString(): HomePageData.fromJson,
-    (OnePictureData).toString(): OnePictureData.fromJson,
+    (OnePictureDataEntity).toString(): OnePictureDataEntity.fromJson,
+    (OnePictureDataData).toString(): OnePictureDataData.fromJson,
     (UserInfoData).toString(): UserInfoData.fromJson,
     (UserPermission).toString(): UserPermission.fromJson,
     (VerInfo).toString(): VerInfo.fromJson,
