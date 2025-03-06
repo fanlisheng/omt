@@ -6,6 +6,7 @@ import 'package:kayo_package/views/widget/base/image_view.dart';
 import 'package:kayo_package/views/widget/base/text_view.dart';
 import '../../../../bean/home/home_page/device_entity.dart';
 import '../../../../utils/color_utils.dart';
+import '../../../../utils/device_utils.dart';
 import '../view_models/bind_device_viewmodel.dart';
 
 class DeviceListView extends StatefulWidget {
@@ -34,11 +35,12 @@ class _DeviceListViewState extends State<DeviceListView> {
           Container(
             decoration: BoxDecoration(
                 border: Border.all(width: 1, color: "#5D6666".toColor())),
-            height: 215,
+            height: 128,
+            width: double.infinity,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
                 Row(
                   children: [
                     const SizedBox(width: 12),
@@ -73,9 +75,9 @@ class _DeviceListViewState extends State<DeviceListView> {
                     const SizedBox(width: 12),
                   ],
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 0),
                 Expanded(
-                  child: deviceShowList1(model.deviceData, onTap: (index) {
+                  child: deviceShowList2(model.deviceData, onTap: (index) {
                     model.selectedItemEventAction(index);
                   }),
                 ),
@@ -200,8 +202,8 @@ Widget deviceShowList2(
           }
               : null,
           child: Container(
-            width: 100, // 固定宽度
-            height: 150, // 固定高度
+            width: 90, // 固定宽度
+            height: 76, // 固定高度
             decoration: BoxDecoration(
               border: Border.all(
                 width: 1,
@@ -225,7 +227,10 @@ Widget deviceShowList2(
                       const SizedBox(height: 8),
                       Expanded(
                         flex: 5,
-                        child: ImageView(src: source('home/ic_device')),
+                        child: ImageView(
+                          src: source(DeviceUtils.getDeviceImage(
+                              deviceData[index].deviceType ?? 0)),
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Expanded(

@@ -269,7 +269,7 @@ class DeviceUtils {
     "路由器": "home/ic_device_router",
   };
 
-  static const Map<int, DeviceType> _intToDeviceTypeMap = {
+  static const Map<int, DeviceType> intToDeviceTypeMap = {
     5: DeviceType.powerBox,
     6: DeviceType.router, // 如果没有 router，需补充到 DeviceType 枚举
     8: DeviceType.nvr,
@@ -302,6 +302,6 @@ class DeviceUtils {
   }
 
   static DeviceType? getDeviceTypeFromInt(int value) {
-    return _intToDeviceTypeMap[value];
+    return intToDeviceTypeMap[value];
   }
 }

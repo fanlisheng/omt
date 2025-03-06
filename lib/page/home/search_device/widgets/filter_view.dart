@@ -1,5 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' as m;
+
 import 'package:go_router/go_router.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/common/id_name_value.dart';
@@ -64,13 +65,25 @@ class _FilterViewState extends State<FilterView> {
           //         },
           //         placeholder: "请选择实例")),
           Expanded(
-            flex: 2, // 0.5 的比例
+            flex: 3, // 0.5 的比例
             child: AutoSuggestBox<StrIdNameValue>(
               key: model.asgbKey,
               enabled: model.searchState != DeviceSearchState.searching,
               placeholder: "请选择",
               focusNode: model.focusNode,
               controller: model.controller,
+              decoration: WidgetStateProperty.resolveWith<BoxDecoration>(
+                (Set<WidgetState> states) {
+                  return const BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: ColorUtils.transparent,
+                        width: 2.0,
+                      ),
+                    ),
+                  );
+                },
+              ),
               onChanged: (text, reason) {
                 if (reason == TextChangedReason.cleared) {
                   model.selectedInstance = null;
@@ -80,20 +93,20 @@ class _FilterViewState extends State<FilterView> {
               items: model.instanceList
                   .map<AutoSuggestBoxItem<StrIdNameValue>>(
                     (instance) => AutoSuggestBoxItem<StrIdNameValue>(
-                    value: instance,
-                    label: instance.name ?? "",
-                    onFocusChange: (focused) {
-                      if (focused) debugPrint('Focused ${instance.name}');
-                    },
-                    onSelected: () {
-                      model.selectedInstance = instance;
-                      model.notifyListeners();
-                    }),
-              )
+                        value: instance,
+                        label: instance.name ?? "",
+                        onFocusChange: (focused) {
+                          if (focused) debugPrint('Focused ${instance.name}');
+                        },
+                        onSelected: () {
+                          model.selectedInstance = instance;
+                          model.notifyListeners();
+                        }),
+                  )
                   .toList(),
               itemBuilder:
                   (BuildContext context, AutoSuggestBoxItem<dynamic> item) {
-                return InkWell(
+                return m.InkWell(
                   child: Container(
                     padding: const EdgeInsets.all(8.0),
                     child: Wrap(
@@ -176,80 +189,94 @@ class _FilterViewState extends State<FilterView> {
           const SizedBox(width: 15),
           TextView(
             "搜索",
-            bgColor: ColorUtils.colorGreen,
-            color: BaseColorUtils.white,
+            bgColor: model.selectedInstance != null
+                ? ColorUtils.colorGreen
+                : ColorUtils.colorGreen.withOpacity(0.2),
+            color: model.selectedInstance != null
+                ? BaseColorUtils.white
+                : BaseColorUtils.white.withOpacity(0.2),
             textDarkOnlyOpacity: true,
             textAlign: TextAlign.center,
             padding:
                 const EdgeInsets.only(top: 6, bottom: 6, left: 24, right: 24),
             radius: 0,
-            onTap: () {
-              model.searchEventAction();
-            },
+            onTap: model.selectedInstance != null
+                ? () {
+                    model.searchEventAction();
+                  }
+                : null,
           ),
+
+          if(model.searchState == DeviceSearchState.onePicturePage)...[
+            const SizedBox(width: 10,),
+            IconButton(
+              icon: const Icon(FluentIcons.reset, size: 20.0),
+              onPressed: model.resetEventAction,
+            ),
+          ]
         ],
       ),
     );
   }
 
-  Widget _buildMenu2({
-    required SearchDeviceViewModel model,
-    required String selectedValue,
-    required List<IdNameValue> options,
-    required void Function(IdNameValue) onSelected,
-  }) {
-    bool simpleDisabled = model.searchState == DeviceSearchState.searching;
-    LogUtils.info(msg: simpleDisabled, tag: "========");
-    return LayoutBuilder(builder: (context, constraints) {
-      return Container(
-        // 设置高度，与其他控件一致
-        height: 32,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        decoration: BoxDecoration(
-          color: "#4E5353".toColor(), // 深灰色背景
-          // border: Border.all(color: Colors.grey),
-          // borderRadius: BorderRadius.circular(4),
-        ),
-        child: PopupMenuTheme(
-            data: const PopupMenuThemeData(
-              color: ColorUtils.colorBlack, // 设置背景颜色
-            ),
-            child: PopupMenuButton<IdNameValue>(
-              onSelected: onSelected,
-              position: PopupMenuPosition.under,
-              enabled: !simpleDisabled,
-              tooltip: "",
-              itemBuilder: (context) {
-                return options
-                    .map((option) => PopupMenuItem(
-                          value: option,
-                          child: SizedBox(
-                            // width:  constraints.maxWidth,
-                            child: Text(option.name ?? ""),
-                          ),
-                        ))
-                    .toList();
-              },
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      selectedValue,
-                      style: TextStyle(
-                          color: simpleDisabled == true
-                              ? ColorUtils.colorBlackLiteLite
-                              : ColorUtils.colorWhite),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  Icon(Icons.arrow_drop_down,
-                      color: simpleDisabled == true
-                          ? ColorUtils.colorBlackLiteLite
-                          : ColorUtils.colorWhite),
-                ],
-              ),
-            )),
-      );
-    });
-  }
+// Widget _buildMenu2({
+//   required SearchDeviceViewModel model,
+//   required String selectedValue,
+//   required List<IdNameValue> options,
+//   required void Function(IdNameValue) onSelected,
+// }) {
+//   bool simpleDisabled = model.searchState == DeviceSearchState.searching;
+//   LogUtils.info(msg: simpleDisabled, tag: "========");
+//   return LayoutBuilder(builder: (context, constraints) {
+//     return Container(
+//       // 设置高度，与其他控件一致
+//       height: 32,
+//       padding: const EdgeInsets.symmetric(horizontal: 12),
+//       decoration: BoxDecoration(
+//         color: "#4E5353".toColor(), // 深灰色背景
+//         // border: Border.all(color: Colors.grey),
+//         // borderRadius: BorderRadius.circular(4),
+//       ),
+//       child: PopupMenuTheme(
+//           data: const PopupMenuThemeData(
+//             color: ColorUtils.colorBlack, // 设置背景颜色
+//           ),
+//           child: PopupMenuButton<IdNameValue>(
+//             onSelected: onSelected,
+//             position: PopupMenuPosition.under,
+//             enabled: !simpleDisabled,
+//             tooltip: "",
+//             itemBuilder: (context) {
+//               return options
+//                   .map((option) => PopupMenuItem(
+//                         value: option,
+//                         child: SizedBox(
+//                           // width:  constraints.maxWidth,
+//                           child: Text(option.name ?? ""),
+//                         ),
+//                       ))
+//                   .toList();
+//             },
+//             child: Row(
+//               children: [
+//                 Expanded(
+//                   child: Text(
+//                     selectedValue,
+//                     style: TextStyle(
+//                         color: simpleDisabled == true
+//                             ? ColorUtils.colorBlackLiteLite
+//                             : ColorUtils.colorWhite),
+//                     overflow: TextOverflow.ellipsis,
+//                   ),
+//                 ),
+//                 Icon(Icons.arrow_drop_down,
+//                     color: simpleDisabled == true
+//                         ? ColorUtils.colorBlackLiteLite
+//                         : ColorUtils.colorWhite),
+//               ],
+//             ),
+//           )),
+//     );
+//   });
+// }
 }

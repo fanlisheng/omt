@@ -32,14 +32,14 @@ class DetailAiView extends StatelessWidget {
   Widget aiView(DetailAiViewModel model) {
     return Column(
       children: [
-        Container(
+        Expanded(child:  Container(
           margin: const EdgeInsets.only(left: 16, right: 16),
           padding:
-              const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),
+          const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),
           color: ColorUtils.colorBackgroundLine,
           width: double.infinity,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: ListView(
+            // crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
                 "AI设备信息",
@@ -119,13 +119,11 @@ class DetailAiView extends StatelessWidget {
               const SizedBox(height: 12),
             ],
           ),
-        ),
-        Expanded(
-          child: Container(),
-        ),
-        Row(
+        ),),
+        const SizedBox(height: 20,),
+        const Row(
           children: [
-            const SizedBox(
+            SizedBox(
               width: 16,
             ),
             // Clickable(
@@ -140,7 +138,7 @@ class DetailAiView extends StatelessWidget {
             //     ),
             //   ),
             // ),
-            const SizedBox(
+            SizedBox(
               width: 16,
             ),
           ],

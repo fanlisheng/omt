@@ -16,7 +16,9 @@ import 'package:omt/utils/device_utils.dart';
 import 'package:omt/utils/intent_utils.dart';
 import 'package:omt/utils/log_utils.dart';
 import '../../../../bean/common/id_name_value.dart';
+import '../../../../bean/home/home_page/device_unbound_entity.dart';
 import '../../../../bean/one_picture/one_picture/one_picture_data_entity.dart';
+import '../../../one_picture/one_picture/one_picture_page.dart';
 import '../../device_detail/view_models/device_detail_viewmodel.dart';
 
 ///
@@ -51,6 +53,8 @@ class SearchDeviceViewModel extends BaseViewModel {
   //扫描出的设备数据
   List<DeviceEntity> deviceScanData = [];
 
+  List<DeviceEntity> deviceScanTemporaryData = [];
+
   //没有绑定的数据
   List<DeviceEntity> deviceNoBindingData = [];
 
@@ -66,6 +70,8 @@ class SearchDeviceViewModel extends BaseViewModel {
   final asgbKey = GlobalKey<AutoSuggestBoxState>();
 
   OnePictureDataData? onePictureHttpData;
+
+  final GlobalKey<OnePicturePageState> picturePageKey = GlobalKey();
 
   @override
   void initState() async {
@@ -114,59 +120,31 @@ class SearchDeviceViewModel extends BaseViewModel {
   }
 
   ///点击事件
+  //
+  resetEventAction() {
+    //清空数据
+    deviceStatistics = "";
+    deviceScanData = [];
+    deviceNoBindingData = [];
+    deviceScanTemporaryData = [];
+    selectedInstance = null;
+    selectedDoor = null;
+    selectedInOut = null;
+    controller.text = "";
+    //改变状态
+    searchState = DeviceSearchState.notSearched;
+    notifyListeners();
+  }
+
   //搜索事件
   searchEventAction() async {
-    // DeviceDetailViewModel model = DeviceDetailViewModel(
-    //   deviceType: DeviceType.power,
-    //   // nodeCode: '124#12812-2#2-3#1-11#0',
-    //   nodeCode: '124#12812-2#7-4#1',
-    // );
-
-    // GoRouter.of(context!).push(Routes.deviceDetail, extra: model);
-    // GoRouter.of(context!).push('/navigation/navigation_view');
-
-    // IntentUtils.share.push(context,
-    //     routeName: RouterPage.DeviceDetailScreen, data: {"data": model});
-
     // final result =
     //     await hikvisionDeviceInfo(ipAddress: "192.168.101.22");
     // LogUtils.info(msg: result);
     // discoverService();
 
-    // IntentUtils.share.push(context,
-    //     routeName: RouterPage.DeviceAddPage, data: {"id": 0, "type": DeviceType.ai});
-
     // scanDevice();
-    if (selectedInstance == null || (selectedInstance?.id ?? "").isEmpty) {
-      return;
-    }
-    deviceNoBindingData = [
-      DeviceEntity(deviceType: 6, ip: "192.168.101.5"),
-      DeviceEntity(deviceType: 6, ip: "192.168.101.5"),
-      DeviceEntity(deviceType: 6, ip: "192.168.101.5"),
-      DeviceEntity(deviceType: 6, ip: "192.168.101.5"),
-      DeviceEntity(deviceType: 6, ip: "192.168.101.5"),
-      DeviceEntity(deviceType: 6, ip: "192.168.101.5"),
-      DeviceEntity(deviceType: 6, ip: "192.168.101.5"),
-      DeviceEntity(deviceType: 6, ip: "192.168.101.5"),
-      DeviceEntity(deviceType: 6, ip: "192.168.101.5"),
-      DeviceEntity(deviceType: 6, ip: "192.168.101.5"),
-      DeviceEntity(deviceType: 6, ip: "192.168.101.5"),
-    ];
-    searchState = DeviceSearchState.onePicturePage;
-    notifyListeners();
-    // HttpQuery.share.onePictureService.deviceTree(
-    //     instanceId: "124#12812",
-    //     // instanceId: selectedInstance!.id!,
-    //     gateId: selectedDoor?.id,
-    //     passId: selectedInOut?.id,
-    //     onSuccess: (data) {
-    //       onePictureHttpData = data;
-    //       searchState = DeviceSearchState.onePicturePage;
-    //       notifyListeners();
-    //     },
-    //     onCache: (data) {},
-    //     onError: (e) {});
+    _requestUnboundDevices();
   }
 
   //开始扫描
@@ -184,34 +162,12 @@ class SearchDeviceViewModel extends BaseViewModel {
     if (stopScanning == true) {
       searchState = DeviceSearchState.notSearched;
       deviceScanData = [];
+      deviceScanTemporaryData = deviceScanData;
     } else {
       //扫描完成,上传请求
-      HttpQuery.share.homePageService.deviceScan(
-          instanceId: selectedInstance?.id ?? "",
-          // instanceId: "562#6175",
-          deviceList: deviceScanData,
-          onSuccess: (DeviceScanEntity? scanData) {
-            searchState = DeviceSearchState.completed;
-            deviceStatistics =
-                _generateDeviceStatistics(scanData?.devices ?? []);
-            deviceScanData = scanData?.devices ?? [];
-            deviceNoBindingData = scanData?.unboundDevices ?? [];
-            notifyListeners();
-          },
-          onError: (e) {
-            searchState = DeviceSearchState.completed;
-            deviceStatistics = "";
-            deviceScanData = [];
-            deviceNoBindingData = [];
-            notifyListeners();
-          });
+      _requestDeviceScanData(deviceScanData);
     }
     notifyListeners();
-  }
-
-  // 定义一个停止条件的回调函数
-  bool _shouldStop() {
-    return stopScanning; // 当 stopScanning 为 true 时停止
   }
 
   //扫描停止事件
@@ -234,43 +190,68 @@ class SearchDeviceViewModel extends BaseViewModel {
       "instance": selectedInstance
     })?.then((a) {
       if (IntentUtils.share.isResultOk(a)) {
-        scanAnewEventAction();
+        if (searchState == DeviceSearchState.completed) {
+          _requestDeviceScanData(deviceScanTemporaryData);
+        } else if (searchState == DeviceSearchState.onePicturePage) {
+          _requestUnboundDevices();
+        }
+        //   scanAnewEventAction();
       }
     });
   }
 
-  //所有服务
-  discoverService() async {
-    final MDnsClient client = MDnsClient();
-    await client.start();
+  _requestDeviceScanData(List<DeviceEntity> deviceList) {
+    HttpQuery.share.homePageService.deviceScan(
+        instanceId: selectedInstance?.id ?? "",
+        // instanceId: "562#6175",
+        deviceList: deviceList,
+        onSuccess: (DeviceScanEntity? scanData) {
+          searchState = DeviceSearchState.completed;
+          deviceStatistics = _generateDeviceStatistics(scanData?.devices ?? []);
+          deviceScanData = scanData?.devices ?? [];
+          deviceScanTemporaryData = scanData?.devices ?? [];
+          deviceNoBindingData = scanData?.unboundDevices ?? [];
+          notifyListeners();
+        },
+        onError: (e) {
+          searchState = DeviceSearchState.completed;
+          deviceStatistics = "";
+          deviceScanData = [];
+          deviceNoBindingData = [];
+          notifyListeners();
+        });
+  }
 
-    // 扫描所有服务
-    await for (final PtrResourceRecord ptrA in client.lookup<PtrResourceRecord>(
-        ResourceRecordQuery.serverPointer('_services._dns-sd._udp.local'))) {
-      await for (final PtrResourceRecord ptr
-          in client.lookup<PtrResourceRecord>(
-              ResourceRecordQuery.serverPointer(ptrA.domainName))) {
-        print('开始扫描 service: ${ptrA.domainName}');
-
-        await for (final SrvResourceRecord srv
-            in client.lookup<SrvResourceRecord>(
-                ResourceRecordQuery.service(ptr.domainName))) {
-          print('设备名字: ${srv.target}');
-
-          await for (final IPAddressResourceRecord ip
-              in client.lookup<IPAddressResourceRecord>(
-                  ResourceRecordQuery.addressIPv4(srv.target))) {
-            if (ip.address.address == "192.168.101.22") {
-              print('设备IP是对的');
-              client.stop();
-              return;
-            }
-          }
-        }
-      }
+  _requestUnboundDevices() {
+    if (selectedInstance == null || (selectedInstance?.id ?? "").isEmpty) {
+      return;
     }
+    HttpQuery.share.homePageService.getUnboundDevices(
+      instanceId: selectedInstance!.id!,
+      onSuccess: (DeviceUnboundEntity? a) {
+        deviceNoBindingData = a?.unboundDevices ?? [];
+        searchState = DeviceSearchState.onePicturePage;
+        //记录统计数据
+        StringBuffer countStr = StringBuffer();
+        for (DeviceUnboundAllCount item in a?.allCount ?? []) {
+          countStr.write("${item.count}个${item.deviceTypeText} / ");
+        }
+        String result = countStr.toString();
+        if (result.length > 2) {
+          deviceStatistics = result.substring(0, result.length - 2);
+        } else {
+          deviceStatistics = result;
+        }
+        //重新请求一张图的数据
+        picturePageKey.currentState?.refresh();
+        notifyListeners();
+      },
+    );
+  }
 
-    client.stop();
+  // 定义一个停止条件的回调函数
+  bool _shouldStop() {
+    return stopScanning; // 当 stopScanning 为 true 时停止
   }
 
 // LocalDeviceEntity getDeviceTypeInfo(LocalDeviceEntity info) {
@@ -295,8 +276,10 @@ class SearchDeviceViewModel extends BaseViewModel {
 
     // 定义设备类型对应关系
     final deviceTypeMap = {
+      5: "电源箱",
       6: "路由器",
       8: "NVR",
+      9: "交换机",
       10: "AI设备",
       11: "摄像头",
     };

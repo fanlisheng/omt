@@ -16,6 +16,7 @@ import '../../../../bean/home/home_page/device_detail_exchange_entity.dart';
 import '../../../../bean/home/home_page/device_detail_nvr_entity.dart';
 import '../../../../bean/home/home_page/device_detail_power_box_entity.dart';
 import '../../../../bean/home/home_page/device_detail_power_entity.dart';
+import '../../../../bean/home/home_page/device_unbound_entity.dart';
 
 // import 'package:omt/utils/shared_utils.dart';
 
@@ -59,6 +60,8 @@ class HomePageService {
 
   get _setCameraBasicPhoto =>
       '${API.share.host}api/device/camera/set_basic_photo';
+
+  get _getUnboundDevices => '${API.share.host}api/device/devices';
 
   getInstanceList(
     String areaCode, {
@@ -329,6 +332,26 @@ class HomePageService {
     HttpManager.share.doHttpPost<CodeMessageData>(
       await _setCameraBasicPhoto,
       {"device_code": deviceCode, "type": type, "url": url},
+      method: 'POST',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  getUnboundDevices({
+    required String instanceId,
+    required ValueChanged<DeviceUnboundEntity?>? onSuccess,
+    ValueChanged<DeviceUnboundEntity?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<DeviceUnboundEntity>(
+      await _getUnboundDevices,
+      {
+        "instance_id": instanceId,
+      },
       method: 'POST',
       autoHideDialog: true,
       autoShowDialog: true,

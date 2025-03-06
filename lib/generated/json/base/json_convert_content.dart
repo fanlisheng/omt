@@ -17,6 +17,7 @@ import 'package:omt/bean/home/home_page/device_detail_nvr_entity.dart';
 import 'package:omt/bean/home/home_page/device_detail_power_box_entity.dart';
 import 'package:omt/bean/home/home_page/device_detail_power_entity.dart';
 import 'package:omt/bean/home/home_page/device_entity.dart';
+import 'package:omt/bean/home/home_page/device_unbound_entity.dart';
 import 'package:omt/bean/home/home_page/home_page_data.dart';
 import 'package:omt/bean/one_picture/one_picture/one_picture_data_entity.dart';
 import 'package:omt/bean/user/user_login/user_login_data.dart';
@@ -283,6 +284,18 @@ class JsonConvert {
       return data.map<DeviceScanEntity>((Map<String, dynamic> e) =>
           DeviceScanEntity.fromJson(e)).toList() as M;
     }
+    if (<DeviceUnboundEntity>[] is M) {
+      return data.map<DeviceUnboundEntity>((Map<String, dynamic> e) =>
+          DeviceUnboundEntity.fromJson(e)).toList() as M;
+    }
+    if (<DeviceUnboundAllCount>[] is M) {
+      return data.map<DeviceUnboundAllCount>((Map<String, dynamic> e) =>
+          DeviceUnboundAllCount.fromJson(e)).toList() as M;
+    }
+    if (<DeviceUnboundAbnormalCount>[] is M) {
+      return data.map<DeviceUnboundAbnormalCount>((Map<String, dynamic> e) =>
+          DeviceUnboundAbnormalCount.fromJson(e)).toList() as M;
+    }
     if (<HomePageData>[] is M) {
       return data.map<HomePageData>((Map<String, dynamic> e) =>
           HomePageData.fromJson(e)).toList() as M;
@@ -400,6 +413,10 @@ class JsonConvertClassCollection {
     (DeviceDetailPowerData).toString(): DeviceDetailPowerData.fromJson,
     (DeviceEntity).toString(): DeviceEntity.fromJson,
     (DeviceScanEntity).toString(): DeviceScanEntity.fromJson,
+    (DeviceUnboundEntity).toString(): DeviceUnboundEntity.fromJson,
+    (DeviceUnboundAllCount).toString(): DeviceUnboundAllCount.fromJson,
+    (DeviceUnboundAbnormalCount).toString(): DeviceUnboundAbnormalCount
+        .fromJson,
     (HomePageData).toString(): HomePageData.fromJson,
     (OnePictureDataEntity).toString(): OnePictureDataEntity.fromJson,
     (OnePictureDataData).toString(): OnePictureDataData.fromJson,

@@ -22,6 +22,7 @@ class SearchDeviceScreen extends StatelessWidget {
           return Container(
             color: "#3B3F3F".toColor(),
             child: fu.ScaffoldPage(
+              padding: const EdgeInsets.only(top: 12, bottom: 0),
               header: fu.PageHeader(
                 title: TextView(
                   '首页',
@@ -44,7 +45,8 @@ class SearchDeviceScreen extends StatelessWidget {
                     height: 40,
                     margin:
                         const EdgeInsets.only(left: 20, right: 20, bottom: 15),
-                    color: const Color(0xFF4E5353), // 深灰色背景
+                    color: const Color(0xFF4E5353),
+                    // 深灰色背景
                     child: Row(
                       children: [
                         const SizedBox(width: 16),
@@ -52,10 +54,14 @@ class SearchDeviceScreen extends StatelessWidget {
                           '设备统计：',
                           style: TextStyle(color: Colors.white),
                         ),
-                        Text(
-                          model.deviceStatistics,
-                          style: const TextStyle(
-                            color: ColorUtils.colorGreen,
+                        Expanded(
+                          child: Text(
+                            model.deviceStatistics,
+                            style: const TextStyle(
+                              color: ColorUtils.colorGreen,
+                              fontSize: 12,
+                            ),
+                            maxLines: 2,
                           ),
                         ),
                       ],

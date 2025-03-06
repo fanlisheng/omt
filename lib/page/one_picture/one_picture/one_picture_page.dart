@@ -16,7 +16,7 @@ import 'package:graphview/GraphView.dart';
 ///  Copyright © 2024 .. All rights reserved.
 ///
 
-class OnePicturePage extends StatelessWidget {
+class OnePicturePage extends StatefulWidget {
   final String? instanceId;
   final int? gateId;
   final int? passId;
@@ -24,11 +24,20 @@ class OnePicturePage extends StatelessWidget {
   const OnePicturePage({super.key, this.instanceId, this.gateId, this.passId});
 
   @override
+  State<OnePicturePage> createState() => OnePicturePageState();
+}
+
+class OnePicturePageState extends State<OnePicturePage> {
+  OnePictureViewModel? viewModel;
+
+  @override
   Widget build(BuildContext context) {
     return ProviderWidget<OnePictureViewModel>(
-        model: OnePictureViewModel(instanceId, gateId, passId),
+        model: OnePictureViewModel(
+            widget.instanceId, widget.gateId, widget.passId),
         autoLoadData: true,
         builder: (context, model, child) {
+          viewModel = model;
           return InteractiveViewer(
               constrained: false,
               boundaryMargin: const EdgeInsets.all(100),
@@ -37,17 +46,17 @@ class OnePicturePage extends StatelessWidget {
               child: model.graph.nodeCount() == 0
                   ? Container()
                   : GraphView(
-                graph: model.graph,
-                algorithm: SugiyamaAlgorithm(model.builder),
-                paint: Paint()
-                  ..color = Colors.green
-                  ..strokeWidth = 1
-                  ..style = PaintingStyle.stroke,
-                builder: (Node node) {
-                  var a = node.key!.value as String?;
-                  return rectangleWidget(model, a);
-                },
-              ));
+                      graph: model.graph,
+                      algorithm: SugiyamaAlgorithm(model.builder),
+                      paint: Paint()
+                        ..color = Colors.green
+                        ..strokeWidth = 1
+                        ..style = PaintingStyle.stroke,
+                      builder: (Node node) {
+                        var a = node.key!.value as String?;
+                        return rectangleWidget(model, a);
+                      },
+                    ));
           return ToolBar(
             title: '一张图',
             elevation: 0,
@@ -266,7 +275,7 @@ class OnePicturePage extends StatelessWidget {
             ),
             onTap: () {
               // print('tapped' + '${data.toString()}');
-              model.onTapItem(data);
+              model.onTapItem(oData);
             },
           );
         },
@@ -402,6 +411,11 @@ class OnePicturePage extends StatelessWidget {
                   ],
                 )));
   }
+
+  refresh() {
+    viewModel?.refresh();
+  }
+
 }
 
 extension on Container {

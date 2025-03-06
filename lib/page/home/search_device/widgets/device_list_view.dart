@@ -21,7 +21,7 @@ class _DeviceListViewState extends State<DeviceListView> {
   Widget build(BuildContext context) {
     SearchDeviceViewModel model = widget.viewModel;
     return Container(
-      margin: const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
+      margin: const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 8),
       color: ColorUtils.colorBackgroundLine,
       child: contentView(model),
     );
@@ -32,8 +32,13 @@ class _DeviceListViewState extends State<DeviceListView> {
       case DeviceSearchState.notSearched:
         return noSearchStateView(model);
       case DeviceSearchState.searching:
-      case DeviceSearchState.completed:
         return searchingAndCompleted(model);
+      case DeviceSearchState.completed:
+        if (model.deviceScanData.isEmpty) {
+          return noSearchDataView(model);
+        } else {
+          return searchingAndCompleted(model);
+        }
       case DeviceSearchState.onePicturePage:
         return onePicturePageView(model);
     }
@@ -47,10 +52,13 @@ class _DeviceListViewState extends State<DeviceListView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Row(
                       children: [
@@ -77,15 +85,16 @@ class _DeviceListViewState extends State<DeviceListView> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 5),
+                    const SizedBox(height: 0),
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Expanded(
                           child: LinearProgressIndicator(
                             value:
-                                model.searchState == DeviceSearchState.completed
-                                    ? 1
-                                    : null,
+                            model.searchState == DeviceSearchState.completed
+                                ? 1
+                                : null,
                             // 进度值，0.5表示50%
                             backgroundColor: "#676B6B".toColor(),
                             // 进度条的背景颜色
@@ -93,21 +102,23 @@ class _DeviceListViewState extends State<DeviceListView> {
                                 ColorUtils.colorGreen),
                             // 进度条的颜色
                             borderRadius: BorderRadius.circular(2.5),
-                            minHeight: 5,
+                            minHeight: 3,
                           ),
                         ),
                         Visibility(
                           visible:
-                              model.searchState == DeviceSearchState.completed,
-                          child: ImageView(
+                          model.searchState == DeviceSearchState.completed,
+                          child:
+                          // Image.asset(source("home/ic_complete"),width: 20,height: 20,),
+                          ImageView(
                             src: source("home/ic_complete"),
                             width: 20,
                             height: 20,
-                            margin: const EdgeInsets.only(bottom: 15, left: 20),
+                            margin: const EdgeInsets.only( left: 20,bottom: 10),
                           ),
                         )
                       ],
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -138,61 +149,58 @@ class _DeviceListViewState extends State<DeviceListView> {
             ],
           ),
           const SizedBox(height: 0),
-          Expanded(
-            flex: 7,
-            child: Container(
+          if (model.deviceScanData.isNotEmpty) ...[
+            Container(
+              height: 186,
+              width: double.infinity,
               decoration: BoxDecoration(
                   border: Border.all(width: 1, color: "#5D6666".toColor())),
               child: deviceShowList1(model.deviceScanData),
             ),
-          ),
+          ],
           if (model.deviceNoBindingData.isNotEmpty) ...[
             const SizedBox(height: 10),
-            Expanded(
-              flex: 5,
-              child: Container(
-                decoration: BoxDecoration(
-                    border: Border.all(width: 1, color: "#5D6666".toColor())),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        const SizedBox(width: 12),
-                        const Expanded(
-                          child: Text(
-                            "以下设备未绑定大门编号",
-                            style: TextStyle(
-                                fontSize: 12,
-                                color: ColorUtils.colorWhite,
-                                fontWeight: FontWeight.w500),
-                          ),
+            Container(
+              height: 126,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                  border: Border.all(width: 1, color: "#5D6666".toColor())),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Text(
+                          "以下设备未绑定大门编号",
+                          style: TextStyle(
+                              fontSize: 12,
+                              color: ColorUtils.colorWhite,
+                              fontWeight: FontWeight.w500),
                         ),
-                        TextView(
-                          "绑定",
-                          bgColor: ColorUtils.colorGreen,
-                          color: BaseColorUtils.white,
-                          textDarkOnlyOpacity: true,
-                          textAlign: TextAlign.center,
-                          padding: const EdgeInsets.only(
-                              top: 3, bottom: 3, left: 24, right: 24),
-                          radius: 0,
-                          onTap: () {
-                            model.bindEventAction();
-                          },
-                        ),
-                        const SizedBox(width: 12),
-                      ],
-                    ),
-                    const SizedBox(width: 2),
-                    Expanded(
-                      child: deviceShowList1(model.deviceNoBindingData),
-                    ),
-                  ],
-                ),
+                      ),
+                      TextView(
+                        "绑定",
+                        bgColor: ColorUtils.colorGreen,
+                        color: BaseColorUtils.white,
+                        textDarkOnlyOpacity: true,
+                        textAlign: TextAlign.center,
+                        padding: const EdgeInsets.only(
+                            top: 3, bottom: 3, left: 24, right: 24),
+                        margin: const EdgeInsets.only(top: 2),
+                        radius: 0,
+                        onTap: () {
+                          model.bindEventAction();
+                        },
+                      ),
+                      const SizedBox(width: 12),
+                    ],
+                  ),
+                  Expanded(child: deviceShowList1(model.deviceNoBindingData),),
+                ],
               ),
-            )
+            ),
           ],
         ],
       ),
@@ -209,6 +217,7 @@ class _DeviceListViewState extends State<DeviceListView> {
           Expanded(
             flex: 8,
             child: OnePicturePage(
+              key: model.picturePageKey,
               instanceId: model.selectedInstance?.id!,
               gateId: model.selectedDoor?.id,
               passId: model.selectedInOut?.id,
@@ -308,117 +317,159 @@ class _DeviceListViewState extends State<DeviceListView> {
     );
   }
 
-//显示图片
-  Widget deviceShowList1(List<DeviceEntity> deviceData) {
-    return GridView.builder(
-      padding: const EdgeInsets.only(left: 12, right: 12, top: 10, bottom: 10),
-      itemCount: deviceData.length, // 项目的数量
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 6, // 设置每行显示 3 个项
-        crossAxisSpacing: 10, // 列间距
-        mainAxisSpacing: 10, // 行间距
-      ),
-      itemBuilder: (context, index) {
-        return Container(
-          decoration: BoxDecoration(
-              border: Border.all(width: 1, color: "#5D6666".toColor())),
-          child: Column(
-            children: [
-              const SizedBox(height: 8),
-              Expanded(
-                flex: 5,
-                child: ImageView(
-                    src: source(DeviceUtils.getDeviceImage(
-                        deviceData[index].deviceType ?? 0))),
-              ),
-              SizedBox(height: 4),
-              Expanded(
-                flex: 2,
-                child: FittedBox(
-                  fit: BoxFit.contain,
-                  child: Text(
-                    DeviceUtils.getDeviceTypeString(
-                        deviceData[index].deviceType ?? 0),
-                    style: const TextStyle(color: ColorUtils.colorWhite),
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 2,
-                child: FittedBox(
-                  fit: BoxFit.contain,
-                  child: Container(
-                    margin: const EdgeInsets.only(left: 2, right: 2, bottom: 4),
-                    child: Text(
-                      deviceData[index].ip ?? "",
-                      style: const TextStyle(
-                          color: ColorUtils.colorWhite, fontSize: 10),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+  Widget noSearchDataView(SearchDeviceViewModel model) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text(
+            "暂无设备（请确认设备和本电脑使用同一网络或设备已绑定实例）",
+            style: TextStyle(
+              color: Color(0xFFA7C3C2),
+              fontSize: 12,
+            ),
+            textAlign: TextAlign.center,
           ),
-        );
-      },
+          const SizedBox(height: 10),
+          TextView(
+            "扫描设备",
+            bgColor: model.selectedInstance != null
+                ? ColorUtils.colorGreen
+                : ColorUtils.colorGreen.withOpacity(0.2),
+            color: model.selectedInstance != null
+                ? BaseColorUtils.white
+                : BaseColorUtils.white.withOpacity(0.2),
+            textDarkOnlyOpacity: true,
+            textAlign: TextAlign.center,
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24,
+              vertical: 6,
+            ),
+            radius: 0,
+            onTap: model.selectedInstance != null
+                ? () {
+                    model.scanStartEventAction();
+                  }
+                : null,
+          ),
+        ],
+      ),
     );
   }
+
+//显示图片
 //   Widget deviceShowList1(List<DeviceEntity> deviceData) {
-//     return SingleChildScrollView(
-//       child: Padding(
-//         padding: const EdgeInsets.only(left: 12, right: 12, top: 10, bottom: 10),
-//         child: Wrap(
-//           spacing: 10, // 水平间距
-//           runSpacing: 10, // 垂直间距
-//           children: List.generate(deviceData.length, (index) {
-//             return Container(
-//               width: 90, // 固定宽度
-//               height: 86, // 固定高度
-//               decoration: BoxDecoration(
-//                 border: Border.all(width: 1, color: "#5D6666".toColor()),
-//               ),
-//               child: Column(
-//                 children: [
-//                   const SizedBox(height: 8),
-//                   Expanded(
-//                     flex: 5,
-//                     child: ImageView(
-//                       src: source(DeviceUtils.getDeviceImage(
-//                           deviceData[index].deviceType ?? 0)),
-//                     ),
-//                   ),
-//                   const SizedBox(height: 4),
-//                   Expanded(
-//                     flex: 2,
-//                     child: FittedBox(
-//                       fit: BoxFit.contain,
-//                       child: Text(
-//                         DeviceUtils.getDeviceTypeString(
-//                             deviceData[index].deviceType ?? 0),
-//                         style: const TextStyle(color: ColorUtils.colorWhite),
-//                       ),
-//                     ),
-//                   ),
-//                   Expanded(
-//                     flex: 2,
-//                     child: FittedBox(
-//                       fit: BoxFit.contain,
-//                       child: Container(
-//                         margin: const EdgeInsets.only(left: 2, right: 2, bottom: 4),
-//                         child: Text(
-//                           deviceData[index].ip ?? "",
-//                           style: const TextStyle(
-//                               color: ColorUtils.colorWhite, fontSize: 10),
-//                         ),
-//                       ),
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             );
-//           }),
-//         ),
+//     return GridView.builder(
+//       padding: const EdgeInsets.only(left: 12, right: 12, top: 10, bottom: 10),
+//       itemCount: deviceData.length, // 项目的数量
+//       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+//         crossAxisCount: 6, // 设置每行显示 3 个项
+//         crossAxisSpacing: 10, // 列间距
+//         mainAxisSpacing: 10, // 行间距
 //       ),
+//       itemBuilder: (context, index) {
+//         return Container(
+//           decoration: BoxDecoration(
+//               border: Border.all(width: 1, color: "#5D6666".toColor())),
+//           child: Column(
+//             children: [
+//               const SizedBox(height: 8),
+//               Expanded(
+//                 flex: 5,
+//                 child: ImageView(
+//                     src: source(DeviceUtils.getDeviceImage(
+//                         deviceData[index].deviceType ?? 0))),
+//               ),
+//               SizedBox(height: 4),
+//               Expanded(
+//                 flex: 2,
+//                 child: FittedBox(
+//                   fit: BoxFit.contain,
+//                   child: Text(
+//                     DeviceUtils.getDeviceTypeString(
+//                         deviceData[index].deviceType ?? 0),
+//                     style: const TextStyle(color: ColorUtils.colorWhite),
+//                   ),
+//                 ),
+//               ),
+//               Expanded(
+//                 flex: 2,
+//                 child: FittedBox(
+//                   fit: BoxFit.contain,
+//                   child: Container(
+//                     margin: const EdgeInsets.only(left: 2, right: 2, bottom: 4),
+//                     child: Text(
+//                       deviceData[index].ip ?? "",
+//                       style: const TextStyle(
+//                           color: ColorUtils.colorWhite, fontSize: 10),
+//                     ),
+//                   ),
+//                 ),
+//               ),
+//             ],
+//           ),
+//         );
+//       },
 //     );
 //   }
+  Widget deviceShowList1(List<DeviceEntity> deviceData) {
+    return SingleChildScrollView(
+      child: Padding(
+        padding:
+            const EdgeInsets.only(left: 12, right: 12, top: 10, bottom: 10),
+        child: Wrap(
+          spacing: 10, // 水平间距
+          runSpacing: 10, // 垂直间距
+          children: List.generate(deviceData.length, (index) {
+            return Container(
+              width: 90, // 固定宽度
+              height: 76, // 固定高度
+              decoration: BoxDecoration(
+                border: Border.all(width: 1, color: "#5D6666".toColor()),
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: 8),
+                  Expanded(
+                    flex: 5,
+                    child: ImageView(
+                      src: source(DeviceUtils.getDeviceImage(
+                          deviceData[index].deviceType ?? 0)),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Expanded(
+                    flex: 2,
+                    child: FittedBox(
+                      fit: BoxFit.contain,
+                      child: Text(
+                        DeviceUtils.getDeviceTypeString(
+                            deviceData[index].deviceType ?? 0),
+                        style: const TextStyle(color: ColorUtils.colorWhite),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 2,
+                    child: FittedBox(
+                      fit: BoxFit.contain,
+                      child: Container(
+                        margin:
+                            const EdgeInsets.only(left: 2, right: 2, bottom: 4),
+                        child: Text(
+                          deviceData[index].ip ?? "",
+                          style: const TextStyle(
+                              color: ColorUtils.colorWhite, fontSize: 10),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+        ),
+      ),
+    );
+  }
 }

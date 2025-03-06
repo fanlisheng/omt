@@ -33,8 +33,9 @@ class DetailBatteryExchangeView extends StatelessWidget {
               const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 16),
           color: ColorUtils.colorBackgroundLine,
           width: double.infinity,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: ListView(
+
+            // crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 "交换机信息",
