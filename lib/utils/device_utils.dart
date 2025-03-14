@@ -7,7 +7,6 @@ import 'package:ping_discover_network_forked/ping_discover_network_forked.dart';
 
 import '../bean/home/home_page/device_entity.dart';
 
-
 class DeviceUtils {
   /// MAC 地址前缀映射设备类型
   Map<String, String> macDeviceTypeMap = {
@@ -123,7 +122,17 @@ class DeviceUtils {
       return; // 如果满足中断条件，立即返回
     }
     try {
-      final result = await Process.run('ping', ['-c', '1', '-W', '1', ip]);
+      final isWindows = Platform.isWindows;
+      final List<String> arguments;
+
+      if (isWindows) {
+        // Windows CMD 参数
+        arguments = ['-n', '1', '-w', '1000', ip];
+      } else {
+        // Linux/macOS 参数
+        arguments = ['-c', '1', '-W', '1', ip];
+      }
+      final result = await Process.run('ping', arguments);
       if (result.exitCode == 0) {
         print('Ping 成功: $ip');
       } else {
@@ -140,29 +149,48 @@ class DeviceUtils {
     Map<String, String> ipMacMap = {};
 
     ProcessResult result;
-    if (Platform.isMacOS || Platform.isLinux) {
-      result = await Process.run('arp', ['-a']);
-    } else if (Platform.isWindows) {
+    if (Platform.isMacOS || Platform.isLinux || Platform.isWindows) {
       result = await Process.run('arp', ['-a']);
     } else {
       throw Exception("不支持的平台");
     }
 
-    List<String> lines = result.stdout.toString().split("\n");
+    final lines = result.stdout.split("\n");
+    final isWindows = Platform.isWindows;
     for (var line in lines) {
-      if (shouldStop()) {
+      if (shouldStop != null && shouldStop()) {
         print("停止获取 MAC 地址");
-        return ipMacMap; // 如果满足中断条件，返回当前的结果并停止
+        return ipMacMap;
       }
+      line = line.trim();
+      if (line.isEmpty) continue;
 
-      List<String> parts = line.split(RegExp(r'\s+'));
-      if (parts.length >= 3) {
-        String ip = parts[1].replaceAll("(", "").replaceAll(")", "");
-        String mac = parts[3].toUpperCase();
-        String normalizedMac = normalizeMacAddress(mac);
-        if (RegExp(r'([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}')
-            .hasMatch(normalizedMac)) {
-          ipMacMap[ip] = normalizedMac;
+      if (isWindows) {
+        if (line.contains("Interface") || line.contains("Internet Address"))
+          continue;
+        final parts = line.split(RegExp(r'\s+'));
+        if (parts.length >= 3 &&
+            RegExp(r'^\d+\.\d+\.\d+\.\d+$').hasMatch(parts[0])) {
+          final ip = parts[0];
+          final mac = parts[1].toUpperCase();
+          final normalizedMac = normalizeMacAddress(mac);
+          if (RegExp(r'([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}')
+              .hasMatch(normalizedMac)) {
+            ipMacMap[ip] = normalizedMac;
+          }
+        }
+      } else {
+        if (!line.contains(RegExp(r'\d+\.\d+\.\d+\.\d+'))) continue;
+        line = line.replaceAll("at", "");
+        final parts = line.split(RegExp(r'\s+'));
+        if (parts.length >= 3) {
+          final ip = parts[1].replaceAll("(", "").replaceAll(")", "");
+          final mac = parts[2].toUpperCase();
+          final normalizedMac = normalizeMacAddress(mac);
+          if (RegExp(r'([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}')
+              .hasMatch(normalizedMac)) {
+            ipMacMap[ip] = normalizedMac;
+          }
         }
       }
     }
@@ -172,8 +200,18 @@ class DeviceUtils {
 
   /// 格式化 MAC 地址，确保每组都有两个字符
   static String normalizeMacAddress(String mac) {
-    return mac.split(':').map((part) {
-      return part.length == 1 ? '0$part' : part;
+    // 处理空输入或无效输入
+    if (mac.isEmpty ||
+        !RegExp(r'^([0-9A-Fa-f]{1,2}[:-]){5}[0-9A-Fa-f]{1,2}$').hasMatch(mac)) {
+      return mac; // 返回原始输入或抛出异常，取决于需求
+    }
+
+    // 统一分隔符为冒号，并移除多余字符
+    final normalized = mac.replaceAll('-', ':').toUpperCase();
+
+    // 分割并补齐前导零
+    return normalized.split(':').map((part) {
+      return part.padLeft(2, '0'); // 补前导零至两位
     }).join(':');
   }
 
@@ -258,7 +296,6 @@ class DeviceUtils {
     DeviceType.battery: "电池",
     DeviceType.exchange: "交换机",
     DeviceType.camera: "摄像头",
-    DeviceType.router: "路由器",
   };
 
   // 设备图片映射
