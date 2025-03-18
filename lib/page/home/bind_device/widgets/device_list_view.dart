@@ -28,6 +28,7 @@ class _DeviceListViewState extends State<DeviceListView> {
   Container contentView(BindDeviceViewModel model) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      height: 160,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,

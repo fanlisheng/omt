@@ -22,9 +22,9 @@ import '../../home/device_detail/view_models/device_detail_viewmodel.dart';
 ///
 
 class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
-  final String? instanceId;
-  final int? gateId;
-  final int? passId;
+  String? instanceId;
+  int? gateId;
+  int? passId;
 
   OnePictureViewModel(this.instanceId, this.gateId, this.passId);
 
@@ -43,6 +43,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
   @override
   void initState() async {
     super.initState();
+    requestData();
     builder
       ..nodeSeparation = (60)
       ..levelSeparation = (60)
@@ -57,6 +58,9 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
   @override
   loadData({onSuccess, onCache, onError}) async {
     // var userInfo = await SharedUtils.getUserInfo();
+  }
+
+  void requestData() {
     if (instanceId == null) {
       return;
     }
@@ -76,7 +80,10 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
 
           setDataToGraph(opd);
 
-          onSuccess?.call(opd);
+          data = opd;
+
+          notifyListeners();
+          // onSuccess?.call(opd);
         },
         onCache: (data) {
           // onePictureHttpData = data;
@@ -90,7 +97,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
 
           // onCache?.call(data);
         },
-        onError: onError);
+        onError: (e) {});
   }
 
   void _setDataMap(OnePictureDataData? data) {

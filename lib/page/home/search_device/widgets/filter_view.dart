@@ -1,6 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as m;
-
 import 'package:go_router/go_router.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/common/id_name_value.dart';
@@ -99,6 +98,7 @@ class _FilterViewState extends State<FilterView> {
                           if (focused) debugPrint('Focused ${instance.name}');
                         },
                         onSelected: () {
+                          model.selectedInstance = null;
                           model.selectedInstance = instance;
                           model.notifyListeners();
                         }),
@@ -207,12 +207,19 @@ class _FilterViewState extends State<FilterView> {
                 : null,
           ),
 
-          if(model.searchState == DeviceSearchState.onePicturePage)...[
-            const SizedBox(width: 10,),
-            IconButton(
-              icon: const Icon(FluentIcons.reset, size: 20.0),
-              onPressed: model.resetEventAction,
+          if (model.searchState == DeviceSearchState.onePicturePage) ...[
+            const SizedBox(
+              width: 10,
             ),
+            Button(
+              onPressed: model.resetEventAction,
+              style: ButtonStyle(
+                  backgroundColor: WidgetStatePropertyAll(
+                      FluentTheme.of(context)
+                          .resources
+                          .controlStrongFillColorDisabled)),
+              child: const Icon(FluentIcons.reset, size: 20.0),
+            )
           ]
         ],
       ),

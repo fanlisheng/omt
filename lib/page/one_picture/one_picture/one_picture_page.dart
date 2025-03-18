@@ -17,11 +17,11 @@ import 'package:graphview/GraphView.dart';
 ///
 
 class OnePicturePage extends StatefulWidget {
-  final String? instanceId;
+  String? instanceId;
   final int? gateId;
   final int? passId;
 
-  const OnePicturePage({super.key, this.instanceId, this.gateId, this.passId});
+  OnePicturePage({super.key, this.instanceId, this.gateId, this.passId});
 
   @override
   State<OnePicturePage> createState() => OnePicturePageState();
@@ -412,10 +412,16 @@ class OnePicturePageState extends State<OnePicturePage> {
                 )));
   }
 
-  refresh() {
-    viewModel?.refresh();
+  refresh({
+    @required String? instanceId,
+    @required int? gateId,
+    @required int? passId,
+  }) {
+    viewModel?.instanceId = instanceId;
+    viewModel?.gateId = gateId;
+    viewModel?.passId = passId;
+    viewModel?.requestData();
   }
-
 }
 
 extension on Container {

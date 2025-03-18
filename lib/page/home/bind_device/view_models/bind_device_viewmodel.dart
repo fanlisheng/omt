@@ -103,8 +103,12 @@ class BindDeviceViewModel extends BaseViewModelRefresh<dynamic> {
     // context!.pop();
     // IntentUtils.share.popResultOk(context!);
     if(deviceData.isNotEmpty){
-      pageState = BindDevicePageState.idle;
-      notifyListeners();
+      if(pageState == BindDevicePageState.idle){
+        IntentUtils.share.pop(context!);
+      }else{
+        pageState = BindDevicePageState.idle;
+        notifyListeners();
+      }
     }else{
       if (addSuccess) {
         IntentUtils.share.popResultOk(context!);

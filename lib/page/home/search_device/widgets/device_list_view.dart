@@ -150,13 +150,13 @@ class _DeviceListViewState extends State<DeviceListView> {
           ),
           const SizedBox(height: 0),
           if (model.deviceScanData.isNotEmpty) ...[
-            Container(
-              height: 186,
+            Expanded(child: Container(
+              // height: 186,
               width: double.infinity,
               decoration: BoxDecoration(
                   border: Border.all(width: 1, color: "#5D6666".toColor())),
               child: deviceShowList1(model.deviceScanData),
-            ),
+            ),),
           ],
           if (model.deviceNoBindingData.isNotEmpty) ...[
             const SizedBox(height: 10),
@@ -215,7 +215,6 @@ class _DeviceListViewState extends State<DeviceListView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            flex: 8,
             child: OnePicturePage(
               key: model.picturePageKey,
               instanceId: model.selectedInstance?.id!,
@@ -225,56 +224,53 @@ class _DeviceListViewState extends State<DeviceListView> {
           ),
           if (model.deviceNoBindingData.isNotEmpty) ...[
             const SizedBox(height: 10),
-            Expanded(
-              flex: 5,
-              child: Container(
-                decoration: BoxDecoration(
-                    border: Border.all(width: 1, color: "#5D6666".toColor())),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        const SizedBox(width: 12),
-                        const Expanded(
-                          child: Text(
-                            "以下设备未绑定大门编号",
-                            style: TextStyle(
-                                fontSize: 12,
-                                color: ColorUtils.colorWhite,
-                                fontWeight: FontWeight.w500),
-                          ),
+            Container(
+              height: 126,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                  border: Border.all(width: 1, color: "#5D6666".toColor())),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Text(
+                          "以下设备未绑定大门编号",
+                          style: TextStyle(
+                              fontSize: 12,
+                              color: ColorUtils.colorWhite,
+                              fontWeight: FontWeight.w500),
                         ),
-                        TextView(
-                          "绑定",
-                          bgColor: ColorUtils.colorGreen,
-                          color: BaseColorUtils.white,
-                          textDarkOnlyOpacity: true,
-                          textAlign: TextAlign.center,
-                          padding: const EdgeInsets.only(
-                              top: 3, bottom: 3, left: 24, right: 24),
-                          radius: 0,
-                          onTap: () {
-                            model.bindEventAction();
-                          },
-                        ),
-                        const SizedBox(width: 12),
-                      ],
-                    ),
-                    const SizedBox(width: 2),
-                    Expanded(
-                      child: deviceShowList1(model.deviceNoBindingData),
-                    ),
-                  ],
-                ),
+                      ),
+                      TextView(
+                        "绑定",
+                        bgColor: ColorUtils.colorGreen,
+                        color: BaseColorUtils.white,
+                        textDarkOnlyOpacity: true,
+                        textAlign: TextAlign.center,
+                        padding: const EdgeInsets.only(
+                            top: 3, bottom: 3, left: 24, right: 24),
+                        margin: const EdgeInsets.only(top: 2),
+                        radius: 0,
+                        onTap: () {
+                          model.bindEventAction();
+                        },
+                      ),
+                      const SizedBox(width: 12),
+                    ],
+                  ),
+                  Expanded(child: deviceShowList1(model.deviceNoBindingData),),
+                ],
               ),
-            )
+            ),
           ],
         ],
       ),
     );
   }
+
 
   //没有搜索时的视图
   Widget noSearchStateView(SearchDeviceViewModel model) {
