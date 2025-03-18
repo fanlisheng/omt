@@ -25,18 +25,22 @@ class StateView extends StatelessWidget {
     if (viewModel.pageState == BindDevicePageState.loading) {
     } else if (viewModel.pageState == BindDevicePageState.success) {
       text = "提交完成";
-      text1 = "摄像头、实例绑定关系业务平台绑定成功\n实例、边缘设备、摄像头、NVR、电源箱绑定关系IOT绑定成功";
+      // text1 = "摄像头、实例绑定关系业务平台绑定成功\n实例、边缘设备、摄像头、NVR、电源箱绑定关系IOT绑定成功";
+      text1 = viewModel.showText;
       src = source("home/ic_succeed");
       btnText = "返回";
       action = () {
         viewModel.goBackEventAction();
+        // viewModel.pageState = BindDevicePageState.idle;
+        // viewModel.notifyListeners();
       };
     } else if (viewModel.pageState == BindDevicePageState.failure) {
       text = "提交失败";
-      text1 = "摄像头、实例绑定关系业务平台绑定失败";
-      text2 = "实例、边缘设备、摄像头、NVR、电源箱绑定关系IOT更新失败";
+      // text1 = "摄像头、实例绑定关系业务平台绑定失败";
+      // text2 = "实例、边缘设备、摄像头、NVR、电源箱绑定关系IOT更新失败";
+      text1 = viewModel.showText;
       textColor = ColorUtils.colorRed;
-      text2Color = ColorUtils.colorRed;
+      // text2Color = ColorUtils.colorRed;
       src = source("home/ic_failure");
       btnText = "手动更新";
       action = () {
@@ -78,11 +82,11 @@ class StateView extends StatelessWidget {
             style: const TextStyle(
                 color: ColorUtils.colorWhite, fontSize: 12, height: 1.5),
           ),
-          Text(
-            text2,
-            textAlign: TextAlign.center,
-            style: TextStyle(color: text2Color, fontSize: 12, height: 2),
-          ),
+          // Text(
+          //   text2,
+          //   textAlign: TextAlign.center,
+          //   style: TextStyle(color: text2Color, fontSize: 12, height: 2),
+          // ),
           const SizedBox(height: 20),
 
           // 手动更新按钮

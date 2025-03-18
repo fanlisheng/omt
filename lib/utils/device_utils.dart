@@ -65,6 +65,10 @@ class DeviceUtils {
 
         String ip = entry.key;
         String mac = entry.value;
+
+        if(ip == "192.168.101.82"){
+          print("------------");
+        }
         String deviceTypeText = getDeviceTypeForMacAddress(mac);
 
         if (ip == "$subnet.1") {
@@ -83,7 +87,7 @@ class DeviceUtils {
                 deviceTypeText: deviceTypeText,
                 deviceType: getDeviceTypeInt(deviceTypeText),
                 deviceCode: "");
-            if (deviceTypeText == "AI设备") {
+            if (deviceTypeText == "AI设备" || deviceTypeText == "NVR") {
               String deviceCode = mac.replaceAll(":", "");
               deviceCode = deviceCode.toLowerCase();
               deviceEntity.deviceCode = deviceCode;

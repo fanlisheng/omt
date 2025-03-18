@@ -22,11 +22,10 @@ class BindDeviceScreen extends StatelessWidget {
   final StrIdNameValue instance;
   final List<IdNameValue> doorList;
 
-  const BindDeviceScreen(
-      {super.key,
-      required this.deviceData,
-      required this.instance,
-      required this.doorList});
+  const BindDeviceScreen({super.key,
+    required this.deviceData,
+    required this.instance,
+    required this.doorList});
 
   @override
   Widget build(BuildContext context) {
@@ -42,11 +41,9 @@ class BindDeviceScreen extends StatelessWidget {
                 title: DNavigationView(
                   title: "绑定",
                   titlePass: "首页 / ",
-                  onTap: model.pageState == BindDevicePageState.success
-                      ? () {
-                          IntentUtils.share.popResultOk(context!);
-                        }
-                      : null,
+                  onTap: (){
+                    model.goBackEventAction();
+                  },
                 ),
               ),
               content: contentView(model),
@@ -66,7 +63,17 @@ class BindDeviceScreen extends StatelessWidget {
                 margin: const EdgeInsets.only(left: 20, right: 20),
                 color: ColorUtils.colorBackgroundLine,
                 child: Column(
+                  crossAxisAlignment: fu.CrossAxisAlignment.start,
                   children: [
+                    const fu.SizedBox(height: 16),
+                    Padding(
+                      padding: const fu.EdgeInsets.only(left: 20),
+                      child: fu.Text(
+                        model.instance.name ?? "",
+                        style: const fu.TextStyle(
+                            fontSize: 14, color: ColorUtils.colorGreenLiteLite),
+                      ),
+                    ),
                     //设备视频
                     DeviceListView(viewModel: model),
                     // 选择大门视图
@@ -101,7 +108,7 @@ class BindDeviceScreen extends StatelessWidget {
           Clickable(
             child: Container(
               padding:
-                  const EdgeInsets.only(left: 25, right: 25, top: 6, bottom: 6),
+              const EdgeInsets.only(left: 25, right: 25, top: 6, bottom: 6),
               color: ColorUtils.colorGreen,
               child: const Text(
                 "绑定",

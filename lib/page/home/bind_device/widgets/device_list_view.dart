@@ -88,11 +88,10 @@ class _DeviceListViewState extends State<DeviceListView> {
       ),
     );
   }
-
 }
+
 //显示图片
-Widget deviceShowList1(List<DeviceEntity> deviceData,
-    {Function(int)? onTap}) {
+Widget deviceShowList1(List<DeviceEntity> deviceData, {Function(int)? onTap}) {
   return GridView.builder(
     padding: const EdgeInsets.only(left: 12, right: 12, top: 10, bottom: 10),
     itemCount: deviceData.length, // 项目的数量
@@ -105,8 +104,8 @@ Widget deviceShowList1(List<DeviceEntity> deviceData,
       return Clickable(
         onTap: onTap != null
             ? () {
-          onTap(index);
-        }
+                onTap(index);
+              }
             : null,
         child: Stack(
           children: [
@@ -186,9 +185,9 @@ Widget deviceShowList1(List<DeviceEntity> deviceData,
 
 //显示图片
 Widget deviceShowList2(
-    List<DeviceEntity> deviceData, {
-      Function(int)? onTap,
-    }) {
+  List<DeviceEntity> deviceData, {
+  Function(int)? onTap,
+}) {
   return SingleChildScrollView(
     padding: const EdgeInsets.only(left: 12, right: 12, top: 10, bottom: 10),
     child: Wrap(
@@ -198,8 +197,8 @@ Widget deviceShowList2(
         return Clickable(
           onTap: onTap != null
               ? () {
-            onTap(index);
-          }
+                  onTap(index);
+                }
               : null,
           child: Container(
             width: 90, // 固定宽度
@@ -238,8 +237,10 @@ Widget deviceShowList2(
                         child: FittedBox(
                           fit: BoxFit.contain,
                           child: Text(
-                            deviceData[index].deviceTypeText ?? "-",
-                            style: const TextStyle(color: ColorUtils.colorWhite),
+                              DeviceUtils.getDeviceTypeString(
+                                  deviceData[index].deviceType ?? 0),
+                            style:
+                                const TextStyle(color: ColorUtils.colorWhite),
                           ),
                         ),
                       ),

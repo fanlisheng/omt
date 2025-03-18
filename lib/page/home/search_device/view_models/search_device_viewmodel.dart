@@ -49,19 +49,14 @@ class SearchDeviceViewModel extends BaseViewModel {
 
   //设备统计字段
   String deviceStatistics = "";
-
   //扫描出的设备数据
   List<DeviceEntity> deviceScanData = [];
-
   List<DeviceEntity> deviceScanTemporaryData = [];
-
   //没有绑定的数据
   List<DeviceEntity> deviceNoBindingData = [];
-
-  //扫描进度
-
   //停止扫描
   bool stopScanning = false;
+  //
 
   // 创建 FocusNode 来监听焦点事件
   FocusNode focusNode = FocusNode();
@@ -254,25 +249,9 @@ class SearchDeviceViewModel extends BaseViewModel {
     return stopScanning; // 当 stopScanning 为 true 时停止
   }
 
-// LocalDeviceEntity getDeviceTypeInfo(LocalDeviceEntity info) {
-//   if (info.domainName == null) return info;
-//   if (info.domainName!.contains('DS-2CD') ||
-//       info.domainName!.contains('DS-2DE')) {
-//     info.type = "摄像头";
-//   } else if (info.domainName!.contains('DS-76') ||
-//       info.domainName!.contains('DS-77')) {
-//     info.type = "DVR";
-//   } else if (info.domainName!.contains('AI')) {
-//     info.type = "AI 设备";
-//   } else {
-//     info.type = "未知设备";
-//     return info;
-//   }
-//   return info;
-// }
 
   String _generateDeviceStatistics(List<DeviceEntity>? deviceList) {
-    if (deviceList == null || deviceList.isEmpty) return "无设备";
+    if (deviceList == null || deviceList.isEmpty) return "暂无设备";
 
     // 定义设备类型对应关系
     final deviceTypeMap = {

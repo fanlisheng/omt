@@ -156,7 +156,7 @@ class _FilterViewState extends State<FilterView> {
               child: FComboBox<IdNameValue>(
                   selectedValue: model.selectedDoor,
                   items: model.doorList,
-                  disabled: disabled,
+                  disabled: (disabled || model.selectedInstance == null),
                   onChanged: (a) {
                     model.selectedDoor = a;
                     model.notifyListeners();
@@ -180,7 +180,7 @@ class _FilterViewState extends State<FilterView> {
               child: FComboBox<IdNameValue>(
                   selectedValue: model.selectedInOut,
                   items: model.inOutList,
-                  disabled: disabled,
+                  disabled: (disabled || model.selectedDoor == null),
                   onChanged: (a) {
                     model.selectedInOut = a;
                     model.notifyListeners();

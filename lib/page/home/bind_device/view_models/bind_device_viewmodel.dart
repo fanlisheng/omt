@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
 import 'package:omt/routing/routes.dart';
+import 'package:omt/utils/device_utils.dart';
 
 import '../../../../bean/common/id_name_value.dart';
 import '../../../../bean/home/home_page/device_entity.dart';
@@ -25,33 +26,16 @@ class BindDeviceViewModel extends BaseViewModelRefresh<dynamic> {
 
   //全选中
   bool selected = false;
-
   //选中的数量
   int selectedCount = 0;
-
   //大门号
   IdNameValue? selectedDoor;
-
-  // String? gateNo;
-  // List gates = <String>[
-  //   'Abyssinian',
-  //   'Aegean',
-  //   'American Bobtail',
-  //   'American Curl',
-  //   'American Ringtail',
-  //   'American Shorthair',
-  //   'American Wirehair',
-  //   'Aphrodite Giant',
-  //   'Arabian Mau',
-  //   'Asian cat',
-  //   'Asian Semi-longhair',
-  //   'Australian Mist',
-  //   'Balinese',
-  //   'Bambino',
-  // ];
-
   //页面状态
   BindDevicePageState pageState = BindDevicePageState.idle;
+  //提交后显示的text
+  String showText = "";
+  //添加成功，用户记录添加成功过，返回后刷新
+  bool addSuccess = false;
 
   @override
   void initState() async {
@@ -83,6 +67,13 @@ class BindDeviceViewModel extends BaseViewModelRefresh<dynamic> {
     } else {
       selectedCount = 0;
     }
+    // List<DeviceEntity> selectedDevices = [];
+    // if (deviceData.isNotEmpty) {
+    //   selectedDevices =
+    //       deviceData.where((device) => device.selected ?? false).toList();
+    // }
+    // pageState = BindDevicePageState.success;
+    // displayBindingMessage(selectedDevices);
     notifyListeners();
   }
 
@@ -100,7 +91,7 @@ class BindDeviceViewModel extends BaseViewModelRefresh<dynamic> {
   //绑定设备
   bingingEventAction() {
     if (selectedDoor == null || (selectedDoor?.id ?? 0) <= 0) {
-      LoadingUtils.showToast(data:"未选择大门或大门编号不正确");
+      LoadingUtils.showToast(data: "未选择大门或大门编号不正确");
       return;
     }
 
@@ -110,7 +101,17 @@ class BindDeviceViewModel extends BaseViewModelRefresh<dynamic> {
   //成功返回
   goBackEventAction() {
     // context!.pop();
-    IntentUtils.share.popResultOk(context!);
+    // IntentUtils.share.popResultOk(context!);
+    if(deviceData.isNotEmpty){
+      pageState = BindDevicePageState.idle;
+      notifyListeners();
+    }else{
+      if (addSuccess) {
+        IntentUtils.share.popResultOk(context!);
+      } else {
+        IntentUtils.share.pop(context!);
+      }
+    }
   }
 
   //手动绑定
@@ -132,11 +133,44 @@ class BindDeviceViewModel extends BaseViewModelRefresh<dynamic> {
         deviceList: selectedDevices,
         onSuccess: (m) {
           pageState = BindDevicePageState.success;
+          displayBindingMessage(selectedDevices);
+          deviceData.removeWhere((device) => selectedDevices.contains(device));
+          addSuccess = true;
           notifyListeners();
         },
         onError: (e) {
           pageState = BindDevicePageState.failure;
+          displayBindingMessage(selectedDevices);
           notifyListeners();
         });
+  }
+
+  void displayBindingMessage(List<DeviceEntity> selectedDevices) {
+    // 提取所有非空的 deviceTypeText 并去重
+    final deviceTypes = selectedDevices
+        .map(
+            (device) => DeviceUtils.getDeviceTypeString(device.deviceType ?? 0))
+        .toSet() // 去重
+        .toList();
+
+    if (deviceTypes.isEmpty) {
+      return;
+    }
+
+    // 检查是否包含“摄像头”
+    bool hasCamera = deviceTypes.contains("摄像头");
+    String deviceTypeString = deviceTypes.join("、"); // 用“、”拼接设备类型
+    String stateText = (pageState == BindDevicePageState.success) ? "成功" : "失败";
+
+    if (hasCamera && deviceTypes.length == 1) {
+      // 只有摄像头类型
+      showText = "摄像头、实例绑定关系业务平台绑定$stateText\n实例、摄像头绑定关系IOT绑定$stateText";
+    } else if (!hasCamera) {
+      // 没有摄像头类型
+      showText = "实例、$deviceTypeString绑定关系IOT绑定$stateText";
+    } else {
+      // 有多种类型且包含摄像头
+      showText= '摄像头、实例绑定关系业务平台绑定$stateText\n实例、$deviceTypeString绑定关系IOT绑定$stateText';
+    }
   }
 }
