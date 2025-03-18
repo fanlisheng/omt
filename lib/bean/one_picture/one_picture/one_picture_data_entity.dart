@@ -66,6 +66,7 @@ class OnePictureDataData {
   String? mac;
   bool sameTypeData = false;
   bool ignore = false;
+  bool unknown = false;
 
   bool get showAddBtn {
     return false;
@@ -82,7 +83,7 @@ class OnePictureDataData {
   String? icon;
 
   String? get showDesc {
-    return ip.defaultStr(data: desc);
+    return ip.defaultStr(data: desc??'');
   }
 
   bool? get showName {

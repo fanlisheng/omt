@@ -115,6 +115,10 @@ OnePictureDataData $OnePictureDataDataFromJson(Map<String, dynamic> json) {
   if (ignore != null) {
     onePictureDataData.ignore = ignore;
   }
+  final bool? unknown = jsonConvert.convert<bool>(json['unknown']);
+  if (unknown != null) {
+    onePictureDataData.unknown = unknown;
+  }
   final List<OnePictureDataData>? nextList = (json['nextList'] as List<
       dynamic>?)
       ?.map(
@@ -165,6 +169,7 @@ Map<String, dynamic> $OnePictureDataDataToJson(OnePictureDataData entity) {
   data['mac'] = entity.mac;
   data['sameTypeData'] = entity.sameTypeData;
   data['ignore'] = entity.ignore;
+  data['unknown'] = entity.unknown;
   data['nextList'] = entity.nextList.map((v) => v.toJson()).toList();
   data['lineColor'] = entity.lineColor;
   data['errorTxt'] = entity.errorTxt;
@@ -187,6 +192,7 @@ extension OnePictureDataDataExtension on OnePictureDataData {
     String? mac,
     bool? sameTypeData,
     bool? ignore,
+    bool? unknown,
     IconData? iconData,
     String? icon,
     List<OnePictureDataData>? nextList,
@@ -208,6 +214,7 @@ extension OnePictureDataDataExtension on OnePictureDataData {
       ..mac = mac ?? this.mac
       ..sameTypeData = sameTypeData ?? this.sameTypeData
       ..ignore = ignore ?? this.ignore
+      ..unknown = unknown ?? this.unknown
       ..iconData = iconData ?? this.iconData
       ..icon = icon ?? this.icon
       ..nextList = nextList ?? this.nextList

@@ -98,6 +98,39 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
       dataMap['${data!.type}_${data.id}'] = data;
     }
     if (null != data?.children && data!.children.isNotEmpty) {
+      if (data.type == OnePictureType.DM.index) {
+        if (data.children.isNotEmpty) {
+          var notJckList = data.children.where((e) {
+            return e.type != OnePictureType.JCK.index;
+          }).toList();
+
+          var dyxList = data.children.where((e) {
+            return e.type == OnePictureType.DYX.index;
+          }).toList();
+
+          var gdsbList = data.children.where((e) {
+            return e.type == OnePictureType.GDSB.index;
+          }).toList();
+
+          if (notJckList.isNotEmpty && gdsbList.isEmpty) {
+            data.children.add(OnePictureDataData()
+              ..type = OnePictureType.GDSB.index
+              ..unknown = true
+              ..children = [
+                OnePictureDataData()
+                  ..type = OnePictureType.SD.index
+                  ..name = '电源未知'
+              ]);
+            if (dyxList.isEmpty) {
+              data.children.add(OnePictureDataData()
+                ..type = OnePictureType.DYX.index
+                ..unknown = true
+                ..name = '电源箱未知');
+            }
+          }
+        }
+      }
+
       for (var item in data.children) {
         _setDataMap(item);
       }
@@ -357,7 +390,10 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
           } else {
             var nodeNext = Node.Id('${next.type}_${next.id}');
             graph.addEdge(nodeRoot, nodeNext,
-                paint: Paint()..color = opd.lineColor.toColor());
+                paint: Paint()
+                  ..color = opd.unknown
+                      ? ColorUtils.transparent
+                      : opd.lineColor.toColor());
             doSetDataToGraph(graph, next, parentNode: nodeNext);
 
             jhjTargetList.add(next);
@@ -371,7 +407,10 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
           for (var next in jhjTargetList) {
             var nodeNext = Node.Id('${next.type}_${next.id}');
             graph.addEdge(nodeNext, nodeRoot,
-                paint: Paint()..color = jhj.lineColor.toColor(),
+                paint: Paint()
+                  ..color = jhj.unknown
+                      ? ColorUtils.transparent
+                      : jhj.lineColor.toColor(),
                 showArrow: false);
           }
         }
@@ -381,6 +420,15 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
   }
 
   void onTapItem(OnePictureDataData? data) {
+    if (data?.unknown == true) {
+      if (data?.type == OnePictureType.DYX.index) {
+        /// 电源箱未知
+      } else if (data?.type == OnePictureType.SD.index ||
+          data?.type == OnePictureType.DC.index) {
+        /// 电源未知
+      }
+    }
+
     if (data == null ||
         (data.nodeCode ?? "").isEmpty ||
         DeviceUtils.getDeviceTypeFromInt(data.type ?? 0) == null) {

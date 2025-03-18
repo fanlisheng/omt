@@ -89,7 +89,8 @@ class JsonConvert {
       return null;
     }
     try {
-      return value.map((dynamic e) => _asT<T>(e, enumConvert: enumConvert))
+      return value
+          .map((dynamic e) => _asT<T>(e, enumConvert: enumConvert))
           .toList();
     } catch (e, stackTrace) {
       debugPrint('asT<$T> $e $stackTrace');
@@ -317,7 +318,8 @@ class JsonConvert {
           UserPermission.fromJson(e)).toList() as M;
     }
     if (<VerInfo>[] is M) {
-      return data.map<VerInfo>((Map<String, dynamic> e) => VerInfo.fromJson(e))
+      return data
+          .map<VerInfo>((Map<String, dynamic> e) => VerInfo.fromJson(e))
           .toList() as M;
     }
     if (<VerInfoRet>[] is M) {
