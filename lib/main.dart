@@ -79,9 +79,9 @@ void main() async {
         // await windowManager.setTitle('');
       }
 
-      await windowManager.setMinimumSize(const Size(1050, 600));
-      await windowManager.setMaximumSize(const Size(1050, 600));
-      // await windowManager.setResizable(false);
+      await windowManager.setMinimumSize(const Size(1280, 800));
+      // await windowManager.setMaximumSize(const Size(1280, 800));
+      await windowManager.setResizable(true);
       await windowManager.setPreventClose(true);
       await windowManager.setSkipTaskbar(false);
       await windowManager.setMovable(true);

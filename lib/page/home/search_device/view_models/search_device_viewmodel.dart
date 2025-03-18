@@ -49,13 +49,17 @@ class SearchDeviceViewModel extends BaseViewModel {
 
   //设备统计字段
   String deviceStatistics = "";
+
   //扫描出的设备数据
   List<DeviceEntity> deviceScanData = [];
   List<DeviceEntity> deviceScanTemporaryData = [];
+
   //没有绑定的数据
   List<DeviceEntity> deviceNoBindingData = [];
+
   //停止扫描
   bool stopScanning = false;
+
   //
 
   // 创建 FocusNode 来监听焦点事件
@@ -238,7 +242,10 @@ class SearchDeviceViewModel extends BaseViewModel {
           deviceStatistics = result;
         }
         //重新请求一张图的数据
-        picturePageKey.currentState?.refresh();
+        picturePageKey.currentState?.refresh(
+            instanceId: selectedInstance?.id,
+            gateId: selectedDoor?.id,
+            passId: selectedInOut?.id);
         notifyListeners();
       },
     );
@@ -248,7 +255,6 @@ class SearchDeviceViewModel extends BaseViewModel {
   bool _shouldStop() {
     return stopScanning; // 当 stopScanning 为 true 时停止
   }
-
 
   String _generateDeviceStatistics(List<DeviceEntity>? deviceList) {
     if (deviceList == null || deviceList.isEmpty) return "暂无设备";

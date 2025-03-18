@@ -173,7 +173,7 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
                       ? "#F3FFFF".toColor()
                       : "#678384".toColor()),
             ),
-            body: const KeepAlivePage(
+            body: KeepAlivePage(
               child: OnePicturePage(),
             ),
           ),
@@ -247,7 +247,7 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
     PaneItem(
       icon: const Icon(FluentIcons.picture),
       title: const Text('一张图'),
-      body: const OnePicturePage(),
+      body: OnePicturePage(),
       onTap: () => debugPrint('一张图'),
     ),
   ];
