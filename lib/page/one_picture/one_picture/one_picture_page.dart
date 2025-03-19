@@ -111,7 +111,7 @@ class OnePicturePageState extends State<OnePicturePage> {
                   left: 16,
                   right: 16),
               decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey, width: 1),
+                  border: Border.all(color: '#347979'.toColor(), width: 1),
                   borderRadius: BorderRadius.circular(4)),
               child: Row(
                 children: onePictureDataData!.getChildList().map((e) {
@@ -141,31 +141,10 @@ class OnePicturePageState extends State<OnePicturePage> {
         },
         child: Container(
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey, width: 1),
+              border: Border.all(color: '#347979'.toColor(), width: 1),
               borderRadius: BorderRadius.circular(4),
             ),
-            child: Container(
-                padding:
-                    EdgeInsets.only(top: 16, bottom: 16, left: 16, right: 16),
-                margin:
-                    EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 16),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(4),
-                  boxShadow: [
-                    BoxShadow(color: Colors.blue[100]!, spreadRadius: 1),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    onePictureDataData?.iconData == null
-                        ? SizedBox.shrink()
-                        : Icon(onePictureDataData?.iconData),
-                    Text('${onePictureDataData?.showNameText}'),
-                    (onePictureDataData?.showDesc ?? '').isEmpty
-                        ? SizedBox.shrink()
-                        : TextView(onePictureDataData?.showDesc),
-                  ],
-                ))));
+            child: _item(onePictureDataData)));
   }
 
   Widget rectangleSubWidget2(
@@ -230,31 +209,10 @@ class OnePicturePageState extends State<OnePicturePage> {
                     padding: const EdgeInsets.only(
                         top: 0, bottom: 0, left: 16, right: 16),
                     decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey, width: 1),
+                        border: Border.all(color: '#347979'.toColor(), width: 1),
                         borderRadius: BorderRadius.circular(4)),
                     child: (oData?.getChildList() ?? []).isEmpty
-                        ? Container(
-                            padding: const EdgeInsets.all(16),
-                            margin: const EdgeInsets.only(
-                                top: 16, bottom: 16, left: 16, right: 16),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(4),
-                              boxShadow: [
-                                BoxShadow(
-                                    color: Colors.blue[100]!, spreadRadius: 1),
-                              ],
-                            ),
-                            child: Column(
-                              children: [
-                                oData?.iconData == null
-                                    ? SizedBox.shrink()
-                                    : Icon(oData?.iconData),
-                                Text('${oData?.showNameText}'),
-                                (oData?.showDesc ?? '').isEmpty
-                                    ? SizedBox.shrink()
-                                    : Text(oData?.showDesc??''),
-                              ],
-                            ))
+                        ? _item(oData)
                         : Row(
                             children: oData!.getChildList().map((e) {
                               final Graph graph = Graph();
@@ -306,7 +264,7 @@ class OnePicturePageState extends State<OnePicturePage> {
                     padding: const EdgeInsets.only(
                         top: 0, bottom: 20, left: 16, right: 16),
                     decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey, width: 1),
+                        border: Border.all(color: '#347979'.toColor(), width: 1),
                         borderRadius: BorderRadius.circular(4)),
                     child: Container(child: cW)),
                 (data?.showDesc ?? '').isEmpty
@@ -347,7 +305,7 @@ class OnePicturePageState extends State<OnePicturePage> {
                         top: 0, bottom: 30, left: 16, right: 16),
                     margin: EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey, width: 1),
+                        border: Border.all(color: '#347979'.toColor(), width: 1),
                         borderRadius: BorderRadius.circular(4)),
                     child: Row(
                       children: data!.getChildList().map((e) {
@@ -371,37 +329,33 @@ class OnePicturePageState extends State<OnePicturePage> {
                             })
                 ],
               )
-            : Container(
-                padding: EdgeInsets.all(16),
-                margin: data.getChildList().length > 1
-                    ? EdgeInsets.all(16)
-                    : (((data.getChildList().firstOrNull?.nextList ?? [])
-                            .isEmpty)
-                        ? EdgeInsets.only(
-                            left: 16, right: 16, top: 16, bottom: 16)
-                        : EdgeInsets.all(16)),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(4),
-                  boxShadow: [
-                    BoxShadow(color: Colors.blue[100]!, spreadRadius: 1),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    Column(
-                      children: [
-                        data?.iconData == null
-                            ? SizedBox.shrink()
-                            : Icon(data?.iconData),
-                        Text('${data?.showNameText}'),
-                        (data?.showDesc ?? '').isEmpty
-                            ? SizedBox.shrink()
-                            : Text(data?.showDesc ?? ''),
-                      ],
-                    ),
-                    cW
-                  ],
-                )));
+            : _item(data));
+  }
+
+  Container _item(OnePictureDataData? oData) {
+    return Container(
+                          padding: const EdgeInsets.all(16),
+                          margin: const EdgeInsets.only(
+                              top: 16, bottom: 16, left: 16, right: 16),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(color: '#82FFFC'.toColor(opacity: .1)),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: '#82FFFC'.toColor(opacity: .05), spreadRadius: 1),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              (oData?.icon??'').isEmpty
+                                  ? SizedBox.shrink()
+                                  : ImageView(src: oData?.icon,height: 22,width: 22,),
+                              TextView('${oData?.showNameText}',color: '#30E7E3'.toColor(),),
+                              (oData?.showDesc ?? '').isEmpty
+                                  ? SizedBox.shrink()
+                                  : Text(oData?.showDesc??''),
+                            ],
+                          ));
   }
 
   refresh({

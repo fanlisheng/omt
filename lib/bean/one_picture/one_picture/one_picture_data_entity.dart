@@ -161,7 +161,8 @@ class OnePictureDataData {
     } else {
       ///实例
       if (type == OnePictureType.SL.index) {
-        lineColor = ColorUtils.colorGreen.toColorHex();
+        // lineColor = ColorUtils.colorGreen.toColorHex();
+        lineColor = '#3FC6BD';
 
         ///供电设备
       } else if (type == OnePictureType.GDSB.index) {
@@ -173,7 +174,8 @@ class OnePictureDataData {
 
         ///交换机
       } else if (type == OnePictureType.JHJ.index) {
-        lineColor = ColorUtils.colorBlueLight.toColorHex();
+        // lineColor = ColorUtils.colorBlueLight.toColorHex();
+        lineColor = '#347979';
         showArrow = false;
       } else {
         lineColor = ColorUtils.colorGra.toColorHex();
@@ -242,34 +244,38 @@ class OnePictureDataData {
   }
 
   void setIcon() {
-    if (type == OnePictureType.SL.index) {
-      iconData = Icons.house;
+    var iconEnd = '';
+     if (type == OnePictureType.SL.index) {
+       iconEnd ='';
     } else if (type == OnePictureType.DM.index) {
-      iconData = Icons.door_sliding;
+       iconEnd ='';
     } else if (type == OnePictureType.JCK.index) {
-      iconData = Icons.transfer_within_a_station;
+       iconEnd ='';
     } else if (type == OnePictureType.GDSB.index) {
-      iconData = Icons.power_input;
+       iconEnd ='';
     } else if (type == OnePictureType.DYX.index) {
-      iconData = Icons.power;
+       iconEnd ='dyx';
     } else if (type == OnePictureType.LYQ.index) {
-      iconData = Icons.router;
+       iconEnd ='lyq';
     } else if (type == OnePictureType.YXWL.index) {
-      iconData = Icons.language_outlined;
+       iconEnd ='yxwl';
     } else if (type == OnePictureType.NVR.index) {
-      iconData = Icons.camera_outdoor_rounded;
+       iconEnd ='nvr2';
     } else if (type == OnePictureType.JHJ.index) {
-      iconData = Icons.route_rounded;
+       iconEnd ='jhj';
     } else if (type == OnePictureType.AISB.index) {
-      iconData = Icons.rocket_launch;
+       iconEnd ='aisb';
     } else if (type == OnePictureType.SXT.index) {
-      iconData = Icons.photo_camera_front;
+       iconEnd ='sxt';
     } else if (type == OnePictureType.SD.index) {
-      iconData = Icons.power_input;
+       iconEnd ='sd';
     } else if (type == OnePictureType.DC.index) {
-      iconData = Icons.battery_std;
+       iconEnd ='dc';
     } else {
-      iconData = Icons.hourglass_empty;
+       iconEnd ='';
     }
+     if(iconEnd.isNotEmpty){
+       icon = source('home/ic_device_${iconEnd}');
+     }
   }
 }

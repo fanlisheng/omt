@@ -410,6 +410,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
             var nodeNext = Node.Id('${next.type}_${next.id}');
             graph.addEdge(nodeRoot, nodeNext,
                 paint: Paint()
+                  ..strokeWidth = 2
                   ..color = opd.unknown
                       ? ColorUtils.transparent
                       : opd.lineColor.toColor());
@@ -427,6 +428,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
             var nodeNext = Node.Id('${next.type}_${next.id}');
             graph.addEdge(nodeNext, nodeRoot,
                 paint: Paint()
+                  ..strokeWidth = 2
                   ..style = PaintingStyle.fill
                   ..color = jhj.unknown
                       ? ColorUtils.transparent
