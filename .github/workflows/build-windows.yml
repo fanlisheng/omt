@@ -12,18 +12,30 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4  # 签出代码
-        
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-            flutter-version: '3.27.1'  # 指定你项目的 Flutter 版本
-            channel: 'stable'         # 使用稳定通道
-            
+          flutter-version: '3.27.1'  # 指定你项目的 Flutter 版本
+          channel: 'stable'         # 使用稳定通道
+
       - name: Get dependencies
         run: flutter pub get
 
       - name: Build Windows app
         run: flutter build windows
+
+      - name: Replace system_theme_plugin.dll
+        run: |
+          # 确认替换文件存在
+          if exist windows_deps/system_theme_plugin.dll (
+            copy windows_deps/system_theme_plugin.dll build/windows/x64/runner/Release/system_theme_plugin.dll
+            echo Replaced system_theme_plugin.dll successfully.
+          ) else (
+            echo Error: windows_deps/system_theme_plugin.dll not found.
+            exit 1
+          )
+        shell: cmd  # 使用 Windows 的 cmd shell
 
       - name: Upload Windows build
         uses: actions/upload-artifact@v4
