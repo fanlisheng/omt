@@ -27,7 +27,6 @@ jobs:
 
       - name: Replace system_theme_plugin.dll
         run: |
-          # 确认替换文件存在
           if exist windows_deps/system_theme_plugin.dll (
             copy windows_deps/system_theme_plugin.dll build/windows/x64/runner/Release/system_theme_plugin.dll
             echo Replaced system_theme_plugin.dll successfully.
