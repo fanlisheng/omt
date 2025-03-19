@@ -30,6 +30,7 @@ jobs:
           if exist windows_deps/system_theme_plugin.dll (
             copy windows_deps/system_theme_plugin.dll build/windows/x64/runner/Release/system_theme_plugin.dll
             echo Replaced system_theme_plugin.dll successfully.
+            dir build/windows/x64/runner/Release/
           ) else (
             echo Error: windows_deps/system_theme_plugin.dll not found.
             exit 1
