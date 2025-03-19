@@ -40,7 +40,9 @@ class OnePicturePageState extends State<OnePicturePage> {
           viewModel = model;
           return InteractiveViewer(
               constrained: false,
-              boundaryMargin: const EdgeInsets.all(100),
+               // clipBehavior: Clip.antiAlias,
+              boundaryMargin: const EdgeInsets.all(50),
+              // transformationController: model.transformationController,
               minScale: 0.01,
               maxScale: 5.6,
               child: model.graph.nodeCount() == 0
@@ -105,7 +107,7 @@ class OnePicturePageState extends State<OnePicturePage> {
             Container(
               padding: EdgeInsets.only(
                   top: onePictureDataData?.showAddBtn == true ? 32 : 0,
-                  bottom: onePictureDataData?.showAddBtn == true ? 16 : 0,
+                  bottom: onePictureDataData?.showAddBtn == true ? 16 : 20,
                   left: 16,
                   right: 16),
               decoration: BoxDecoration(
@@ -248,6 +250,9 @@ class OnePicturePageState extends State<OnePicturePage> {
                                     ? SizedBox.shrink()
                                     : Icon(oData?.iconData),
                                 Text('${oData?.showNameText}'),
+                                (oData?.showDesc ?? '').isEmpty
+                                    ? SizedBox.shrink()
+                                    : Text(oData?.showDesc??''),
                               ],
                             ))
                         : Row(
@@ -267,9 +272,6 @@ class OnePicturePageState extends State<OnePicturePage> {
                             }).toList(),
                           ),
                   ),
-                  (oData?.showDesc ?? '').isEmpty
-                      ? SizedBox.shrink()
-                      : TextView(oData?.showDesc),
                 ],
               ),
             ),
@@ -302,7 +304,7 @@ class OnePicturePageState extends State<OnePicturePage> {
                     : TextView(data?.showNameText),
                 Container(
                     padding: const EdgeInsets.only(
-                        top: 0, bottom: 0, left: 16, right: 16),
+                        top: 0, bottom: 20, left: 16, right: 16),
                     decoration: BoxDecoration(
                         border: Border.all(color: Colors.grey, width: 1),
                         borderRadius: BorderRadius.circular(4)),
@@ -318,20 +320,10 @@ class OnePicturePageState extends State<OnePicturePage> {
                     });
         } else {
           if (data.showBorder == true) {
-            // return Container(
-            //   width: 100,
-            //   height: 100,
-            //   color: ColorUtils.colorGreen,
-            //   child: Text('${data.showNameText}'),
-            // );
+
           }
           if (data.ignore == true) {
-            // return Container(
-            //   width: 100,
-            //   height: 100,
-            //   color: ColorUtils.colorBlueLight,
-            //   child: Text('${data.showNameText}222'),
-            // );
+
           }
         }
       }
@@ -352,7 +344,7 @@ class OnePicturePageState extends State<OnePicturePage> {
                       : TextView(data?.showNameText),
                   Container(
                     padding: const EdgeInsets.only(
-                        top: 0, bottom: 0, left: 16, right: 16),
+                        top: 0, bottom: 30, left: 16, right: 16),
                     margin: EdgeInsets.all(16),
                     decoration: BoxDecoration(
                         border: Border.all(color: Colors.grey, width: 1),

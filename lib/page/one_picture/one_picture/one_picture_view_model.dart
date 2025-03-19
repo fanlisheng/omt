@@ -11,6 +11,8 @@ import 'package:omt/utils/json_utils.dart';
 import '../../../router_utils.dart';
 import '../../../utils/intent_utils.dart';
 import '../../home/device_detail/view_models/device_detail_viewmodel.dart';
+import 'dart:ui' as ui;
+import 'package:vector_math/vector_math_64.dart' as vmath;
 
 ///
 ///  omt
@@ -27,6 +29,9 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
   int? passId;
 
   OnePictureViewModel(this.instanceId, this.gateId, this.passId);
+
+  final TransformationController transformationController =
+      TransformationController();
 
   final Graph graph = Graph();
 
@@ -48,6 +53,13 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
       ..nodeSeparation = (60)
       ..levelSeparation = (60)
       ..orientation = SugiyamaConfiguration.ORIENTATION_TOP_BOTTOM;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // 在 Widget 构建完成后设置初始变换
+      transformationController.value = vmath.Matrix4.identity()
+        // ..translate(0, 0, 0.0) // 初始平移
+        ..scale(0.7, 0.7, 0.7); // 初始缩放
+    });
   }
 
   @override
@@ -415,6 +427,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
             var nodeNext = Node.Id('${next.type}_${next.id}');
             graph.addEdge(nodeNext, nodeRoot,
                 paint: Paint()
+                  ..style = PaintingStyle.fill
                   ..color = jhj.unknown
                       ? ColorUtils.transparent
                       : jhj.lineColor.toColor(),
@@ -454,6 +467,39 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
   void onTapItemNew(OnePictureDataData? data) {
     print('onTapItemNew ${data?.id}');
   }
+
+  void _powerSub(OnePictureDataData opd,
+      {List<OnePictureDataData>? jck,
+      List<OnePictureDataData>? lyq,
+      List<OnePictureDataData>? nvr,
+      List<OnePictureDataData>? jhj,
+      List<OnePictureDataData>? yxwl}) {
+    if (jck?.isNotEmpty == true) {
+      opd.nextList.addAll(jck!);
+    }
+    if (lyq?.isNotEmpty == true) {
+      opd.nextList.addAll(lyq!);
+    }
+    if (nvr?.isNotEmpty == true) {
+      opd.nextList.addAll(nvr!);
+    }
+    if (jhj?.isNotEmpty == true) {
+      if (jhj!.length > 1) {
+        var father =
+            jhj[0].copyWith(children: jhj, sameTypeData: true, name: '');
+        opd.nextList.add(father);
+        dataMap['${father!.type}_${father.id}'] = father;
+        for (var child in jhj) {
+          opd.nextList.remove(child);
+        }
+      } else {
+        opd.nextList.addAll(jhj!);
+      }
+    }
+    if (yxwl?.isNotEmpty == true) {
+      opd.nextList.addAll(yxwl!);
+    }
+  }
 }
 
 OnePictureDataData? getJckFather(
@@ -475,27 +521,4 @@ OnePictureDataData? getJckFather(
     return jckFather;
   }
   return null;
-}
-
-void _powerSub(OnePictureDataData opd,
-    {List<OnePictureDataData>? jck,
-    List<OnePictureDataData>? lyq,
-    List<OnePictureDataData>? nvr,
-    List<OnePictureDataData>? jhj,
-    List<OnePictureDataData>? yxwl}) {
-  if (jck?.isNotEmpty == true) {
-    opd.nextList.addAll(jck!);
-  }
-  if (lyq?.isNotEmpty == true) {
-    opd.nextList.addAll(lyq!);
-  }
-  if (nvr?.isNotEmpty == true) {
-    opd.nextList.addAll(nvr!);
-  }
-  if (jhj?.isNotEmpty == true) {
-    opd.nextList.addAll(jhj!);
-  }
-  if (yxwl?.isNotEmpty == true) {
-    opd.nextList.addAll(yxwl!);
-  }
 }
