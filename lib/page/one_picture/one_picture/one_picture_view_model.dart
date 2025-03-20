@@ -10,6 +10,7 @@ import 'package:omt/utils/json_utils.dart';
 
 import '../../../router_utils.dart';
 import '../../../utils/intent_utils.dart';
+import '../../home/device_add/view_models/device_add_viewmodel.dart';
 import '../../home/device_detail/view_models/device_detail_viewmodel.dart';
 import 'dart:ui' as ui;
 import 'package:vector_math/vector_math_64.dart' as vmath;
@@ -468,26 +469,21 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
         /// 电源未知
       }
     }
+    DeviceType? type = DeviceUtils.getDeviceTypeFromInt(data?.type ?? 0);
+    String code = data?.nodeCode ?? "";
 
-    // if (OnePictureType.DC || OnePictureType.SD) {
-    //   DeviceDetailViewModel model = DeviceDetailViewModel(
-    //     deviceType: DeviceUtils.getDeviceTypeFromInt(data.type ?? 0)!,
-    //     nodeCode: data.nodeCode!,
-    //   );
-    //   IntentUtils.share.push(context,
-    //       routeName: RouterPage.DeviceDetailScreen, data: {"data": model});
-    // }
+    if ((data?.type == OnePictureType.DC.index) ||
+        (data?.type == OnePictureType.SD.index)) {
+      type = DeviceType.power;
+      code = data?.parentNodeCode ?? "";
+    }
 
-    if (data == null ||
-        (data.nodeCode ?? "").isEmpty ||
-        DeviceUtils.getDeviceTypeFromInt(data.type ?? 0) == null) {
+    if (code.isEmpty || type == null) {
       return;
     }
-    print('onTapItem ${data.id}');
     DeviceDetailViewModel model = DeviceDetailViewModel(
-      deviceType: DeviceUtils.getDeviceTypeFromInt(data.type ?? 0)!,
-      nodeCode: data.nodeCode!,
-      // nodeCode: '124#12812-2#2-3#1-11#0',
+      deviceType: type,
+      nodeCode: code,
     );
     IntentUtils.share.push(context,
         routeName: RouterPage.DeviceDetailScreen, data: {"data": model});
