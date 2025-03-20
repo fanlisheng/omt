@@ -53,10 +53,13 @@ class PhotoPreviewScreen extends StatelessWidget {
                       children: [
                         SizedBox(
                           width: 120,
-                          child: FComboBox(
+                          child: FComboBox<String>(
                               selectedValue: model.selectedType,
                               items: model.typeList,
-                              onChanged: (a) {},
+                              onChanged: (String? a) {
+                                model.selectedType = a ?? "";
+                                model.notifyListeners();
+                              },
                               placeholder: "照片类型"),
                         ),
                         const SizedBox(width: 12),

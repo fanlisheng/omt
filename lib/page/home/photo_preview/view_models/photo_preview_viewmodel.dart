@@ -24,7 +24,7 @@ class PhotoPreviewViewModel extends BaseViewModelRefresh<dynamic> {
   int? pageIndex;
   int? pageLimit;
 
-  String selectedType = "全部照片";
+  String selectedType = "";
   List<String> typeList = [
     "全部照片",
     "抓拍照片",
@@ -56,12 +56,8 @@ class PhotoPreviewViewModel extends BaseViewModelRefresh<dynamic> {
       deviceCode: photoPreviewScreenData.deviceCode,
       type: selectedType == "全部照片" ? 0 : (selectedType == "抓拍照片" ? 2 : 1),
       snapAts: [
-        DateTime(selectedDateTime.year, selectedDateTime.month,
-                selectedDateTime.day, 0, 0, 0)
-            .toString(),
-        DateTime(selectedDateTime.year, selectedDateTime.month,
-                selectedDateTime.day, 23, 59, 59)
-            .toString(),
+        BaseTimeUtils.dateToTimeStr(selectedDateTime,format: "yyyy-MM-dd 00:00:00"),
+        BaseTimeUtils.dateToTimeStr(selectedDateTime,format: "yyyy-MM-dd 23:59:59"),
       ],
       onSuccess: (DeviceDetailCameraSnapList? data) {
         if (data != null) {
