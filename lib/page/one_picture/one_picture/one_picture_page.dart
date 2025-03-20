@@ -40,13 +40,26 @@ class OnePicturePageState extends State<OnePicturePage> {
           viewModel = model;
           return InteractiveViewer(
               constrained: false,
-               // clipBehavior: Clip.antiAlias,
+              // clipBehavior: Clip.antiAlias,
               boundaryMargin: const EdgeInsets.all(50),
               // transformationController: model.transformationController,
-              minScale: 0.01,
-              maxScale: 5.6,
+              minScale: 0.1,
+              maxScale: 1,
               child: model.graph.nodeCount() == 0
-                  ? Container()
+                  ? ((model.theOnePictureDataData?.getChildList() ?? []).isNotEmpty
+                      ? (
+                  Row(
+                    children: model.theOnePictureDataData!.getChildList().map((e) {
+                      final Graph graph = Graph();
+                      SugiyamaConfiguration builder = SugiyamaConfiguration()
+                        ..bendPointShape = CurvedBendPointShape(curveLength: 6)
+                        ..coordinateAssignment = CoordinateAssignment.UpRight;
+                      return rectangleSubWidget2(
+                          model: model, data: e, graph: graph, builder: builder);
+                    }).toList(),
+                  )
+              )
+                      : Container())
                   : GraphView(
                       graph: model.graph,
                       algorithm: SugiyamaAlgorithm(model.builder),
@@ -59,37 +72,6 @@ class OnePicturePageState extends State<OnePicturePage> {
                         return rectangleWidget(model, a);
                       },
                     ));
-          return ToolBar(
-            title: '一张图',
-            elevation: 0,
-            actions: [
-              TextButton(
-                  onPressed: () {
-                    model.refresh();
-                  },
-                  child: Text('刷新'))
-            ],
-            iosBack: true,
-            child: InteractiveViewer(
-                constrained: false,
-                boundaryMargin: const EdgeInsets.all(100),
-                minScale: 0.01,
-                maxScale: 5.6,
-                child: model.graph.nodeCount() == 0
-                    ? Container()
-                    : GraphView(
-                        graph: model.graph,
-                        algorithm: SugiyamaAlgorithm(model.builder),
-                        paint: Paint()
-                          ..color = Colors.green
-                          ..strokeWidth = 1
-                          ..style = PaintingStyle.stroke,
-                        builder: (Node node) {
-                          var a = node.key!.value as String?;
-                          return rectangleWidget(model, a);
-                        },
-                      )),
-          );
         });
   }
 
@@ -106,10 +88,10 @@ class OnePicturePageState extends State<OnePicturePage> {
                 : TextView(onePictureDataData?.showNameText),
             Container(
               padding: EdgeInsets.only(
-                  top: onePictureDataData?.showAddBtn == true ? 32 : 0,
-                  bottom: onePictureDataData?.showAddBtn == true ? 16 : 20,
+                  top: onePictureDataData?.showAddBtn == true ? 32 : 16,
+                  bottom: onePictureDataData?.showAddBtn == true ? 16 : 32,
                   left: 16,
-                  right: 16),
+                  right: 32),
               decoration: BoxDecoration(
                   border: Border.all(color: '#347979'.toColor(), width: 1),
                   borderRadius: BorderRadius.circular(4)),
@@ -152,15 +134,6 @@ class OnePicturePageState extends State<OnePicturePage> {
       OnePictureDataData? data,
       Graph? graph,
       SugiyamaConfiguration? builder}) {
-    // model.currentIndex++;
-    // if (model.currentIndex > 16) {
-    //   return Container(
-    //     color: ColorUtils.colorRed,
-    //     height: 100,
-    //     width: 100,
-    //   );
-    // }
-
     if (data == null) {
       LogUtils.info(msg: 'nodeId or onePictureDataData is null');
       return const SizedBox.shrink();
@@ -209,7 +182,8 @@ class OnePicturePageState extends State<OnePicturePage> {
                     padding: const EdgeInsets.only(
                         top: 0, bottom: 0, left: 16, right: 16),
                     decoration: BoxDecoration(
-                        border: Border.all(color: '#347979'.toColor(), width: 1),
+                        border:
+                            Border.all(color: '#347979'.toColor(), width: 1),
                         borderRadius: BorderRadius.circular(4)),
                     child: (oData?.getChildList() ?? []).isEmpty
                         ? _item(oData)
@@ -264,7 +238,8 @@ class OnePicturePageState extends State<OnePicturePage> {
                     padding: const EdgeInsets.only(
                         top: 0, bottom: 20, left: 16, right: 16),
                     decoration: BoxDecoration(
-                        border: Border.all(color: '#347979'.toColor(), width: 1),
+                        border:
+                            Border.all(color: '#347979'.toColor(), width: 1),
                         borderRadius: BorderRadius.circular(4)),
                     child: Container(child: cW)),
                 (data?.showDesc ?? '').isEmpty
@@ -277,12 +252,8 @@ class OnePicturePageState extends State<OnePicturePage> {
                       model.onTapItemNew(data);
                     });
         } else {
-          if (data.showBorder == true) {
-
-          }
-          if (data.ignore == true) {
-
-          }
+          if (data.showBorder == true) {}
+          if (data.ignore == true) {}
         }
       }
 
@@ -302,10 +273,11 @@ class OnePicturePageState extends State<OnePicturePage> {
                       : TextView(data?.showNameText),
                   Container(
                     padding: const EdgeInsets.only(
-                        top: 0, bottom: 30, left: 16, right: 16),
+                        top: 16, bottom: 30, left: 16, right: 32),
                     margin: EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                        border: Border.all(color: '#347979'.toColor(), width: 1),
+                        border:
+                            Border.all(color: '#347979'.toColor(), width: 1),
                         borderRadius: BorderRadius.circular(4)),
                     child: Row(
                       children: data!.getChildList().map((e) {
@@ -334,28 +306,33 @@ class OnePicturePageState extends State<OnePicturePage> {
 
   Container _item(OnePictureDataData? oData) {
     return Container(
-                          padding: const EdgeInsets.all(16),
-                          margin: const EdgeInsets.only(
-                              top: 16, bottom: 16, left: 16, right: 16),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4),
-                            border: Border.all(color: '#82FFFC'.toColor(opacity: .1)),
-                            boxShadow: [
-                              BoxShadow(
-                                  color: '#82FFFC'.toColor(opacity: .05), spreadRadius: 1),
-                            ],
-                          ),
-                          child: Column(
-                            children: [
-                              (oData?.icon??'').isEmpty
-                                  ? SizedBox.shrink()
-                                  : ImageView(src: oData?.icon,height: 22,width: 22,),
-                              TextView('${oData?.showNameText}',color: '#30E7E3'.toColor(),),
-                              (oData?.showDesc ?? '').isEmpty
-                                  ? SizedBox.shrink()
-                                  : Text(oData?.showDesc??''),
-                            ],
-                          ));
+        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(top: 16, bottom: 16, left: 16, right: 16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(color: '#82FFFC'.toColor(opacity: .1)),
+          boxShadow: [
+            BoxShadow(color: '#82FFFC'.toColor(opacity: .05), spreadRadius: 1),
+          ],
+        ),
+        child: Column(
+          children: [
+            (oData?.icon ?? '').isEmpty
+                ? SizedBox.shrink()
+                : ImageView(
+                    src: oData?.icon,
+                    height: 22,
+                    width: 22,
+                  ),
+            TextView(
+              '${oData?.showNameText}',
+              color: '#30E7E3'.toColor(),
+            ),
+            (oData?.showDesc ?? '').isEmpty
+                ? SizedBox.shrink()
+                : Text(oData?.showDesc ?? ''),
+          ],
+        ));
   }
 
   refresh({
@@ -366,7 +343,7 @@ class OnePicturePageState extends State<OnePicturePage> {
     viewModel?.instanceId = instanceId;
     viewModel?.gateId = gateId;
     viewModel?.passId = passId;
-    viewModel?.requestData();
+    viewModel?.reInitData();
   }
 }
 

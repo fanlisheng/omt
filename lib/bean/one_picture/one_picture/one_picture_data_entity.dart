@@ -68,9 +68,22 @@ class OnePictureDataData {
   bool ignore = false;
   bool unknown = false;
 
+  String? get parentNodeCode {
+    if (nodeCode != null && nodeCode!.contains('-')) {
+      var split = nodeCode!.split('-');
+      split.removeLast();
+      if (split.length > 1) {
+        return split.join('-');
+      } else {
+        return '';
+      }
+    }
+    return '';
+  }
+
   bool get showAddBtn {
     return false;
-     if ((type == OnePictureType.DM.index && children.length == 1) ||
+    if ((type == OnePictureType.DM.index && children.length == 1) ||
         (type == OnePictureType.JCK.index && showBorder)) {
       return true;
     }
@@ -83,7 +96,7 @@ class OnePictureDataData {
   String? icon;
 
   String? get showDesc {
-    return ip.defaultStr(data: desc??'');
+    return ip.defaultStr(data: desc ?? '');
   }
 
   bool? get showName {
@@ -166,11 +179,13 @@ class OnePictureDataData {
 
         ///供电设备
       } else if (type == OnePictureType.GDSB.index) {
-        lineColor = ColorUtils.colorBrown.toColorHex();
+        // lineColor = ColorUtils.colorBrown.toColorHex();
+        lineColor = '#FF4D4F';
 
         ///电源箱
       } else if (type == OnePictureType.DYX.index) {
-        lineColor = ColorUtils.colorBrown.toColorHex();
+        // lineColor = ColorUtils.colorBrown.toColorHex();
+        lineColor = '#FF4D4F';
 
         ///交换机
       } else if (type == OnePictureType.JHJ.index) {
@@ -245,37 +260,37 @@ class OnePictureDataData {
 
   void setIcon() {
     var iconEnd = '';
-     if (type == OnePictureType.SL.index) {
-       iconEnd ='';
+    if (type == OnePictureType.SL.index) {
+      iconEnd = '';
     } else if (type == OnePictureType.DM.index) {
-       iconEnd ='';
+      iconEnd = '';
     } else if (type == OnePictureType.JCK.index) {
-       iconEnd ='';
+      iconEnd = '';
     } else if (type == OnePictureType.GDSB.index) {
-       iconEnd ='';
+      iconEnd = '';
     } else if (type == OnePictureType.DYX.index) {
-       iconEnd ='dyx';
+      iconEnd = 'dyx';
     } else if (type == OnePictureType.LYQ.index) {
-       iconEnd ='lyq';
+      iconEnd = 'lyq';
     } else if (type == OnePictureType.YXWL.index) {
-       iconEnd ='yxwl';
+      iconEnd = 'yxwl';
     } else if (type == OnePictureType.NVR.index) {
-       iconEnd ='nvr2';
+      iconEnd = 'nvr2';
     } else if (type == OnePictureType.JHJ.index) {
-       iconEnd ='jhj';
+      iconEnd = 'jhj';
     } else if (type == OnePictureType.AISB.index) {
-       iconEnd ='aisb';
+      iconEnd = 'aisb';
     } else if (type == OnePictureType.SXT.index) {
-       iconEnd ='sxt';
+      iconEnd = 'sxt';
     } else if (type == OnePictureType.SD.index) {
-       iconEnd ='sd';
+      iconEnd = 'sd';
     } else if (type == OnePictureType.DC.index) {
-       iconEnd ='dc';
+      iconEnd = 'dc';
     } else {
-       iconEnd ='';
+      iconEnd = '';
     }
-     if(iconEnd.isNotEmpty){
-       icon = source('home/ic_device_${iconEnd}');
-     }
+    if (iconEnd.isNotEmpty) {
+      icon = source('home/ic_device_${iconEnd}');
+    }
   }
 }
