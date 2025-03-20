@@ -4,6 +4,7 @@ import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/one_picture/one_picture/one_picture_data_entity.dart';
 import 'package:omt/utils/color_utils.dart';
 import 'package:omt/utils/log_utils.dart';
+import 'package:omt/widget/canvas/dashed_border_painter.dart';
 import 'one_picture_view_model.dart';
 import 'package:graphview/GraphView.dart';
 
@@ -46,19 +47,26 @@ class OnePicturePageState extends State<OnePicturePage> {
               minScale: 0.1,
               maxScale: 1,
               child: model.graph.nodeCount() == 0
-                  ? ((model.theOnePictureDataData?.getChildList() ?? []).isNotEmpty
-                      ? (
-                  Row(
-                    children: model.theOnePictureDataData!.getChildList().map((e) {
-                      final Graph graph = Graph();
-                      SugiyamaConfiguration builder = SugiyamaConfiguration()
-                        ..bendPointShape = CurvedBendPointShape(curveLength: 6)
-                        ..coordinateAssignment = CoordinateAssignment.UpRight;
-                      return rectangleSubWidget2(
-                          model: model, data: e, graph: graph, builder: builder);
-                    }).toList(),
-                  )
-              )
+                  ? ((model.theOnePictureDataData?.getChildList() ?? [])
+                          .isNotEmpty
+                      ? (Row(
+                          children: model.theOnePictureDataData!
+                              .getChildList()
+                              .map((e) {
+                            final Graph graph = Graph();
+                            SugiyamaConfiguration builder =
+                                SugiyamaConfiguration()
+                                  ..bendPointShape =
+                                      CurvedBendPointShape(curveLength: 6)
+                                  ..coordinateAssignment =
+                                      CoordinateAssignment.UpRight;
+                            return rectangleSubWidget2(
+                                model: model,
+                                data: e,
+                                graph: graph,
+                                builder: builder);
+                          }).toList(),
+                        ))
                       : Container())
                   : GraphView(
                       graph: model.graph,
@@ -274,10 +282,13 @@ class OnePicturePageState extends State<OnePicturePage> {
                   Container(
                     padding: const EdgeInsets.only(
                         top: 16, bottom: 30, left: 16, right: 32),
-                    margin: EdgeInsets.all(16),
+                    margin: data.getChildList().length > 0
+                        ? null
+                        : EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                        border:
-                            Border.all(color: '#347979'.toColor(), width: 1),
+                        border: data.getChildList().length > 0
+                            ? null
+                            : Border.all(color: '#347979'.toColor(), width: 12),
                         borderRadius: BorderRadius.circular(4)),
                     child: Row(
                       children: data!.getChildList().map((e) {
@@ -293,12 +304,19 @@ class OnePicturePageState extends State<OnePicturePage> {
                             builder: builder);
                       }).toList(),
                     ),
-                  ).addRightIcon(
-                      onTap: data.ignore != true
-                          ? null
-                          : () {
-                              model.onTapItemNew(data);
-                            })
+                  )
+                      .addRightIcon(
+                          onTap: data.ignore != true
+                              ? null
+                              : () {
+                                  model.onTapItemNew(data);
+                                })
+                      .addDashBorder(
+                          color: '#347979'.toColor(),
+                          width: 1,
+                          dash: data.getChildList().length > 0,
+                          margin: EdgeInsets.only(left: 16, right: 16),
+                          borderRadius: 4.0),
                 ],
               )
             : _item(data));
@@ -344,6 +362,30 @@ class OnePicturePageState extends State<OnePicturePage> {
     viewModel?.gateId = gateId;
     viewModel?.passId = passId;
     viewModel?.reInitData();
+  }
+}
+
+extension on Widget {
+  addDashBorder(
+      {required Color color,
+      required int width,
+      required double borderRadius,
+      EdgeInsets? margin,
+      required bool dash}) {
+    if (dash) {
+      var customPaint = CustomPaint(
+        painter: DashedBorderPainter(
+            color: '#347979'.toColor(), borderRadius: borderRadius),
+        child: Padding(padding: EdgeInsets.only(top: 0), child: this),
+      );
+      return null != margin
+          ? Container(
+              margin: margin,
+              child: customPaint,
+            )
+          : customPaint;
+    }
+    return this;
   }
 }
 
