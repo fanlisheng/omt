@@ -81,7 +81,7 @@ class PhotoDetailScreen extends StatelessWidget {
           children: [
             const SizedBox(height: 10),
             const Text(
-              "查看信息",
+              "查看详情",
               style: TextStyle(
                 fontSize: 14,
                 color: ColorUtils.colorGreenLiteLite,

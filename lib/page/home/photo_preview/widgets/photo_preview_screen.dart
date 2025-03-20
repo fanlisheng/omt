@@ -23,9 +23,10 @@ class PhotoPreviewScreenData {
   DeviceDetailCameraDataPhoto? dayBasicPhoto;
   DeviceDetailCameraDataPhoto? nightBasicPhoto;
 
-  PhotoPreviewScreenData({required this.deviceCode,
-    required this.dayBasicPhoto,
-    required this.nightBasicPhoto});
+  PhotoPreviewScreenData(
+      {required this.deviceCode,
+      required this.dayBasicPhoto,
+      required this.nightBasicPhoto});
 }
 
 class PhotoPreviewScreen extends StatelessWidget {
@@ -56,10 +57,12 @@ class PhotoPreviewScreen extends StatelessWidget {
                           child: FComboBox<String>(
                               selectedValue: model.selectedType,
                               items: model.typeList,
-                              onChanged: (String? a) {
+                              onChanged: (String? a) async {
                                 model.selectedType = a ?? "";
+                                model.gridViewKey.currentState
+                                    ?.loadData(refresh: true);
                                 model.notifyListeners();
-                              },
+                              }, //
                               placeholder: "照片类型"),
                         ),
                         const SizedBox(width: 12),
@@ -67,7 +70,7 @@ class PhotoPreviewScreen extends StatelessWidget {
                           child: Container(
                             decoration: BoxDecoration(
                               borderRadius:
-                              const BorderRadius.all(Radius.circular(1)),
+                                  const BorderRadius.all(Radius.circular(1)),
                               color: "#5E6363".toColor(),
                             ),
                             width: 34,
@@ -89,7 +92,7 @@ class PhotoPreviewScreen extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(horizontal: 12),
                             decoration: BoxDecoration(
                               borderRadius:
-                              const BorderRadius.all(Radius.circular(1)),
+                                  const BorderRadius.all(Radius.circular(1)),
                               color: "#5E6363".toColor(),
                             ),
                             height: 34,
@@ -114,7 +117,7 @@ class PhotoPreviewScreen extends StatelessWidget {
                               context: context,
                               initialDate: model.selectedDateTime,
                               firstDate:
-                              DateTime(model.selectedDateTime.year - 100),
+                                  DateTime(model.selectedDateTime.year - 100),
                               lastDate: DateTime.now(),
                               builder: (BuildContext context, Widget? child) {
                                 return Container(
@@ -136,7 +139,7 @@ class PhotoPreviewScreen extends StatelessWidget {
                           child: Container(
                             decoration: BoxDecoration(
                               borderRadius:
-                              const BorderRadius.all(Radius.circular(1)),
+                                  const BorderRadius.all(Radius.circular(1)),
                               color: "#5E6363".toColor(),
                             ),
                             width: 34,
@@ -147,9 +150,7 @@ class PhotoPreviewScreen extends StatelessWidget {
                           onTap: () {
                             DateTime tomorrow = model.selectedDateTime
                                 .add(const Duration(days: 1));
-                            if (tomorrow.day <= DateTime
-                                .now()
-                                .day) {
+                            if (tomorrow.day <= DateTime.now().day) {
                               model.selectedDateTime = tomorrow;
                               model.gridViewKey.currentState
                                   ?.loadData(refresh: true);
@@ -160,9 +161,11 @@ class PhotoPreviewScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  onTap: model.isSetBasicPhoto ? () {
-                    IntentUtils.share.popResultOk(context);
-                  } : null,
+                  onTap: model.isSetBasicPhoto
+                      ? () {
+                          IntentUtils.share.popResultOk(context);
+                        }
+                      : null,
                 ),
               ),
               content: contentView(model),
@@ -226,43 +229,47 @@ class PhotoPreviewScreen extends StatelessWidget {
           Expanded(
             flex: 26,
             child:
-            // ImageDisplayPage<DeviceDetailCameraDataPhoto>(
-            //
-            //   fetchData: (page ,index){
-            //     return model.fetchData(page,index);
-            //   },
-            //   // onDataReloaded: (page , index){
-            //   //
-            //   // },
-            //   itemWidgetBuilder: (c, item) {
-            //     // 使用自定义的 Widget 来展示图片
-            //     return Clickable(
-            //       child: Container(
-            //         padding: const EdgeInsets.only(
-            //             left: 10, right: 10, top: 7, bottom: 6),
-            //         color: "#5B6565".toColor(),
-            //         child: imageTimeView(c, item.url, item.typeText ?? "",
-            //             rightStr: item.snapAt),
-            //       ),
-            //       onTap: () {
-            //         IntentUtils.share
-            //             .push(c, routeName: RouterPage.PhotoDetailScreen);
-            //       },
-            //     );
-            //   },
-            // ),
-            PaginationGridView<DeviceDetailCameraDataPhoto>(
+                // ImageDisplayPage<DeviceDetailCameraDataPhoto>(
+                //
+                //   fetchData: (page ,index){
+                //     return model.fetchData(page,index);
+                //   },
+                //   // onDataReloaded: (page , index){
+                //   //
+                //   // },
+                //   itemWidgetBuilder: (c, item) {
+                //     // 使用自定义的 Widget 来展示图片
+                //     return Clickable(
+                //       child: Container(
+                //         padding: const EdgeInsets.only(
+                //             left: 10, right: 10, top: 7, bottom: 6),
+                //         color: "#5B6565".toColor(),
+                //         child: imageTimeView(c, item.url, item.typeText ?? "",
+                //             rightStr: item.snapAt),
+                //       ),
+                //       onTap: () {
+                //         IntentUtils.share
+                //             .push(c, routeName: RouterPage.PhotoDetailScreen);
+                //       },
+                //     );
+                //   },
+                // ),
+                PaginationGridView<DeviceDetailCameraDataPhoto>(
               // items: model.photoData,
               key: model.gridViewKey,
               fetchData: model.fetchData,
               itemWidgetBuilder: (c, index, item) {
-                print("itemWidgetBuilder - 构建项: $item");
-
+                bool isZP = (item.typeText ?? "").contains("抓拍");
                 return Clickable(
                   child: Container(
                     padding: const EdgeInsets.only(
                         left: 10, right: 10, top: 7, bottom: 6),
-                    color: "#5B6565".toColor(),
+                    decoration: BoxDecoration(
+                      border: isZP
+                          ? Border.all(color: ColorUtils.colorGreen, width: 2)
+                          : null,
+                      color: "#5B6565".toColor(),
+                    ),
                     child: imageTimeView(c, item.url, item.typeText ?? "",
                         rightStr: item.snapAt),
                   ),
@@ -280,9 +287,8 @@ class PhotoPreviewScreen extends StatelessWidget {
 
   Widget imageTimeView(BuildContext context, String? url, String leftStr,
       {String? rightStr, GestureTapCallback? onTap}) {
-    final screenSize = MediaQuery
-        .of(context)
-        .size;
+    bool isZP = leftStr.contains("抓拍");
+    final screenSize = MediaQuery.of(context).size;
     return Clickable(
       // color: "#5B6565".toColor(),
       width: 234 / (1050 - 160) * screenSize.width,
@@ -295,18 +301,18 @@ class PhotoPreviewScreen extends StatelessWidget {
           Expanded(
             child: (url ?? "").isNotEmpty
                 ? ImageView(
-              url: url,
-              // src: source(''),
-              // width: 234,
-              // height: 131,
-            )
+                    url: url,
+                    // src: source(''),
+                    // width: 234,
+                    // height: 131,
+                  )
                 : const Center(
-              child: Text(
-                "没有照片",
-                style: TextStyle(
-                    fontSize: 12, color: ColorUtils.colorGreenLiteLite),
-              ),
-            ),
+                    child: Text(
+                      "没有照片",
+                      style: TextStyle(
+                          fontSize: 12, color: ColorUtils.colorGreenLiteLite),
+                    ),
+                  ),
           ),
           // Container(
           //   width: 234 / (1050 - 160) * screenSize.width,
@@ -321,8 +327,11 @@ class PhotoPreviewScreen extends StatelessWidget {
               Expanded(
                 child: Text(
                   leftStr,
-                  style: const TextStyle(
-                      fontSize: 12, color: ColorUtils.colorGreenLiteLite),
+                  style: TextStyle(
+                      fontSize: 12,
+                      color: (isZP
+                          ? ColorUtils.colorGreen
+                          : ColorUtils.colorGreenLiteLite)),
                 ),
               ),
               Text(

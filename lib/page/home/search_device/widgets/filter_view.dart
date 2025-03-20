@@ -100,6 +100,8 @@ class _FilterViewState extends State<FilterView> {
                         onSelected: () {
                           model.selectedInstance = null;
                           model.selectedInstance = instance;
+                          model.selectedDoor = null;
+                          model.selectedInOut = null;
                           model.notifyListeners();
                         }),
                   )
@@ -159,6 +161,7 @@ class _FilterViewState extends State<FilterView> {
                   disabled: (disabled || model.selectedInstance == null),
                   onChanged: (a) {
                     model.selectedDoor = a;
+                    model.selectedInOut = null;
                     model.notifyListeners();
                   },
                   placeholder: "请选择大门编号")),
