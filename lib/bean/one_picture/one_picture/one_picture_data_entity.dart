@@ -68,6 +68,19 @@ class OnePictureDataData {
   bool ignore = false;
   bool unknown = false;
 
+  String? get parentNodeCode {
+    if (nodeCode != null && nodeCode!.contains('-')) {
+      var split = nodeCode!.split('-');
+      split.removeLast();
+      if (split.length > 1) {
+        return split.join('-');
+      } else {
+        return '';
+      }
+    }
+    return '';
+  }
+
   bool get showAddBtn {
     return false;
     if ((type == OnePictureType.DM.index && children.length == 1) ||
