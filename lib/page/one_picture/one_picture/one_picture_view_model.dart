@@ -33,13 +33,15 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
   final TransformationController transformationController =
       TransformationController();
 
-  final Graph graph = Graph();
+  Graph graph = Graph();
 
   SugiyamaConfiguration builder = SugiyamaConfiguration()
     ..bendPointShape = CurvedBendPointShape(curveLength: 6)
     ..coordinateAssignment = CoordinateAssignment.UpRight;
 
   OnePictureDataData? onePictureHttpData;
+
+  OnePictureDataData? theOnePictureDataData;
 
   Map<String, OnePictureDataData> dataMap = {};
 
@@ -62,6 +64,19 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
     });
   }
 
+  void reInitData() {
+    graph = Graph();
+    builder = SugiyamaConfiguration()
+      ..bendPointShape = CurvedBendPointShape(curveLength: 6)
+      ..coordinateAssignment = CoordinateAssignment.UpRight;
+    onePictureHttpData = null;
+    theOnePictureDataData = null;
+    currentIndex = 0;
+    dataMap.clear();
+    notifyListeners();
+    requestData();
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -78,6 +93,8 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
     }
     HttpQuery.share.onePictureService.deviceTree(
         // instanceId: "124#12812",
+        // gateId: 8,
+        // passId: 1,
         instanceId: instanceId!,
         gateId: gateId,
         passId: passId,
@@ -92,8 +109,8 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
 
           setDataToGraph(opd);
 
-          data = opd;
-
+          // data = opd;
+          theOnePictureDataData = opd;
           notifyListeners();
           // onSuccess?.call(opd);
         },
