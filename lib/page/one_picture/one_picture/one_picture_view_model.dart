@@ -433,7 +433,8 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
                   ..color = jhj.unknown
                       ? ColorUtils.transparent
                       : jhj.lineColor.toColor(),
-                showArrow: false);
+                showArrow: false,
+                dash: true);
           }
         }
       }

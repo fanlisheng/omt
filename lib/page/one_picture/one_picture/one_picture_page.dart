@@ -52,7 +52,7 @@ class OnePicturePageState extends State<OnePicturePage> {
                       algorithm: SugiyamaAlgorithm(model.builder),
                       paint: Paint()
                         ..color = Colors.green
-                        ..strokeWidth = 1
+                        ..strokeWidth = 2
                         ..style = PaintingStyle.stroke,
                       builder: (Node node) {
                         var a = node.key!.value as String?;
