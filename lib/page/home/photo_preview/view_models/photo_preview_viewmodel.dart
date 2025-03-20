@@ -54,7 +54,7 @@ class PhotoPreviewViewModel extends BaseViewModelRefresh<dynamic> {
     await HttpQuery.share.homePageService.cameraPhotoList(
       page: page,
       deviceCode: photoPreviewScreenData.deviceCode,
-      type: selectedType == "全部照片" ? 0 : (selectedType == "抓拍照片" ? 2 : 1),
+      type: selectedType == "抓拍照片" ? 2 : (selectedType == "背景照片" ? 1 :0)  ,
       snapAts: [
         BaseTimeUtils.dateToTimeStr(selectedDateTime,format: "yyyy-MM-dd 00:00:00"),
         BaseTimeUtils.dateToTimeStr(selectedDateTime,format: "yyyy-MM-dd 23:59:59"),

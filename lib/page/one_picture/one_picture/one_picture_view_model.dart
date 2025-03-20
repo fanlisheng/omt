@@ -485,7 +485,8 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
       code = data?.parentNodeCode ?? "";
     }
 
-    if (code.isEmpty || type == null) {
+    if (code.isEmpty || type == null || data?.type ==  OnePictureType.LYQ.index || data?.type ==  OnePictureType.YXWL.index) {
+      //路由器不进去
       return;
     }
     DeviceDetailViewModel model = DeviceDetailViewModel(
