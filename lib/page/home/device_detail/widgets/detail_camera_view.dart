@@ -14,8 +14,10 @@ import 'package:omt/page/home/device_add/view_models/add_camera_viewmodel.dart';
 import 'package:omt/page/home/device_add/widgets/second_step_view.dart';
 import 'package:omt/page/home/device_detail/widgets/detail_ai_view.dart';
 import 'package:omt/utils/color_utils.dart';
+import 'package:omt/utils/date_time_utils.dart';
 
 import '../../../../router_utils.dart';
+import '../../../../utils/image_utils.dart';
 import '../../../../utils/intent_utils.dart';
 import '../../../../utils/log_utils.dart';
 import '../../device_add/view_models/device_add_viewmodel.dart';
@@ -213,8 +215,11 @@ class DetailCameraView extends StatelessWidget {
                                     photo.url!.isNotEmpty) // 过滤掉 url 为空的项
                                 .take(2) // 只取前两个
                                 .expand((photo) => [
-                                      imageTimeView(model.context!, photo.url!,
-                                          photo.snapAt ?? ""),
+                                      imageTimeView(
+                                          model.context!,
+                                          photo.url!,
+                                          DateTimeUtils.removeTimeZone(
+                                              photo.snapAt ?? "")),
                                       const SizedBox(height: 10),
                                     ]),
                           ] else if (model.photoCurrentIndex == 1 &&
@@ -227,10 +232,25 @@ class DetailCameraView extends StatelessWidget {
                                     photo.url!.isNotEmpty) // 过滤掉 url 为空的项
                                 .take(2) // 只取前两个
                                 .expand((photo) => [
-                                      imageTimeView(model.context!, photo.url!,
-                                          photo.snapAt ?? ""),
+                                      imageTimeView(
+                                          model.context!,
+                                          photo.url!,
+                                          DateTimeUtils.removeTimeZone(
+                                              photo.snapAt ?? "")),
                                       const SizedBox(height: 10),
                                     ]),
+                          ] else ...[
+                            Container(
+                              width: 234 /
+                                  (1050 - 160) *
+                                  MediaQuery.of(context).size.width,
+                              height:
+                                  MediaQuery.of(context).size.height * 0.43 / 2,
+                              color: BaseColorUtils.colorGray.withOpacity(0.1),
+                              margin: const EdgeInsets.only(top: 10),
+                              alignment: Alignment.center,
+                              child: const Text("无照片"),
+                            ),
                           ]
                         ],
                       ),
@@ -294,7 +314,9 @@ class DetailCameraView extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 20,),
+        const SizedBox(
+          height: 20,
+        ),
         Row(
           children: [
             // const SizedBox(
@@ -367,7 +389,15 @@ class DetailCameraView extends StatelessWidget {
       width: 234 / (1050 - 160) * screenSize.width,
       // width: 234 ,
       height: screenSize.height * 0.43 / 2,
-      onTap: onTap,
+      onTap: onTap ??
+          () {
+            ImageUtils.share.showBigImg(
+              context,
+              url: ImageUtils.share.getImageUrl(
+                url: url,
+              ),
+            );
+          },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
