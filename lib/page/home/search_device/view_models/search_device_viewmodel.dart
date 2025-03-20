@@ -243,6 +243,7 @@ class SearchDeviceViewModel extends BaseViewModel {
         }
         //重新请求一张图的数据
         picturePageKey.currentState?.refresh(
+          instanceName: selectedInstance?.name,
             instanceId: selectedInstance?.id,
             gateId: selectedDoor?.id,
             passId: selectedInOut?.id);

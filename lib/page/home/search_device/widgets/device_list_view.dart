@@ -217,6 +217,7 @@ class _DeviceListViewState extends State<DeviceListView> {
           Expanded(
             child: OnePicturePage(
               key: model.picturePageKey,
+              instanceName: model.selectedInstance?.name,
               instanceId: model.selectedInstance?.id!,
               gateId: model.selectedDoor?.id,
               passId: model.selectedInOut?.id,

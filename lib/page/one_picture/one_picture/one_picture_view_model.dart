@@ -27,11 +27,13 @@ import 'package:vector_math/vector_math_64.dart' as vmath;
 ///
 
 class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
+  String? instanceName;
   String? instanceId;
   int? gateId;
   int? passId;
 
-  OnePictureViewModel(this.instanceId, this.gateId, this.passId);
+  OnePictureViewModel(
+      this.instanceId, this.gateId, this.passId, this.instanceName);
 
   final TransformationController transformationController =
       TransformationController();
@@ -95,9 +97,6 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
       return;
     }
     HttpQuery.share.onePictureService.deviceTree(
-        // instanceId: "124#12812",
-        // gateId: 8,
-        // passId: 1,
         instanceId: instanceId!,
         gateId: gateId,
         passId: passId,
@@ -105,10 +104,32 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
           currentIndex = 0;
           onePictureHttpData = data;
           dataMap.clear();
+          OnePictureDataData? opd;
+          if (null == data && null == gateId && null == passId) {
+            opd = OnePictureDataData()
+              ..name =  instanceName ?? '未知'
+              ..type = OnePictureType.SL.index
+              ..id = '-99'
+              ..nextList = [
+                OnePictureDataData()
+                  ..name = '未发现绑定设备'
+                  ..type = OnePictureType.OTHER.index
+                  ..id = '-99'
+              ];
 
-          _setDataMap(data);
+            _setDataMap(opd);
 
-          OnePictureDataData? opd = _dealHttpData(data);
+            setArrowBorder(opd);
+          } else if (null == data) {
+            opd = OnePictureDataData()
+              ..name = '未发现绑定设备'
+              ..type = OnePictureType.OTHER.index
+              ..id = '-99';
+            _setDataMap(opd);
+          } else {
+            _setDataMap(data);
+            opd = _dealHttpData(data);
+          }
 
           setDataToGraph(opd);
 
@@ -365,10 +386,10 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
           if (dyx.isNotEmpty) {
             opd.children[0].nextList.addAll(dyx);
             _powerSub(opd.children[0].nextList[0],
-                jck: jck, lyq: lyq, nvr: nvr, jhj: jhj, yxwl: yxwl);
+                jck: jck, lyq: lyq, nvr: nvr, jhj: jhj, yxwl: yxwl, aisb: aisb);
           } else {
             _powerSub(opd.children[0],
-                jck: jck, lyq: lyq, nvr: nvr, jhj: jhj, yxwl: yxwl);
+                jck: jck, lyq: lyq, nvr: nvr, jhj: jhj, yxwl: yxwl, aisb: aisb);
           }
         } else if (dyx.isNotEmpty) {
           opd.children = dyx;
@@ -505,7 +526,8 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
       List<OnePictureDataData>? lyq,
       List<OnePictureDataData>? nvr,
       List<OnePictureDataData>? jhj,
-      List<OnePictureDataData>? yxwl}) {
+      List<OnePictureDataData>? yxwl,
+      List<OnePictureDataData>? aisb}) {
     if (jck?.isNotEmpty == true) {
       opd.nextList.addAll(jck!);
     }
@@ -514,6 +536,9 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
     }
     if (nvr?.isNotEmpty == true) {
       opd.nextList.addAll(nvr!);
+    }
+    if (aisb?.isNotEmpty == true) {
+      opd.nextList.addAll(aisb!);
     }
     if (jhj?.isNotEmpty == true) {
       if (jhj!.length > 1) {

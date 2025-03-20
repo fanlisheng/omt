@@ -18,11 +18,17 @@ import 'package:graphview/GraphView.dart';
 ///
 
 class OnePicturePage extends StatefulWidget {
+  String? instanceName;
   String? instanceId;
   final int? gateId;
   final int? passId;
 
-  OnePicturePage({super.key, this.instanceId, this.gateId, this.passId});
+  OnePicturePage(
+      {super.key,
+      this.instanceId,
+      this.gateId,
+      this.passId,
+      this.instanceName});
 
   @override
   State<OnePicturePage> createState() => OnePicturePageState();
@@ -38,52 +44,59 @@ class OnePicturePageState extends State<OnePicturePage> {
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<OnePictureViewModel>(
-        model: OnePictureViewModel(
-            widget.instanceId, widget.gateId, widget.passId),
+        model: OnePictureViewModel(widget.instanceId, widget.gateId,
+            widget.passId, widget.instanceName),
         autoLoadData: true,
         builder: (context, model, child) {
           viewModel = model;
-          return InteractiveViewer(
-              constrained: false,
-              // clipBehavior: Clip.antiAlias,
-              boundaryMargin: const EdgeInsets.all(50),
-              // transformationController: model.transformationController,
-              minScale: 0.1,
-              maxScale: 1,
-              child: model.graph.nodeCount() == 0
-                  ? ((model.theOnePictureDataData?.getChildList() ?? [])
-                          .isNotEmpty
-                      ? (Row(
-                          children: model.theOnePictureDataData!
-                              .getChildList()
-                              .map((e) {
-                            final Graph graph = Graph();
-                            SugiyamaConfiguration builder =
-                                SugiyamaConfiguration()
-                                  ..bendPointShape =
-                                      CurvedBendPointShape(curveLength: 6)
-                                  ..coordinateAssignment =
-                                      CoordinateAssignment.UpRight;
-                            return rectangleSubWidget2(
-                                model: model,
-                                data: e,
-                                graph: graph,
-                                builder: builder);
-                          }).toList(),
-                        ))
-                      : Container())
-                  : GraphView(
-                      graph: model.graph,
-                      algorithm: SugiyamaAlgorithm(model.builder),
-                      paint: Paint()
-                        ..color = Colors.green
-                        ..strokeWidth = 2
-                        ..style = PaintingStyle.stroke,
-                      builder: (Node node) {
-                        var a = node.key!.value as String?;
-                        return rectangleWidget(model, a);
-                      },
-                    ));
+          return model.theOnePictureDataData?.type == OnePictureType.OTHER.index
+              ? Column(
+                  children: [
+                    rectangleWidget(
+                        model, model.theOnePictureDataData?.theNodeId)
+                  ],
+                )
+              : InteractiveViewer(
+                  constrained: false,
+                  // clipBehavior: Clip.antiAlias,
+                  boundaryMargin: const EdgeInsets.all(50),
+                  // transformationController: model.transformationController,
+                  minScale: 0.1,
+                  maxScale: 1,
+                  child: (model.graph.nodeCount() == 0
+                      ? ((model.theOnePictureDataData?.getChildList() ?? [])
+                              .isNotEmpty
+                          ? (Row(
+                              children: model.theOnePictureDataData!
+                                  .getChildList()
+                                  .map((e) {
+                                final Graph graph = Graph();
+                                SugiyamaConfiguration builder =
+                                    SugiyamaConfiguration()
+                                      ..bendPointShape =
+                                          CurvedBendPointShape(curveLength: 6)
+                                      ..coordinateAssignment =
+                                          CoordinateAssignment.UpRight;
+                                return rectangleSubWidget2(
+                                    model: model,
+                                    data: e,
+                                    graph: graph,
+                                    builder: builder);
+                              }).toList(),
+                            ))
+                          : Container())
+                      : GraphView(
+                          graph: model.graph,
+                          algorithm: SugiyamaAlgorithm(model.builder),
+                          paint: Paint()
+                            ..color = Colors.green
+                            ..strokeWidth = 2
+                            ..style = PaintingStyle.stroke,
+                          builder: (Node node) {
+                            var a = node.key!.value as String?;
+                            return rectangleWidget(model, a);
+                          },
+                        )));
         });
   }
 
@@ -382,10 +395,12 @@ class OnePicturePageState extends State<OnePicturePage> {
   }
 
   refresh({
+    @required String? instanceName,
     @required String? instanceId,
     @required int? gateId,
     @required int? passId,
   }) {
+    viewModel?.instanceName = instanceName;
     viewModel?.instanceId = instanceId;
     viewModel?.gateId = gateId;
     viewModel?.passId = passId;

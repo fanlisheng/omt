@@ -46,7 +46,8 @@ enum OnePictureType {
   AISB,
   SXT,
   SD,
-  DC
+  DC,
+  OTHER
 }
 
 @JsonSerializable()
@@ -67,6 +68,8 @@ class OnePictureDataData {
   bool sameTypeData = false;
   bool ignore = false;
   bool unknown = false;
+
+  String? get theNodeId=> '${type}_${id}';
 
   String? get parentNodeCode {
     if (nodeCode != null && nodeCode!.contains('-')) {
