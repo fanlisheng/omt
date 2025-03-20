@@ -59,37 +59,7 @@ class OnePicturePageState extends State<OnePicturePage> {
                         return rectangleWidget(model, a);
                       },
                     ));
-          return ToolBar(
-            title: '一张图',
-            elevation: 0,
-            actions: [
-              TextButton(
-                  onPressed: () {
-                    model.refresh();
-                  },
-                  child: Text('刷新'))
-            ],
-            iosBack: true,
-            child: InteractiveViewer(
-                constrained: false,
-                boundaryMargin: const EdgeInsets.all(100),
-                minScale: 0.01,
-                maxScale: 5.6,
-                child: model.graph.nodeCount() == 0
-                    ? Container()
-                    : GraphView(
-                        graph: model.graph,
-                        algorithm: SugiyamaAlgorithm(model.builder),
-                        paint: Paint()
-                          ..color = Colors.green
-                          ..strokeWidth = 1
-                          ..style = PaintingStyle.stroke,
-                        builder: (Node node) {
-                          var a = node.key!.value as String?;
-                          return rectangleWidget(model, a);
-                        },
-                      )),
-          );
+
         });
   }
 
@@ -106,10 +76,10 @@ class OnePicturePageState extends State<OnePicturePage> {
                 : TextView(onePictureDataData?.showNameText),
             Container(
               padding: EdgeInsets.only(
-                  top: onePictureDataData?.showAddBtn == true ? 32 : 0,
-                  bottom: onePictureDataData?.showAddBtn == true ? 16 : 20,
+                  top: onePictureDataData?.showAddBtn == true ? 32 : 16,
+                  bottom: onePictureDataData?.showAddBtn == true ? 16 : 32,
                   left: 16,
-                  right: 16),
+                  right: 32),
               decoration: BoxDecoration(
                   border: Border.all(color: '#347979'.toColor(), width: 1),
                   borderRadius: BorderRadius.circular(4)),
@@ -152,16 +122,7 @@ class OnePicturePageState extends State<OnePicturePage> {
       OnePictureDataData? data,
       Graph? graph,
       SugiyamaConfiguration? builder}) {
-    // model.currentIndex++;
-    // if (model.currentIndex > 16) {
-    //   return Container(
-    //     color: ColorUtils.colorRed,
-    //     height: 100,
-    //     width: 100,
-    //   );
-    // }
-
-    if (data == null) {
+     if (data == null) {
       LogUtils.info(msg: 'nodeId or onePictureDataData is null');
       return const SizedBox.shrink();
     }
@@ -302,7 +263,7 @@ class OnePicturePageState extends State<OnePicturePage> {
                       : TextView(data?.showNameText),
                   Container(
                     padding: const EdgeInsets.only(
-                        top: 0, bottom: 30, left: 16, right: 16),
+                        top: 16, bottom: 30, left: 16, right: 32),
                     margin: EdgeInsets.all(16),
                     decoration: BoxDecoration(
                         border: Border.all(color: '#347979'.toColor(), width: 1),
