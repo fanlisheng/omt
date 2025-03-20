@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:graphview/GraphView.dart';
 import 'package:kayo_package/kayo_package.dart';
@@ -51,11 +53,9 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
   @override
   void initState() async {
     super.initState();
-    requestData();
-    builder
-      ..nodeSeparation = (60)
-      ..levelSeparation = (60)
-      ..orientation = SugiyamaConfiguration.ORIENTATION_TOP_BOTTOM;
+    // requestData();
+
+    reInitData();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // 在 Widget 构建完成后设置初始变换
@@ -68,8 +68,10 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
   void reInitData() {
     graph = Graph();
     builder = SugiyamaConfiguration()
+      ..nodeSeparation = (50)
+      ..levelSeparation = (50)
       ..bendPointShape = CurvedBendPointShape(curveLength: 6)
-      ..coordinateAssignment = CoordinateAssignment.UpRight;
+      ..coordinateAssignment = CoordinateAssignment.Average;
     onePictureHttpData = null;
     theOnePictureDataData = null;
     currentIndex = 0;
@@ -113,6 +115,11 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
           // data = opd;
           theOnePictureDataData = opd;
           notifyListeners();
+
+          Timer(Duration(milliseconds: 500), () {
+            notifyListeners();
+          });
+
           // onSuccess?.call(opd);
         },
         onCache: (data) {
