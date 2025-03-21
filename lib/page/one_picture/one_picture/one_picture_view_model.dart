@@ -43,7 +43,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
 
   SugiyamaConfiguration builder = SugiyamaConfiguration()
     ..bendPointShape = CurvedBendPointShape(curveLength: 6)
-    ..coordinateAssignment = CoordinateAssignment.UpRight;
+    ..coordinateAssignment = CoordinateAssignment.Average;
 
   OnePictureDataData? onePictureHttpData;
 
