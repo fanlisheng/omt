@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:kayo_package/extension/_index_extension.dart';
 import 'package:kayo_package/kayo_package.dart';
+import 'package:media_kit/media_kit.dart';
 import 'package:omt/generated/json/base/json_field.dart';
 import 'package:omt/generated/json/one_picture_data_entity.g.dart';
 import 'dart:convert';
 
 import 'package:omt/utils/color_utils.dart';
+import 'package:omt/utils/shared_utils.dart';
 export 'package:omt/generated/json/one_picture_data_entity.g.dart';
 
 @JsonSerializable()
@@ -69,7 +71,47 @@ class OnePictureDataData {
   bool ignore = false;
   bool unknown = false;
 
-  String? get theNodeId=> '${type}_${id}';
+  String? get theNodeId => '${type}_${id}';
+
+  bool? get isCurrentNet {
+    var networkMac = SharedUtils.networkMac;
+
+    List<String> routerMacs = [];
+    if (type == OnePictureType.LYQ.index && mac != null && mac!.isNotEmpty) {
+      routerMacs.add(mac!);
+    } else {
+      _setNetworkMacList(routerMacs, children, nextList);
+    }
+
+    var contains = routerMacs.contains(networkMac);
+    return contains;
+  }
+
+  void _setNetworkMacList(List<String> routerMacs,
+      List<OnePictureDataData>? children, List<OnePictureDataData>? nextList) {
+    if (children != null && children.isNotEmpty) {
+      for (var child in children) {
+        if (child.type == OnePictureType.LYQ.index) {
+          var routerMac = child.mac ?? '';
+          if (routerMac.isNotEmpty && !routerMacs.contains(routerMac)) {
+            routerMacs.add(routerMac);
+          }
+        }
+        _setNetworkMacList(routerMacs, child.children, child.nextList);
+      }
+    }
+    if (nextList != null && nextList.isNotEmpty) {
+      for (var next in nextList) {
+        if (next.type == OnePictureType.LYQ.index) {
+          var routerMac = next.mac ?? '';
+          if (routerMac.isNotEmpty && !routerMacs.contains(routerMac)) {
+            routerMacs.add(routerMac);
+          }
+        }
+        _setNetworkMacList(routerMacs, next.children, next.nextList);
+      }
+    }
+  }
 
   String? get parentNodeCode {
     if (nodeCode != null && nodeCode!.contains('-')) {
@@ -166,6 +208,21 @@ class OnePictureDataData {
     return children;
   }
 
+  bool get showDash {
+    var childList = getChildList();
+    if (childList.isNotEmpty) {
+      var notJckList = childList.where((e) {
+        return e.type != OnePictureType.JCK.index;
+      });
+
+      if (notJckList.isNotEmpty) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   factory OnePictureDataData.fromJson(Map<String, dynamic> json) =>
       $OnePictureDataDataFromJson(json);
 
@@ -183,17 +240,21 @@ class OnePictureDataData {
         ///供电设备
       } else if (type == OnePictureType.GDSB.index) {
         // lineColor = ColorUtils.colorBrown.toColorHex();
-        lineColor = '#FF4D4F';
+        lineColor = '#B3977E';
 
         ///电源箱
       } else if (type == OnePictureType.DYX.index) {
         // lineColor = ColorUtils.colorBrown.toColorHex();
-        lineColor = '#FF4D4F';
+        lineColor = '#B3977E';
 
         ///交换机
       } else if (type == OnePictureType.JHJ.index) {
         // lineColor = ColorUtils.colorBlueLight.toColorHex();
         lineColor = '#347979';
+        showArrow = false;
+      } else if (type == OnePictureType.LYQ.index||type == OnePictureType.YXWL.index) {
+        // lineColor = ColorUtils.colorBlueLight.toColorHex();
+        lineColor = '#127979';
         showArrow = false;
       } else {
         lineColor = ColorUtils.colorGra.toColorHex();

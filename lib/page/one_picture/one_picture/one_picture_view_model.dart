@@ -9,6 +9,7 @@ import 'package:omt/http/http_query.dart';
 import 'package:omt/utils/color_utils.dart';
 import 'package:omt/utils/device_utils.dart';
 import 'package:omt/utils/json_utils.dart';
+import 'package:omt/utils/shared_utils.dart';
 
 import '../../../router_utils.dart';
 import '../../../utils/intent_utils.dart';
@@ -57,6 +58,13 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
     super.initState();
     // requestData();
 
+    DeviceUtils.getNetworkMac(onData: (data) {
+      if (SharedUtils.networkMac != data) {
+        SharedUtils.networkMac = data ?? '';
+        reInitData();
+      }
+    });
+
     reInitData();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -71,7 +79,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
     graph = Graph();
     builder = SugiyamaConfiguration()
       ..nodeSeparation = (50)
-      ..levelSeparation = (50)
+      ..levelSeparation = (70)
       ..bendPointShape = CurvedBendPointShape(curveLength: 6)
       ..coordinateAssignment = CoordinateAssignment.Average;
     onePictureHttpData = null;
@@ -107,7 +115,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
           OnePictureDataData? opd;
           if (null == data && null == gateId && null == passId) {
             opd = OnePictureDataData()
-              ..name =  instanceName ?? '未知'
+              ..name = instanceName ?? '未知'
               ..type = OnePictureType.SL.index
               ..id = '-99'
               ..nextList = [
@@ -447,6 +455,10 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
       if (opd.nextList.isNotEmpty) {
         OnePictureDataData? jhj;
         List<OnePictureDataData> jhjTargetList = [];
+        List<OnePictureDataData> lyqList = [];
+
+        var jhjList = opd.nextList
+            .where((element) => element.type == OnePictureType.JHJ.index);
 
         for (var next in opd.nextList) {
           if (next.type == OnePictureType.JHJ.index &&
@@ -459,15 +471,19 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
                   ..strokeWidth = 2
                   ..color = opd.unknown
                       ? ColorUtils.transparent
-                      : opd.lineColor.toColor());
+                      : opd.lineColor.toColor(),
+                arrowTitle: next.showName == true ? next.showNameText : '',
+                arrowTitleColor: ColorUtils.colorBlackLite.dark);
             doSetDataToGraph(graph, next, parentNode: nodeNext);
 
-            jhjTargetList.add(next);
+            if (jhjList.isNotEmpty && (next.type == OnePictureType.LYQ.index|| next.type == OnePictureType.YXWL.index)) {
+              lyqList.add(next);
+            } else {
+              jhjTargetList.add(next);
+            }
           }
-
           haNode = true;
         }
-
         if (jhj != null && jhjTargetList.isNotEmpty) {
           var nodeRoot = Node.Id('${jhj.type}_${jhj.id}');
           for (var next in jhjTargetList) {
@@ -479,10 +495,29 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
                   ..color = jhj.unknown
                       ? ColorUtils.transparent
                       : jhj.lineColor.toColor(),
-                showArrow: false,
+                 showArrow: false,
+                type: 0,
                 dash: false);
           }
         }
+
+        if (lyqList.isNotEmpty && jhj != null) {
+          var nodeNext = Node.Id('${jhj.type}_${jhj.id}');
+          for (var root in lyqList) {
+            var nodeRoot = Node.Id('${root.type}_${root.id}');
+            graph.addEdge(nodeRoot, nodeNext,
+                paint: Paint()
+                  ..strokeWidth = 2
+                  ..style = PaintingStyle.fill
+                  ..color = root.unknown
+                      ? ColorUtils.transparent
+                      : root.lineColor.toColor(),
+                showArrow: false,
+                type: 2,
+                dash: false);
+          }
+        }
+
       }
     }
     return haNode;
@@ -506,7 +541,10 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
       code = data?.parentNodeCode ?? "";
     }
 
-    if (code.isEmpty || type == null || data?.type ==  OnePictureType.LYQ.index || data?.type ==  OnePictureType.YXWL.index) {
+    if (code.isEmpty ||
+        type == null ||
+        data?.type == OnePictureType.LYQ.index ||
+        data?.type == OnePictureType.YXWL.index) {
       //路由器不进去
       return;
     }

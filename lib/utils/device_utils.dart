@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:network_info_plus/network_info_plus.dart';
 import 'package:omt/page/home/device_add/view_models/device_add_viewmodel.dart';
 import 'package:omt/utils/hikvision_utils.dart';
@@ -66,7 +67,7 @@ class DeviceUtils {
         String ip = entry.key;
         String mac = entry.value;
 
-        if(ip == "192.168.101.82"){
+        if (ip == "192.168.101.82") {
           print("------------");
         }
         String deviceTypeText = getDeviceTypeForMacAddress(mac);
@@ -344,5 +345,72 @@ class DeviceUtils {
 
   static DeviceType? getDeviceTypeFromInt(int value) {
     return intToDeviceTypeMap[value];
+  }
+
+  static Future<String?> getMacAddressByIp(
+      {required String ip, required bool Function() shouldStop}) async {
+    ProcessResult result;
+    if (Platform.isMacOS || Platform.isLinux || Platform.isWindows) {
+      result = await Process.run('arp', ['-a']);
+    } else {
+      throw Exception("不支持的平台");
+    }
+
+    final lines = result.stdout.split("\n");
+    final isWindows = Platform.isWindows;
+
+    for (var line in lines) {
+      if (shouldStop()) {
+        print("停止获取 MAC 地址");
+        return null;
+      }
+      line = line.trim();
+      if (line.isEmpty) continue;
+
+      if (isWindows) {
+        if (line.contains("Interface") || line.contains("Internet Address"))
+          continue;
+        final parts = line.split(RegExp(r'\s+'));
+        if (parts.length >= 3 &&
+            RegExp(r'^\d+\.\d+\.\d+\.\d+$').hasMatch(parts[0])) {
+          final currentIp = parts[0];
+          if (currentIp == ip) {
+            final mac = parts[1].toUpperCase();
+            final normalizedMac = normalizeMacAddress(mac);
+            if (RegExp(r'([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}')
+                .hasMatch(normalizedMac)) {
+              return normalizedMac;
+            }
+          }
+        }
+      } else {
+        if (!line.contains(RegExp(r'\d+\.\d+\.\d+\.\d+'))) continue;
+        line = line.replaceAll("at", "");
+        final parts = line.split(RegExp(r'\s+'));
+        if (parts.length >= 3) {
+          final currentIp = parts[1].replaceAll("(", "").replaceAll(")", "");
+          if (currentIp == ip) {
+            final mac = parts[2].toUpperCase();
+            final normalizedMac = normalizeMacAddress(mac);
+            if (RegExp(r'([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}')
+                .hasMatch(normalizedMac)) {
+              return normalizedMac;
+            }
+          }
+        }
+      }
+    }
+
+    return null; // 如果没有找到匹配的 IP，返回 null
+  }
+
+  static getNetworkMac({ValueChanged<String?>? onData}) async {
+    var subnet = await getSubnet();
+    String? mac = '';
+    if (null != subnet && subnet.isNotEmpty) {
+      subnet = '$subnet.1';
+      mac = await getMacAddressByIp(ip: subnet, shouldStop: () => false);
+    }
+    onData?.call(mac);
   }
 }

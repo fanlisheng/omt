@@ -26,6 +26,9 @@ class SharedUtils {
   static const String _shared_user_info_data = '_shared_user_info_data';
   static const String _shared_the_auth = '_shared_the_auth';
 
+  static String networkMac = '';
+
+
   static setHost(String data) {
     return set(_shared_host, data);
   }
