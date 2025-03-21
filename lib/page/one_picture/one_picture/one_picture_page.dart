@@ -49,7 +49,11 @@ class OnePicturePageState extends State<OnePicturePage> {
         autoLoadData: true,
         builder: (context, model, child) {
           viewModel = model;
-          return model.theOnePictureDataData?.type == OnePictureType.OTHER.index
+          return model.theOnePictureDataData?.type ==
+                      OnePictureType.OTHER.index ||
+                  ((model.theOnePictureDataData?.getChildList() ?? [])
+                          .isEmpty &&
+                      (model.theOnePictureDataData?.nextList ?? []).isEmpty)
               ? Column(
                   children: [
                     rectangleWidget(
