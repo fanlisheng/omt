@@ -48,9 +48,9 @@ dependencies:
   network_info_plus: ^6.1.2
   ping_discover_network_forked: ^0.0.1
   graphview:
-    git:
-      url: https://github.com/kayoxu/graphview.git
-#    path: /Volumes/U/app/demo/graphview
+#    git:
+#      url: https://github.com/kayoxu/graphview.git
+    path: /Volumes/U/app/demo/graphview
 
 dev_dependencies:
   flutter_test:
@@ -63,8 +63,7 @@ dev_dependencies:
 
 
 #dependency_overrides:
-#  intl: 0.18.1
-#  macos_window_utils: ^1.5.0
+#  macos_window_utils: ^1.6.1
 
 
 flutter:

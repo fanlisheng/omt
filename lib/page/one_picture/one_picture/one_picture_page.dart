@@ -78,9 +78,9 @@ class OnePicturePageState extends State<OnePicturePage> {
                                 SugiyamaConfiguration builder =
                                     SugiyamaConfiguration()
                                       ..bendPointShape =
-                                          CurvedBendPointShape(curveLength: 6)
+                                          CurvedBendPointShape(curveLength: 12)
                                       ..coordinateAssignment =
-                                          CoordinateAssignment.UpRight;
+                                          CoordinateAssignment.Left;
                                 return rectangleSubWidget2(
                                     model: model,
                                     data: e,
@@ -135,8 +135,8 @@ class OnePicturePageState extends State<OnePicturePage> {
                 children: onePictureDataData!.getChildList().map((e) {
                   final Graph graph = Graph();
                   SugiyamaConfiguration builder = SugiyamaConfiguration()
-                    ..bendPointShape = CurvedBendPointShape(curveLength: 6)
-                    ..coordinateAssignment = CoordinateAssignment.UpRight;
+                    ..bendPointShape = CurvedBendPointShape(curveLength: 12)
+                    ..coordinateAssignment = CoordinateAssignment.Left;
                   return rectangleSubWidget2(
                       model: model, data: e, graph: graph, builder: builder);
                 }).toList(),
@@ -184,8 +184,8 @@ class OnePicturePageState extends State<OnePicturePage> {
 
     graph ??= Graph();
     builder ??= SugiyamaConfiguration()
-      ..bendPointShape = CurvedBendPointShape(curveLength: 6)
-      ..coordinateAssignment = CoordinateAssignment.UpRight;
+      ..bendPointShape = CurvedBendPointShape(curveLength: 12)
+      ..coordinateAssignment = CoordinateAssignment.Left;
 
     bool addNewGraph = false;
 
@@ -194,10 +194,11 @@ class OnePicturePageState extends State<OnePicturePage> {
       model.doSetDataToGraph(graph, data);
 
       builder
-        ..nodeSeparation = (10)
+        ..nodeSeparation = (24)
         ..levelSeparation = (70)
         ..orientation = SugiyamaConfiguration.ORIENTATION_TOP_BOTTOM
-        ..coordinateAssignment = CoordinateAssignment.DownRight;
+        ..coordinateAssignment = CoordinateAssignment.Left
+      ;
     }
 
     if (addNewGraph) {
@@ -236,9 +237,9 @@ class OnePicturePageState extends State<OnePicturePage> {
                               SugiyamaConfiguration builder =
                                   SugiyamaConfiguration()
                                     ..bendPointShape =
-                                        CurvedBendPointShape(curveLength: 6)
+                                        CurvedBendPointShape(curveLength: 12)
                                     ..coordinateAssignment =
-                                        CoordinateAssignment.UpRight;
+                                        CoordinateAssignment.Left;
                               return rectangleSubWidget2(
                                   model: model,
                                   data: e,
@@ -340,8 +341,8 @@ class OnePicturePageState extends State<OnePicturePage> {
                         final Graph graph = Graph();
                         SugiyamaConfiguration builder = SugiyamaConfiguration()
                           ..bendPointShape =
-                              CurvedBendPointShape(curveLength: 6)
-                          ..coordinateAssignment = CoordinateAssignment.UpRight;
+                              CurvedBendPointShape(curveLength: 12)
+                          ..coordinateAssignment = CoordinateAssignment.Left;
                         return rectangleSubWidget2(
                             model: model,
                             data: e,

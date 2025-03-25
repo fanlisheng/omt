@@ -43,7 +43,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
 
   SugiyamaConfiguration builder = SugiyamaConfiguration()
     ..bendPointShape = CurvedBendPointShape(curveLength: 6)
-    ..coordinateAssignment = CoordinateAssignment.Average;
+    ..coordinateAssignment = CoordinateAssignment.Center;
 
   OnePictureDataData? onePictureHttpData;
 
@@ -81,7 +81,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
       ..nodeSeparation = (50)
       ..levelSeparation = (70)
       ..bendPointShape = CurvedBendPointShape(curveLength: 6)
-      ..coordinateAssignment = CoordinateAssignment.Average;
+      ..coordinateAssignment = CoordinateAssignment.Center;
     onePictureHttpData = null;
     theOnePictureDataData = null;
     currentIndex = 0;
@@ -139,6 +139,14 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
             opd = _dealHttpData(data);
           }
 
+          if (opd != null) {
+            // if(opd.nextList.isNotEmpty){
+            //   if(opd.type == OnePictureType.DM.index){
+            //     ///
+            //   }
+            // }
+          }
+
           setDataToGraph(opd);
 
           // data = opd;
@@ -185,6 +193,14 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
             return e.type == OnePictureType.GDSB.index;
           }).toList();
 
+          var wlList = data.children.where((e) {
+            return e.type == OnePictureType.YXWL.index ||
+                e.type == OnePictureType.LYQ.index;
+          }).toList();
+          var jhjList = data.children.where((e) {
+            return e.type == OnePictureType.JHJ.index;
+          }).toList();
+
           if (notJckList.isNotEmpty && gdsbList.isEmpty) {
             data.children.add(OnePictureDataData()
               ..type = OnePictureType.GDSB.index
@@ -201,7 +217,100 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
                 ..name = '电源箱未知');
             }
           }
+          if (notJckList.isNotEmpty && wlList.isEmpty) {
+            data.children.add(OnePictureDataData()
+              ..type = OnePictureType.YXWL.index
+              ..unknown = true
+              ..children = [
+                OnePictureDataData()
+                  ..type = OnePictureType.YXWL.index
+                  ..name = '未知网路'
+              ]);
+          }
+          if (notJckList.isNotEmpty && jhjList.isEmpty) {
+            data.children.add(OnePictureDataData()
+              ..type = OnePictureType.JHJ.index
+              ..unknown = true
+              ..children = [
+                OnePictureDataData()
+                  ..type = OnePictureType.JHJ.index
+                  ..name = '未知交换机'
+              ]);
+          }
         }
+
+        var jckElements = data.children
+            .where((e) => e.type == OnePictureType.JCK.index)
+            .toList();
+        data.children.removeWhere((e) => e.type == OnePictureType.JCK.index);
+        data.children.insertAll(0, jckElements);
+        if (jckElements.length > 1) {
+          for (var i = 1; i < jckElements.length; i++) {
+            var jckElement = jckElements[i];
+            data.children.add(jckElement);
+          }
+        }
+
+        var elementsToMoveToEnd = data.children
+            .where((e) =>
+                e.type == OnePictureType.LYQ.index ||
+                e.type == OnePictureType.YXWL.index)
+            .toList();
+
+        data.children.removeWhere((e) =>
+            e.type == OnePictureType.LYQ.index ||
+            e.type == OnePictureType.YXWL.index);
+
+        data.children.addAll(elementsToMoveToEnd);
+      } else if (data.type == OnePictureType.JCK.index) {
+        var wlList = data.children.where((e) {
+          return e.type == OnePictureType.YXWL.index ||
+              e.type == OnePictureType.LYQ.index;
+        }).toList();
+        var jhjList = data.children.where((e) {
+          return e.type == OnePictureType.JHJ.index;
+        }).toList();
+
+        var otherList = data.children.where((e) {
+          return e.type != OnePictureType.AISB.index &&
+              e.type != OnePictureType.SXT.index &&
+              e.type != OnePictureType.NVR.index;
+        }).toList();
+
+        if (otherList.isNotEmpty) {
+          if (wlList.isEmpty) {
+            data.children.add(OnePictureDataData()
+              ..type = OnePictureType.YXWL.index
+              ..unknown = true
+              ..children = [
+                OnePictureDataData()
+                  ..type = OnePictureType.YXWL.index
+                  ..name = '未知网路'
+              ]);
+          }
+          if (jhjList.isEmpty) {
+            data.children.add(OnePictureDataData()
+              ..type = OnePictureType.JHJ.index
+              ..unknown = true
+              ..children = [
+                OnePictureDataData()
+                  ..type = OnePictureType.JHJ.index
+                  ..name = '未知交换机'
+              ]);
+          }
+        }
+
+        var elementsToMoveToEnd = data.children
+            .where((e) =>
+                e.type == OnePictureType.LYQ.index ||
+                e.type == OnePictureType.YXWL.index)
+            .toList();
+
+        data.children.removeWhere((e) =>
+            e.type == OnePictureType.LYQ.index ||
+            e.type == OnePictureType.YXWL.index);
+
+        data.children.addAll(elementsToMoveToEnd);
       }
 
       for (var item in data.children) {
@@ -469,14 +578,20 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
             graph.addEdge(nodeRoot, nodeNext,
                 paint: Paint()
                   ..strokeWidth = 2
-                  ..color = opd.unknown
+                  ..color = (opd.unknown &&
+                          (next.type == OnePictureType.DYX.index ||
+                              next.type == OnePictureType.SD.index ||
+                              next.type == OnePictureType.DC.index ||
+                              next.type == OnePictureType.GDSB.index))
                       ? ColorUtils.transparent
                       : opd.lineColor.toColor(),
                 arrowTitle: next.showName == true ? next.showNameText : '',
                 arrowTitleColor: ColorUtils.colorBlackLite.dark);
             doSetDataToGraph(graph, next, parentNode: nodeNext);
 
-            if (jhjList.isNotEmpty && (next.type == OnePictureType.LYQ.index|| next.type == OnePictureType.YXWL.index)) {
+            if (jhjList.isNotEmpty &&
+                (next.type == OnePictureType.LYQ.index ||
+                    next.type == OnePictureType.YXWL.index)) {
               lyqList.add(next);
             } else {
               jhjTargetList.add(next);
@@ -495,7 +610,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
                   ..color = jhj.unknown
                       ? ColorUtils.transparent
                       : jhj.lineColor.toColor(),
-                 showArrow: false,
+                showArrow: false,
                 type: 0,
                 dash: false);
           }
@@ -509,15 +624,12 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
                 paint: Paint()
                   ..strokeWidth = 2
                   ..style = PaintingStyle.fill
-                  ..color = root.unknown
-                      ? ColorUtils.transparent
-                      : root.lineColor.toColor(),
+                  ..color = root.lineColor.toColor(),
                 showArrow: false,
                 type: 2,
                 dash: false);
           }
         }
-
       }
     }
     return haNode;
@@ -531,6 +643,8 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
           data?.type == OnePictureType.DC.index) {
         /// 电源未知
       }
+
+      return;
     }
     DeviceType? type = DeviceUtils.getDeviceTypeFromInt(data?.type ?? 0);
     String code = data?.nodeCode ?? "";
@@ -568,11 +682,10 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
       List<OnePictureDataData>? yxwl,
       List<OnePictureDataData>? aisb}) {
     if (jck?.isNotEmpty == true) {
-      opd.nextList.addAll(jck!);
+      // opd.nextList.addAll(jck!);
+      opd.nextList.insert(0, jck![0]);
     }
-    if (lyq?.isNotEmpty == true) {
-      opd.nextList.addAll(lyq!);
-    }
+
     if (nvr?.isNotEmpty == true) {
       opd.nextList.addAll(nvr!);
     }
@@ -592,8 +705,19 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
         opd.nextList.addAll(jhj!);
       }
     }
+
+    if ((jck?.length ?? 0) > 1) {
+      for (var i = 1; i < jck!.length; i++) {
+        var jckElement = jck[i];
+        opd.nextList.add(jckElement);
+      }
+    }
+
     if (yxwl?.isNotEmpty == true) {
       opd.nextList.addAll(yxwl!);
+    }
+    if (lyq?.isNotEmpty == true) {
+      opd.nextList.addAll(lyq!);
     }
   }
 }

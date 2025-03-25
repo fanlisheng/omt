@@ -254,7 +254,7 @@ class OnePictureDataData {
         showArrow = false;
       } else if (type == OnePictureType.LYQ.index||type == OnePictureType.YXWL.index) {
         // lineColor = ColorUtils.colorBlueLight.toColorHex();
-        lineColor = '#127979';
+        lineColor = '#5A8786';
         showArrow = false;
       } else {
         lineColor = ColorUtils.colorGra.toColorHex();
