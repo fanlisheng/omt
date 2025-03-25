@@ -305,10 +305,10 @@ class DeviceUtils {
 
   // 设备图片映射
   static const Map<String, String> _deviceImageMap = {
-    "NVR": "home/ic_device_nvr",
-    "AI设备": "home/ic_device_ai",
-    "摄像头": "home/ic_device_camera",
-    "路由器": "home/ic_device_router",
+    "NVR": "home/ic_device_nvr2",
+    "AI设备": "home/ic_device_aisb",
+    "摄像头": "home/ic_device_sxt",
+    "路由器": "home/ic_device_lyq",
   };
 
   static const Map<int, DeviceType> intToDeviceTypeMap = {

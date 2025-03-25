@@ -91,6 +91,7 @@ class AppTheme extends ChangeNotifier {
 }
 
 AccentColor get systemAccentColor {
+  return Colors.teal;
   if ((defaultTargetPlatform == TargetPlatform.windows ||
           defaultTargetPlatform == TargetPlatform.android) &&
       !kIsWeb) {
