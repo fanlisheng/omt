@@ -74,11 +74,11 @@ class OnePictureDataData {
   String? get theNodeId => '${type}_${id}';
 
   bool? get isCurrentNet {
-    var networkMac = SharedUtils.networkMac;
+    var networkMac = SharedUtils.networkMac.toLowerCase();
 
     List<String> routerMacs = [];
     if (type == OnePictureType.LYQ.index && mac != null && mac!.isNotEmpty) {
-      routerMacs.add(mac!);
+      routerMacs.add(mac!.toLowerCase());
     } else {
       _setNetworkMacList(routerMacs, children, nextList);
     }
@@ -92,7 +92,7 @@ class OnePictureDataData {
     if (children != null && children.isNotEmpty) {
       for (var child in children) {
         if (child.type == OnePictureType.LYQ.index) {
-          var routerMac = child.mac ?? '';
+          var routerMac = (child.mac ?? '').toLowerCase();
           if (routerMac.isNotEmpty && !routerMacs.contains(routerMac)) {
             routerMacs.add(routerMac);
           }
@@ -103,7 +103,7 @@ class OnePictureDataData {
     if (nextList != null && nextList.isNotEmpty) {
       for (var next in nextList) {
         if (next.type == OnePictureType.LYQ.index) {
-          var routerMac = next.mac ?? '';
+          var routerMac = (next.mac ?? '').toLowerCase();
           if (routerMac.isNotEmpty && !routerMacs.contains(routerMac)) {
             routerMacs.add(routerMac);
           }
