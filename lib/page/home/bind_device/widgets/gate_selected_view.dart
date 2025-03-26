@@ -28,6 +28,7 @@ class _GateSelectedViewState extends State<GateSelectedView> {
           width: 1,
           color: "#5D6666".toColor(),
         ),
+        borderRadius: BorderRadius.circular(3),
       ),
       // width: double.infinity,
       margin: const EdgeInsets.only(left: 16, right: 16, bottom: 58),

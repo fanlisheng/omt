@@ -71,6 +71,7 @@ class _FilterViewState extends State<FilterView> {
               placeholder: "请选择",
               focusNode: model.focusNode,
               controller: model.controller,
+              placeholderStyle: const m.TextStyle(fontSize: 12),
               decoration: WidgetStateProperty.resolveWith<BoxDecoration>(
                 (Set<WidgetState> states) {
                   return const BoxDecoration(
@@ -202,7 +203,7 @@ class _FilterViewState extends State<FilterView> {
             textAlign: TextAlign.center,
             padding:
                 const EdgeInsets.only(top: 6, bottom: 6, left: 24, right: 24),
-            radius: 0,
+            radius: 3,
             onTap: model.selectedInstance != null
                 ? () {
                     model.searchEventAction();

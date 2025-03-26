@@ -62,7 +62,10 @@ class BindDeviceScreen extends StatelessWidget {
             Expanded(
                 child: Container(
               margin: const EdgeInsets.only(left: 20, right: 20),
-              color: ColorUtils.colorBackgroundLine,
+              decoration: BoxDecoration(
+                color: ColorUtils.colorBackgroundLine,
+                borderRadius: BorderRadius.circular(3),
+              ),
               // height: 400,
               child: Column(
                 crossAxisAlignment: fu.CrossAxisAlignment.start,
@@ -112,7 +115,10 @@ class BindDeviceScreen extends StatelessWidget {
             child: Container(
               padding:
                   const EdgeInsets.only(left: 25, right: 25, top: 6, bottom: 6),
-              color: ColorUtils.colorGreen,
+              decoration: BoxDecoration(
+                color: ColorUtils.colorGreen,
+                borderRadius: BorderRadius.circular(3),
+              ),
               child: const Text(
                 "绑定",
                 style: TextStyle(fontSize: 12, color: ColorUtils.colorWhite),

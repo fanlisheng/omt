@@ -17,6 +17,7 @@ import 'detail_ai_view.dart';
 
 class DetailNvrView extends StatelessWidget {
   final String nodeCode;
+
   const DetailNvrView({super.key, required this.nodeCode});
 
   // AddNvrViewModel model;
@@ -36,7 +37,10 @@ class DetailNvrView extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(left: 16, right: 16, bottom: 20),
       padding: const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),
-      color: ColorUtils.colorBackgroundLine,
+      decoration: BoxDecoration(
+        color: ColorUtils.colorBackgroundLine,
+        borderRadius: BorderRadius.circular(3),
+      ),
       width: double.infinity,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,7 +90,10 @@ class DetailNvrView extends StatelessWidget {
               child: SizedBox(
                 width: double.infinity,
                 child: DataTable(
-                  decoration: BoxDecoration(color: "#3B3F3F".toColor()),
+                  decoration: BoxDecoration(
+                    color: "#3B3F3F".toColor(),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
                   dataRowHeight: 40,
                   headingRowHeight: 40,
                   dividerThickness: 0.01,

@@ -29,7 +29,10 @@ class DetailPowerView extends StatelessWidget {
           margin: const EdgeInsets.only(left: 16, right: 16),
           padding:
           const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 16),
-          color: ColorUtils.colorBackgroundLine,
+          decoration: BoxDecoration(
+            color: ColorUtils.colorBackgroundLine,
+            borderRadius: BorderRadius.circular(3),
+          ),
           width: double.infinity,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

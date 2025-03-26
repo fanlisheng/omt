@@ -45,7 +45,10 @@ class SearchDeviceScreen extends StatelessWidget {
                     height: 40,
                     margin:
                         const EdgeInsets.only(left: 20, right: 20, bottom: 15),
-                    color: const Color(0xFF4E5353),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF4E5353),
+                      borderRadius: BorderRadius.circular(3),
+                    ),
                     // 深灰色背景
                     child: Row(
                       children: [

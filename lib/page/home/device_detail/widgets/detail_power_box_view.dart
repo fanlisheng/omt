@@ -16,6 +16,7 @@ import 'detail_ai_view.dart';
 
 class DetailPowerBoxView extends StatelessWidget {
   final String nodeCode;
+
   const DetailPowerBoxView({super.key, required this.nodeCode});
 
   @override
@@ -43,30 +44,31 @@ class DetailPowerBoxView extends StatelessWidget {
                     right: 16,
                     bottom: 16,
                   ),
-                  color: ColorUtils.colorBackgroundLine,
-                  width: double.infinity,
-                  child: Container(
-                    padding: const EdgeInsets.only(
-                        left: 16, right: 16, top: 16, bottom: 16),
+                  padding: const EdgeInsets.only(
+                      left: 16, right: 16, top: 16, bottom: 16),
+                  decoration: BoxDecoration(
                     color: ColorUtils.colorBackgroundLine,
-                    width: double.infinity,
-                    child: infoView(model),
+                    borderRadius: BorderRadius.circular(3),
                   ),
+                  width: double.infinity,
+                  child: infoView(model),
                 ),
                 Container(
-                  margin: const EdgeInsets.only(
-                    left: 16,
-                    right: 16,
-                    bottom: 16,
-                  ),
-                  color: ColorUtils.colorBackgroundLine,
-                  width: double.infinity,
-                  child: Container(
-                    padding: const EdgeInsets.only(
-                        left: 16, right: 16, top: 16, bottom: 16),
+                  padding: const EdgeInsets.only(
+                      left: 16, right: 16, top: 16, bottom: 16),
+                  margin:
+                      const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                  decoration: BoxDecoration(
                     color: ColorUtils.colorBackgroundLine,
-                    width: double.infinity,
-                    child: Row(children: [Expanded(child: edInfoView(model))],),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                  width: double.infinity,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: edInfoView(model),
+                      )
+                    ],
                   ),
                 ),
               ],
@@ -74,29 +76,29 @@ class DetailPowerBoxView extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        Row(
-          children: [
-            const SizedBox(
-              width: 16,
-            ),
-            Clickable(
-              onTap: () {},
-              child: Container(
-                padding: const EdgeInsets.only(
-                    left: 25, right: 25, top: 6, bottom: 6),
-                color: ColorUtils.colorGreen,
-                child: const Text(
-                  "重启主程",
-                  style: TextStyle(fontSize: 12, color: ColorUtils.colorWhite),
-                ),
-              ),
-            ),
-            const SizedBox(
-              width: 16,
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
+        // Row(
+        //   children: [
+        //     const SizedBox(
+        //       width: 16,
+        //     ),
+        //     Clickable(
+        //       onTap: () {},
+        //       child: Container(
+        //         padding: const EdgeInsets.only(
+        //             left: 25, right: 25, top: 6, bottom: 6),
+        //         color: ColorUtils.colorGreen,
+        //         child: const Text(
+        //           "重启主程",
+        //           style: TextStyle(fontSize: 12, color: ColorUtils.colorWhite),
+        //         ),
+        //       ),
+        //     ),
+        //     const SizedBox(
+        //       width: 16,
+        //     ),
+        //   ],
+        // ),
+        // const SizedBox(height: 16),
       ],
     );
   }
@@ -202,95 +204,103 @@ class DetailPowerBoxView extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        SizedBox(width: double.infinity,child: DataTable(
-          decoration: BoxDecoration(color: "#3B3F3F".toColor()),
-          dataRowHeight: 40,
-          headingRowHeight: 40,
-          dividerThickness: 0.01,
-          columns: const [
-            DataColumn(label: Text("DC", style: TextStyle(fontSize: 12))),
-            DataColumn(label: Text("状态", style: TextStyle(fontSize: 12))),
-            DataColumn(label: Text("电压", style: TextStyle(fontSize: 12))),
-            DataColumn(label: Text("电流", style: TextStyle(fontSize: 12))),
-            DataColumn(label: Text("运行设备", style: TextStyle(fontSize: 12))),
-            // DataColumn(label: Text("操作", style: TextStyle(fontSize: 12))),
-          ],
-          rows: (model.deviceInfo.dcInterfaces ?? []).asMap().keys.map((index) {
-            DeviceDetailPowerBoxDataDcInterfaces info =
-            (model.deviceInfo.dcInterfaces ?? [])[index];
-            return DataRow(
-                color: WidgetStateProperty.all(
-                    index % 2 == 0 ? "#4E5353".toColor() : "#3B3F3F".toColor()),
-                cells: [
-                  DataCell(Text(
-                    (info.interfaceNum ?? 0).toString(),
-                    style: const TextStyle(fontSize: 12),
-                  )),
-                  DataCell(Text(
-                    info.statusText ?? "",
-                    style: const TextStyle(fontSize: 12),
-                  )),
-                  DataCell(Text((info.voltage ?? 0).toString(),
-                      style: const TextStyle(fontSize: 12))),
-                  DataCell(Text((info.current ?? 0).toString(),
-                      style: const TextStyle(fontSize: 12))),
-                  DataCell(Text(info.connectDevice ?? "",
-                      style: const TextStyle(fontSize: 12))),
-                  // DataCell(Row(
-                  //   children: [
-                  //     OutlinedButton(
-                  //       onPressed: () {
-                  //         model.changeDeviceStateAction(info);
-                  //       },
-                  //       style: ButtonStyle(
-                  //         padding: const WidgetStatePropertyAll(
-                  //           EdgeInsets.symmetric(
-                  //               vertical: -2.0, horizontal: 10),
-                  //         ),
-                  //         shape: WidgetStatePropertyAll(
-                  //           //圆角
-                  //           RoundedRectangleBorder(
-                  //               borderRadius: BorderRadius.circular(5)),
-                  //         ),
-                  //         side: const WidgetStatePropertyAll(BorderSide(
-                  //             color: ColorUtils.colorRed, width: 1.0)),
-                  //       ),
-                  //       child: Text(
-                  //         info.statusText == "关闭" ? "打开" : "关闭",
-                  //         style: TextStyle(
-                  //             fontSize: 12,
-                  //             color: info.statusText == "关闭"
-                  //                 ? ColorUtils.colorGreen
-                  //                 : ColorUtils.colorRed),
-                  //       ),
-                  //     ),
-                  //     OutlinedButton(
-                  //       onPressed: () {
-                  //         model.recordDeviceAction(info);
-                  //       },
-                  //       style: ButtonStyle(
-                  //         padding: const WidgetStatePropertyAll(
-                  //           EdgeInsets.symmetric(vertical: 0.0, horizontal: 10),
-                  //         ),
-                  //         shape: WidgetStatePropertyAll(
-                  //           //圆角
-                  //           RoundedRectangleBorder(
-                  //               borderRadius: BorderRadius.circular(5)),
-                  //         ),
-                  //         side: const WidgetStatePropertyAll(BorderSide(
-                  //             color: ColorUtils.colorRed, width: 1.0)),
-                  //       ),
-                  //       child: const Text(
-                  //         "记录",
-                  //         style: TextStyle(
-                  //             fontSize: 12, color: ColorUtils.colorRed),
-                  //       ),
-                  //     ),
-                  //   ],
-                  // )),
-                ]);
-          }).toList(),
-        ),)
+        SizedBox(
+          width: double.infinity,
+          child: DataTable(
+            decoration: BoxDecoration(
+              color: "#3B3F3F".toColor(),
+              borderRadius: BorderRadius.circular(3),
+            ),
+            dataRowHeight: 40,
+            headingRowHeight: 40,
+            dividerThickness: 0.01,
+            columns: const [
+              DataColumn(label: Text("DC", style: TextStyle(fontSize: 12))),
+              DataColumn(label: Text("状态", style: TextStyle(fontSize: 12))),
+              DataColumn(label: Text("电压", style: TextStyle(fontSize: 12))),
+              DataColumn(label: Text("电流", style: TextStyle(fontSize: 12))),
+              DataColumn(label: Text("运行设备", style: TextStyle(fontSize: 12))),
+              // DataColumn(label: Text("操作", style: TextStyle(fontSize: 12))),
+            ],
+            rows:
+                (model.deviceInfo.dcInterfaces ?? []).asMap().keys.map((index) {
+              DeviceDetailPowerBoxDataDcInterfaces info =
+                  (model.deviceInfo.dcInterfaces ?? [])[index];
+              return DataRow(
+                  color: WidgetStateProperty.all(index % 2 == 0
+                      ? "#4E5353".toColor()
+                      : "#3B3F3F".toColor()),
+                  cells: [
+                    DataCell(Text(
+                      (info.interfaceNum ?? 0).toString(),
+                      style: const TextStyle(fontSize: 12),
+                    )),
+                    DataCell(Text(
+                      info.statusText ?? "",
+                      style: const TextStyle(fontSize: 12),
+                    )),
+                    DataCell(Text((info.voltage ?? 0).toString(),
+                        style: const TextStyle(fontSize: 12))),
+                    DataCell(Text((info.current ?? 0).toString(),
+                        style: const TextStyle(fontSize: 12))),
+                    DataCell(Text(info.connectDevice ?? "",
+                        style: const TextStyle(fontSize: 12))),
+                    // DataCell(Row(
+                    //   children: [
+                    //     OutlinedButton(
+                    //       onPressed: () {
+                    //         model.changeDeviceStateAction(info);
+                    //       },
+                    //       style: ButtonStyle(
+                    //         padding: const WidgetStatePropertyAll(
+                    //           EdgeInsets.symmetric(
+                    //               vertical: -2.0, horizontal: 10),
+                    //         ),
+                    //         shape: WidgetStatePropertyAll(
+                    //           //圆角
+                    //           RoundedRectangleBorder(
+                    //               borderRadius: BorderRadius.circular(5)),
+                    //         ),
+                    //         side: const WidgetStatePropertyAll(BorderSide(
+                    //             color: ColorUtils.colorRed, width: 1.0)),
+                    //       ),
+                    //       child: Text(
+                    //         info.statusText == "关闭" ? "打开" : "关闭",
+                    //         style: TextStyle(
+                    //             fontSize: 12,
+                    //             color: info.statusText == "关闭"
+                    //                 ? ColorUtils.colorGreen
+                    //                 : ColorUtils.colorRed),
+                    //       ),
+                    //     ),
+                    //     OutlinedButton(
+                    //       onPressed: () {
+                    //         model.recordDeviceAction(info);
+                    //       },
+                    //       style: ButtonStyle(
+                    //         padding: const WidgetStatePropertyAll(
+                    //           EdgeInsets.symmetric(vertical: 0.0, horizontal: 10),
+                    //         ),
+                    //         shape: WidgetStatePropertyAll(
+                    //           //圆角
+                    //           RoundedRectangleBorder(
+                    //               borderRadius: BorderRadius.circular(5)),
+                    //         ),
+                    //         side: const WidgetStatePropertyAll(BorderSide(
+                    //             color: ColorUtils.colorRed, width: 1.0)),
+                    //       ),
+                    //       child: const Text(
+                    //         "记录",
+                    //         style: TextStyle(
+                    //             fontSize: 12, color: ColorUtils.colorRed),
+                    //       ),
+                    //     ),
+                    //   ],
+                    // )),
+                  ]);
+            }).toList(),
+          ),
+        )
       ],
     );
   }

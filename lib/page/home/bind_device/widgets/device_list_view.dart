@@ -35,7 +35,12 @@ class _DeviceListViewState extends State<DeviceListView> {
         children: [
           Container(
             decoration: BoxDecoration(
-                border: Border.all(width: 1, color: "#5D6666".toColor())),
+              border: Border.all(
+                width: 1,
+                color: "#5D6666".toColor(),
+              ),
+              borderRadius: BorderRadius.circular(3),
+            ),
             height: 128,
             width: double.infinity,
             child: Column(
@@ -61,13 +66,6 @@ class _DeviceListViewState extends State<DeviceListView> {
                           style: TextStyle(
                             fontSize: 12,
                             color: ColorUtils.colorWhite,
-                          ),
-                        ),
-                        style: CheckboxThemeData(
-                          checkedDecoration: WidgetStateProperty.all(
-                            const BoxDecoration(
-                              color: ColorUtils.colorGreen,
-                            ),
                           ),
                         ),
                         onChanged: (a) {
@@ -126,6 +124,11 @@ Widget deviceShowList1(List<DeviceEntity> deviceData, {Function(int)? onTap}) {
                   color: deviceData[index].selected == true
                       ? "#5D6666".toColor()
                       : ColorUtils.transparent,
+                  boxShadow: [
+                    BoxShadow(
+                        color: '#82FFFC'.toColor(opacity: .05),
+                        spreadRadius: 1),
+                  ],
                 ),
                 child: Column(
                   children: [
@@ -141,8 +144,7 @@ Widget deviceShowList1(List<DeviceEntity> deviceData, {Function(int)? onTap}) {
                         fit: BoxFit.contain,
                         child: Text(
                           deviceData[index].deviceTypeText ?? "-",
-                          style:
-                          const TextStyle(color: ColorUtils.colorWhite),
+                          style: const TextStyle(color: ColorUtils.colorWhite),
                         ),
                       ),
                     ),
@@ -211,9 +213,15 @@ Widget deviceShowList2(
                     ? ColorUtils.colorGreen
                     : "#5D6666".toColor(),
               ),
+              borderRadius: BorderRadius.circular(3),
               color: deviceData[index].selected == true
                   ? "#5D6666".toColor()
                   : ColorUtils.transparent,
+              boxShadow: [
+                BoxShadow(
+                  color: '#82FFFC'.toColor(opacity: .05),
+                ),
+              ],
             ),
             child: Stack(
               children: [
@@ -238,8 +246,8 @@ Widget deviceShowList2(
                         child: FittedBox(
                           fit: BoxFit.contain,
                           child: Text(
-                              DeviceUtils.getDeviceTypeString(
-                                  deviceData[index].deviceType ?? 0),
+                            DeviceUtils.getDeviceTypeString(
+                                deviceData[index].deviceType ?? 0),
                             style:
                                 const TextStyle(color: ColorUtils.colorWhite),
                           ),

@@ -373,24 +373,24 @@ class SysUtils {
     final appTheme = context.watch<AppTheme>();
     final theme = fu.FluentTheme.of(context);
     return Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-      Align(
-        alignment: AlignmentDirectional.centerEnd,
-        child: Padding(
-          padding: const EdgeInsetsDirectional.only(end: 8.0),
-          child: fu.ToggleSwitch(
-            // style: fu.ToggleSwitchThemeData.standard(theme.copyWith(activeColor: ColorUtils.colorAccent)),
-            content: const Text('深色模式'),
-            checked: fu.FluentTheme.of(context).brightness.isDark,
-            onChanged: (v) {
-              if (v) {
-                appTheme.mode = ThemeMode.dark;
-              } else {
-                appTheme.mode = ThemeMode.light;
-              }
-            },
-          ),
-        ),
-      ),
+      // Align(
+      //   alignment: AlignmentDirectional.centerEnd,
+      //   child: Padding(
+      //     padding: const EdgeInsetsDirectional.only(end: 8.0),
+      //     child: fu.ToggleSwitch(
+      //       // style: fu.ToggleSwitchThemeData.standard(theme.copyWith(activeColor: ColorUtils.colorAccent)),
+      //       content: const Text('深色模式'),
+      //       checked: fu.FluentTheme.of(context).brightness.isDark,
+      //       onChanged: (v) {
+      //         if (v) {
+      //           appTheme.mode = ThemeMode.dark;
+      //         } else {
+      //           appTheme.mode = ThemeMode.light;
+      //         }
+      //       },
+      //     ),
+      //   ),
+      // ),
       if (!kIsWeb) const WindowButtons(),
     ]);
   }

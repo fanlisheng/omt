@@ -53,7 +53,10 @@ class DetailCameraView extends StatelessWidget {
             margin: const EdgeInsets.only(left: 16, right: 16),
             padding:
                 const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),
-            color: ColorUtils.colorBackgroundLine,
+            decoration: BoxDecoration(
+              color: ColorUtils.colorBackgroundLine,
+              borderRadius: BorderRadius.circular(3),
+            ),
             width: double.infinity,
             child: ListView(
               // crossAxisAlignment: CrossAxisAlignment.center,
@@ -344,7 +347,10 @@ class DetailCameraView extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.only(
                     left: 25, right: 25, top: 6, bottom: 6),
-                color: ColorUtils.colorGreen,
+                decoration: BoxDecoration(
+                  color: ColorUtils.colorGreen,
+                  borderRadius: BorderRadius.circular(3),
+                ),
                 child: const Text(
                   "图片预览",
                   style: TextStyle(fontSize: 12, color: ColorUtils.colorWhite),
@@ -365,13 +371,16 @@ class DetailCameraView extends StatelessWidget {
     final screenSize = MediaQuery.of(model.context!).size;
     final width = (screenSize.width - 160) * 0.54;
     final height = screenSize.height * 0.43;
-    return SizedBox(
+    return Container(
       width: width,
       height: height,
-      child: Stack(
-        children: [
-          Video(controller: model.controller),
-        ],
+      decoration: BoxDecoration(
+        color: Colors.black,
+        borderRadius: BorderRadius.circular(3),
+      ),
+      child: Container(
+        margin: const EdgeInsets.all(2),
+        child: Video(controller: model.controller),
       ),
     );
   }
@@ -386,8 +395,8 @@ class DetailCameraView extends StatelessWidget {
     final screenSize = MediaQuery.of(context).size;
     return Clickable(
       // color: "#5B6565".toColor(),
-      width: 234 / (1050 - 160) * screenSize.width,
-      // width: 234 ,
+      // width: 234 / (1050 - 160) * screenSize.width,
+      // // width: 234 ,
       height: screenSize.height * 0.43 / 2,
       onTap: onTap ??
           () {

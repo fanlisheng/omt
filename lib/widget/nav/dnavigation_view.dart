@@ -45,6 +45,7 @@ class DNavigationView extends StatelessWidget {
                   width: 1,
                   color: ColorUtils.colorGreen,
                 ),
+                borderRadius: BorderRadius.circular(3),
               ),
               padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 10),
               child: const Text(

@@ -22,7 +22,10 @@ class _DeviceListViewState extends State<DeviceListView> {
     SearchDeviceViewModel model = widget.viewModel;
     return Container(
       margin: const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 8),
-      color: ColorUtils.colorBackgroundLine,
+      decoration: BoxDecoration(
+        color: ColorUtils.colorBackgroundLine,
+        borderRadius: BorderRadius.circular(3),
+      ),
       child: contentView(model),
     );
   }
@@ -85,16 +88,19 @@ class _DeviceListViewState extends State<DeviceListView> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 0),
+                    SizedBox(
+                        height: model.searchState == DeviceSearchState.completed
+                            ? 0
+                            : 12),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Expanded(
                           child: LinearProgressIndicator(
                             value:
-                            model.searchState == DeviceSearchState.completed
-                                ? 1
-                                : null,
+                                model.searchState == DeviceSearchState.completed
+                                    ? 1
+                                    : null,
                             // 进度值，0.5表示50%
                             backgroundColor: "#676B6B".toColor(),
                             // 进度条的背景颜色
@@ -102,19 +108,19 @@ class _DeviceListViewState extends State<DeviceListView> {
                                 ColorUtils.colorGreen),
                             // 进度条的颜色
                             borderRadius: BorderRadius.circular(2.5),
-                            minHeight: 3,
+                            minHeight: 5,
                           ),
                         ),
                         Visibility(
                           visible:
-                          model.searchState == DeviceSearchState.completed,
+                              model.searchState == DeviceSearchState.completed,
                           child:
-                          // Image.asset(source("home/ic_complete"),width: 20,height: 20,),
-                          ImageView(
+                              // Image.asset(source("home/ic_complete"),width: 20,height: 20,),
+                              ImageView(
                             src: source("home/ic_complete"),
                             width: 20,
                             height: 20,
-                            margin: const EdgeInsets.only( left: 20,bottom: 10),
+                            margin: const EdgeInsets.only(left: 20, bottom: 10),
                           ),
                         )
                       ],
@@ -139,7 +145,7 @@ class _DeviceListViewState extends State<DeviceListView> {
                   horizontal: 25,
                   vertical: 6,
                 ),
-                radius: 0,
+                radius: 3,
                 onTap: () {
                   model.searchState == DeviceSearchState.searching
                       ? model.scanStopEventAction()
@@ -150,13 +156,20 @@ class _DeviceListViewState extends State<DeviceListView> {
           ),
           const SizedBox(height: 0),
           if (model.deviceScanData.isNotEmpty) ...[
-            Expanded(child: Container(
-              // height: 186,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                  border: Border.all(width: 1, color: "#5D6666".toColor())),
-              child: deviceShowList1(model.deviceScanData),
-            ),),
+            Expanded(
+              child: Container(
+                // height: 186,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    width: 1,
+                    color: "#5D6666".toColor(),
+                  ),
+                  borderRadius: BorderRadius.circular(3),
+                ),
+                child: deviceShowList1(model.deviceScanData),
+              ),
+            ),
           ],
           if (model.deviceNoBindingData.isNotEmpty) ...[
             const SizedBox(height: 10),
@@ -164,7 +177,12 @@ class _DeviceListViewState extends State<DeviceListView> {
               height: 126,
               width: double.infinity,
               decoration: BoxDecoration(
-                  border: Border.all(width: 1, color: "#5D6666".toColor())),
+                border: Border.all(
+                  width: 1,
+                  color: "#5D6666".toColor(),
+                ),
+                borderRadius: BorderRadius.circular(3),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -189,7 +207,7 @@ class _DeviceListViewState extends State<DeviceListView> {
                         padding: const EdgeInsets.only(
                             top: 3, bottom: 3, left: 24, right: 24),
                         margin: const EdgeInsets.only(top: 2),
-                        radius: 0,
+                        radius: 3,
                         onTap: () {
                           model.bindEventAction();
                         },
@@ -197,7 +215,9 @@ class _DeviceListViewState extends State<DeviceListView> {
                       const SizedBox(width: 12),
                     ],
                   ),
-                  Expanded(child: deviceShowList1(model.deviceNoBindingData),),
+                  Expanded(
+                    child: deviceShowList1(model.deviceNoBindingData),
+                  ),
                 ],
               ),
             ),
@@ -229,7 +249,12 @@ class _DeviceListViewState extends State<DeviceListView> {
               height: 126,
               width: double.infinity,
               decoration: BoxDecoration(
-                  border: Border.all(width: 1, color: "#5D6666".toColor())),
+                border: Border.all(
+                  width: 1,
+                  color: "#5D6666".toColor(),
+                ),
+                borderRadius: BorderRadius.circular(3),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -254,7 +279,7 @@ class _DeviceListViewState extends State<DeviceListView> {
                         padding: const EdgeInsets.only(
                             top: 3, bottom: 3, left: 24, right: 24),
                         margin: const EdgeInsets.only(top: 2),
-                        radius: 0,
+                        radius: 3,
                         onTap: () {
                           model.bindEventAction();
                         },
@@ -262,7 +287,9 @@ class _DeviceListViewState extends State<DeviceListView> {
                       const SizedBox(width: 12),
                     ],
                   ),
-                  Expanded(child: deviceShowList1(model.deviceNoBindingData),),
+                  Expanded(
+                    child: deviceShowList1(model.deviceNoBindingData),
+                  ),
                 ],
               ),
             ),
@@ -271,7 +298,6 @@ class _DeviceListViewState extends State<DeviceListView> {
       ),
     );
   }
-
 
   //没有搜索时的视图
   Widget noSearchStateView(SearchDeviceViewModel model) {
@@ -302,7 +328,7 @@ class _DeviceListViewState extends State<DeviceListView> {
               horizontal: 24,
               vertical: 6,
             ),
-            radius: 0,
+            radius: 3,
             onTap: model.selectedInstance != null
                 ? () {
                     model.scanStartEventAction();
@@ -423,6 +449,11 @@ class _DeviceListViewState extends State<DeviceListView> {
               height: 76, // 固定高度
               decoration: BoxDecoration(
                 border: Border.all(width: 1, color: "#5D6666".toColor()),
+                borderRadius: BorderRadius.circular(3),
+                boxShadow: [
+                  BoxShadow(
+                      color: '#82FFFC'.toColor(opacity: .05), spreadRadius: 1),
+                ],
               ),
               child: Column(
                 children: [

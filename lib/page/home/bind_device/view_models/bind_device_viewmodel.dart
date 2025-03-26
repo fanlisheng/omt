@@ -26,14 +26,19 @@ class BindDeviceViewModel extends BaseViewModelRefresh<dynamic> {
 
   //全选中
   bool selected = false;
+
   //选中的数量
   int selectedCount = 0;
+
   //大门号
   IdNameValue? selectedDoor;
+
   //页面状态
   BindDevicePageState pageState = BindDevicePageState.idle;
+
   //提交后显示的text
   String showText = "";
+
   //添加成功，用户记录添加成功过，返回后刷新
   bool addSuccess = false;
 
@@ -99,22 +104,25 @@ class BindDeviceViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   //成功返回
-  goBackEventAction() {
-    // context!.pop();
-    // IntentUtils.share.popResultOk(context!);
-    if(deviceData.isNotEmpty){
-      if(pageState == BindDevicePageState.idle){
-        IntentUtils.share.pop(context!);
-      }else{
-        pageState = BindDevicePageState.idle;
-        notifyListeners();
-      }
-    }else{
-      if (addSuccess) {
+  void goBackEventAction() {
+    // 统一处理返回逻辑
+    void handlePop({required bool success}) {
+      if (success) {
         IntentUtils.share.popResultOk(context!);
       } else {
         IntentUtils.share.pop(context!);
       }
+    }
+
+    if (deviceData.isNotEmpty) {
+      if (pageState == BindDevicePageState.idle) {
+        handlePop(success: addSuccess);
+      } else {
+        pageState = BindDevicePageState.idle;
+        notifyListeners();
+      }
+    } else {
+      handlePop(success: addSuccess);
     }
   }
 
@@ -129,8 +137,8 @@ class BindDeviceViewModel extends BaseViewModelRefresh<dynamic> {
       selectedDevices =
           deviceData.where((device) => device.selected ?? false).toList();
     }
-    if(selectedDevices.isEmpty){
-      LoadingUtils.showToast( data: "没有选中的设备，请选择需要绑定的设备!");
+    if (selectedDevices.isEmpty) {
+      LoadingUtils.showToast(data: "没有选中的设备，请选择需要绑定的设备!");
       return;
     }
 
@@ -180,7 +188,8 @@ class BindDeviceViewModel extends BaseViewModelRefresh<dynamic> {
       showText = "实例、$deviceTypeString绑定关系IOT绑定$stateText";
     } else {
       // 有多种类型且包含摄像头
-      showText= '摄像头、实例绑定关系业务平台绑定$stateText\n实例、$deviceTypeString绑定关系IOT绑定$stateText';
+      showText =
+          '摄像头、实例绑定关系业务平台绑定$stateText\n实例、$deviceTypeString绑定关系IOT绑定$stateText';
     }
   }
 }

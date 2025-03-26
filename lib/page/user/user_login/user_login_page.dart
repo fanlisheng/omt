@@ -7,6 +7,7 @@ import 'package:omt/utils/color_utils.dart';
 import 'package:omt/utils/sys_utils.dart';
 import 'package:omt/widget/combobox.dart';
 import 'package:omt/widget/lib/register_ver_button.dart';
+import '../../../theme.dart';
 import 'user_login_view_model.dart';
 
 ///
@@ -41,6 +42,7 @@ class UserLoginPage extends StatelessWidget {
           return ui.FluentTheme(
             data: FluentThemeData(
               brightness: Brightness.light, // 强制此页面为亮色模式
+              accentColor: AppTheme().color,
             ),
             child: Row(
               children: [
@@ -134,6 +136,7 @@ class UserLoginPage extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 12.0,
                   ),
+                  cursorColor: ui.Colors.teal,
                   decoration: ui.WidgetStatePropertyAll(
                       BoxDecoration(color: "#EEF6F5".toColor())),
                 ),
@@ -141,9 +144,11 @@ class UserLoginPage extends StatelessWidget {
                 ui.TextBox(
                   placeholder: '请输入密码',
                   controller: model.pwdController,
+                  obscureText: true,
                   style: const TextStyle(
                     fontSize: 12.0,
                   ),
+                  cursorColor: ui.Colors.teal,
                   decoration: ui.WidgetStatePropertyAll(
                       BoxDecoration(color: "#EEF6F5".toColor())),
                 ),

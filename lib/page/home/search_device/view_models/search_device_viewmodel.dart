@@ -143,6 +143,9 @@ class SearchDeviceViewModel extends BaseViewModel {
     stopScanning = false;
     notifyListeners();
 
+    // 记录开始时间
+    final startTime = DateTime.now();
+
     // 使用状态服务扫描设备
     DeviceSearchResult result = await _searchService.scanAndProcessDevices(
       instanceId: selectedInstance?.id,
@@ -157,6 +160,15 @@ class SearchDeviceViewModel extends BaseViewModel {
     deviceNoBindingData = result.unboundDevices;
 
     notifyListeners();
+
+    // 记录结束时间并计算耗时
+    final endTime = DateTime.now();
+    final duration = endTime.difference(startTime);
+
+// 打印分钟和秒
+    final minutes = duration.inMinutes;
+    final seconds = duration.inSeconds % 60;
+    print('扫描总耗时: $minutes分 $seconds秒');
   }
 
   //扫描停止事件

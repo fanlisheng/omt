@@ -32,95 +32,103 @@ class DetailAiView extends StatelessWidget {
   Widget aiView(DetailAiViewModel model) {
     return Column(
       children: [
-        Expanded(child:  Container(
-          margin: const EdgeInsets.only(left: 16, right: 16),
-          padding:
-          const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),
-          color: ColorUtils.colorBackgroundLine,
-          width: double.infinity,
-          child: ListView(
-            // crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "AI设备信息",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: ColorUtils.colorGreenLiteLite,
-                  fontWeight: FontWeight.w500,
+        Expanded(
+          child: Container(
+            margin: const EdgeInsets.only(left: 16, right: 16),
+            padding:
+                const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),
+            decoration: BoxDecoration(
+              color: ColorUtils.colorBackgroundLine,
+                borderRadius: BorderRadius.circular(3),
+            ),
+            width: double.infinity,
+            child: ListView(
+              // crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "AI设备信息",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: ColorUtils.colorGreenLiteLite,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  RowItemInfoView(
-                      name: "实例", value: model.deviceInfo.instanceName),
-                  RowItemInfoView(
-                      name: "大门编号", value: model.deviceInfo.gateName),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  RowItemInfoView(
-                      name: "进/出口", value: model.deviceInfo.passName),
-                  RowItemInfoView(
-                      name: "标签", value: model.deviceInfo.labelName),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  RowItemInfoView(
-                      name: "AI设备编码", value: model.deviceInfo.deviceCode),
-                  RowItemInfoView(name: "IP地址", value: model.deviceInfo.ip),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  RowItemInfoView(
-                    name: "主程版本",
-                    value: model.deviceInfo.programVersion,
-                    // buttonName: "升级",
-                    // buttonAction: () {
-                    //   LogUtils.info(msg: "点击--主程版本-升级");
-                    // },
-                  ),
-                  RowItemInfoView(
-                    name: "识别版本",
-                    value: model.deviceInfo.identityVersion,
-                    // buttonName: "升级",
-                    // buttonAction: () {
-                    //   LogUtils.info(msg: "点击--识别版本-升级");
-                    // },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  RowItemInfoView(
-                      name: "摄像头编码", value: model.deviceInfo.cameraDeviceCode),
-                  RowItemInfoView(
-                    name: "IOT连接状态",
-                    value: model.deviceInfo.iotConnectStatus,
-                    hasState: true,
-                    stateColor: model.deviceInfo.iotConnectStatus == "连接成功"
-                        ? ColorUtils.colorGreen
-                        : ColorUtils.colorRed,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-            ],
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    RowItemInfoView(
+                        name: "实例", value: model.deviceInfo.instanceName),
+                    RowItemInfoView(
+                        name: "大门编号", value: model.deviceInfo.gateName),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    RowItemInfoView(
+                        name: "进/出口", value: model.deviceInfo.passName),
+                    RowItemInfoView(
+                        name: "标签", value: model.deviceInfo.labelName),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    RowItemInfoView(
+                        name: "AI设备编码", value: model.deviceInfo.deviceCode),
+                    RowItemInfoView(name: "IP地址", value: model.deviceInfo.ip),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    RowItemInfoView(
+                      name: "主程版本",
+                      value: model.deviceInfo.programVersion,
+                      // buttonName: "升级",
+                      // buttonAction: () {
+                      //   LogUtils.info(msg: "点击--主程版本-升级");
+                      // },
+                    ),
+                    RowItemInfoView(
+                      name: "识别版本",
+                      value: model.deviceInfo.identityVersion,
+                      // buttonName: "升级",
+                      // buttonAction: () {
+                      //   LogUtils.info(msg: "点击--识别版本-升级");
+                      // },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    RowItemInfoView(
+                        name: "摄像头编码",
+                        value: model.deviceInfo.cameraDeviceCode),
+                    RowItemInfoView(
+                      name: "IOT连接状态",
+                      value: model.deviceInfo.iotConnectStatus,
+                      hasState: true,
+                      stateColor: model.deviceInfo.iotConnectStatus == "连接成功"
+                          ? ColorUtils.colorGreen
+                          : ColorUtils.colorRed,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+              ],
+            ),
           ),
-        ),),
-        const SizedBox(height: 20,),
+        ),
+        const SizedBox(
+          height: 20,
+        ),
         const Row(
           children: [
             SizedBox(
@@ -193,7 +201,7 @@ class RowItemInfoView extends StatelessWidget {
             child: Container(
               width: 6,
               height: 6,
-              margin: const EdgeInsets.only(right: 5,top: 6),
+              margin: const EdgeInsets.only(right: 5, top: 6),
               decoration: BoxDecoration(
                   borderRadius: const BorderRadius.all(Radius.circular(3)),
                   color: stateColor ?? ColorUtils.colorRed),
