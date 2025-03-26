@@ -10,12 +10,12 @@ list(APPEND FLUTTER_PLUGIN_LIST
   flutter_volume_controller
   media_kit_libs_windows_video
   media_kit_video
+  screen_brightness_windows
   screen_retriever
   share_plus
   syncfusion_pdfviewer_windows
   system_theme
   url_launcher_windows
-  volume_controller
   window_manager
 )
 

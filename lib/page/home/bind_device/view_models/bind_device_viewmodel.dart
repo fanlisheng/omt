@@ -124,13 +124,19 @@ class BindDeviceViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   void request() {
-    pageState = BindDevicePageState.loading;
-    notifyListeners();
     List<DeviceEntity> selectedDevices = [];
     if (deviceData.isNotEmpty) {
       selectedDevices =
           deviceData.where((device) => device.selected ?? false).toList();
     }
+    if(selectedDevices.isEmpty){
+      LoadingUtils.showToast( data: "没有选中的设备，请选择需要绑定的设备!");
+      return;
+    }
+
+    pageState = BindDevicePageState.loading;
+    notifyListeners();
+
     HttpQuery.share.homePageService.bindGate(
         instanceId: instance.id ?? "",
         gateId: selectedDoor?.id ?? 0,
