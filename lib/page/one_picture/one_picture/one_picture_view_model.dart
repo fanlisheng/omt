@@ -730,8 +730,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
     if (oData == null) {
       theHoverOnePictureDataData = null;
       notifyListeners();
-    }
-    if (theHoverOnePictureDataData != oData) {
+    } else if (theHoverOnePictureDataData != oData) {
       theHoverOnePictureDataData = oData;
       notifyListeners();
     }
