@@ -25,13 +25,15 @@ enum StepNumber {
 }
 
 class DeviceAddViewModel extends BaseViewModelRefresh<dynamic> {
-  final int id;
-   DeviceType deviceType;
-  DeviceAddViewModel(this.id, this.deviceType);
+  // 父节点code
+  final String pNodeCode;
+
+  DeviceAddViewModel(this.pNodeCode,);
 
   //第几步
   StepNumber stepNumber = StepNumber.first;
-
+  //设备类型
+  DeviceType? deviceType;
   //电源类型
   String portType = "";
   List portTypes = ["显示进口", "出口", "共用进出口"];
@@ -51,6 +53,7 @@ class DeviceAddViewModel extends BaseViewModelRefresh<dynamic> {
       IdNameValue(id: 4, name: "电源箱"),
       IdNameValue(id: 5, name: "交换机"),
       IdNameValue(id: 6, name: "电池"),
+      IdNameValue(id: 7, name: "路由器"),
     ];
   }
 

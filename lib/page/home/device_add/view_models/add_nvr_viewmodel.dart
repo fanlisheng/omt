@@ -2,6 +2,8 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
+import 'package:omt/bean/common/code_data.dart';
+import 'package:omt/http/http_query.dart';
 import '../../../../bean/home/home_page/device_entity.dart';
 import 'device_add_viewmodel.dart';
 
@@ -64,5 +66,32 @@ class AddNvrViewModel extends BaseViewModelRefresh<dynamic> {
   ///点击事件
   refreshEventAction(){
 
+  }
+
+  // 安装NVR设备
+  installNvr({
+    String? pNodeCode,
+    required String deviceCode,
+    required String ip,
+    required String mac,
+    String? instanceId,
+    int? gateId,
+    int? passId,
+  }) {
+    HttpQuery.share.installService.nvrInstall(
+      pNodeCode: pNodeCode,
+      deviceCode: deviceCode,
+      ip: ip,
+      mac: mac,
+      instanceId: instanceId,
+      gateId: gateId,
+      passId: passId,
+      onSuccess: (data) {
+        LoadingUtils.showToast(data: 'NVR安装成功');
+      },
+      onError: (error) {
+        LoadingUtils.showToast(data: 'NVR安装失败: $error');
+      }
+    );
   }
 }

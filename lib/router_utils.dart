@@ -179,8 +179,7 @@ Route<dynamic> generateRoute(RouteSettings settings, {uniqueId}) {
           settings: settings,
           builder: (context) {
             return DeviceAddScreen(
-              id: arguments["id"],
-              deviceType: arguments["type"],
+              pNodeCode: arguments["pNodeCode"],
             );
           });
 

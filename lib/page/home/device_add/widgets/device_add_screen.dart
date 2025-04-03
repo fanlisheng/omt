@@ -17,16 +17,17 @@ import '../view_models/device_add_viewmodel.dart';
 import '../view_models/second_step_viewmodel.dart';
 
 class DeviceAddScreen extends StatelessWidget {
-  final int id;
-  final DeviceType deviceType;
+  // 父节点code
+  final String pNodeCode;
+  // final DeviceType deviceType;
 
   const DeviceAddScreen(
-      {super.key, required this.id, required this.deviceType});
+      {super.key, required this.pNodeCode});
 
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<DeviceAddViewModel>(
-        model: DeviceAddViewModel(id, deviceType)..themeNotifier = true,
+        model: DeviceAddViewModel(pNodeCode)..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
           bool complete = //步骤四，步骤三中 ai和 camera 为完成
@@ -101,12 +102,12 @@ class DeviceAddScreen extends StatelessWidget {
           return FirstStepView(model: model);
         case StepNumber.second:
           return SecondStepView(
-              model: SecondStepViewModel()..deviceType = model.deviceType);
+              model: SecondStepViewModel()..deviceType = model.deviceType!);
         case StepNumber.third:
-          var a = ThirdFourStepViewModel(deviceType: model.deviceType, stepNumber: model.stepNumber);
+          var a = ThirdFourStepViewModel(deviceType: model.deviceType!, stepNumber: model.stepNumber);
           return ThirdFourStepView(model: a,);
         case StepNumber.four:
-          var a = ThirdFourStepViewModel(deviceType: model.deviceType, stepNumber: model.stepNumber);
+          var a = ThirdFourStepViewModel(deviceType: model.deviceType!, stepNumber: model.stepNumber);
           return ThirdFourStepView(model: a,);
       }
       return FirstStepView(model: model);

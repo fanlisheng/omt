@@ -73,6 +73,14 @@ DeviceDetailAiData $DeviceDetailAiDataFromJson(Map<String, dynamic> json) {
   if (iotConnectStatus != null) {
     deviceDetailAiData.iotConnectStatus = iotConnectStatus;
   }
+  final String? serverHost = jsonConvert.convert<String>(json['server_host']);
+  if (serverHost != null) {
+    deviceDetailAiData.serverHost = serverHost;
+  }
+  final String? mac = jsonConvert.convert<String>(json['mac']);
+  if (mac != null) {
+    deviceDetailAiData.mac = mac;
+  }
   return deviceDetailAiData;
 }
 
@@ -88,6 +96,8 @@ Map<String, dynamic> $DeviceDetailAiDataToJson(DeviceDetailAiData entity) {
   data['identity_version'] = entity.identityVersion;
   data['camera_device_code'] = entity.cameraDeviceCode;
   data['iot_connect_status'] = entity.iotConnectStatus;
+  data['server_host'] = entity.serverHost;
+  data['mac'] = entity.mac;
   return data;
 }
 
@@ -103,6 +113,8 @@ extension DeviceDetailAiDataExtension on DeviceDetailAiData {
     String? identityVersion,
     String? cameraDeviceCode,
     String? iotConnectStatus,
+    String? serverHost,
+    String? mac,
   }) {
     return DeviceDetailAiData()
       ..instanceName = instanceName ?? this.instanceName
@@ -114,6 +126,8 @@ extension DeviceDetailAiDataExtension on DeviceDetailAiData {
       ..programVersion = programVersion ?? this.programVersion
       ..identityVersion = identityVersion ?? this.identityVersion
       ..cameraDeviceCode = cameraDeviceCode ?? this.cameraDeviceCode
-      ..iotConnectStatus = iotConnectStatus ?? this.iotConnectStatus;
+      ..iotConnectStatus = iotConnectStatus ?? this.iotConnectStatus
+      ..serverHost = serverHost ?? this.serverHost
+      ..mac = mac ?? this.mac;
   }
 }

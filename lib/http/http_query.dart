@@ -1,5 +1,6 @@
 import 'package:omt/http/service/camera/camera_configuration_service.dart';
 import 'package:omt/http/service/fileService/fileService.dart';
+import 'package:omt/http/service/install/install_service.dart';
 import 'package:omt/http/service/label_management/label_management_service.dart';
 import 'package:omt/http/service/user/user_login/user_login_service.dart';
 import 'package:omt/http/service/home/home_page/home_page_service.dart';
@@ -33,6 +34,7 @@ class HttpQuery {
   late LabelManagementService labelManagementService;
   late VideoConfigurationService videoConfigurationService;
   late CameraConfigurationService cameraConfigurationService;
+  late InstallService installService;
 
   late OnePictureService onePictureService;
   ///ReplaceServiceDefine
@@ -45,6 +47,7 @@ class HttpQuery {
     labelManagementService = LabelManagementService();
     videoConfigurationService = VideoConfigurationService();
     cameraConfigurationService = CameraConfigurationService();
+    installService = InstallService();
 
     onePictureService = OnePictureService();
     ///ReplaceServiceImplementation

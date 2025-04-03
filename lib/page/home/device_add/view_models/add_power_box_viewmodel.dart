@@ -2,6 +2,8 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
+import 'package:omt/bean/common/code_data.dart';
+import 'package:omt/http/http_query.dart';
 import '../../../../bean/home/home_page/device_entity.dart';
 import 'device_add_viewmodel.dart';
 
@@ -67,5 +69,53 @@ class AddPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
   @override
   loadData({onSuccess, onCache, onError}) {
     ///网络请求
+  }
+
+  // 安装电源箱
+  installPowerBox({
+    String? pNodeCode,
+    required String deviceCode,
+    required String ip,
+    required String mac,
+    String? instanceId,
+    int? gateId,
+    int? passId,
+  }) {
+    HttpQuery.share.installService.powerBoxInstall(
+      pNodeCode: pNodeCode,
+      deviceCode: deviceCode,
+      ip: ip,
+      mac: mac,
+      instanceId: instanceId,
+      gateId: gateId,
+      passId: passId,
+      onSuccess: (data) {
+        LoadingUtils.showToast(data: '电源箱安装成功');
+      },
+      onError: (error) {
+        LoadingUtils.showToast(data: '电源箱安装失败: $error');
+      }
+    );
+  }
+
+  // 安装电源信息
+  installPower({
+    String? pNodeCode,
+    String? instanceId,
+    int? gateId,
+    int? passId,
+  }) {
+    HttpQuery.share.installService.powerInstall(
+      pNodeCode: pNodeCode,
+      instanceId: instanceId,
+      gateId: gateId,
+      passId: passId,
+      onSuccess: (data) {
+        LoadingUtils.showToast(data: '电源信息安装成功');
+      },
+      onError: (error) {
+        LoadingUtils.showToast(data: '电源信息安装失败: $error');
+      }
+    );
   }
 }

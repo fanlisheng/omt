@@ -45,7 +45,7 @@ class FirstStepView extends StatelessWidget {
                   ),
                   SizedBox(width: 2),
                   Text(
-                    "进/出口",
+                    "设备类型",
                     style: TextStyle(
                       fontSize: 12,
                       color: ColorUtils.colorWhite,
@@ -75,7 +75,7 @@ class FirstStepView extends StatelessWidget {
                   model.notifyListeners();
                 },
                 placeholder: const Text(
-                  "请选择进/出口",
+                  "请选择设备类型",
                   textAlign: TextAlign.start,
                   style: TextStyle(
                       fontSize: 12, color: ColorUtils.colorBlackLiteLite),

@@ -40,6 +40,9 @@ class DeviceDetailAiData {
 	String? cameraDeviceCode;
 	@JSONField(name: "iot_connect_status")
 	String? iotConnectStatus;
+	@JSONField(name: "server_host")
+	String? serverHost;
+	String? mac;
 
 	DeviceDetailAiData();
 

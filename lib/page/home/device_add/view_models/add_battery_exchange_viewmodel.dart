@@ -1,5 +1,7 @@
 import 'package:kayo_package/kayo_package.dart';
 import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
+import 'package:omt/bean/common/code_data.dart';
+import 'package:omt/http/http_query.dart';
 import 'device_add_viewmodel.dart';
 
 class AddBatteryExchangeViewModel extends BaseViewModelRefresh<dynamic> {
@@ -32,4 +34,63 @@ class AddBatteryExchangeViewModel extends BaseViewModelRefresh<dynamic> {
     ///网络请求
   }
 
+  // 安装交换机
+  installSwitch({
+    String? pNodeCode,
+    required String deviceCode,
+    required String ip,
+    required String mac,
+    required String interfaceNum,
+    required String powerMethod,
+    String? instanceId,
+    int? gateId,
+    int? passId,
+  }) {
+    HttpQuery.share.installService.switchInstall(
+      pNodeCode: pNodeCode,
+      deviceCode: deviceCode,
+      ip: ip,
+      mac: mac,
+      interfaceNum: interfaceNum,
+      powerMethod: powerMethod,
+      instanceId: instanceId,
+      gateId: gateId,
+      passId: passId,
+      onSuccess: (data) {
+        LoadingUtils.showToast(data: '交换机安装成功');
+      },
+      onError: (error) {
+        LoadingUtils.showToast(data: '交换机安装失败: $error');
+      }
+    );
+  }
+
+  // 安装路由器
+  installRouter({
+    String? pNodeCode,
+    required String deviceCode,
+    required String ip,
+    required String mac,
+    required int type,
+    String? instanceId,
+    int? gateId,
+    int? passId,
+  }) {
+    HttpQuery.share.installService.routerInstall(
+      pNodeCode: pNodeCode,
+      deviceCode: deviceCode,
+      ip: ip,
+      mac: mac,
+      type: type,
+      instanceId: instanceId,
+      gateId: gateId,
+      passId: passId,
+      onSuccess: (data) {
+        LoadingUtils.showToast(data: '路由器安装成功');
+      },
+      onError: (error) {
+        LoadingUtils.showToast(data: '路由器安装失败: $error');
+      }
+    );
+  }
 }

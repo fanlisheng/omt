@@ -127,7 +127,7 @@ class OnePictureDataData {
   }
 
   bool get showAddBtn {
-    return false;
+    // return false;
     if ((type == OnePictureType.DM.index && children.length == 1) ||
         (type == OnePictureType.JCK.index && showBorder)) {
       return true;

@@ -671,7 +671,12 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
   }
 
   void onTapItemNew(OnePictureDataData? data) {
-    print('onTapItemNew ${data?.id}');
+    if (data == null) {
+      return;
+    }
+    IntentUtils.share.push(context,
+        routeName: RouterPage.DeviceAddPage,
+        data: {"pNodeCode": data.nodeCode});
   }
 
   void _powerSub(OnePictureDataData opd,

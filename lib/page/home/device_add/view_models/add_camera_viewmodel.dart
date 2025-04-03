@@ -4,7 +4,9 @@ import 'package:kayo_package/kayo_package.dart';
 import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
+import 'package:omt/bean/common/code_data.dart';
 import 'package:omt/bean/home/home_page/camera_device_entity.dart';
+import 'package:omt/http/http_query.dart';
 import '../../../../bean/home/home_page/device_entity.dart';
 import 'device_add_viewmodel.dart';
 
@@ -81,5 +83,30 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
   //编辑
   editEventAction(int index){
     notifyListeners();
+  }
+
+  // 安装AI设备和摄像头
+  installAiDeviceAndCamera({
+    String? pNodeCode,
+    String? instanceId,
+    int? gateId,
+    int? passId,
+    required Map<String, dynamic> aiDevice,
+    required Map<String, dynamic> camera,
+  }) {
+    HttpQuery.share.installService.aiDeviceCameraInstall(
+      pNodeCode: pNodeCode,
+      instanceId: instanceId,
+      gateId: gateId,
+      passId: passId,
+      aiDevice: aiDevice,
+      camera: camera,
+      onSuccess: (data) {
+        LoadingUtils.showToast(data: '安装成功');
+      },
+      onError: (error) {
+        LoadingUtils.showToast(data: '安装失败: $error');
+      }
+    );
   }
 }

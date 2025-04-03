@@ -175,11 +175,20 @@ class HomePageService {
   }
 
   deviceDetailAi({
-    required String nodeCode,
+    String? nodeCode,
+    String? deviceCode,
     required ValueChanged<DeviceDetailAiData?> onSuccess,
     ValueChanged<DeviceDetailAiData?>? onCache,
     ValueChanged<String>? onError,
   }) async {
+    Map<String, dynamic> params = {};
+
+    if (nodeCode != null) {
+      params["node_code"] = deviceCode;
+    }
+    if (deviceCode != null) {
+      params["device_code"] = deviceCode;
+    }
     HttpManager.share.doHttpPost<DeviceDetailAiData>(
       await _deviceDetailAi,
       {
