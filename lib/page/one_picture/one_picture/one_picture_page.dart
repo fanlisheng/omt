@@ -141,10 +141,13 @@ class OnePicturePageState extends State<OnePicturePage> {
                       model: model, data: e, graph: graph, builder: builder);
                 }).toList(),
               ).addDashBorder(
-                  color: (onePictureDataData.isCurrentNet != true?'#888888': '#347979').toColor(),
+                  color: (onePictureDataData.isCurrentNet != true
+                          ? '#888888'
+                          : '#347979')
+                      .toColor(),
                   width: 1,
                   dash: onePictureDataData.showDash,
-                  padding: EdgeInsets.only(right: 20,bottom: 20),
+                  padding: EdgeInsets.only(right: 20, bottom: 20),
                   margin: const EdgeInsets.only(
                       left: 16, right: 16, top: 16, bottom: 16),
                   borderRadius: 4.0),
@@ -197,8 +200,7 @@ class OnePicturePageState extends State<OnePicturePage> {
         ..nodeSeparation = (24)
         ..levelSeparation = (70)
         ..orientation = SugiyamaConfiguration.ORIENTATION_TOP_BOTTOM
-        ..coordinateAssignment = CoordinateAssignment.Left
-      ;
+        ..coordinateAssignment = CoordinateAssignment.Left;
     }
 
     if (addNewGraph) {
@@ -273,22 +275,22 @@ class OnePicturePageState extends State<OnePicturePage> {
         // data.setBorder();
         if (data.showBorder == false) {
           return Container(
-                   child: Column(children: [
-                    // !(data?.showName ?? true)
-                    //     ? SizedBox.shrink()
-                    //     : TextView(data?.showNameText, size: _titleSize()),
-                    Container(
-                         // decoration: data.getChildList().length > 0
-                         //    ? null
-                         //    : BoxDecoration(
-                         //        border: Border.all(
-                         //            color: '#347979'.toColor(), width: 1),
-                         //        borderRadius: BorderRadius.circular(4)),
-                        child: Container(child: cW)),
-                    (data?.showDesc ?? '').isEmpty
-                        ? SizedBox.shrink()
-                        : TextView(data?.showDesc),
-                  ]))
+                  child: Column(children: [
+            // !(data?.showName ?? true)
+            //     ? SizedBox.shrink()
+            //     : TextView(data?.showNameText, size: _titleSize()),
+            Container(
+                // decoration: data.getChildList().length > 0
+                //    ? null
+                //    : BoxDecoration(
+                //        border: Border.all(
+                //            color: '#347979'.toColor(), width: 1),
+                //        borderRadius: BorderRadius.circular(4)),
+                child: Container(child: cW)),
+            (data?.showDesc ?? '').isEmpty
+                ? SizedBox.shrink()
+                : TextView(data?.showDesc),
+          ]))
               .addRightIcon(
                   onTap: data?.showAddBtn != true
                       ? null
@@ -296,15 +298,15 @@ class OnePicturePageState extends State<OnePicturePage> {
                           model.onTapItemNew(data);
                         })
               .addDashBorder(
-                  color:  (data.isCurrentNet != true?'#888888': '#347979').toColor(),
+                  color: (data.isCurrentNet != true ? '#888888' : '#347979')
+                      .toColor(),
                   width: 1,
                   dash: data.getChildList().length > 0,
                   margin:
                       EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 16),
                   padding:
                       EdgeInsets.only(left: 0, right: 0, top: 0, bottom: 0),
-                  borderRadius: 4.0)
-          ;
+                  borderRadius: 4.0);
         } else {
           if (data.showBorder == true) {}
           if (data.ignore == true) {}
@@ -358,7 +360,10 @@ class OnePicturePageState extends State<OnePicturePage> {
                                   model.onTapItemNew(data);
                                 })
                       .addDashBorder(
-                          color: (data.isCurrentNet != true?'#888888': '#347979').toColor(),
+                          color: (data.isCurrentNet != true
+                                  ? '#888888'
+                                  : '#347979')
+                              .toColor(),
                           width: 1,
                           dash: data.getChildList().length > 0,
                           margin: EdgeInsets.only(
@@ -369,38 +374,67 @@ class OnePicturePageState extends State<OnePicturePage> {
             : _item(data));
   }
 
-  Container _item(OnePictureDataData? oData) {
-    return Container(
-        padding: const EdgeInsets.only(left: 8,right: 8,top: 8,bottom: 8),
-        margin: const EdgeInsets.only(top: 8, bottom: 8, left: 8, right: 8),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(4),
-          border: Border.all(color: '#82FFFC'.toColor(opacity: .1)),
-          boxShadow: [
-            BoxShadow(color: '#82FFFC'.toColor(opacity: .05), spreadRadius: 1),
-          ],
-        ),
-        child: Column(
-          children: [
-            (oData?.icon ?? '').isEmpty
-                ? SizedBox.shrink()
-                : ImageView(
-                    src: oData?.icon,
-                    height: 22,
-                    width: 22,
-                  ),
-            TextView(
-              '${oData?.showNameText}',
-              color: '#30E7E3'.toColor(),
-              size: oData?.type == OnePictureType.SL.index ? 18 : 14,
-              fontWeight: FontWeight.w500,
-            ),
-            SizedBox(height: 0,child: TextView('252.255.235.235',size: 12,)),
-            (oData?.showDesc ?? '').isEmpty
-                ? SizedBox.shrink()
-                : Text(oData?.showDesc ?? '',style: TextStyle(fontSize: 12),),
-          ],
-        ));
+  Widget _item(OnePictureDataData? oData) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (event) {
+        viewModel?.setHover(oData);
+        // LogUtils.info(tag: 'MouseRegion', msg: 'Mouse entered the region');
+      },
+      onExit: (event) {
+        // LogUtils.info(tag: 'MouseRegion', msg: 'Mouse exited the region');
+        viewModel?.setHover(null);
+      },
+      onHover: (event) {
+        // LogUtils.info(tag: 'MouseRegion', msg: 'Mouse is hovering over the region');
+      },
+      child: Container(
+          padding: const EdgeInsets.only(left: 8, right: 8, top: 8, bottom: 8),
+          margin: const EdgeInsets.only(top: 8, bottom: 8, left: 8, right: 8),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(
+                color: viewModel?.theHoverOnePictureDataData == oData
+                    ? '#82FFFC'.toColor(opacity: .2)
+                    : '#82FFFC'.toColor(opacity: .1)),
+            boxShadow: [
+              BoxShadow(
+                  color: viewModel?.theHoverOnePictureDataData == oData
+                      ? '#82FFFC'.toColor(opacity: .2)
+                      : '#82FFFC'.toColor(opacity: .05),
+                  spreadRadius: 1),
+            ],
+          ),
+          child: Column(
+            children: [
+              (oData?.icon ?? '').isEmpty
+                  ? SizedBox.shrink()
+                  : ImageView(
+                      src: oData?.icon,
+                      height: 22,
+                      width: 22,
+                    ),
+              TextView(
+                '${oData?.showNameText}',
+                color: '#30E7E3'.toColor(),
+                size: oData?.type == OnePictureType.SL.index ? 18 : 14,
+                fontWeight: FontWeight.w500,
+              ),
+              SizedBox(
+                  height: 0,
+                  child: TextView(
+                    '252.255.235.235',
+                    size: 12,
+                  )),
+              (oData?.showDesc ?? '').isEmpty
+                  ? SizedBox.shrink()
+                  : Text(
+                      oData?.showDesc ?? '',
+                      style: TextStyle(fontSize: 12),
+                    ),
+            ],
+          )),
+    );
   }
 
   refresh({
@@ -428,7 +462,7 @@ extension on Widget {
     if (dash) {
       var customPaint = CustomPaint(
         painter: DashedBorderPainter(
-            color: color, borderRadius: borderRadius,strokeWidth: width),
+            color: color, borderRadius: borderRadius, strokeWidth: width),
         child:
             Padding(padding: padding ?? EdgeInsets.only(top: 0), child: this),
       );

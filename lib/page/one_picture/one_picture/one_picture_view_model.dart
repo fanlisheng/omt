@@ -48,6 +48,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
   OnePictureDataData? onePictureHttpData;
 
   OnePictureDataData? theOnePictureDataData;
+  OnePictureDataData? theHoverOnePictureDataData;
 
   Map<String, OnePictureDataData> dataMap = {};
 
@@ -239,15 +240,19 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
           }
         }
 
-        var jckElements = data.children
-            .where((e) => e.type == OnePictureType.JCK.index)
-            .toList();
-        data.children.removeWhere((e) => e.type == OnePictureType.JCK.index);
-        data.children.insertAll(0, jckElements);
-        if (jckElements.length > 1) {
-          for (var i = 1; i < jckElements.length; i++) {
-            var jckElement = jckElements[i];
-            data.children.add(jckElement);
+        if (data.children.isNotEmpty) {
+          var jckElements = data.children
+              .where((e) => e.type == OnePictureType.JCK.index)
+              .toList();
+          data.children.removeWhere((e) => e.type == OnePictureType.JCK.index);
+          if (jckElements.isNotEmpty) {
+            data.children.insert(0, jckElements[0]);
+          }
+          if (jckElements.length > 1) {
+            for (var i = 1; i < jckElements.length; i++) {
+              var jckElement = jckElements[i];
+              data.children.add(jckElement);
+            }
           }
         }
 
@@ -723,6 +728,16 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
     }
     if (lyq?.isNotEmpty == true) {
       opd.nextList.addAll(lyq!);
+    }
+  }
+
+  void setHover(OnePictureDataData? oData) {
+    if (oData == null) {
+      theHoverOnePictureDataData = null;
+      notifyListeners();
+    } else if (theHoverOnePictureDataData != oData) {
+      theHoverOnePictureDataData = oData;
+      notifyListeners();
     }
   }
 }
