@@ -8,26 +8,15 @@ import '../view_models/add_battery_exchange_viewmodel.dart';
 import '../view_models/device_add_viewmodel.dart';
 
 class AddBatteryExchangeView extends StatelessWidget {
-  final DeviceType deviceType;
-  final StepNumber stepNumber;
-  final bool? isInstall; //是安装 默认否
-
-  const AddBatteryExchangeView(this.deviceType, this.stepNumber,
-      {super.key, this.isInstall});
+  final DeviceAddViewModel model;
+  const AddBatteryExchangeView({super.key, required this.model});
 
   @override
   Widget build(BuildContext context) {
-    return ProviderWidget<AddBatteryExchangeViewModel>(
-        model: AddBatteryExchangeViewModel(
-            deviceType, stepNumber, isInstall ?? false)
-          ..themeNotifier = true,
-        autoLoadData: true,
-        builder: (context, model, child) {
-          return contentView(model);
-        });
+    return contentView(model);
   }
 
-  Column contentView(AddBatteryExchangeViewModel model) {
+  Column contentView(DeviceAddViewModel model) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -60,7 +49,7 @@ class AddBatteryExchangeView extends StatelessWidget {
     );
   }
 
-  List<Widget> batteryView(AddBatteryExchangeViewModel model) {
+  List<Widget> batteryView(DeviceAddViewModel model) {
     return [
       const SizedBox(height: 10),
       const RowTitle(name: "电池容量"),
@@ -103,7 +92,7 @@ class AddBatteryExchangeView extends StatelessWidget {
     ];
   }
 
-  List<Widget> exchangeView(AddBatteryExchangeViewModel model) {
+  List<Widget> exchangeView(DeviceAddViewModel model) {
     return [
       const SizedBox(height: 16),
       const RowTitle(name: "交换机接口数量"),
@@ -126,7 +115,7 @@ class AddBatteryExchangeView extends StatelessWidget {
                       model.notifyListeners();
                     },
                   ),
-                  Text(option,
+                  Text("$option口",
                       style: TextStyle(
                           fontSize: 12,
                           color: model.selectedPortNumber != option

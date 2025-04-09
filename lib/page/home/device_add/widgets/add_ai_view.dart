@@ -4,7 +4,6 @@ import 'package:kayo_package/extension/_index_extension.dart';
 import 'package:kayo_package/mvvm/base/provider_widget.dart';
 import 'package:kayo_package/views/widget/base/clickable.dart';
 import 'package:kayo_package/views/widget/base/dash_line.dart';
-import 'package:omt/page/home/device_add/widgets/second_step_view.dart';
 import 'package:omt/utils/color_utils.dart';
 
 import '../../../../bean/home/home_page/device_detail_ai_entity.dart';
@@ -15,24 +14,16 @@ import '../view_models/add_ai_viewmodel.dart';
 import '../view_models/device_add_viewmodel.dart';
 
 class AddAiView extends StatelessWidget {
-  final DeviceType deviceType;
-  final StepNumber stepNumber;
-  final bool? isInstall; //是安装 默认否
-  const AddAiView(this.deviceType, this.stepNumber,
-      {super.key, this.isInstall});
+  final DeviceAddViewModel model;
+
+  const AddAiView({super.key, required this.model});
 
   @override
   Widget build(BuildContext context) {
-    return ProviderWidget<AddAiViewModel>(
-        model: AddAiViewModel(deviceType, stepNumber, isInstall ?? false)
-          ..themeNotifier = true,
-        autoLoadData: true,
-        builder: (context, model, child) {
-          return aiView(model, context);
-        });
+    return aiView(model, context);
   }
 
-  Column aiView(AddAiViewModel model, BuildContext context) {
+  Column aiView(DeviceAddViewModel model, BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -81,8 +72,8 @@ class AddAiView extends StatelessWidget {
         const SizedBox(height: 10),
         Expanded(
           child: ListView(
-            children: model.deviceList.asMap().keys.map((index) {
-              DeviceDetailAiData e = model.deviceList[index];
+            children: model.aiDeviceList.asMap().keys.map((index) {
+              DeviceDetailAiData e = model.aiDeviceList[index];
               return Container(
                 height: (e.mac ?? "").isEmpty ? 140 : 278,
                 margin: const EdgeInsets.only(left: 16, right: 16, bottom: 10),
@@ -139,7 +130,7 @@ class AddAiView extends StatelessWidget {
                           height: 32,
                           child: TextBox(
                             placeholder: '请输入AI设备IP地址',
-                            controller: model.controllers[index],
+                            controller: model.aiControllers[index],
                             style: const TextStyle(
                               fontSize: 12.0,
                             ),
@@ -150,7 +141,10 @@ class AddAiView extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.only(
                                 left: 12, right: 12, top: 6, bottom: 6),
-                            color: ColorUtils.colorGreen,
+                            decoration: BoxDecoration(
+                              color: ColorUtils.colorGreen,
+                              borderRadius: BorderRadius.circular(3),
+                            ),
                             child: const Text(
                               "连接",
                               style: TextStyle(
@@ -158,7 +152,7 @@ class AddAiView extends StatelessWidget {
                             ),
                           ),
                           onTap: () {
-                            model.connectEventAction(index);
+                            model.connectAiDeviceAction(index);
                           },
                         ),
                       ],
@@ -233,19 +227,20 @@ class AddAiView extends StatelessWidget {
     );
   }
 
-  void _showSearchDialog(BuildContext context, AddAiViewModel parentModel) {
+  void _showSearchDialog(BuildContext context, DeviceAddViewModel parentModel) {
     // 创建一个新的 ViewModel 实例
-    final dialogModel = AddAiViewModel(
-        parentModel.deviceType, parentModel.stepNumber, parentModel.isInstall);
-    dialogModel.startSearch();
+    // final dialogModel = AddAiViewModel(
+    //     parentModel.deviceType, parentModel.stepNumber, parentModel.isInstall);
+    // dialogModel.startSearch();
+    parentModel.startAiSearch();
 
     ui.showDialog(
       context: context,
       barrierColor: Colors.black.withOpacity(0.6),
       barrierDismissible: false,
       builder: (context) {
-        return ProviderWidget<AddAiViewModel>(
-            model: dialogModel,
+        return ProviderWidget<DeviceAddViewModel>(
+            model: parentModel,
             builder: (context, model, child) {
               return Center(
                 child: Container(
@@ -272,8 +267,7 @@ class AddAiView extends StatelessWidget {
                           Clickable(
                             onTap: () {
                               Navigator.pop(context);
-                              dialogModel
-                                  .dispose(); // 确保在关闭对话框时 dispose 新的 ViewModel
+                              // model.dispose(); // 确保在关闭对话框时 dispose 新的 ViewModel
                             },
                             child: const Icon(
                               FluentIcons.chrome_close,
@@ -284,7 +278,7 @@ class AddAiView extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 20),
-                      if (model.isSearching) ...[
+                      if (model.isAiSearching) ...[
                         const SizedBox(height: 40),
                         const ui.CircularProgressIndicator(),
                         const SizedBox(height: 24),
@@ -298,10 +292,8 @@ class AddAiView extends StatelessWidget {
                         const SizedBox(height: 20),
                         FilledButton(
                           onPressed: () {
-                            model.stopSearch();
+                            model.stopAiSearch();
                             Navigator.pop(context);
-                            dialogModel
-                                .dispose(); // 确保在关闭对话框时 dispose 新的 ViewModel
                           },
                           style: ButtonStyle(
                               backgroundColor: WidgetStateProperty.all(
@@ -312,7 +304,7 @@ class AddAiView extends StatelessWidget {
                             style: TextStyle(color: Colors.white),
                           ),
                         ),
-                      ] else if (model.searchResults.isEmpty) ...[
+                      ] else if (model.aiSearchResults.isEmpty) ...[
                         const Text(
                           "无AI设备",
                           style: TextStyle(
@@ -320,12 +312,12 @@ class AddAiView extends StatelessWidget {
                             fontSize: 14,
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 80),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             FilledButton(
-                              onPressed: () => model.startSearch(),
+                              onPressed: () => model.startAiSearch(),
                               child: const Text(
                                 "重新搜索",
                                 style: TextStyle(color: Colors.white),
@@ -335,8 +327,6 @@ class AddAiView extends StatelessWidget {
                             FilledButton(
                               onPressed: () {
                                 Navigator.pop(context);
-                                dialogModel
-                                    .dispose(); // 确保在关闭对话框时 dispose 新的 ViewModel
                               },
                               child: const Text(
                                 "返回",
@@ -348,14 +338,14 @@ class AddAiView extends StatelessWidget {
                       ] else ...[
                         Expanded(
                           child: ListView.builder(
-                            itemCount: model.searchResults.length,
+                            itemCount: model.aiSearchResults.length,
                             itemBuilder: (context, index) {
-                              final result = model.searchResults[index];
+                              final result = model.aiSearchResults[index];
                               return ui.RadioListTile<String>(
                                 value: result.ip ?? "",
-                                groupValue: model.selectedIp,
+                                groupValue: model.selectedAiIp,
                                 onChanged: (value) {
-                                  model.selectedIp = value;
+                                  model.selectedAiIp = value;
                                   model.notifyListeners();
                                 },
                                 title: Text(
@@ -380,8 +370,6 @@ class AddAiView extends StatelessWidget {
                             FilledButton(
                               onPressed: () {
                                 Navigator.pop(context);
-                                dialogModel
-                                    .dispose(); // 确保在关闭对话框时 dispose 新的 ViewModel
                               },
                               style: ButtonStyle(
                                   backgroundColor: WidgetStateProperty.all(
@@ -395,14 +383,12 @@ class AddAiView extends StatelessWidget {
                             const SizedBox(width: 16),
                             FilledButton(
                               onPressed: () {
-                                if (model.selectedIp != null) {
+                                if (model.selectedAiIp != null) {
                                   // 处理选中的IP
-                                  parentModel.selectedIp =
-                                      model.selectedIp; // 将选中的IP传递给父 ViewModel
-                                  parentModel.handleSelectedIp();
+                                  parentModel.selectedAiIp = model
+                                      .selectedAiIp; // 将选中的IP传递给父 ViewModel
+                                  parentModel.handleSelectedAiIp();
                                   Navigator.pop(context);
-                                  dialogModel
-                                      .dispose(); // 确保在关闭对话框时 dispose 新的 ViewModel
                                 }
                               },
                               child: const Text(

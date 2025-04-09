@@ -11,7 +11,6 @@ import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/bean/common/name_value.dart';
 import 'package:omt/bean/home/home_page/camera_device_entity.dart';
 import 'package:omt/page/home/device_add/view_models/add_camera_viewmodel.dart';
-import 'package:omt/page/home/device_add/widgets/second_step_view.dart';
 import 'package:omt/page/home/device_detail/widgets/detail_ai_view.dart';
 import 'package:omt/utils/color_utils.dart';
 import 'package:omt/utils/date_time_utils.dart';

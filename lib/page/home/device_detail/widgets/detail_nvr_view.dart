@@ -7,7 +7,6 @@ import 'package:kayo_package/mvvm/base/provider_widget.dart';
 import 'package:kayo_package/views/widget/base/clickable.dart';
 import 'package:kayo_package/views/widget/base/dash_line.dart';
 import 'package:omt/page/home/device_add/view_models/add_nvr_viewmodel.dart';
-import 'package:omt/page/home/device_add/widgets/second_step_view.dart';
 import 'package:omt/utils/color_utils.dart';
 
 import '../../../../bean/home/home_page/device_detail_nvr_entity.dart';

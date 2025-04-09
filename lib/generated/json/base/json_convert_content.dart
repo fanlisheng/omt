@@ -20,6 +20,7 @@ import 'package:omt/bean/home/home_page/device_entity.dart';
 import 'package:omt/bean/home/home_page/device_unbound_entity.dart';
 import 'package:omt/bean/home/home_page/home_page_data.dart';
 import 'package:omt/bean/one_picture/one_picture/one_picture_data_entity.dart';
+import 'package:omt/bean/remove/device_list_entity.dart';
 import 'package:omt/bean/user/user_login/user_login_data.dart';
 import 'package:omt/bean/user/ver_info.dart';
 import 'package:omt/bean/video/video_configuration/Video_Connect_entity.dart';
@@ -309,6 +310,14 @@ class JsonConvert {
       return data.map<OnePictureDataData>((Map<String, dynamic> e) =>
           OnePictureDataData.fromJson(e)).toList() as M;
     }
+    if (<DeviceListEntity>[] is M) {
+      return data.map<DeviceListEntity>((Map<String, dynamic> e) =>
+          DeviceListEntity.fromJson(e)).toList() as M;
+    }
+    if (<DeviceListData>[] is M) {
+      return data.map<DeviceListData>((Map<String, dynamic> e) =>
+          DeviceListData.fromJson(e)).toList() as M;
+    }
     if (<UserInfoData>[] is M) {
       return data.map<UserInfoData>((Map<String, dynamic> e) =>
           UserInfoData.fromJson(e)).toList() as M;
@@ -422,6 +431,8 @@ class JsonConvertClassCollection {
     (HomePageData).toString(): HomePageData.fromJson,
     (OnePictureDataEntity).toString(): OnePictureDataEntity.fromJson,
     (OnePictureDataData).toString(): OnePictureDataData.fromJson,
+    (DeviceListEntity).toString(): DeviceListEntity.fromJson,
+    (DeviceListData).toString(): DeviceListData.fromJson,
     (UserInfoData).toString(): UserInfoData.fromJson,
     (UserPermission).toString(): UserPermission.fromJson,
     (VerInfo).toString(): VerInfo.fromJson,

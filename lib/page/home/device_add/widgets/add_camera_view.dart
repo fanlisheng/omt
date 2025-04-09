@@ -6,34 +6,25 @@ import 'package:kayo_package/utils/base_sys_utils.dart';
 import 'package:kayo_package/views/widget/base/clickable.dart';
 import 'package:kayo_package/views/widget/base/dash_line.dart';
 import 'package:media_kit_video/media_kit_video.dart';
+import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/bean/home/home_page/camera_device_entity.dart';
 import 'package:omt/page/home/device_add/view_models/add_camera_viewmodel.dart';
-import 'package:omt/page/home/device_add/widgets/second_step_view.dart';
 import 'package:omt/utils/color_utils.dart';
 
 import '../view_models/add_ai_viewmodel.dart';
 import '../view_models/device_add_viewmodel.dart';
 
 class AddCameraView extends StatelessWidget {
-  final DeviceType deviceType;
-  final StepNumber stepNumber;
-  final bool? isInstall; //是安装 默认否
+  final DeviceAddViewModel model;
 
-  const AddCameraView({super.key, required this.deviceType, required this.stepNumber, this.isInstall});
-  // final AddCameraViewModel model;
-  // const AddCameraView(this.model, {super.key});
+  const AddCameraView({super.key, required this.model});
 
   @override
   Widget build(BuildContext context) {
-    return ProviderWidget<AddCameraViewModel>(
-        model: AddCameraViewModel(deviceType,stepNumber,isInstall ?? false)..themeNotifier = true,
-        autoLoadData: true,
-        builder: (context, model, child) {
-          return cameraView(context, model);
-        });
+    return cameraView(model, context);
   }
 
-  Column cameraView(BuildContext context, AddCameraViewModel model) {
+  Column cameraView(DeviceAddViewModel model, BuildContext context) {
     var windowWidth = BaseSysUtils.getWidth(context);
     var row = windowWidth > 600 * 2 + 200;
     var showDraw = windowWidth > 600 + 200;
@@ -59,8 +50,8 @@ class AddCameraView extends StatelessWidget {
         const SizedBox(height: 10),
         Expanded(
             child: ListView(
-          children: model.deviceList.asMap().keys.map((index) {
-            CameraDeviceEntity e = model.deviceList[index];
+          children: model.cameraDeviceList.asMap().keys.map((index) {
+            CameraDeviceEntity e = model.cameraDeviceList[index];
             double height = 194;
             if ((e.rtsp ?? "").isNotEmpty) {
               height = 237;
@@ -77,7 +68,7 @@ class AddCameraView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if(e.readOnly)...[
+                  if (e.readOnly) ...[
                     Row(
                       children: [
                         Expanded(
@@ -92,7 +83,7 @@ class AddCameraView extends StatelessWidget {
                         ),
                         Button(
                           onPressed: () {
-                            model.deleteEventAction(index);
+                            model.deleteCameraAction(index);
                           },
                           child: Row(
                             children: [
@@ -142,7 +133,7 @@ class AddCameraView extends StatelessWidget {
                               ],
                             ),
                             onPressed: () {
-                              model.editEventAction(index);
+                              model.editCameraAction(index);
                             }),
                       ],
                     ),
@@ -186,7 +177,7 @@ class AddCameraView extends StatelessWidget {
                                     textAlign: TextAlign.start,
                                     style: const TextStyle(
                                         fontSize: 12,
-                                        color: ColorUtils.colorBlackLiteLite),
+                                        color: ColorUtils.colorWhite),
                                   ),
                                 );
                               }).toList(),
@@ -256,7 +247,7 @@ class AddCameraView extends StatelessWidget {
                         onTap: e.readOnly
                             ? null
                             : () {
-                                model.connectEventAction();
+                                model.connectCameraAction();
                               },
                         child: Container(
                           padding: const EdgeInsets.only(
@@ -392,15 +383,15 @@ class AddCameraView extends StatelessWidget {
                           ),
                           enabled: !e.readOnly,
                         ),
-                        two: ComboBox<String>(
+                        two: ComboBox<IdNameValue>(
                           isExpanded: true,
                           value: e.selectedCameraType,
                           items: model.cameraTypeList
-                              .map<ComboBoxItem<String>>((e) {
-                            return ComboBoxItem<String>(
+                              .map<ComboBoxItem<IdNameValue>>((e) {
+                            return ComboBoxItem<IdNameValue>(
                               value: e,
                               child: Text(
-                                e,
+                                e.name ?? "",
                                 textAlign: TextAlign.start,
                                 style: const TextStyle(
                                   fontSize: 12,
@@ -466,15 +457,15 @@ class AddCameraView extends StatelessWidget {
                                 color: ColorUtils.colorBlackLiteLite),
                           ),
                         ),
-                        two: ComboBox<String>(
+                        two: ComboBox<IdNameValue>(
                           isExpanded: true,
-                          value: e.isRegulation,
+                          value: e.selectedRegulation,
                           items: model.regulationList
-                              .map<ComboBoxItem<String>>((e) {
-                            return ComboBoxItem<String>(
+                              .map<ComboBoxItem<IdNameValue>>((e) {
+                            return ComboBoxItem<IdNameValue>(
                               value: e,
                               child: Text(
-                                e,
+                                e.name ?? "",
                                 textAlign: TextAlign.start,
                                 style: const TextStyle(
                                     fontSize: 12,
@@ -485,7 +476,7 @@ class AddCameraView extends StatelessWidget {
                           onChanged: e.readOnly
                               ? null
                               : (a) {
-                                  e.selectedEntryExit = a!;
+                                  e.selectedRegulation = a!;
                                   model.notifyListeners();
                                 },
                           placeholder: const Text(
@@ -539,7 +530,7 @@ class AddCameraView extends StatelessWidget {
                                   ),
                                 ),
                                 onTap: () {
-                                  model.completeEventAction();
+                                  model.completeCameraAction();
                                 },
                               ),
                             ] else ...[
@@ -562,7 +553,7 @@ class AddCameraView extends StatelessWidget {
                                   ),
                                 ),
                                 onTap: () {
-                                  model.restartRecognitionEventAction();
+                                  model.restartRecognitionAction();
                                 },
                               ),
                               const SizedBox(width: 18),
@@ -585,7 +576,7 @@ class AddCameraView extends StatelessWidget {
                                   ),
                                 ),
                                 onTap: () {
-                                  model.photoPreviewEventAction();
+                                  model.photoPreviewAction();
                                 },
                               ),
                             ],
@@ -603,14 +594,14 @@ class AddCameraView extends StatelessWidget {
     );
   }
 
-  Widget _videoView(AddCameraViewModel model) {
+  Widget _videoView(DeviceAddViewModel model) {
     return Center(
         child: SizedBox(
       width: 640,
       height: 360,
       child: Stack(
         children: [
-          Video(controller: model.controller),
+          Video(controller: model.videoController),
         ],
       ),
     ));

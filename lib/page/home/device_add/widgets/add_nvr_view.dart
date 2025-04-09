@@ -7,33 +7,24 @@ import 'package:kayo_package/mvvm/base/provider_widget.dart';
 import 'package:kayo_package/views/widget/base/clickable.dart';
 import 'package:kayo_package/views/widget/base/dash_line.dart';
 import 'package:omt/page/home/device_add/view_models/add_nvr_viewmodel.dart';
-import 'package:omt/page/home/device_add/widgets/second_step_view.dart';
 import 'package:omt/utils/color_utils.dart';
 
+import '../../../../bean/common/id_name_value.dart';
+import '../../../../bean/home/home_page/device_detail_nvr_entity.dart';
+import '../../../../bean/home/home_page/device_entity.dart';
 import '../view_models/device_add_viewmodel.dart';
 
 class AddNvrView extends StatelessWidget {
-  final DeviceType deviceType;
-  final StepNumber stepNumber;
-  final bool? showInstall;
+  final DeviceAddViewModel model;
 
-  const AddNvrView(
-      {super.key, required this.deviceType, required this.stepNumber, this.showInstall});
-
-  // AddNvrViewModel model;
-  // AddNvrView(this.model, {super.key});
+  const AddNvrView({super.key, required this.model});
 
   @override
   Widget build(BuildContext context) {
-    return ProviderWidget<AddNvrViewModel>(
-        model: AddNvrViewModel(deviceType, stepNumber,showInstall ?? false)..themeNotifier = true,
-        autoLoadData: true,
-        builder: (context, model1, child) {
-          return nvrView(model1);
-        });
+    return nvrView(model);
   }
 
-  Widget nvrView(AddNvrViewModel model) {
+  Widget nvrView(DeviceAddViewModel model) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -41,20 +32,23 @@ class AddNvrView extends StatelessWidget {
           margin: const EdgeInsets.only(left: 16, right: 16),
           padding:
               const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),
-          color: ColorUtils.colorBackgroundLine,
+          decoration: BoxDecoration(
+            color: ColorUtils.colorBackgroundLine,
+            borderRadius: BorderRadius.circular(3),
+          ),
           width: double.infinity,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-               Text(
-                "第${(model.showInstall == false) ? "二" : "四"}步：添加Nvr设备",
+              Text(
+                "第${(model.isInstall == false) ? "二" : "四"}步：添加Nvr设备",
                 style: const TextStyle(
                   fontSize: 14,
                   color: ColorUtils.colorGreenLiteLite,
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              if (model.showInstall) ...[
+              if (model.isInstall) ...[
                 const SizedBox(height: 16),
                 // 是否需要安装NVR
                 const Row(
@@ -137,26 +131,26 @@ class AddNvrView extends StatelessWidget {
                             ],
                           ),
                           const SizedBox(height: 8),
-                          ui.ComboBox<String>(
+                          ui.ComboBox<IdNameValue>(
                             isExpanded: true,
-                            value: model.selectedEntryExit,
-                            items: ["共用进出口", "进出口1", "进出口2"]
-                                .map<ui.ComboBoxItem<String>>((e) {
-                              return ui.ComboBoxItem<String>(
+                            value: model.selectedNarInOut,
+                            items: model.inOutList
+                                .map<ui.ComboBoxItem<IdNameValue>>((e) {
+                              return ui.ComboBoxItem<IdNameValue>(
                                 value: e,
                                 child: SizedBox(
                                   child: Text(
-                                    e,
+                                    e.name ?? "",
                                     textAlign: TextAlign.start,
                                     style: const TextStyle(
                                         fontSize: 12,
-                                        color: ColorUtils.colorBlackLiteLite),
+                                        color: ColorUtils.colorWhite),
                                   ),
                                 ),
                               );
                             }).toList(),
                             onChanged: (a) {
-                              model.selectedEntryExit = a!;
+                              model.selectedNarInOut = a!;
                               model.notifyListeners();
                             },
                             placeholder: const Text(
@@ -195,9 +189,14 @@ class AddNvrView extends StatelessWidget {
                               const SizedBox(width: 10),
                               Clickable(
                                 child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(3),
+                                    color: model.isNvrSearching == false
+                                        ? ColorUtils.colorGreen
+                                        : ColorUtils.colorGrayLight,
+                                  ),
                                   padding: const EdgeInsets.only(
                                       left: 12, right: 12, top: 2, bottom: 2),
-                                  color: ColorUtils.colorGreen,
                                   child: const Text(
                                     "刷新",
                                     style: TextStyle(
@@ -206,7 +205,7 @@ class AddNvrView extends StatelessWidget {
                                   ),
                                 ),
                                 onTap: () {
-                                  model.refreshEventAction();
+                                  model.refreshNvrAction();
                                 },
                               ),
                             ],
@@ -217,25 +216,23 @@ class AddNvrView extends StatelessWidget {
                             children: List.generate(
                               model.nvrIpList.length, // 动态生成子元素数量
                               (index) {
-                                final ip = model.nvrIpList[index];
+                                DeviceEntity device = model.nvrIpList[index];
                                 return Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Radio(
-                                      value: ip,
+                                      value: device,
                                       groupValue: model.selectedNvrIp,
                                       activeColor: ColorUtils.colorGreen,
                                       onChanged: (value) {
-                                        model.selectedNvrIp = value as String;
-                                        model.isNvrNeeded = true;
-                                        model.notifyListeners();
+                                        model.selectNvrIpAction(device);
                                       },
                                     ),
                                     Text(
-                                      ip,
+                                      "${device.ip}",
                                       style: TextStyle(
                                         fontSize: 12,
-                                        color: model.selectedNvrIp == ip
+                                        color: model.selectedNvrIp == device
                                             ? ColorUtils.colorGreen
                                             : ColorUtils.colorWhite,
                                       ),
@@ -299,29 +296,38 @@ class AddNvrView extends StatelessWidget {
                                 label:
                                     Text("操作", style: TextStyle(fontSize: 12))),
                           ],
-                          rows: model.nvrInfo.asMap().keys.map((index) {
-                            Map<String, String> info = model.nvrInfo[index];
+                          rows: (model.nvrData.channels ?? [])
+                              .asMap()
+                              .keys
+                              .map((index) {
+                            DeviceDetailNvrDataChannels info =
+                                model.nvrData.channels![index];
                             return DataRow(
                                 color: WidgetStateProperty.all(index % 2 == 0
                                     ? "#4E5353".toColor()
                                     : "#3B3F3F".toColor()),
                                 cells: [
                                   DataCell(Text(
-                                    info["通道号"]!,
+                                    "${info.channelNum ?? 0}",
                                     style: const TextStyle(fontSize: 12),
                                   )),
                                   DataCell(Text(
-                                    info["是否在录像"]!,
-                                    style: const TextStyle(fontSize: 12),
+                                    info.recordStatus ?? "",
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        color:
+                                            (info.recordStatus ?? "") == "正在录像"
+                                                ? ColorUtils.colorGreen
+                                                : ColorUtils.colorRed),
                                   )),
-                                  DataCell(Text(info["信号状态"]!,
+                                  DataCell(Text(info.signalStatus ?? "",
                                       style: const TextStyle(fontSize: 12))),
-                                  DataCell(Text(info["更新时间"]!,
+                                  DataCell(Text(info.updatedAt ?? "",
                                       style: const TextStyle(fontSize: 12))),
                                   DataCell(
                                     OutlinedButton(
                                       onPressed: () {
-                                        model.nvrInfo.remove(info);
+                                        // model.nvrInfo.remove(info);
                                         model.notifyListeners();
                                       },
                                       style: ButtonStyle(

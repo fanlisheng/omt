@@ -38,10 +38,10 @@ class SearchDeviceViewModel extends BaseViewModel {
   DeviceSearchState searchState = DeviceSearchState.notSearched;
 
   List<StrIdNameValue> instanceList = [];
-  List<IdNameValue> doorList = [];
-  List<IdNameValue> inOutList = [];
   StrIdNameValue? selectedInstance;
   IdNameValue? selectedDoor;
+  List<IdNameValue> doorList = [];
+  List<IdNameValue> inOutList = [];
   IdNameValue? selectedInOut;
 
   //设备统计字段
@@ -96,14 +96,24 @@ class SearchDeviceViewModel extends BaseViewModel {
   }
 
   void _loadInitialData() async {
-    // 使用状态服务初始化数据
-    DeviceSearchInitData data = await _searchService.initSearchData();
+    bool success = false;
+    while (!success) {
+      try {
+        // 使用状态服务初始化数据
+        DeviceSearchInitData data = await _searchService.initSearchData();
 
-    instanceList = data.instanceList;
-    doorList = data.doorList;
-    inOutList = data.inOutList;
+        instanceList = data.instanceList;
+        doorList = data.doorList;
+        inOutList = data.inOutList;
 
-    notifyListeners();
+        success = true; // 获取成功，退出循环
+        notifyListeners();
+      } catch (e) {
+        // 可选：记录错误日志
+        print('请求错误 $e');
+        await Future.delayed(const Duration(seconds: 1)); // 延迟后重试，避免过于频繁请求
+      }
+    }
   }
 
   @override

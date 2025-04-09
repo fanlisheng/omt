@@ -288,28 +288,29 @@ class InstallDeviceScreen extends StatelessWidget {
   }
 
   Widget bottomContentView(InstallDeviceViewModel model) {
-    switch (model.currentStep) {
-      case 1:
-        return stepOneView(model);
-      case 2:
-        return const AddAiView(DeviceType.ai, StepNumber.second);
-      case 3:
-        return const AddCameraView(
-            deviceType: DeviceType.camera, stepNumber: StepNumber.third);
-      case 4:
-        return const AddNvrView(
-            deviceType: DeviceType.nvr,
-            stepNumber: StepNumber.third,
-            showInstall: true);
-      case 5:
-        return const AddPowerBoxView(DeviceType.powerBox, StepNumber.second,
-            isInstall: true);
-      case 6:
-        return const AddBatteryExchangeView(
-            DeviceType.battery, StepNumber.second,
-            isInstall: true);
-      default:
-        return Container();
-    }
+    // switch (model.currentStep) {
+    //   case 1:
+    //     return stepOneView(model);
+    //   case 2:
+    //     return const AddAiView(DeviceType.ai, StepNumber.second);
+    //   case 3:
+    //     return const AddCameraView(
+    //         deviceType: DeviceType.camera, stepNumber: StepNumber.third);
+    //   case 4:
+    //     return const AddNvrView(
+    //         deviceType: DeviceType.nvr,
+    //         stepNumber: StepNumber.third,
+    //         showInstall: true);
+    //   case 5:
+    //     return const AddPowerBoxView(DeviceType.powerBox, StepNumber.second,
+    //         isInstall: true);
+    //   case 6:
+    //     return const AddBatteryExchangeView(
+    //         DeviceType.battery, StepNumber.second,
+    //         isInstall: true);
+    //   default:
+    //     return Container();
+    // }
+    return Container();
   }
 }

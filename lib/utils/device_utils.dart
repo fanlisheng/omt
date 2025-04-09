@@ -19,7 +19,7 @@ class DeviceUtils {
 
   /// 扫描设备并获取设备信息，支持中断
   static Future<List<DeviceEntity>> scanAndFetchDevicesInfo(
-      {required bool Function() shouldStop}) async {
+      {bool Function()? shouldStop, String? deviceType}) async {
     List<DeviceEntity> infoList = [];
 
     // 1. 获取本机 IP（确定局域网段）
@@ -34,7 +34,7 @@ class DeviceUtils {
     const batchSize = 70; // 每批次同时处理的数量
     for (int i = 1; i < 255; i++) {
       String ip = "$subnet.$i";
-      pingTasks.add(pingDevice(ip, shouldStop));
+      pingTasks.add(pingDevice(ip, shouldStop ?? (() => false)));
 
       // 每批次执行 `batchSize` 个任务
       if (pingTasks.length == batchSize || i == 254) {
@@ -42,14 +42,15 @@ class DeviceUtils {
         pingTasks.clear(); // 清空当前任务队列
       }
 
-      if (shouldStop()) {
+      if (shouldStop?.call() ?? false) {
         print("扫描被中断");
         return infoList; // 中断时退出循环
       }
     }
 
     // 3. 获取所有IP的mac地址（支持中断）
-    Map<String, String>? ipMac = await getMacAddresses(shouldStop: shouldStop);
+    Map<String, String>? ipMac =
+        await getMacAddresses(shouldStop: shouldStop ?? (() => false));
     if (ipMac == null) {
       print("无法获取 MAC 地址");
       return infoList;
@@ -59,7 +60,7 @@ class DeviceUtils {
     List<Future<void>> getInfoTasks = [];
     for (var entry in ipMac.entries) {
       getInfoTasks.add(Future<void>(() async {
-        if (shouldStop()) {
+        if (shouldStop?.call() ?? false) {
           print("扫描被中断");
           return; // 中断时退出循环
         }
@@ -72,14 +73,24 @@ class DeviceUtils {
         }
         String deviceTypeText = getDeviceTypeForMacAddress(mac);
 
+        // 如果指定了设备类型，检查当前设备类型是否匹配
+        if (deviceType != null) {
+          if (deviceTypeText != deviceType) {
+            return; // 如果类型不匹配，直接跳过
+          }
+        }
+
         if (ip == "$subnet.1") {
           //路由器
-          infoList.add(DeviceEntity(
-              ip: ip,
-              mac: mac,
-              deviceTypeText: "路由器",
-              deviceType: getDeviceTypeInt("路由器"),
-              deviceCode: ""));
+          if (deviceType == null || deviceType == 6) {
+            // 6 是路由器的类型
+            infoList.add(DeviceEntity(
+                ip: ip,
+                mac: mac,
+                deviceTypeText: "路由器",
+                deviceType: getDeviceTypeInt("路由器"),
+                deviceCode: ""));
+          }
         } else {
           if (deviceTypeText.isNotEmpty) {
             DeviceEntity deviceEntity = DeviceEntity(
@@ -89,8 +100,8 @@ class DeviceUtils {
                 deviceType: getDeviceTypeInt(deviceTypeText),
                 deviceCode: "");
             if (deviceTypeText == "AI设备" || deviceTypeText == "NVR") {
-              String deviceCode = mac.replaceAll(":", "");
-              deviceCode = deviceCode.toLowerCase();
+              String deviceCode =
+                  DeviceUtils.getDeviceCodeByMacAddress(macAddress: mac);
               deviceEntity.deviceCode = deviceCode;
               infoList.add(deviceEntity);
             } else {
@@ -106,11 +117,6 @@ class DeviceUtils {
               }
             }
           }
-        }
-
-        if (shouldStop()) {
-          print("扫描被中断");
-          return; // 中断时退出循环
         }
       }));
     }
@@ -304,11 +310,27 @@ class DeviceUtils {
   };
 
   // 设备图片映射
+  // static const Map<String, String> _deviceImageMap = {
+  //   "NVR": "home/ic_device_nvr2",
+  //   "AI设备": "home/ic_device_aisb",
+  //   "摄像头": "home/ic_device_sxt",
+  //   "路由器": "home/ic_device_lyq",
+  //   "交换机": "home/ic_device_jhj",
+  //   "市电": "home/ic_device_sd",
+  //   "电池": "home/ic_device_dc",
+  //   "电源箱": "home/ic_device_dyx",
+  //   "有线网络": "home/ic_device_yxwl",
+  // };
   static const Map<String, String> _deviceImageMap = {
-    "NVR": "home/ic_device_nvr2",
-    "AI设备": "home/ic_device_aisb",
-    "摄像头": "home/ic_device_sxt",
-    "路由器": "home/ic_device_lyq",
+    "8": "home/ic_device_nvr2",
+    "10": "home/ic_device_aisb",
+    "11": "home/ic_device_sxt",
+    "6": "home/ic_device_lyq",
+    "9": "home/ic_device_jhj",
+    "12": "home/ic_device_sd",
+    "13": "home/ic_device_dc",
+    "5": "home/ic_device_dyx",
+    "7": "home/ic_device_yxwl",
   };
 
   static const Map<int, DeviceType> intToDeviceTypeMap = {
@@ -335,7 +357,7 @@ class DeviceUtils {
 
   /// 获取设备图片路径
   static String getDeviceImage(int deviceType) {
-    return _deviceImageMap[getDeviceTypeString(deviceType)] ?? "";
+    return _deviceImageMap["$deviceType"] ?? "";
   }
 
   /// 获取设备类型名称
@@ -350,6 +372,7 @@ class DeviceUtils {
   static Future<String?> getMacAddressByIp(
       {required String ip, required bool Function() shouldStop}) async {
     ProcessResult result;
+    await pingDevice(ip, shouldStop);
     if (Platform.isMacOS || Platform.isLinux || Platform.isWindows) {
       result = await Process.run('arp', ['-a']);
     } else {
@@ -412,5 +435,12 @@ class DeviceUtils {
       mac = await getMacAddressByIp(ip: subnet, shouldStop: () => false);
     }
     onData?.call(mac);
+  }
+
+  ///获取deviceCode根据mac
+  static String getDeviceCodeByMacAddress({required String macAddress}) {
+    String deviceCode = macAddress.replaceAll(":", "");
+    deviceCode = deviceCode.toLowerCase();
+    return deviceCode;
   }
 }

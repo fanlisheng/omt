@@ -108,8 +108,8 @@ class HomePageService {
       await _inOutList,
       {},
       method: 'GET',
-      autoHideDialog: true,
-      autoShowDialog: true,
+      autoHideDialog: false,
+      autoShowDialog: false,
       onSuccess: onSuccess,
       onCache: onCache,
       onError: onError,
@@ -204,16 +204,23 @@ class HomePageService {
   }
 
   deviceDetailNvr({
-    required String nodeCode,
+    String? nodeCode,
+    String? deviceCode, //mac地址去掉间隔小写
     required ValueChanged<DeviceDetailNvrData?> onSuccess,
     ValueChanged<DeviceDetailNvrData?>? onCache,
     ValueChanged<String>? onError,
   }) async {
+    Map<String, dynamic> params = {};
+
+    if (nodeCode != null) {
+      params["node_code"] = nodeCode;
+    }
+    if (deviceCode != null) {
+      params["device_code"] = deviceCode;
+    }
     HttpManager.share.doHttpPost<DeviceDetailNvrData>(
       await _deviceDetailNvr,
-      {
-        "node_code": nodeCode,
-      },
+      params,
       method: 'POST',
       autoHideDialog: true,
       autoShowDialog: true,
@@ -224,16 +231,23 @@ class HomePageService {
   }
 
   deviceDetailPowerBox({
-    required String nodeCode,
+    String? nodeCode,
+    String? deviceCode, //mac地址去掉间隔小写
     required ValueChanged<DeviceDetailPowerBoxData?> onSuccess,
     ValueChanged<DeviceDetailPowerBoxData?>? onCache,
     ValueChanged<String>? onError,
   }) async {
+    Map<String, dynamic> params = {};
+
+    if (nodeCode != null) {
+      params["node_code"] = nodeCode;
+    }
+    if (deviceCode != null) {
+      params["device_code"] = deviceCode;
+    }
     HttpManager.share.doHttpPost<DeviceDetailPowerBoxData>(
       await _deviceDetailPowerBox,
-      {
-        "node_code": nodeCode,
-      },
+      params,
       method: 'POST',
       autoHideDialog: true,
       autoShowDialog: true,

@@ -397,7 +397,7 @@ class OnePicturePageState extends State<OnePicturePage> {
                 color: viewModel?.theHoverOnePictureDataData == oData
                     ? '#82FFFC'.toColor(opacity: .2)
                     : '#82FFFC'.toColor(opacity: .1)),
-            boxShadow: [
+            boxShadow: <BoxShadow>[
               BoxShadow(
                   color: viewModel?.theHoverOnePictureDataData == oData
                       ? '#82FFFC'.toColor(opacity: .2)

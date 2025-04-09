@@ -5,8 +5,9 @@ import 'package:kayo_package/mvvm/base/provider_widget.dart';
 import 'package:kayo_package/views/widget/base/clickable.dart';
 import 'package:kayo_package/views/widget/base/dash_line.dart';
 import 'package:omt/page/home/device_add/widgets/add_camera_view.dart';
-import 'package:omt/page/home/device_add/widgets/second_step_view.dart';
 import 'package:omt/utils/color_utils.dart';
+import '../../../../bean/common/id_name_value.dart';
+import '../../../../bean/home/home_page/device_detail_power_box_entity.dart';
 import '../../device_detail/widgets/detail_ai_view.dart';
 import '../view_models/add_ai_viewmodel.dart';
 import '../view_models/add_power_box_viewmodel.dart';
@@ -14,24 +15,16 @@ import '../view_models/device_add_viewmodel.dart';
 import 'add_ai_view.dart';
 
 class AddPowerBoxView extends StatelessWidget {
-  final DeviceType deviceType;
-  final StepNumber stepNumber;
-  final bool? isInstall; //是安装 默认否
+  final DeviceAddViewModel model;
 
-  const AddPowerBoxView(this.deviceType, this.stepNumber, {super.key, this.isInstall});
+  const AddPowerBoxView({super.key, required this.model});
 
   @override
   Widget build(BuildContext context) {
-    return ProviderWidget<AddPowerBoxViewModel>(
-        model: AddPowerBoxViewModel(deviceType, stepNumber, isInstall ?? false)
-          ..themeNotifier = true,
-        autoLoadData: true,
-        builder: (context, model, child) {
-          return powerBoxView(model);
-        });
+    return powerBoxView(model);
   }
 
-  Widget powerBoxView(AddPowerBoxViewModel model) {
+  Widget powerBoxView(DeviceAddViewModel model) {
     return ListView(
       // crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -48,7 +41,7 @@ class AddPowerBoxView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-               Text(
+              Text(
                 "第${(model.isInstall == false) ? "二" : "五"}步：添加电源箱",
                 style: const TextStyle(
                   fontSize: 14,
@@ -109,79 +102,81 @@ class AddPowerBoxView extends StatelessWidget {
               ),
               if (model.isPowerBoxNeeded == true) ...[
                 const SizedBox(height: 10),
-                EquallyRow(one: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const RowTitle(name: "进/出口"),
-                    const SizedBox(height: 8),
-                    ui.ComboBox<String>(
-                      isExpanded: true,
-                      value: model.selectedEntryExit,
-                      items: model.entryExitList
-                          .map<ui.ComboBoxItem<String>>((e) {
-                        return ui.ComboBoxItem<String>(
-                          value: e,
-                          child: SizedBox(
-                            child: Text(
-                              e,
-                              textAlign: TextAlign.start,
-                            ),
+                EquallyRow(
+                    one: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const RowTitle(name: "进/出口"),
+                        const SizedBox(height: 8),
+                        ui.ComboBox<IdNameValue>(
+                          isExpanded: true,
+                          value: model.selectedPowerBoxInOut,
+                          items: model.inOutList
+                              .map<ui.ComboBoxItem<IdNameValue>>((e) {
+                            return ui.ComboBoxItem<IdNameValue>(
+                              value: e,
+                              child: SizedBox(
+                                child: Text(
+                                  e.name ?? "",
+                                  textAlign: TextAlign.start,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (a) {
+                            model.selectedPowerBoxInOut = a!;
+                            model.notifyListeners();
+                          },
+                          placeholder: const Text(
+                            "请选择进/出口",
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                                fontSize: 12,
+                                color: ColorUtils.colorBlackLiteLite),
                           ),
-                        );
-                      }).toList(),
-                      onChanged: (a) {
-                        model.selectedEntryExit = a!;
-                        model.notifyListeners();
-                      },
-                      placeholder: const Text(
-                        "请选择进/出口",
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                            fontSize: 12,
-                            color: ColorUtils.colorBlackLiteLite),
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ), two: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const RowTitle(name: "电源箱编码"),
-                    const SizedBox(height: 8),
-                    ui.ComboBox<String>(
-                      isExpanded: true,
-                      value: model.selectedPowerBoxCoding,
-                      items: model.powerBoxCodingList
-                          .map<ui.ComboBoxItem<String>>((e) {
-                        return ui.ComboBoxItem<String>(
-                          value: e,
-                          child: SizedBox(
-                            child: Text(
-                              e,
-                              textAlign: TextAlign.start,
-                            ),
+                    two: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const RowTitle(name: "电源箱编码"),
+                        const SizedBox(height: 8),
+                        ui.ComboBox<DeviceDetailPowerBoxData>(
+                          isExpanded: true,
+                          value: model.selectedDeviceDetailPowerBox,
+                          items: model.powerBoxList
+                              .map<ui.ComboBoxItem<DeviceDetailPowerBoxData>>(
+                                  (e) {
+                            return ui.ComboBoxItem<DeviceDetailPowerBoxData>(
+                              value: e,
+                              child: SizedBox(
+                                child: Text(
+                                  e.deviceCode ?? '',
+                                  textAlign: TextAlign.start,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (a) {
+                            model.selectedPowerBoxCode(a);
+                          },
+                          placeholder: const Text(
+                            "请选择电源箱编码",
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                                fontSize: 12,
+                                color: ColorUtils.colorBlackLiteLite),
                           ),
-                        );
-                      }).toList(),
-                      onChanged: (a) {
-                        model.selectedPowerBoxCoding = a!;
-                        model.notifyListeners();
-                      },
-                      placeholder: const Text(
-                        "请选择电源箱编码",
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                            fontSize: 12,
-                            color: ColorUtils.colorBlackLiteLite),
-                      ),
-                    ),
-                  ],
-                )),
+                        ),
+                      ],
+                    )),
               ]
             ],
           ),
         ),
         if (model.isPowerBoxNeeded == true &&
-            model.selectedPowerBoxCoding.isNotEmpty) ...[
+            model.selectedDeviceDetailPowerBox != null) ...[
           Container(
             margin: const EdgeInsets.only(
               left: 16,
@@ -211,14 +206,14 @@ class AddPowerBoxView extends StatelessWidget {
     );
   }
 
-  Widget infoView(AddPowerBoxViewModel model) {
+  Widget infoView(DeviceAddViewModel model) {
     return Container(
       height: 140,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "电源${model.selectedPowerBoxCoding}箱信息",
+            "电源${model.selectedDeviceDetailPowerBox?.deviceCode ?? ""}箱信息",
             style: const TextStyle(
               fontSize: 14,
               color: ColorUtils.colorGreenLiteLite,
@@ -262,7 +257,7 @@ class AddPowerBoxView extends StatelessWidget {
     );
   }
 
-  Widget edInfoView(AddPowerBoxViewModel model) {
+  Widget edInfoView(DeviceAddViewModel model) {
     return SizedBox(
       width: double.infinity,
       child: DataTable(
@@ -278,31 +273,34 @@ class AddPowerBoxView extends StatelessWidget {
           DataColumn(label: Text("运行设备", style: TextStyle(fontSize: 12))),
           DataColumn(label: Text("操作", style: TextStyle(fontSize: 12))),
         ],
-        rows: model.edPortInfo.asMap().keys.map((index) {
-          Map<String, String> info = model.edPortInfo[index];
+        rows: (model.selectedDeviceDetailPowerBox?.dcInterfaces ?? [])
+            .asMap()
+            .keys
+            .map((index) {
+          DeviceDetailPowerBoxDataDcInterfaces? info =
+              model.selectedDeviceDetailPowerBox?.dcInterfaces?[index];
           return DataRow(
               color: WidgetStateProperty.all(
                   index % 2 == 0 ? "#4E5353".toColor() : "#3B3F3F".toColor()),
               cells: [
                 DataCell(Text(
-                  info["DC"]!,
+                  "${info?.interfaceNum}",
                   style: const TextStyle(fontSize: 12),
                 )),
                 DataCell(Text(
-                  info["状态"]!,
+                  info?.statusText ?? "",
                   style: const TextStyle(fontSize: 12),
                 )),
-                DataCell(
-                    Text(info["电压"]!, style: const TextStyle(fontSize: 12))),
-                DataCell(
-                    Text(info["电流"]!, style: const TextStyle(fontSize: 12))),
-                DataCell(
-                    Text(info["运行设备"]!, style: const TextStyle(fontSize: 12))),
+                DataCell(Text("${info?.voltage}",
+                    style: const TextStyle(fontSize: 12))),
+                DataCell(Text("${info?.current}",
+                    style: const TextStyle(fontSize: 12))),
+                DataCell(Text(info?.connectDevice ?? '',
+                    style: const TextStyle(fontSize: 12))),
                 DataCell(Row(
                   children: [
                     OutlinedButton(
                       onPressed: () {
-                        model.edPortInfo.remove(info);
                         model.notifyListeners();
                       },
                       style: ButtonStyle(
@@ -325,7 +323,6 @@ class AddPowerBoxView extends StatelessWidget {
                     ),
                     OutlinedButton(
                       onPressed: () {
-                        model.edPortInfo.remove(info);
                         model.notifyListeners();
                       },
                       style: ButtonStyle(
