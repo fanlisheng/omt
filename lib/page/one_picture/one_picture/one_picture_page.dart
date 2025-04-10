@@ -124,8 +124,15 @@ class OnePicturePageState extends State<OnePicturePage> {
             //       ),
             Container(
               padding: EdgeInsets.only(
-                  top: onePictureDataData?.showAddBtn == true ? 32 : 0,
-                  bottom: onePictureDataData?.showAddBtn == true ? 16 : 0,
+                  top: onePictureDataData?.showAddBtn == true
+                      ? ((onePictureDataData?.getChildList() ?? []).length > 1
+                          ? 0
+                          : 50)
+                      : 0,
+                  bottom: onePictureDataData?.showAddBtn == true &&
+                          (onePictureDataData?.getChildList() ?? []).length > 1
+                      ? 16
+                      : 0,
                   left: 0,
                   right: 0),
               decoration: BoxDecoration(
@@ -227,6 +234,9 @@ class OnePicturePageState extends State<OnePicturePage> {
                   Container(
                     padding: const EdgeInsets.only(
                         top: 0, bottom: 0, left: 0, right: 0),
+                    // margin: (oData?.getChildList() ?? []).isEmpty
+                    //     ? null
+                    //     : const EdgeInsets.only(bottom: 16, right: 20),
                     decoration: BoxDecoration(
                         border:
                             Border.all(color: '#347979'.toColor(), width: 1),
@@ -275,22 +285,28 @@ class OnePicturePageState extends State<OnePicturePage> {
         // data.setBorder();
         if (data.showBorder == false) {
           return Container(
+                  padding: EdgeInsets.only(
+                      top: data?.showAddBtn == true ? 0 : 0,
+                      bottom: data?.showAddBtn == true ? 16 : 0,
+                      left: 0,
+                      right: 0),
                   child: Column(children: [
-            // !(data?.showName ?? true)
-            //     ? SizedBox.shrink()
-            //     : TextView(data?.showNameText, size: _titleSize()),
-            Container(
-                // decoration: data.getChildList().length > 0
-                //    ? null
-                //    : BoxDecoration(
-                //        border: Border.all(
-                //            color: '#347979'.toColor(), width: 1),
-                //        borderRadius: BorderRadius.circular(4)),
-                child: Container(child: cW)),
-            (data?.showDesc ?? '').isEmpty
-                ? SizedBox.shrink()
-                : TextView(data?.showDesc),
-          ]))
+                    // !(data?.showName ?? true)
+                    //     ? SizedBox.shrink()
+                    //     : TextView(data?.showNameText, size: _titleSize()),
+                    Container(
+
+                        // decoration: data.getChildList().length > 0
+                        //    ? null
+                        //    : BoxDecoration(
+                        //        border: Border.all(
+                        //            color: '#347979'.toColor(), width: 1),
+                        //        borderRadius: BorderRadius.circular(4)),
+                        child: Container(child: cW)),
+                    (data?.showDesc ?? '').isEmpty
+                        ? SizedBox.shrink()
+                        : TextView(data?.showDesc),
+                  ]))
               .addRightIcon(
                   onTap: data?.showAddBtn != true
                       ? null
@@ -301,7 +317,8 @@ class OnePicturePageState extends State<OnePicturePage> {
                   color: (data.isCurrentNet != true ? '#888888' : '#347979')
                       .toColor(),
                   width: 1,
-                  dash: data.getChildList().length > 0,
+                  dash: data.getChildList().length > 0 &&
+                      data.type == OnePictureType.DM.index,
                   margin:
                       EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 16),
                   padding:
@@ -328,8 +345,11 @@ class OnePicturePageState extends State<OnePicturePage> {
                   //     ? SizedBox.shrink()
                   //     : TextView(data?.showNameText, size: _titleSize()),
                   Container(
-                    padding: const EdgeInsets.only(
-                        top: 0, bottom: 16, left: 0, right: 20),
+                    padding: EdgeInsets.only(
+                        top: data?.showAddBtn == true ? 0 : 0,
+                        bottom: data?.showAddBtn == true ? 16 : 0,
+                        left: 0,
+                        right: data?.showAddBtn == true ? 20 : 0),
                     // margin: data.getChildList().length > 0
                     //     ? null
                     //     : EdgeInsets.all(16),
@@ -367,7 +387,10 @@ class OnePicturePageState extends State<OnePicturePage> {
                           width: 1,
                           dash: data.getChildList().length > 0,
                           margin: EdgeInsets.only(
-                              left: 16, right: 16, top: 16, bottom: 16),
+                              left: 16,
+                              right: 16,
+                              top: data.showAddBtn ? 40 : 16,
+                              bottom: 16),
                           borderRadius: 4.0),
                 ],
               )
@@ -487,8 +510,8 @@ extension on Container {
       children: [
         this,
         Positioned(
-            right: 20,
-            top: 30,
+            right: 12,
+            top: 20,
             child: btn ??
                 TextButton(
                     onPressed: onTap,

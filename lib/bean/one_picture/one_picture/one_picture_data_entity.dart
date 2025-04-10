@@ -127,10 +127,25 @@ class OnePictureDataData {
   }
 
   bool get showAddBtn {
-    // return false;
-    if ((type == OnePictureType.DM.index && children.length == 1) ||
-        (type == OnePictureType.JCK.index && showBorder)) {
+    if (type == OnePictureType.DM.index
+        // && children.length == 1
+    ) {
       return true;
+    }
+
+    if (type == OnePictureType.JCK.index) {
+      if (children.isNotEmpty) {
+        for (var child in children) {
+          if (child.type != OnePictureType.AISB.index &&
+              child.type != OnePictureType.SXT.index &&
+              child.type != OnePictureType.NVR.index) {
+            return true;
+          }
+        }
+        // if(children.length == 1){
+        //   return true;
+        // }
+      }
     }
     return false;
   }
@@ -252,7 +267,8 @@ class OnePictureDataData {
         // lineColor = ColorUtils.colorBlueLight.toColorHex();
         lineColor = '#347979';
         showArrow = false;
-      } else if (type == OnePictureType.LYQ.index||type == OnePictureType.YXWL.index) {
+      } else if (type == OnePictureType.LYQ.index ||
+          type == OnePictureType.YXWL.index) {
         // lineColor = ColorUtils.colorBlueLight.toColorHex();
         lineColor = '#5A8786';
         showArrow = false;
