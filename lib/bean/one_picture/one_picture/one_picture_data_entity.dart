@@ -127,7 +127,9 @@ class OnePictureDataData {
   }
 
   bool get showAddBtn {
-    if (type == OnePictureType.DM.index) {
+    if (type == OnePictureType.DM.index
+        // && children.length == 1
+    ) {
       return true;
     }
 
@@ -140,6 +142,9 @@ class OnePictureDataData {
             return true;
           }
         }
+        // if(children.length == 1){
+        //   return true;
+        // }
       }
     }
     return false;
