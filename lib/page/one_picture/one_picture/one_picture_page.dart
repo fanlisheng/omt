@@ -227,6 +227,9 @@ class OnePicturePageState extends State<OnePicturePage> {
                   Container(
                     padding: const EdgeInsets.only(
                         top: 0, bottom: 0, left: 0, right: 0),
+                    // margin: (oData?.getChildList() ?? []).isEmpty
+                    //     ? null
+                    //     : const EdgeInsets.only(bottom: 16, right: 20),
                     decoration: BoxDecoration(
                         border:
                             Border.all(color: '#347979'.toColor(), width: 1),
