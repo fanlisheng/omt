@@ -49,57 +49,60 @@ class AddPowerBoxView extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(height: 16),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    "*",
-                    style: TextStyle(fontSize: 12, color: ColorUtils.colorRed),
-                  ),
-                  SizedBox(width: 2),
-                  Text(
-                    "现场是否需要安装电源箱",
-                    style:
-                        TextStyle(fontSize: 12, color: ColorUtils.colorWhite),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Radio(
-                    value: true,
-                    groupValue: model.isPowerBoxNeeded,
-                    activeColor: ColorUtils.colorGreen,
-                    onChanged: (value) {
-                      model.isPowerBoxNeeded = value as bool;
-                      model.notifyListeners();
-                    },
-                  ),
-                  Text("需要",
-                      style: TextStyle(
-                          fontSize: 12,
-                          color: model.isPowerBoxNeeded
-                              ? ColorUtils.colorGreen
-                              : ColorUtils.colorWhite)),
-                  const SizedBox(width: 16),
-                  Radio(
-                    value: false,
-                    groupValue: model.isPowerBoxNeeded,
-                    activeColor: ColorUtils.colorGreen,
-                    onChanged: (value) {
-                      model.isPowerBoxNeeded = value as bool;
-                      model.notifyListeners();
-                    },
-                  ),
-                  Text("不需要",
-                      style: TextStyle(
-                          fontSize: 12,
-                          color: model.isPowerBoxNeeded
-                              ? ColorUtils.colorWhite
-                              : ColorUtils.colorGreen)),
-                ],
-              ),
+              if (model.isInstall == true) ...[
+                const SizedBox(height: 16),
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      "*",
+                      style:
+                          TextStyle(fontSize: 12, color: ColorUtils.colorRed),
+                    ),
+                    SizedBox(width: 2),
+                    Text(
+                      "现场是否需要安装电源箱",
+                      style:
+                          TextStyle(fontSize: 12, color: ColorUtils.colorWhite),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Radio(
+                      value: true,
+                      groupValue: model.isPowerBoxNeeded,
+                      activeColor: ColorUtils.colorGreen,
+                      onChanged: (value) {
+                        model.isPowerBoxNeeded = value as bool;
+                        model.notifyListeners();
+                      },
+                    ),
+                    Text("需要",
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: model.isPowerBoxNeeded
+                                ? ColorUtils.colorGreen
+                                : ColorUtils.colorWhite)),
+                    const SizedBox(width: 16),
+                    Radio(
+                      value: false,
+                      groupValue: model.isPowerBoxNeeded,
+                      activeColor: ColorUtils.colorGreen,
+                      onChanged: (value) {
+                        model.isPowerBoxNeeded = value as bool;
+                        model.notifyListeners();
+                      },
+                    ),
+                    Text("不需要",
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: model.isPowerBoxNeeded
+                                ? ColorUtils.colorWhite
+                                : ColorUtils.colorGreen)),
+                  ],
+                ),
+              ],
               if (model.isPowerBoxNeeded == true) ...[
                 const SizedBox(height: 10),
                 EquallyRow(

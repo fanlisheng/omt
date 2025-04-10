@@ -247,7 +247,7 @@ class AddCameraView extends StatelessWidget {
                         onTap: e.readOnly
                             ? null
                             : () {
-                                model.connectCameraAction();
+                                model.connectCameraAction(index);
                               },
                         child: Container(
                           padding: const EdgeInsets.only(
@@ -262,7 +262,7 @@ class AddCameraView extends StatelessWidget {
                       ),
                     ],
                   ),
-                  if ((e.rtsp ?? "").isNotEmpty) ...[
+                  if ((e.code ?? "").isNotEmpty) ...[
                     const SizedBox(height: 16),
                     Row(
                       children: [
@@ -293,23 +293,23 @@ class AddCameraView extends StatelessWidget {
                     ),
                     if (e.isOpen ?? false) ...[
                       const SizedBox(height: 16),
-                      const Row(
+                      Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(
                             flex: 1,
                             child: Row(
                               children: [
-                                Text(
+                                const Text(
                                   "设备编码:",
                                   style: TextStyle(
                                       fontSize: 12,
                                       color: ColorUtils.colorBlackLiteLite),
                                 ),
-                                SizedBox(width: 10),
+                                const SizedBox(width: 10),
                                 Text(
-                                  "设备编码",
-                                  style: TextStyle(
+                                  e.code ?? "",
+                                  style: const TextStyle(
                                       fontSize: 12,
                                       color: ColorUtils.colorGreenLiteLite),
                                 )
@@ -320,18 +320,18 @@ class AddCameraView extends StatelessWidget {
                             flex: 1,
                             child: Row(
                               children: [
-                                Text(
+                                const Text(
                                   "RTSP:",
                                   style: TextStyle(
                                       fontSize: 12,
                                       color: ColorUtils.colorBlackLiteLite),
                                 ),
-                                SizedBox(width: 10),
+                                const SizedBox(width: 10),
                                 Expanded(
                                   child: Text(
-                                    "rtsp://admin:flm2020hb@192.168.101.236:554/Streaming/Channels/101",
+                                    e.rtspController.text ?? '',
                                     maxLines: 2,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 12,
                                       color: ColorUtils.colorGreenLiteLite,
                                     ),
@@ -426,15 +426,15 @@ class AddCameraView extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       EquallyRow(
-                        one: ComboBox<String>(
+                        one: ComboBox<IdNameValue>(
                           isExpanded: true,
                           value: e.selectedEntryExit,
-                          items: model.entryExitList
-                              .map<ComboBoxItem<String>>((e) {
-                            return ComboBoxItem<String>(
+                          items: model.inOutList
+                              .map<ComboBoxItem<IdNameValue>>((e) {
+                            return ComboBoxItem<IdNameValue>(
                               value: e,
                               child: Text(
-                                e,
+                                e.name ?? "",
                                 textAlign: TextAlign.start,
                                 style: const TextStyle(
                                   fontSize: 12,

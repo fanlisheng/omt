@@ -17,7 +17,7 @@ import '../../../bean/home/home_page/device_detail_power_box_entity.dart';
 
 class InstallService {
   get _aiDeviceCameraInstall =>
-      '${API.share.host}api/device/ai_device_camera/install';
+      '${API.share.host}api/device/aidevice_camera/install';
 
   get _nvrInstall => '${API.share.host}api/device/nvr/install';
 
@@ -191,8 +191,6 @@ class InstallService {
   powerBoxInstall({
     String? pNodeCode,
     required String deviceCode,
-    required String ip,
-    required String mac,
     String? instanceId,
     int? gateId,
     int? passId,
@@ -202,8 +200,6 @@ class InstallService {
   }) async {
     Map<String, dynamic> params = {
       "device_code": deviceCode,
-      "ip": ip,
-      "mac": mac,
     };
 
     if (pNodeCode != null) {
@@ -298,7 +294,7 @@ class InstallService {
     HttpManager.share.doHttpPost<List<IdNameValue>>(
       await _getCameraType,
       {},
-      method: 'GET',
+      method: 'POST',
       autoHideDialog: false,
       autoShowDialog: false,
       onSuccess: onSuccess,
@@ -315,7 +311,7 @@ class InstallService {
     HttpManager.share.doHttpPost<List<IdNameValue>>(
       await _getCameraStatus,
       {},
-      method: 'GET',
+      method: 'POST',
       autoHideDialog: false,
       autoShowDialog: false,
       onSuccess: onSuccess,

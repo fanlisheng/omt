@@ -9,11 +9,15 @@ class CameraDeviceEntity {
   bool? isOpen = false;
   String? rtsp;
   String? code;
-  String? name;
-  String? type;
-  String? entryExit;
+
+  // String? name;
+  // String? type;
+  String? mac;
+
+  // String? entryExit;
   // String? isRegulation;
   String? id;
+  String? ip;
 
   //不允许编辑
   bool readOnly = false;
@@ -24,7 +28,7 @@ class CameraDeviceEntity {
   TextEditingController videoIdController = TextEditingController();
 
   // 进/出口选项
-  String selectedEntryExit = "";
+  IdNameValue? selectedEntryExit;
 
   //摄像头类型
   IdNameValue? selectedCameraType;
@@ -35,9 +39,9 @@ class CameraDeviceEntity {
   CameraDeviceEntity({
     this.rtsp,
     this.code,
-    this.name,
-    this.type,
-    this.entryExit,
+    // this.name,
+    // this.type,
+    // this.entryExit,
     // this.isRegulation,
     this.id,
     this.isOpen,

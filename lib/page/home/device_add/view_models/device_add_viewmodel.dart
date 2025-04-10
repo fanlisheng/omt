@@ -4,6 +4,7 @@ import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/test/test.dart';
+import 'package:omt/utils/hikvision_utils.dart';
 import 'package:omt/utils/log_utils.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/home/home_page/device_detail_ai_entity.dart';
@@ -15,6 +16,7 @@ import 'package:omt/utils/device_utils.dart';
 import 'package:omt/utils/sys_utils.dart';
 import 'package:omt/http/http_query.dart';
 
+import '../../../../bean/video/video_configuration/Video_Connect_entity.dart';
 import '../../../../utils/intent_utils.dart';
 import '../../search_device/services/device_search_service.dart';
 
@@ -82,7 +84,6 @@ class DeviceAddViewModel extends BaseViewModelRefresh<dynamic> {
   List<CameraDeviceEntity> cameraDeviceList = [CameraDeviceEntity()];
   List<TextEditingController> cameraControllers = [TextEditingController()];
   List<IdNameValue> cameraTypeList = [];
-  List<String> entryExitList = ["共用进出口", "进出口1", "进出口2"];
   List<IdNameValue> regulationList = [];
   String selectedAiIpForCamera = "";
 
@@ -98,7 +99,7 @@ class DeviceAddViewModel extends BaseViewModelRefresh<dynamic> {
   // ===== 电源箱相关属性 =====
   IdNameValue? selectedPowerBoxInOut;
   DeviceDetailPowerBoxData? selectedDeviceDetailPowerBox;
-  bool isPowerBoxNeeded = false;
+  bool isPowerBoxNeeded = true;
   List<DeviceDetailPowerBoxData> powerBoxList = [];
 
   // ===== 电池/交换机相关属性 =====
@@ -160,6 +161,8 @@ class DeviceAddViewModel extends BaseViewModelRefresh<dynamic> {
     for (var controller in cameraControllers) {
       controller.dispose();
     }
+    player.dispose();
+    routerIpController.dispose();
     super.dispose();
   }
 
@@ -261,14 +264,15 @@ class DeviceAddViewModel extends BaseViewModelRefresh<dynamic> {
               LoadingUtils.showToast(data: '请先连接AI设备');
               return;
             }
-            break;
-          case DeviceType.camera:
-            // 检查是否已连接摄像头
-            if (cameraDeviceList.isEmpty) {
-              LoadingUtils.showToast(data: '请先连接摄像头');
-              return;
+            if (regulationList.isEmpty) {
+              _getCameraStatusList();
+            }
+            if (cameraTypeList.isEmpty) {
+              _getCameraTypeList();
             }
             break;
+          case DeviceType.camera:
+            return;
           case DeviceType.nvr:
             // 检查是否已选择NVR
             if (selectedNarInOut == null) {
@@ -287,11 +291,21 @@ class DeviceAddViewModel extends BaseViewModelRefresh<dynamic> {
             return;
           case DeviceType.powerBox:
             // 检查是否已选择电源箱
-            if (selectedDeviceDetailPowerBox == null) {
+            if (selectedPowerBoxInOut?.id == null) {
+              LoadingUtils.showToast(data: '请选择进出口');
+              return;
+            }
+            if (selectedDeviceDetailPowerBox?.deviceCode == null) {
               LoadingUtils.showToast(data: '请先选择电源箱');
               return;
             }
-            break;
+            // 执行交换机安装
+            installPowerBox(
+              pNodeCode: pNodeCode,
+              deviceCode: selectedDeviceDetailPowerBox!.deviceCode!,
+              passId: selectedPowerBoxInOut!.id!,
+            );
+            return;
           case DeviceType.exchange:
             // 交换机需要检查参数
             if (selectedPortNumber == null || selectedSupplyMethod == null) {
@@ -351,7 +365,21 @@ class DeviceAddViewModel extends BaseViewModelRefresh<dynamic> {
         stepNumber = StepNumber.third;
       case StepNumber.third:
         if (deviceType == DeviceType.ai || deviceType == DeviceType.camera) {
-          stepNumber = StepNumber.four;
+          // 检查是否已连接摄像头
+          CameraDeviceEntity camera = cameraDeviceList.first;
+          if ((camera.deviceNameController.text.isEmpty) ||
+              ((camera.selectedCameraType?.value ?? -1) == -1) ||
+              ((camera.selectedRegulation?.value ?? -1) == -1) ||
+              ((camera.selectedEntryExit?.id ?? -1) == -1)) {
+            LoadingUtils.showToast(data: '“设备名称、摄像头类型、进出口、是否纳入监管”不能为空！');
+            return;
+          }
+          installAiDeviceAndCamera(
+              pNodeCode: pNodeCode,
+              passId: camera.selectedEntryExit?.id ?? -1,
+              aiDevice: aiDeviceList.first,
+              cameraDevice: cameraDeviceList.first);
+          return;
         }
       //完成
       case StepNumber.four:
@@ -453,15 +481,33 @@ class DeviceAddViewModel extends BaseViewModelRefresh<dynamic> {
     String? instanceId,
     int? gateId,
     int? passId,
-    required Map<String, dynamic> aiDevice,
-    required Map<String, dynamic> camera,
+    required DeviceDetailAiData aiDevice,
+    required CameraDeviceEntity cameraDevice,
   }) {
+    Map<String, dynamic> ai = {
+      "ip": aiDevice.ip ?? "",
+      "mac": aiDevice.mac ?? "",
+    };
+    Map<String, dynamic> camera = {
+      "device_code": cameraDevice.code ?? "",
+      "name": cameraDevice.deviceNameController.text ?? "",
+      "ip": cameraDevice.ip ?? "",
+      "mac": cameraDevice.mac,
+      "rtsp_url": cameraDevice.rtsp,
+      "pass_id": cameraDevice.selectedEntryExit?.id ?? -1,
+      "camera_type": cameraDevice.selectedCameraType?.value ?? 0,
+      "control_status": cameraDevice.selectedRegulation?.value ?? 0,
+    };
+    if (cameraDevice.id != null) {
+      camera["camera_code"] = cameraDevice.id;
+    }
+
     HttpQuery.share.installService.aiDeviceCameraInstall(
         pNodeCode: pNodeCode,
         instanceId: instanceId,
         gateId: gateId,
         passId: passId,
-        aiDevice: aiDevice,
+        aiDevice: ai,
         camera: camera,
         onSuccess: (data) {
           LoadingUtils.showToast(data: '安装成功');
@@ -474,11 +520,22 @@ class DeviceAddViewModel extends BaseViewModelRefresh<dynamic> {
   // ===== 摄像头相关方法 =====
 
   // 连接摄像头
-  connectCameraAction() {
-    if (cameraDeviceList.isNotEmpty) {
-      cameraDeviceList.first.rtsp = cameraDeviceList.first.rtspController.text;
-      notifyListeners();
+  connectCameraAction(int index) async {
+    LoadingUtils.show(data: "连接中...");
+    CameraDeviceEntity e = cameraDeviceList[index];
+    if (e.rtspController.text.isEmpty) return;
+    e.rtsp = e.rtspController.text;
+    player.open(Media(e.rtsp!));
+    e.ip = DeviceUtils.getIpFromRtsp(e.rtsp!);
+    DeviceEntity? deviceEntity =
+        await hikvisionDeviceInfo(ipAddress: e.ip ?? "");
+    if (deviceEntity?.deviceCode?.isEmpty ?? true) {
+      LoadingUtils.showError(data: "连接失败!");
+      return;
     }
+    e.code = deviceEntity?.deviceCode ?? "";
+    e.mac = deviceEntity?.mac;
+    notifyListeners();
   }
 
   // 完成摄像头设置
@@ -584,9 +641,11 @@ class DeviceAddViewModel extends BaseViewModelRefresh<dynamic> {
   //选择电源箱code
   selectedPowerBoxCode(DeviceDetailPowerBoxData? a) {
     HttpQuery.share.homePageService.deviceDetailPowerBox(
-        nodeCode: a?.deviceCode ?? "",
+        deviceCode: a?.deviceCode ?? "",
         onSuccess: (data) {
-          selectedDeviceDetailPowerBox = selectedDeviceDetailPowerBox;
+          selectedDeviceDetailPowerBox = a;
+          selectedDeviceDetailPowerBox?.dcInterfaces = data?.dcInterfaces ?? [];
+          notifyListeners();
         });
     notifyListeners();
   }
@@ -595,17 +654,13 @@ class DeviceAddViewModel extends BaseViewModelRefresh<dynamic> {
   installPowerBox({
     String? pNodeCode,
     required String deviceCode,
-    required String ip,
-    required String mac,
     String? instanceId,
     int? gateId,
-    int? passId,
+    required int passId,
   }) {
     HttpQuery.share.installService.powerBoxInstall(
         pNodeCode: pNodeCode,
         deviceCode: deviceCode,
-        ip: ip,
-        mac: mac,
         instanceId: instanceId,
         gateId: gateId,
         passId: passId,

@@ -191,9 +191,7 @@ class HomePageService {
     }
     HttpManager.share.doHttpPost<DeviceDetailAiData>(
       await _deviceDetailAi,
-      {
-        "node_code": nodeCode,
-      },
+      params,
       method: 'POST',
       autoHideDialog: true,
       autoShowDialog: true,
