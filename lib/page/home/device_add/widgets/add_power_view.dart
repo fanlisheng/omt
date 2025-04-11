@@ -5,11 +5,11 @@ import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/utils/color_utils.dart';
 import 'package:omt/widget/checkbox.dart';
 import '../../../../bean/common/id_name_value.dart';
-import '../view_models/device_add_viewmodel.dart';
+import '../view_models/add_power_viewmodel.dart';
 import 'add_camera_view.dart';
 
 class AddPowerView extends StatefulWidget {
-  final DeviceAddViewModel model;
+  final AddPowerViewModel model;
 
   const AddPowerView({super.key, required this.model});
 
@@ -20,10 +20,15 @@ class AddPowerView extends StatefulWidget {
 class _AddPowerViewState extends State<AddPowerView> {
   @override
   Widget build(BuildContext context) {
-    return contentView(widget.model);
+    return ProviderWidget<AddPowerViewModel>(
+        model: widget.model..themeNotifier = true,
+        autoLoadData: true,
+        builder: (context, model, child) {
+          return contentView(widget.model);
+        });
   }
 
-  Widget contentView(DeviceAddViewModel model) {
+  Widget contentView(AddPowerViewModel model) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -94,38 +99,6 @@ class _AddPowerViewState extends State<AddPowerView> {
                 ),
                 two: Container(),
               ),
-              // Wrap(
-              //   spacing: 10.0,
-              //   runSpacing: 10.0,
-              //   children: [
-              //     ComboBox<String>(
-              //       isExpanded: false,
-              //       value: model.portType,
-              //       items: model.inOutList.map<ComboBoxItem<String>>((e) {
-              //         return ComboBoxItem<String>(
-              //           value: e,
-              //           child: SizedBox(
-              //             width: 300,
-              //             child: Text(
-              //               e,
-              //               textAlign: TextAlign.start,
-              //             ),
-              //           ),
-              //         );
-              //       }).toList(),
-              //       onChanged: (a) {
-              //         model.portType = a!;
-              //         model.notifyListeners();
-              //       },
-              //       placeholder: const Text(
-              //         "请选择进/出口",
-              //         textAlign: TextAlign.start,
-              //         style: TextStyle(
-              //             fontSize: 12, color: ColorUtils.colorBlackLiteLite),
-              //       ),
-              //     ),
-              //   ],
-              // ),
               const SizedBox(height: 38),
               DashLine(
                 color: "#5D6666".toColor(),

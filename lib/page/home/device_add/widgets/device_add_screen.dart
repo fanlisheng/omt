@@ -13,6 +13,7 @@ import 'package:omt/page/home/device_add/widgets/add_nvr_view.dart';
 import 'package:omt/page/home/device_add/widgets/add_power_box_view.dart';
 import 'package:omt/page/home/device_add/widgets/add_power_view.dart';
 import 'package:omt/page/home/device_add/widgets/add_router_view.dart';
+import 'package:omt/theme.dart';
 import 'package:omt/widget/nav/dnavigation_view.dart';
 import '../../../../utils/color_utils.dart';
 import '../view_models/device_add_viewmodel.dart';
@@ -29,11 +30,10 @@ class DeviceAddScreen extends StatelessWidget {
         model: DeviceAddViewModel(pNodeCode)..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
-          bool complete =
-              (model.stepNumber == StepNumber.second &&
+          bool complete = (model.stepNumber == StepNumber.second &&
                   model.deviceType != DeviceType.ai &&
                   model.deviceType != DeviceType.camera) ||
-                  (model.stepNumber == StepNumber.third);
+              (model.stepNumber == StepNumber.third);
           return Container(
             color: "#3B3F3F".toColor(),
             child: fu.ScaffoldPage(
@@ -51,7 +51,10 @@ class DeviceAddScreen extends StatelessWidget {
                             child: Container(
                               padding: const EdgeInsets.only(
                                   left: 12, right: 12, top: 4, bottom: 4),
-                              color: ColorUtils.colorGreen,
+                              decoration: BoxDecoration(
+                                color: AppTheme().color,
+                                borderRadius: BorderRadius.circular(3),
+                              ),
                               child: const Text(
                                 "上一步",
                                 style: TextStyle(
@@ -68,7 +71,10 @@ class DeviceAddScreen extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.only(
                                 left: 12, right: 12, top: 4, bottom: 4),
-                            color: ColorUtils.colorGreen,
+                            decoration: BoxDecoration(
+                              color: AppTheme().color,
+                              borderRadius: BorderRadius.circular(3),
+                            ),
                             child: Text(
                               complete ? "添加完成" : "下一步",
                               style: const TextStyle(
@@ -190,18 +196,20 @@ class DeviceAddScreen extends StatelessWidget {
   Widget secondStepView(DeviceAddViewModel model) {
     switch (model.deviceType) {
       case DeviceType.ai:
+        return AddAiView(model: model.aiViewModel!);
       case DeviceType.camera:
-        return AddAiView(model: model);
+        return AddAiView(model: model.aiViewModel!);
+      // return AddCameraView(model: model.cameraViewModel!);
       case DeviceType.nvr:
-        return AddNvrView(model: model);
+        return AddNvrView(model: model.nvrViewModel!);
       case DeviceType.powerBox:
-        return AddPowerBoxView(model: model);
+        return AddPowerBoxView(model: model.powerBoxViewModel!);
       case DeviceType.power:
-        return AddPowerView(model: model);
+        return AddPowerView(model: model.powerViewModel!);
       case DeviceType.exchange:
-        return AddBatteryExchangeView(model: model);
+        return AddBatteryExchangeView(model: model.batteryExchangeViewModel!);
       case DeviceType.router:
-        return AddRouterView(model: model);
+        return AddRouterView(model: model.routerViewModel!);
       default:
         return Container();
     }
@@ -215,14 +223,14 @@ class DeviceAddScreen extends StatelessWidget {
       case DeviceType.ai:
       case DeviceType.camera:
         if (model.stepNumber == StepNumber.third) {
-          return AddCameraView(model: model);
+          return AddCameraView(model: model.cameraViewModel!);
         } else if (model.stepNumber == StepNumber.four) {
           return fourView(model);
         } else {
           return Container();
         }
       case DeviceType.powerBox:
-        return AddPowerBoxView(model: model);
+        return AddPowerBoxView(model: model.powerBoxViewModel!);
       case DeviceType.nvr:
       case DeviceType.battery:
       case DeviceType.exchange:
@@ -316,7 +324,7 @@ class DeviceAddScreen extends StatelessWidget {
             color: ColorUtils.colorBackgroundLine,
             child: Column(
               children: [
-                AddPowerView(model: model),
+                // AddPowerView(model: model),
               ],
             ),
           ),

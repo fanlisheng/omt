@@ -6,24 +6,26 @@ import 'package:kayo_package/extension/_index_extension.dart';
 import 'package:kayo_package/mvvm/base/provider_widget.dart';
 import 'package:kayo_package/views/widget/base/clickable.dart';
 import 'package:kayo_package/views/widget/base/dash_line.dart';
-import 'package:omt/page/home/device_add/view_models/add_nvr_viewmodel.dart';
 import 'package:omt/utils/color_utils.dart';
 import '../../../../bean/common/id_name_value.dart';
-import '../../../../bean/home/home_page/device_detail_nvr_entity.dart';
-import '../../../../bean/home/home_page/device_entity.dart';
-import '../view_models/device_add_viewmodel.dart';
+import '../view_models/add_router_viewmodel.dart';
 
 class AddRouterView extends StatelessWidget {
-  final DeviceAddViewModel model;
+  final AddRouterViewModel model;
 
   const AddRouterView({super.key, required this.model});
 
   @override
   Widget build(BuildContext context) {
-    return nvrView(model);
+    return ProviderWidget<AddRouterViewModel>(
+        model: model..themeNotifier = true,
+        autoLoadData: true,
+        builder: (context, model, child) {
+          return routerView(model);
+        });
   }
 
-  Widget nvrView(DeviceAddViewModel model) {
+  Widget routerView(AddRouterViewModel model) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

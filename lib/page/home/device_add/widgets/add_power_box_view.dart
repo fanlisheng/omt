@@ -9,22 +9,26 @@ import 'package:omt/utils/color_utils.dart';
 import '../../../../bean/common/id_name_value.dart';
 import '../../../../bean/home/home_page/device_detail_power_box_entity.dart';
 import '../../device_detail/widgets/detail_ai_view.dart';
-import '../view_models/add_ai_viewmodel.dart';
 import '../view_models/add_power_box_viewmodel.dart';
-import '../view_models/device_add_viewmodel.dart';
 import 'add_ai_view.dart';
 
 class AddPowerBoxView extends StatelessWidget {
-  final DeviceAddViewModel model;
+  final AddPowerBoxViewModel model;
 
   const AddPowerBoxView({super.key, required this.model});
 
   @override
   Widget build(BuildContext context) {
-    return powerBoxView(model);
+
+    return ProviderWidget<AddPowerBoxViewModel>(
+        model: model..themeNotifier = true,
+        autoLoadData: true,
+        builder: (context, model, child) {
+          return powerBoxView(model);
+        });
   }
 
-  Widget powerBoxView(DeviceAddViewModel model) {
+  Widget powerBoxView(AddPowerBoxViewModel model) {
     return ListView(
       // crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -209,8 +213,8 @@ class AddPowerBoxView extends StatelessWidget {
     );
   }
 
-  Widget infoView(DeviceAddViewModel model) {
-    return Container(
+  Widget infoView(AddPowerBoxViewModel model) {
+    return SizedBox(
       height: 140,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -260,7 +264,7 @@ class AddPowerBoxView extends StatelessWidget {
     );
   }
 
-  Widget edInfoView(DeviceAddViewModel model) {
+  Widget edInfoView(AddPowerBoxViewModel model) {
     return SizedBox(
       width: double.infinity,
       child: DataTable(

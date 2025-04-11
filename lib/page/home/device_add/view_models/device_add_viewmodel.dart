@@ -1,24 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
-import 'package:media_kit/media_kit.dart';
-import 'package:media_kit_video/media_kit_video.dart';
-import 'package:omt/bean/common/id_name_value.dart';
-import 'package:omt/test/test.dart';
-import 'package:omt/utils/hikvision_utils.dart';
-import 'package:omt/utils/log_utils.dart';
 import 'package:kayo_package/kayo_package.dart';
-import 'package:omt/bean/home/home_page/device_detail_ai_entity.dart';
-import 'package:omt/bean/home/home_page/device_detail_nvr_entity.dart';
-import 'package:omt/bean/home/home_page/device_detail_power_box_entity.dart';
-import 'package:omt/bean/home/home_page/device_entity.dart';
-import 'package:omt/bean/home/home_page/camera_device_entity.dart';
-import 'package:omt/utils/device_utils.dart';
-import 'package:omt/utils/sys_utils.dart';
+import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
+import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/http/http_query.dart';
+import 'package:omt/utils/device_utils.dart';
+import 'package:omt/utils/intent_utils.dart';
 
-import '../../../../bean/video/video_configuration/Video_Connect_entity.dart';
-import '../../../../utils/intent_utils.dart';
-import '../../search_device/services/device_search_service.dart';
+import 'add_ai_viewmodel.dart';
+import 'add_battery_exchange_viewmodel.dart';
+import 'add_camera_viewmodel.dart';
+import 'add_nvr_viewmodel.dart';
+import 'add_power_box_viewmodel.dart';
+import 'add_power_viewmodel.dart';
+import 'add_router_viewmodel.dart';
 
 enum DeviceType {
   power, // 电源
@@ -43,81 +37,30 @@ class DeviceAddViewModel extends BaseViewModelRefresh<dynamic> {
   // 父节点code
   final String pNodeCode;
 
-  DeviceAddViewModel(
-    this.pNodeCode,
-  );
+  DeviceAddViewModel(this.pNodeCode);
 
   StepNumber stepNumber = StepNumber.first; //第几步
   DeviceType? deviceType; //设备类型
   bool isInstall = false; //是安装 默认否
 
-  // 设备信息
-  // String deviceCode = ''; // 设备编码
-  // String deviceIp = ''; // 设备IP
-  // String deviceMac = ''; // 设备MAC地址
-
   IdNameValue? deviceTypeSelected;
   List deviceTypes = [];
 
   // ===== 共用 进出口 =====
-  List<IdNameValue> inOutList = [];
-
-  // IdNameValue? selectedInOut;
-
-  // ===== 电源设备相关属性 =====
-  String portType = "";
-  bool batteryMains = false; //市电
-  bool battery = false; //电池
-  IdNameValue? selectedPowerInOut;
-
-  // ===== AI设备相关属性 =====
-  List<DeviceDetailAiData> aiDeviceList = [DeviceDetailAiData()];
-  List<TextEditingController> aiControllers = [TextEditingController()];
-  bool isAiSearching = false;
-  String? selectedAiIp;
-  List<DeviceEntity> aiSearchResults = [];
-  bool stopAiScanning = false;
-
-  // ===== 摄像头相关属性 =====
-  late final player = Player();
-  late final videoController = VideoController(player);
-  List<CameraDeviceEntity> cameraDeviceList = [CameraDeviceEntity()];
-  List<TextEditingController> cameraControllers = [TextEditingController()];
-  List<IdNameValue> cameraTypeList = [];
-  List<IdNameValue> regulationList = [];
-  String selectedAiIpForCamera = "";
-
-  // ===== NVR相关属性 =====
-  List<DeviceEntity> nvrDeviceList = [DeviceEntity()];
-  bool isNvrNeeded = true;
-  DeviceEntity? selectedNvrIp;
-  List<DeviceEntity> nvrIpList = [];
-  DeviceDetailNvrData nvrData = DeviceDetailNvrData();
-  bool isNvrSearching = false;
-  IdNameValue? selectedNarInOut;
-
-  // ===== 电源箱相关属性 =====
-  IdNameValue? selectedPowerBoxInOut;
-  DeviceDetailPowerBoxData? selectedDeviceDetailPowerBox;
-  bool isPowerBoxNeeded = true;
-  List<DeviceDetailPowerBoxData> powerBoxList = [];
-
-  // ===== 电池/交换机相关属性 =====
-  bool isCapacity80 = true;
-  List<int> portNumber = [5, 8];
-  int? selectedPortNumber;
-  List<String> supplyMethod = ["POE", "DC", "AC"];
-  String? selectedSupplyMethod;
-
-  // ===== 路由器相关属性 =====
-  IdNameValue? selectedRouterInOut;
-  IdNameValue? selectedRouterType;
-  List<IdNameValue> routerTypeList = [];
-  TextEditingController routerIpController = TextEditingController();
+  // List<IdNameValue> inOutList = [];
 
   // ===== 网络环境相关属性 =====
   String selectedNetworkEnv = "";
   List<IdNameValue> networkEnvList = [];
+
+  // ===== 各个子ViewModel =====
+  AddAiViewModel? aiViewModel;
+  AddCameraViewModel? cameraViewModel;
+  AddNvrViewModel? nvrViewModel;
+  AddPowerBoxViewModel? powerBoxViewModel;
+  AddBatteryExchangeViewModel? batteryExchangeViewModel;
+  AddPowerViewModel? powerViewModel;
+  AddRouterViewModel? routerViewModel;
 
   @override
   void initState() async {
@@ -131,18 +74,14 @@ class DeviceAddViewModel extends BaseViewModelRefresh<dynamic> {
       IdNameValue(id: 6, name: "电源"),
       IdNameValue(id: 7, name: "路由器"),
     ];
-    routerTypeList = [
-      IdNameValue(id: 6, name: "无线"),
-      IdNameValue(id: 7, name: "有线")
-    ];
 
-    // 初始化NVR的进/出口列表
-    HttpQuery.share.homePageService.getInOutList(
-      onSuccess: (List<IdNameValue>? data) {
-        inOutList = data ?? [];
-        notifyListeners();
-      },
-    );
+    // 初始化进/出口列表
+    // HttpQuery.share.homePageService.getInOutList(
+    //   onSuccess: (List<IdNameValue>? data) {
+    //     inOutList = data ?? [];
+    //     notifyListeners();
+    //   },
+    // );
 
     // 初始化网络环境列表
     networkEnvList = [
@@ -155,14 +94,6 @@ class DeviceAddViewModel extends BaseViewModelRefresh<dynamic> {
   @override
   void dispose() {
     // 销毁所有控制器
-    for (var controller in aiControllers) {
-      controller.dispose();
-    }
-    for (var controller in cameraControllers) {
-      controller.dispose();
-    }
-    player.dispose();
-    routerIpController.dispose();
     super.dispose();
   }
 
@@ -173,9 +104,9 @@ class DeviceAddViewModel extends BaseViewModelRefresh<dynamic> {
 
   ///确定电源类型
   confirmPowerEventAction() {
-    if (portType.isNotEmpty && (battery || batteryMains)) {
-      LogUtils.info(msg: "confirmPowerEventAction");
-    }
+    // if (portType.isNotEmpty && (battery || batteryMains)) {
+    //   LogUtils.info(msg: "confirmPowerEventAction");
+    // }
   }
 
   //选择设备类型
@@ -223,544 +154,203 @@ class DeviceAddViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   //下一步
+  //下一步
   nextStepEventAction() async {
     switch (stepNumber) {
       case StepNumber.first:
         if ((deviceTypeSelected?.name ?? "").isEmpty) {
           return;
         }
+        // 根据选择的设备类型创建对应的 ViewModel
         switch (deviceType) {
-          case DeviceType.router:
-            String? subnet = await DeviceUtils.getSubnet();
-            if (null != subnet && subnet.isNotEmpty) {
-              subnet = '$subnet.1';
-              routerIpController.text = subnet;
-            }
+          case DeviceType.ai:
+            aiViewModel = AddAiViewModel(pNodeCode);
+            break;
+          case DeviceType.camera:
+            aiViewModel = AddAiViewModel(pNodeCode);
+            break;
+          case DeviceType.nvr:
+            nvrViewModel = AddNvrViewModel(pNodeCode);
             break;
           case DeviceType.powerBox:
-            // 初始化电源箱列表
-            HttpQuery.share.installService.getUnboundPowerBox(
-              onSuccess: (List<DeviceDetailPowerBoxData>? data) {
-                powerBoxList = data ?? [];
-                notifyListeners();
-              },
-            );
-            String? subnet = await DeviceUtils.getSubnet();
-            if (null != subnet && subnet.isNotEmpty) {
-              subnet = '$subnet.1';
-              routerIpController.text = subnet;
-            }
+            powerBoxViewModel =
+                AddPowerBoxViewModel(pNodeCode, isInstall: isInstall);
+            break;
+          case DeviceType.exchange:
+            batteryExchangeViewModel = AddBatteryExchangeViewModel(pNodeCode,
+                isInstall: isInstall, isBattery: false);
+            break;
+          case DeviceType.battery:
+            batteryExchangeViewModel = AddBatteryExchangeViewModel(pNodeCode,
+                isInstall: isInstall, isBattery: true);
+            break;
+          case DeviceType.power:
+            powerViewModel = AddPowerViewModel(pNodeCode, isInstall: isInstall);
+            break;
+          case DeviceType.router:
+            routerViewModel =
+                AddRouterViewModel(pNodeCode, isInstall: isInstall);
             break;
           default:
             break;
         }
         stepNumber = StepNumber.second;
       case StepNumber.second:
-        // 根据设备类型执行不同的操作
+        // 处理不同设备类型的下一步操作
         switch (deviceType) {
           case DeviceType.ai:
-            // 检查是否已连接AI设备
-            if (aiDeviceList.isEmpty || aiDeviceList.first.mac == null) {
+            // AI设备
+            if (aiViewModel != null &&
+                aiViewModel!.aiDeviceList.isNotEmpty &&
+                aiViewModel!.aiDeviceList.first.mac != null) {
+              cameraViewModel =
+                  AddCameraViewModel(pNodeCode, aiViewModel?.aiDeviceList ?? []);
+              stepNumber = StepNumber.third;
+            } else {
               LoadingUtils.showToast(data: '请先连接AI设备');
               return;
             }
-            if (regulationList.isEmpty) {
-              _getCameraStatusList();
+            break;
+          case DeviceType.camera:
+            // 摄像头
+            if (cameraViewModel != null) {
+              stepNumber = StepNumber.third;
+            } else {
+              return;
             }
-            if (cameraTypeList.isEmpty) {
-              _getCameraTypeList();
+            break;
+          case DeviceType.nvr:
+            // NVR设备
+            if (nvrViewModel != null) {
+              nvrViewModel!.installNvrAction();
+            }
+            return;
+          case DeviceType.powerBox:
+            // 电源箱
+            if (powerBoxViewModel != null) {
+              powerBoxViewModel!.installPowerBox();
+            }
+            return;
+          case DeviceType.exchange:
+            // 交换机
+            if (batteryExchangeViewModel != null &&
+                !batteryExchangeViewModel!.isBattery) {
+              batteryExchangeViewModel!.installSwitch();
+            }
+            return;
+          case DeviceType.battery:
+            // 电池
+            // if (batteryExchangeViewModel != null && batteryExchangeViewModel!.isBattery) {
+            //   batteryExchangeViewModel!.installBattery();
+            // }
+            return;
+          case DeviceType.power:
+            // 电源
+            if (powerViewModel != null) {
+              powerViewModel!.installPower();
+            }
+            return;
+          case DeviceType.router:
+            // 路由器
+            if (routerViewModel != null) {
+              routerViewModel!.installRouter();
+            }
+            return;
+          default:
+            return;
+        }
+        break;
+      case StepNumber.third:
+        stepNumber = StepNumber.four;
+        break;
+      case StepNumber.four:
+        //完成
+        break;
+    }
+    notifyListeners();
+  }
+
+  nextStepEventAction2() async {
+    switch (stepNumber) {
+      case StepNumber.first:
+        if ((deviceTypeSelected?.name ?? "").isEmpty) {
+          return;
+        }
+        stepNumber = StepNumber.second;
+        notifyListeners();
+        break;
+      case StepNumber.second:
+        // 根据设备类型执行不同的操作
+        switch (deviceType) {
+          case DeviceType.ai:
+            // AI设备
+            if (aiViewModel != null &&
+                aiViewModel!.aiDeviceList.isNotEmpty &&
+                aiViewModel!.aiDeviceList.first.mac != null &&
+                aiViewModel?.aiDeviceList.first.ip != null) {
+              cameraViewModel = AddCameraViewModel(
+                  pNodeCode, aiViewModel?.aiDeviceList ?? []);
+              stepNumber = StepNumber.third;
+            } else {
+              LoadingUtils.showToast(data: '请先连接AI设备');
+              return;
             }
             break;
           case DeviceType.camera:
-            return;
+            // 摄像头
+            if (cameraViewModel != null) {
+              stepNumber = StepNumber.third;
+            } else {
+              return;
+            }
+            break;
           case DeviceType.nvr:
-            // 检查是否已选择NVR
-            if (selectedNarInOut == null) {
-              LoadingUtils.showToast(data: '请先选择进出口');
-              return;
+            // NVR设备
+            if (nvrViewModel != null) {
+              nvrViewModel!.installNvrAction();
             }
-            if (selectedNvrIp == null) {
-              LoadingUtils.showToast(data: '请先选择NVR设备');
-              return;
-            }
-            installNvr(
-                pNodeCode: pNodeCode,
-                ip: selectedNvrIp!.ip ?? "",
-                mac: selectedNvrIp!.mac ?? "",
-                passId: selectedNarInOut!.id!);
             return;
           case DeviceType.powerBox:
-            // 检查是否已选择电源箱
-            if (selectedPowerBoxInOut?.id == null) {
-              LoadingUtils.showToast(data: '请选择进出口');
-              return;
+            // 电源箱
+            if (powerBoxViewModel != null) {
+              powerBoxViewModel!.installPowerBox();
             }
-            if (selectedDeviceDetailPowerBox?.deviceCode == null) {
-              LoadingUtils.showToast(data: '请先选择电源箱');
-              return;
-            }
-            // 执行交换机安装
-            installPowerBox(
-              pNodeCode: pNodeCode,
-              deviceCode: selectedDeviceDetailPowerBox!.deviceCode!,
-              passId: selectedPowerBoxInOut!.id!,
-            );
             return;
           case DeviceType.exchange:
-            // 交换机需要检查参数
-            if (selectedPortNumber == null || selectedSupplyMethod == null) {
-              LoadingUtils.showToast(data: '请选择交换机接口数量和供电方式');
-              return;
+            // 交换机
+            if (batteryExchangeViewModel != null &&
+                !batteryExchangeViewModel!.isBattery) {
+              batteryExchangeViewModel!.installSwitch();
             }
-
-            // 执行交换机安装
-            installSwitch(
-              pNodeCode: pNodeCode,
-              interfaceNum: selectedPortNumber!,
-              powerMethod: selectedSupplyMethod!,
-            );
+            return;
+          case DeviceType.battery:
+            // 电池
             return;
           case DeviceType.power:
-            // 电源需要检查参数
-            if (selectedPowerInOut?.id == null) {
-              LoadingUtils.showToast(data: '请选择进出口');
-              return;
+            // 电源
+            if (powerViewModel != null) {
+              powerViewModel!.installPower();
             }
-            if (batteryMains == false && battery == false) {
-              LoadingUtils.showToast(data: '请选择电源类型');
-              return;
-            }
-
-            // 执行电源安装
-            installPower(
-              pNodeCode: pNodeCode,
-              hasBatteryMains: batteryMains,
-              batteryCap: battery == false ? null : (isCapacity80 ? 80 : 160),
-              type: selectedPowerInOut!.id!,
-            );
-            break;
+            return;
           case DeviceType.router:
-            // 路由器需要检查参数
-            if (selectedRouterInOut?.id == null ||
-                selectedRouterType?.id == null) {
-              LoadingUtils.showToast(data: '请选择进出口/有线无线类型');
-              return;
+            // 路由器
+            if (routerViewModel != null) {
+              routerViewModel!.installRouter();
             }
-            if (routerIpController.text.isEmpty) {
-              LoadingUtils.showToast(data: '没有识别到路由器');
-              return;
-            }
-
-            // 执行路由器安装
-            installRouter(
-              pNodeCode: pNodeCode,
-              ip: routerIpController.text,
-              type: selectedRouterType!.id!, // 默认类型
-              passId: selectedRouterInOut!.id!,
-            );
             return;
           default:
             break;
         }
         stepNumber = StepNumber.third;
+        notifyListeners();
+        break;
       case StepNumber.third:
-        if (deviceType == DeviceType.ai || deviceType == DeviceType.camera) {
-          // 检查是否已连接摄像头
-          CameraDeviceEntity camera = cameraDeviceList.first;
-          if ((camera.deviceNameController.text.isEmpty) ||
-              ((camera.selectedCameraType?.value ?? -1) == -1) ||
-              ((camera.selectedRegulation?.value ?? -1) == -1) ||
-              ((camera.selectedEntryExit?.id ?? -1) == -1)) {
-            LoadingUtils.showToast(data: '“设备名称、摄像头类型、进出口、是否纳入监管”不能为空！');
-            return;
-          }
-          installAiDeviceAndCamera(
-              pNodeCode: pNodeCode,
-              passId: camera.selectedEntryExit?.id ?? -1,
-              aiDevice: aiDeviceList.first,
-              cameraDevice: cameraDeviceList.first);
-          return;
-        }
-      //完成
+        stepNumber = StepNumber.four;
+        notifyListeners();
+        break;
       case StepNumber.four:
-      //完成
+        // 完成
+        break;
     }
-    notifyListeners();
-  }
-
-  // ===== AI设备相关方法 =====
-
-  // 连接AI设备
-  connectAiDeviceAction(int index) async {
-    if (SysUtils.isIPAddress(aiControllers[index].text)) {
-      //获取到mac
-      LoadingUtils.show(data: "连接设备中...");
-      String? mac = await DeviceUtils.getMacAddressByIp(
-          ip: aiControllers[index].text,
-          shouldStop: () {
-            return false;
-          });
-      if (mac == null) {
-        LoadingUtils.showToast(data: '该设备不在线');
-        return;
-      }
-      //请求设备信息
-      String deviceCode =
-          DeviceUtils.getDeviceCodeByMacAddress(macAddress: mac);
-      HttpQuery.share.homePageService.deviceDetailAi(
-          deviceCode: deviceCode,
-          onSuccess: (DeviceDetailAiData? data) {
-            if (data != null) {
-              data.mac = mac;
-              data.ip = aiControllers[index].text;
-              //只有一个
-              aiDeviceList = [data];
-            }
-            notifyListeners();
-            LoadingUtils.dismiss;
-          });
-    } else {
-      LoadingUtils.showToast(data: '请输入正确的IP地址');
-    }
-  }
-
-  // 开始搜索AI设备
-  void startAiSearch() async {
-    isAiSearching = true;
-    aiSearchResults.clear();
-    selectedAiIp = null;
-    notifyListeners();
-    // 扫描设备
-    List<DeviceEntity> searchDevices = await DeviceSearchService()
-        .scanDevices(shouldStop: _shouldStopAi, deviceType: "AI设备");
-    if (_shouldStopAi()) {
-      stopAiSearch();
-      return;
-    }
-    List<DeviceEntity> aiDevices =
-        searchDevices.where((device) => device.deviceType == 10).toList();
-    // 搜索完成后调用：
-    aiSearchResults = List.from(aiDevices); // 设置搜索结果
-    isAiSearching = false;
-    notifyListeners();
-  }
-
-  // 停止搜索AI设备
-  void stopAiSearch() {
-    isAiSearching = false;
-    aiSearchResults = [];
-    notifyListeners();
-  }
-
-  // 处理选中的AI设备IP
-  void handleSelectedAiIp() {
-    if (selectedAiIp != null) {
-      // 将选中的IP填入第一个空的或新的输入框
-      int targetIndex =
-          aiControllers.indexWhere((controller) => controller.text.isEmpty);
-      if (targetIndex == -1) {
-        // 使用第一个输入框
-        aiControllers[0].text = selectedAiIp!;
-      } else {
-        aiControllers[targetIndex].text = selectedAiIp!;
-      }
-
-      // 自动触发连接
-      connectAiDeviceAction(targetIndex == -1 ? 0 : targetIndex);
-    }
-  }
-
-  // 定义一个停止条件的回调函数
-  bool _shouldStopAi() {
-    return stopAiScanning; // 当 stopAiScanning 为 true 时停止
-  }
-
-  // 安装AI设备和摄像头
-  installAiDeviceAndCamera({
-    String? pNodeCode,
-    String? instanceId,
-    int? gateId,
-    int? passId,
-    required DeviceDetailAiData aiDevice,
-    required CameraDeviceEntity cameraDevice,
-  }) {
-    Map<String, dynamic> ai = {
-      "ip": aiDevice.ip ?? "",
-      "mac": aiDevice.mac ?? "",
-    };
-    Map<String, dynamic> camera = {
-      "device_code": cameraDevice.code ?? "",
-      "name": cameraDevice.deviceNameController.text ?? "",
-      "ip": cameraDevice.ip ?? "",
-      "mac": cameraDevice.mac,
-      "rtsp_url": cameraDevice.rtsp,
-      "pass_id": cameraDevice.selectedEntryExit?.id ?? -1,
-      "camera_type": cameraDevice.selectedCameraType?.value ?? 0,
-      "control_status": cameraDevice.selectedRegulation?.value ?? 0,
-    };
-    if (cameraDevice.id != null) {
-      camera["camera_code"] = cameraDevice.id;
-    }
-
-    HttpQuery.share.installService.aiDeviceCameraInstall(
-        pNodeCode: pNodeCode,
-        instanceId: instanceId,
-        gateId: gateId,
-        passId: passId,
-        aiDevice: ai,
-        camera: camera,
-        onSuccess: (data) {
-          LoadingUtils.showToast(data: '安装成功');
-        },
-        onError: (error) {
-          LoadingUtils.showToast(data: '安装失败: $error');
-        });
-  }
-
-  // ===== 摄像头相关方法 =====
-
-  // 连接摄像头
-  connectCameraAction(int index) async {
-    LoadingUtils.show(data: "连接中...");
-    CameraDeviceEntity e = cameraDeviceList[index];
-    if (e.rtspController.text.isEmpty) return;
-    e.rtsp = e.rtspController.text;
-    player.open(Media(e.rtsp!));
-    e.ip = DeviceUtils.getIpFromRtsp(e.rtsp!);
-    DeviceEntity? deviceEntity =
-        await hikvisionDeviceInfo(ipAddress: e.ip ?? "");
-    if (deviceEntity?.deviceCode?.isEmpty ?? true) {
-      LoadingUtils.showError(data: "连接失败!");
-      return;
-    }
-    e.code = deviceEntity?.deviceCode ?? "";
-    e.mac = deviceEntity?.mac;
-    notifyListeners();
-  }
-
-  // 完成摄像头设置
-  completeCameraAction() {
-    if (cameraDeviceList.isNotEmpty) {
-      cameraDeviceList.first.readOnly = true;
-      notifyListeners();
-    }
-  }
-
-  // 重启识别
-  restartRecognitionAction() {
-    notifyListeners();
-  }
-
-  // 图片预览
-  photoPreviewAction() {
-    notifyListeners();
-  }
-
-  // 删除摄像头
-  deleteCameraAction(int index) {
-    notifyListeners();
-  }
-
-  // 编辑摄像头
-  editCameraAction(int index) {
-    notifyListeners();
-  }
-
-  // ===== NVR相关方法 =====
-
-  // 刷新NVR列表
-  refreshNvrAction() {
-    if (isNvrSearching) return;
-    _getNvrList();
-  }
-
-  // 选择一个NVR IP
-  selectNvrIpAction(DeviceEntity ip) {
-    if (ip.mac == null || ip == selectedNvrIp) return;
-    selectedNvrIp = ip;
-    isNvrNeeded = true;
-    notifyListeners();
-    //请求通道信息
-    String deviceCode =
-        DeviceUtils.getDeviceCodeByMacAddress(macAddress: selectedNvrIp!.mac!);
-    HttpQuery.share.homePageService.deviceDetailNvr(
-        deviceCode: deviceCode,
-        onSuccess: (data) {
-          nvrData = data ?? DeviceDetailNvrData();
-          notifyListeners();
-        });
-  }
-
-  // 获取NVR列表
-  void _getNvrList() {
-    isNvrSearching = true;
-    notifyListeners();
-    LoadingUtils.show(data: "正在获取当前网络下的NVR设备");
-    DeviceUtils.scanAndFetchDevicesInfo(deviceType: "NVR")
-        .then((List<DeviceEntity> data) {
-      LoadingUtils.show(data: "正在获取当前网络下的NVR设备");
-      nvrIpList.clear();
-      for (var a in data) {
-        if (a.ip != null) {
-          nvrIpList.add(a);
-        }
-      }
-      isNvrSearching = false;
-      notifyListeners();
-      LoadingUtils.dismiss();
-    });
-  }
-
-  // 安装NVR设备
-  installNvr({
-    required String pNodeCode,
-    required String ip,
-    required String mac,
-    String? instanceId,
-    int? gateId,
-    required int passId,
-  }) {
-    HttpQuery.share.installService.nvrInstall(
-        pNodeCode: pNodeCode,
-        ip: ip,
-        mac: mac,
-        instanceId: instanceId,
-        gateId: gateId,
-        passId: passId,
-        onSuccess: (data) {
-          LoadingUtils.showToast(data: 'NVR安装成功');
-          IntentUtils.share.popResultOk(context!);
-        },
-        onError: (error) {
-          LoadingUtils.showToast(data: 'NVR安装失败: $error');
-        });
-  }
-
-  /// ===== 电源箱相关方法 =====
-
-  //选择电源箱code
-  selectedPowerBoxCode(DeviceDetailPowerBoxData? a) {
-    HttpQuery.share.homePageService.deviceDetailPowerBox(
-        deviceCode: a?.deviceCode ?? "",
-        onSuccess: (data) {
-          selectedDeviceDetailPowerBox = a;
-          selectedDeviceDetailPowerBox?.dcInterfaces = data?.dcInterfaces ?? [];
-          notifyListeners();
-        });
-    notifyListeners();
-  }
-
-  // 安装电源箱
-  installPowerBox({
-    String? pNodeCode,
-    required String deviceCode,
-    String? instanceId,
-    int? gateId,
-    required int passId,
-  }) {
-    HttpQuery.share.installService.powerBoxInstall(
-        pNodeCode: pNodeCode,
-        deviceCode: deviceCode,
-        instanceId: instanceId,
-        gateId: gateId,
-        passId: passId,
-        onSuccess: (data) {
-          LoadingUtils.showToast(data: '电源箱安装成功');
-          IntentUtils.share.popResultOk(context!);
-        },
-        onError: (error) {
-          LoadingUtils.showToast(data: '电源箱安装失败: $error');
-        });
-  }
-
-  // 安装电源信息
-  installPower({
-    String? pNodeCode,
-    required bool hasBatteryMains, //有市电
-    required int type,
-    int? batteryCap,
-  }) {
-    HttpQuery.share.installService.powerInstall(
-        pNodeCode: pNodeCode,
-        hasBatteryMains: hasBatteryMains,
-        type: type,
-        batteryCap: batteryCap,
-        onSuccess: (data) {
-          LoadingUtils.showToast(data: '电源信息安装成功');
-          IntentUtils.share.popResultOk(context!);
-        },
-        onError: (error) {
-          LoadingUtils.showToast(data: '电源信息安装失败: $error');
-        });
-  }
-
-  // ===== 电池/交换机相关方法 =====
-
-  // 安装交换机
-  installSwitch({
-    String? pNodeCode,
-    required int interfaceNum,
-    required String powerMethod,
-  }) {
-    HttpQuery.share.installService.switchInstall(
-        pNodeCode: pNodeCode,
-        interfaceNum: interfaceNum,
-        powerMethod: powerMethod,
-        onSuccess: (data) {
-          LoadingUtils.showToast(data: '交换机安装成功');
-          IntentUtils.share.popResultOk(context!);
-        },
-        onError: (error) {
-          LoadingUtils.showToast(data: '交换机安装失败: $error');
-        });
-  }
-
-  // 安装电池
-  installBattery({
-    String? pNodeCode,
-    required int capacity,
-  }) {
-    // HttpQuery.share.installService.batteryInstall(
-    //     pNodeCode: pNodeCode,
-    //     capacity: capacity,
-    //     onSuccess: (data) {
-    //       LoadingUtils.showToast(data: '电池安装成功');
-    //     },
-    //     onError: (error) {
-    //       LoadingUtils.showToast(data: '电池安装失败: $error');
-    //     });
-  }
-
-  // 安装路由器
-  installRouter({
-    String? pNodeCode,
-    required String ip,
-    required int type,
-    required int passId,
-  }) {
-    HttpQuery.share.installService.routerInstall(
-        pNodeCode: pNodeCode,
-        type: type,
-        ip: ip,
-        passId: passId,
-        onSuccess: (data) {
-          LoadingUtils.showToast(data: '路由器安装成功');
-          IntentUtils.share.popResultOk(context!);
-        },
-        onError: (error) {
-          LoadingUtils.showToast(data: '路由器安装失败: $error');
-        });
-  }
-
-  _getCameraTypeList() {
-    HttpQuery.share.installService.getCameraType(onSuccess: (data) {
-      cameraTypeList = data ?? [];
-    });
-  }
-
-  _getCameraStatusList() {
-    HttpQuery.share.installService.getCameraStatus(onSuccess: (data) {
-      regulationList = data ?? [];
-    });
   }
 }

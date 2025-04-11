@@ -9,21 +9,27 @@ import 'package:omt/utils/color_utils.dart';
 import '../../../../bean/home/home_page/device_detail_ai_entity.dart';
 import '../../../../bean/home/home_page/device_entity.dart';
 import '../../../../theme.dart';
+import '../../../../utils/device_utils.dart';
 import '../../device_detail/widgets/detail_ai_view.dart';
 import '../view_models/add_ai_viewmodel.dart';
-import '../view_models/device_add_viewmodel.dart';
+import 'ai_search_view.dart';
 
 class AddAiView extends StatelessWidget {
-  final DeviceAddViewModel model;
+  final AddAiViewModel model;
 
   const AddAiView({super.key, required this.model});
 
   @override
   Widget build(BuildContext context) {
-    return aiView(model, context);
+    return ProviderWidget<AddAiViewModel>(
+        model: model..themeNotifier = true,
+        autoLoadData: true,
+        builder: (context, model, child) {
+          return aiView(model, context);
+        });
   }
 
-  Column aiView(DeviceAddViewModel model, BuildContext context) {
+  Column aiView(AddAiViewModel model, BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -45,7 +51,12 @@ class AddAiView extends StatelessWidget {
               ),
               const ui.SizedBox(width: 10),
               Clickable(
-                onTap: () => _showSearchDialog(context, model),
+                onTap: (){
+                  showAiSearchDialog(context).then((ip){
+                    model.selectedAiIp = ip;
+                    model.notifyListeners();
+                  });
+                },
                 child: Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
@@ -227,184 +238,4 @@ class AddAiView extends StatelessWidget {
     );
   }
 
-  void _showSearchDialog(BuildContext context, DeviceAddViewModel parentModel) {
-    // 创建一个新的 ViewModel 实例
-    // final dialogModel = AddAiViewModel(
-    //     parentModel.deviceType, parentModel.stepNumber, parentModel.isInstall);
-    // dialogModel.startSearch();
-    parentModel.startAiSearch();
-
-    ui.showDialog(
-      context: context,
-      barrierColor: Colors.black.withOpacity(0.6),
-      barrierDismissible: false,
-      builder: (context) {
-        return ProviderWidget<DeviceAddViewModel>(
-            model: parentModel,
-            builder: (context, model, child) {
-              return Center(
-                child: Container(
-                  width: 400,
-                  height: 300,
-                  decoration: BoxDecoration(
-                    color: ColorUtils.colorBackgroundLine,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            "搜索AI设备",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: ColorUtils.colorWhite,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          Clickable(
-                            onTap: () {
-                              Navigator.pop(context);
-                              // model.dispose(); // 确保在关闭对话框时 dispose 新的 ViewModel
-                            },
-                            child: const Icon(
-                              FluentIcons.chrome_close,
-                              color: ColorUtils.colorWhite,
-                              size: 20,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      if (model.isAiSearching) ...[
-                        const SizedBox(height: 40),
-                        const ui.CircularProgressIndicator(),
-                        const SizedBox(height: 24),
-                        const Text(
-                          "AI设备IP搜索中...",
-                          style: TextStyle(
-                            color: ColorUtils.colorWhite,
-                            fontSize: 14,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        FilledButton(
-                          onPressed: () {
-                            model.stopAiSearch();
-                            Navigator.pop(context);
-                          },
-                          style: ButtonStyle(
-                              backgroundColor: WidgetStateProperty.all(
-                                  Colors.red) // 示例：根据条件设置颜色
-                              ),
-                          child: const Text(
-                            "取消搜索",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ] else if (model.aiSearchResults.isEmpty) ...[
-                        const Text(
-                          "无AI设备",
-                          style: TextStyle(
-                            color: ColorUtils.colorWhite,
-                            fontSize: 14,
-                          ),
-                        ),
-                        const SizedBox(height: 80),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            FilledButton(
-                              onPressed: () => model.startAiSearch(),
-                              child: const Text(
-                                "重新搜索",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            FilledButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: const Text(
-                                "返回",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ] else ...[
-                        Expanded(
-                          child: ListView.builder(
-                            itemCount: model.aiSearchResults.length,
-                            itemBuilder: (context, index) {
-                              final result = model.aiSearchResults[index];
-                              return ui.RadioListTile<String>(
-                                value: result.ip ?? "",
-                                groupValue: model.selectedAiIp,
-                                onChanged: (value) {
-                                  model.selectedAiIp = value;
-                                  model.notifyListeners();
-                                },
-                                title: Text(
-                                  result.ip ?? "",
-                                  style: const TextStyle(
-                                    color: ColorUtils.colorWhite,
-                                  ),
-                                ),
-                                subtitle: Text(
-                                  "MAC: ${result.mac}",
-                                  style: const TextStyle(
-                                    color: ColorUtils.colorGray,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            FilledButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              style: ButtonStyle(
-                                  backgroundColor: WidgetStateProperty.all(
-                                      Colors.red) // 示例：根据条件设置颜色
-                                  ),
-                              child: const Text(
-                                "返回",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            FilledButton(
-                              onPressed: () {
-                                if (model.selectedAiIp != null) {
-                                  // 处理选中的IP
-                                  parentModel.selectedAiIp = model
-                                      .selectedAiIp; // 将选中的IP传递给父 ViewModel
-                                  parentModel.handleSelectedAiIp();
-                                  Navigator.pop(context);
-                                }
-                              },
-                              child: const Text(
-                                "确定",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              );
-            });
-      },
-    );
-  }
 }

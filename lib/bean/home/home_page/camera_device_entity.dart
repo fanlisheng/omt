@@ -16,7 +16,7 @@ class CameraDeviceEntity {
 
   // String? entryExit;
   // String? isRegulation;
-  String? id;
+  // String? id;
   String? ip;
 
   //不允许编辑
@@ -43,7 +43,7 @@ class CameraDeviceEntity {
     // this.type,
     // this.entryExit,
     // this.isRegulation,
-    this.id,
+    // this.id,
     this.isOpen,
   });
 
