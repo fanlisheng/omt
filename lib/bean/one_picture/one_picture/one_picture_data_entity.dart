@@ -126,10 +126,19 @@ class OnePictureDataData {
     return '';
   }
 
+  bool get showAddBtnDM {
+    if (type == OnePictureType.DM.index &&
+        children.isEmpty &&
+        nextList.isEmpty) {
+      return true;
+    }
+    return false;
+  }
+
   bool get showAddBtn {
     if (type == OnePictureType.DM.index
         // && children.length == 1
-    ) {
+        ) {
       return true;
     }
 
@@ -189,6 +198,8 @@ class OnePictureDataData {
       return '';
     } else if (type == OnePictureType.SXT.index) {
       return typeText.defaultStr(data: name);
+    }else if (type == OnePictureType.DM.index && children.isEmpty && nextList.isEmpty) {
+      return '未绑定设备';
     } else {
       return name.defaultStr(data: typeText);
     }
