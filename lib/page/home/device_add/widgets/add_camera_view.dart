@@ -742,9 +742,9 @@ class RowTitle extends StatelessWidget {
 
 class EquallyRow extends StatelessWidget {
   final Widget one;
-  final Widget two;
+  final Widget? two;
 
-  const EquallyRow({super.key, required this.one, required this.two});
+  const EquallyRow({super.key, required this.one, this.two});
 
   @override
   Widget build(BuildContext context) {
@@ -752,7 +752,7 @@ class EquallyRow extends StatelessWidget {
       children: [
         Expanded(flex: 1, child: one),
         const SizedBox(width: 20),
-        Expanded(flex: 1, child: two),
+        Expanded(flex: 1, child: two ?? Container()),
         const SizedBox(width: 20),
       ],
     );

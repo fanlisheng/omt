@@ -159,6 +159,7 @@ class InstallService {
   routerInstall({
     String? pNodeCode,
     required String ip,
+    required String mac,
     required int type,
     required int passId,
     required ValueChanged<CodeMessageData?> onSuccess,
@@ -168,6 +169,7 @@ class InstallService {
     Map<String, dynamic> params = {
       "ip": ip,
       "type": type,
+      "mac": mac,
       "pass_id": passId,
     };
 

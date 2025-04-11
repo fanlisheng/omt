@@ -9,6 +9,12 @@ import 'package:fluent_ui/fluent_ui.dart';
 enum NavigationIndicators { sticky, end }
 
 class AppTheme extends ChangeNotifier {
+  static final AppTheme _instance = AppTheme._internal();
+
+  factory AppTheme() => _instance;
+
+  AppTheme._internal();
+
   AccentColor? _color;
 
   AccentColor get color => _color ?? systemAccentColor;

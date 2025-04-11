@@ -24,6 +24,10 @@ class DetailPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
   @override
   void initState() async {
     super.initState();
+    _requestData();
+  }
+
+  void _requestData() {
     HttpQuery.share.homePageService.deviceDetailPowerBox(
         nodeCode: nodeCode,
         onSuccess: (DeviceDetailPowerBoxData? a) {
@@ -69,6 +73,7 @@ class DetailPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
         onSuccess: (data) {
           isCloseAllDc = false;
           LoadingUtils.show(data: "${isCloseAllDc ? "关闭" : "打开"}成功!");
+          _requestData();
         });
   }
 
@@ -79,6 +84,7 @@ class DetailPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
         status: a.statusText == "打开" ? 1 : 2,
         onSuccess: (data) {
           LoadingUtils.show(data: "${(a.statusText == "打开") ? "关闭" : "打开"}成功!");
+          _requestData();
         });
   }
 }

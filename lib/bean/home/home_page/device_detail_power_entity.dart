@@ -33,6 +33,8 @@ class DeviceDetailPowerData {
 	String? powerType;
 	@JSONField(name: "battery_capacity")
 	int? batteryCapacity;
+	@JSONField(name: "node_id")
+	String? nodeId;
 
 	DeviceDetailPowerData();
 

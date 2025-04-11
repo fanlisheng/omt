@@ -42,6 +42,8 @@ class DeviceDetailAiData {
 	String? iotConnectStatus;
 	@JSONField(name: "server_host")
 	String? serverHost;
+	@JSONField(name: "node_id")
+	String? nodeId;
 	String? mac;
 
 	DeviceDetailAiData();

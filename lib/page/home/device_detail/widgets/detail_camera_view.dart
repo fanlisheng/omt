@@ -12,6 +12,7 @@ import 'package:omt/bean/common/name_value.dart';
 import 'package:omt/bean/home/home_page/camera_device_entity.dart';
 import 'package:omt/page/home/device_add/view_models/add_camera_viewmodel.dart';
 import 'package:omt/page/home/device_detail/widgets/detail_ai_view.dart';
+import 'package:omt/theme.dart';
 import 'package:omt/utils/color_utils.dart';
 import 'package:omt/utils/date_time_utils.dart';
 
@@ -331,7 +332,10 @@ class DetailCameraView extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.only(
                     left: 25, right: 25, top: 6, bottom: 6),
-                color: ColorUtils.colorGreen,
+                decoration: BoxDecoration(
+                  color: AppTheme().color,
+                  borderRadius: BorderRadius.circular(3),
+                ),
                 child: const Text(
                   "重启识别",
                   style: TextStyle(fontSize: 12, color: ColorUtils.colorWhite),
@@ -349,7 +353,7 @@ class DetailCameraView extends StatelessWidget {
                 padding: const EdgeInsets.only(
                     left: 25, right: 25, top: 6, bottom: 6),
                 decoration: BoxDecoration(
-                  color: ColorUtils.colorGreen,
+                  color: AppTheme().color,
                   borderRadius: BorderRadius.circular(3),
                 ),
                 child: const Text(
@@ -357,6 +361,27 @@ class DetailCameraView extends StatelessWidget {
                   style: TextStyle(fontSize: 12, color: ColorUtils.colorWhite),
                 ),
               ),
+            ),
+            Expanded(child: Container()),
+            Clickable(
+              onTap: () {
+                model.editEventAction();
+              },
+              child: Container(
+                padding: const EdgeInsets.only(
+                    left: 25, right: 25, top: 6, bottom: 6),
+                decoration: BoxDecoration(
+                  color: "#F9871E".toColor(),
+                  borderRadius: BorderRadius.circular(3),
+                ),
+                child: const Text(
+                  "修改信息",
+                  style: TextStyle(fontSize: 12, color: ColorUtils.colorWhite),
+                ),
+              ),
+            ),
+            const SizedBox(
+              width: 16,
             ),
           ],
         ),

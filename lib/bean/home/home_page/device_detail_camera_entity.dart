@@ -54,6 +54,8 @@ class DeviceDetailCameraData {
   DeviceDetailCameraDataPhoto? dayBasicPhoto;
   @JSONField(name: "night_basic_photo")
   DeviceDetailCameraDataPhoto? nightBasicPhoto;
+  @JSONField(name: "node_id")
+  String? nodeId;
 
   DeviceDetailCameraData();
 

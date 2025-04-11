@@ -7,6 +7,7 @@ import 'package:omt/bean/common/code_data.dart';
 import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/bean/home/home_page/device_detail_ai_entity.dart';
 import 'package:omt/bean/home/home_page/device_detail_camera_entity.dart';
+import 'package:omt/bean/home/home_page/device_detail_router_entity_entity.dart';
 import 'package:omt/bean/home/home_page/device_entity.dart';
 import 'package:omt/http/api.dart';
 import 'package:omt/http/http_manager.dart';
@@ -56,6 +57,8 @@ class HomePageService {
 
   get _deviceDetailCamera => '${API.share.host}api/device/camera/detail';
 
+  get _deviceDetailRouter => '${API.share.host}api/device/router/detail';
+
   get _cameraPhotoList => '${API.share.host}api/device/camera/snap_list';
 
   get _setCameraBasicPhoto =>
@@ -79,6 +82,13 @@ class HomePageService {
       '${API.share.host}api/device/power_box/dc_interface_control';
 
   get _deleteNvrChannel => '${API.share.host}api/device/nvr/delete_channel';
+
+  // 新增编辑接口URL
+  get _editCamera => '${API.share.host}api/device/camera/edit';
+  get _editNvr => '${API.share.host}api/device/nvr/edit';
+  get _editPowerBox => '${API.share.host}api/device/power_box/edit';
+  get _editRouter => '${API.share.host}api/device/router/edit';
+  get _editSwitch => '${API.share.host}api/device/switch/edit';
 
   getInstanceList(
     String areaCode, {
@@ -332,6 +342,26 @@ class HomePageService {
     );
   }
 
+  deviceDetailRouter({
+    required String nodeCode,
+    required ValueChanged<DeviceDetailRouterData?> onSuccess,
+    ValueChanged<DeviceDetailRouterData?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<DeviceDetailRouterData>(
+      await _deviceDetailRouter,
+      {
+        "node_code": nodeCode,
+      },
+      method: 'POST',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
   cameraPhotoList({
     required int page,
     required String deviceCode,
@@ -545,6 +575,140 @@ class HomePageService {
       {
         'device_code': deviceCode,
         'channel_ids': channelIds,
+      },
+      method: 'POST',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  // 新增编辑接口方法
+  
+  // 摄像头修改
+  editCamera({
+    required int nodeId,
+    required String name,
+    required int cameraType,
+    required int passId,
+    required int controlStatus,
+    String? cameraCode,
+    required ValueChanged<CodeMessageData?> onSuccess,
+    ValueChanged<CodeMessageData?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    Map<String, dynamic> params = {
+      "node_id": nodeId,
+      "name": name,
+      "camera_type": cameraType,
+      "pass_id": passId,
+      "control_status": controlStatus,
+    };
+    
+    if (cameraCode != null && cameraCode.isNotEmpty) {
+      params["camera_code"] = cameraCode;
+    }
+    
+    HttpManager.share.doHttpPost<CodeMessageData>(
+      await _editCamera,
+      params,
+      method: 'POST',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+  
+  // NVR修改
+  editNvr({
+    required int nodeId,
+    required int passId,
+    required ValueChanged<CodeMessageData?> onSuccess,
+    ValueChanged<CodeMessageData?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<CodeMessageData>(
+      await _editNvr,
+      {
+        "node_id": nodeId,
+        "pass_id": passId,
+      },
+      method: 'POST',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+  
+  // 电源箱修改
+  editPowerBox({
+    required int nodeId,
+    required int passId,
+    required ValueChanged<CodeMessageData?> onSuccess,
+    ValueChanged<CodeMessageData?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<CodeMessageData>(
+      await _editPowerBox,
+      {
+        "node_id": nodeId,
+        "pass_id": passId,
+      },
+      method: 'POST',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+  
+  // 路由器修改
+  editRouter({
+    required int nodeId,
+    required int passId,
+    required ValueChanged<CodeMessageData?> onSuccess,
+    ValueChanged<CodeMessageData?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<CodeMessageData>(
+      await _editRouter,
+      {
+        "node_id": nodeId,
+        "pass_id": passId,
+      },
+      method: 'POST',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+  
+  // 交换机修改
+  editSwitch({
+    required int nodeId,
+    required int passId,
+    required int interfaceNum,
+    required String powerMethod,
+    required ValueChanged<CodeMessageData?> onSuccess,
+    ValueChanged<CodeMessageData?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<CodeMessageData>(
+      await _editSwitch,
+      {
+        "node_id": nodeId,
+        "pass_id": passId,
+        "interface_num": interfaceNum,
+        "power_method": powerMethod,
       },
       method: 'POST',
       autoHideDialog: true,
