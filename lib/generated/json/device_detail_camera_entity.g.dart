@@ -114,6 +114,10 @@ DeviceDetailCameraData $DeviceDetailCameraDataFromJson(
   if (nightBasicPhoto != null) {
     deviceDetailCameraData.nightBasicPhoto = nightBasicPhoto;
   }
+  final String? nodeId = jsonConvert.convert<String>(json['node_id']);
+  if (nodeId != null) {
+    deviceDetailCameraData.nodeId = nodeId;
+  }
   return deviceDetailCameraData;
 }
 
@@ -137,6 +141,7 @@ Map<String, dynamic> $DeviceDetailCameraDataToJson(
       entity.lastSnapPhotos?.map((v) => v.toJson()).toList();
   data['day_basic_photo'] = entity.dayBasicPhoto?.toJson();
   data['night_basic_photo'] = entity.nightBasicPhoto?.toJson();
+  data['node_id'] = entity.nodeId;
   return data;
 }
 
@@ -158,6 +163,7 @@ extension DeviceDetailCameraDataExtension on DeviceDetailCameraData {
     List<DeviceDetailCameraDataPhoto>? lastSnapPhotos,
     DeviceDetailCameraDataPhoto? dayBasicPhoto,
     DeviceDetailCameraDataPhoto? nightBasicPhoto,
+    String? nodeId,
   }) {
     return DeviceDetailCameraData()
       ..name = name ?? this.name
@@ -175,7 +181,8 @@ extension DeviceDetailCameraDataExtension on DeviceDetailCameraData {
       ..lastBgPhotos = lastBgPhotos ?? this.lastBgPhotos
       ..lastSnapPhotos = lastSnapPhotos ?? this.lastSnapPhotos
       ..dayBasicPhoto = dayBasicPhoto ?? this.dayBasicPhoto
-      ..nightBasicPhoto = nightBasicPhoto ?? this.nightBasicPhoto;
+      ..nightBasicPhoto = nightBasicPhoto ?? this.nightBasicPhoto
+      ..nodeId = nodeId ?? this.nodeId;
   }
 }
 

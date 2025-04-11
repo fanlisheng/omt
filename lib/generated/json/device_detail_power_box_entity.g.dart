@@ -97,6 +97,10 @@ DeviceDetailPowerBoxData $DeviceDetailPowerBoxDataFromJson(
   if (dcInterfaces != null) {
     deviceDetailPowerBoxData.dcInterfaces = dcInterfaces;
   }
+  final String? nodeId = jsonConvert.convert<String>(json['node_id']);
+  if (nodeId != null) {
+    deviceDetailPowerBoxData.nodeId = nodeId;
+  }
   return deviceDetailPowerBoxData;
 }
 
@@ -117,6 +121,7 @@ Map<String, dynamic> $DeviceDetailPowerBoxDataToJson(
   data['outlet_temperature'] = entity.outletTemperature;
   data['version'] = entity.version;
   data['dc_interfaces'] = entity.dcInterfaces?.map((v) => v.toJson()).toList();
+  data['node_id'] = entity.nodeId;
   return data;
 }
 
@@ -136,6 +141,7 @@ extension DeviceDetailPowerBoxDataExtension on DeviceDetailPowerBoxData {
     int? outletTemperature,
     String? version,
     List<DeviceDetailPowerBoxDataDcInterfaces>? dcInterfaces,
+    String? nodeId,
   }) {
     return DeviceDetailPowerBoxData()
       ..instanceName = instanceName ?? this.instanceName
@@ -151,7 +157,8 @@ extension DeviceDetailPowerBoxDataExtension on DeviceDetailPowerBoxData {
       ..inletTemperature = inletTemperature ?? this.inletTemperature
       ..outletTemperature = outletTemperature ?? this.outletTemperature
       ..version = version ?? this.version
-      ..dcInterfaces = dcInterfaces ?? this.dcInterfaces;
+      ..dcInterfaces = dcInterfaces ?? this.dcInterfaces
+      ..nodeId = nodeId ?? this.nodeId;
   }
 }
 

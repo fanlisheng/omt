@@ -35,6 +35,8 @@ class DeviceDetailExchangeData {
 	int? interfaceNum;
 	@JSONField(name: "power_method")
 	String? powerMethod;
+	@JSONField(name: "node_id")
+	String? nodeId;
 
 	DeviceDetailExchangeData();
 

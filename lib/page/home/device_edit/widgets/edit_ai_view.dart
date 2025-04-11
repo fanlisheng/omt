@@ -11,18 +11,17 @@ import '../../../../bean/home/home_page/device_entity.dart';
 import '../../../../theme.dart';
 import '../../../../utils/device_utils.dart';
 import '../../device_detail/widgets/detail_ai_view.dart';
-import '../view_models/add_ai_viewmodel.dart';
-import 'ai_search_view.dart';
-import 'package:provider/provider.dart';
+import '../view_models/edit_ai_viewmodel.dart';
+import '../../device_add/widgets/ai_search_view.dart';
 
-class AddAiView extends StatelessWidget {
-  final AddAiViewModel model;
+class EditAiView extends StatelessWidget {
+  final EditAiViewModel model;
 
-  const AddAiView({super.key, required this.model});
+  const EditAiView({super.key, required this.model});
 
   @override
   Widget build(BuildContext context) {
-    return ProviderWidget<AddAiViewModel>(
+    return ProviderWidget<EditAiViewModel>(
         model: model..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
@@ -30,7 +29,7 @@ class AddAiView extends StatelessWidget {
         });
   }
 
-  Column aiView(AddAiViewModel model, BuildContext context) {
+  Column aiView(EditAiViewModel model, BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -43,7 +42,7 @@ class AddAiView extends StatelessWidget {
           child: Row(
             children: [
               const Text(
-                "第二步：添加AI设备",
+                "编辑AI设备",
                 style: TextStyle(
                   fontSize: 14,
                   color: ColorUtils.colorGreenLiteLite,
@@ -235,8 +234,35 @@ class AddAiView extends StatelessWidget {
             }).toList(),
           ),
         ),
+        Container(
+          margin: const EdgeInsets.all(16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Clickable(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: ColorUtils.colorGreen,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Text(
+                    "保存",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: ColorUtils.colorWhite,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                onTap: () {
+                  model.saveAiDevice();
+                },
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
-
-}
+} 

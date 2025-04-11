@@ -3,6 +3,12 @@ import 'package:kayo_package/views/common/404.dart';
 import 'package:omt/page/home/bind_device/widgets/bind_device_screen.dart';
 import 'package:omt/page/home/device_add/widgets/device_add_screen.dart';
 import 'package:omt/page/home/device_detail/widgets/device_detail_screen.dart';
+import 'package:omt/page/home/device_edit/widgets/edit_ai_view.dart';
+import 'package:omt/page/home/device_edit/widgets/edit_battery_exchange_view.dart';
+import 'package:omt/page/home/device_edit/widgets/edit_camera_view.dart';
+import 'package:omt/page/home/device_edit/widgets/edit_power_box_view.dart';
+import 'package:omt/page/home/device_edit/widgets/edit_power_view.dart';
+import 'package:omt/page/home/device_edit/widgets/edit_router_view.dart';
 import 'package:omt/page/home/home/home_page.dart';
 import 'package:omt/page/home/photo_detail/widgets/photo_detail_screen.dart';
 import 'package:omt/page/home/photo_preview/widgets/photo_preview_screen.dart';
@@ -83,6 +89,29 @@ class RouterPage {
 
   ///照片预览详情
   static const String PhotoDetailScreen = 'PhotoDetailScreen';
+
+  ///设备编辑相关//////////////////////////////////////
+
+  ///AI设备编辑
+  static const String EditAiPage = 'EditAiPage';
+
+  ///摄像头编辑
+  static const String EditCameraPage = 'EditCameraPage';
+
+  ///NVR设备编辑
+  static const String EditNvrPage = 'EditNvrPage';
+
+  ///电源箱编辑
+  static const String EditPowerBoxPage = 'EditPowerBoxPage';
+
+  ///电源编辑
+  static const String EditPowerPage = 'EditPowerPage';
+
+  ///电池/交换机编辑
+  static const String EditBatteryExchangePage = 'EditBatteryExchangePage';
+
+  ///路由器编辑
+  static const String EditRouterDevicePage = 'EditRouterDevicePage';
 
   ///ReplaceRouterPageDefine
 }
@@ -207,6 +236,69 @@ Route<dynamic> generateRoute(RouteSettings settings, {uniqueId}) {
           builder: (context) {
             return PhotoDetailScreen(
               pageNeedData: arguments["data"],
+            );
+          });
+
+    case RouterPage.EditAiPage:
+      return CupertinoPageRoute(
+          settings: settings,
+          builder: (context) {
+            return EditAiView(
+              model: arguments["data"],
+            );
+          });
+
+    case RouterPage.EditCameraPage:
+      return CupertinoPageRoute(
+          settings: settings,
+          builder: (context) {
+            return EditCameraView(
+              model: arguments["data"],
+            );
+          });
+
+    case RouterPage.EditNvrPage:
+      return CupertinoPageRoute(
+          settings: settings,
+          builder: (context) {
+            return EditCameraView(
+              model: arguments["data"],
+            );
+          });
+
+    case RouterPage.EditPowerBoxPage:
+      return CupertinoPageRoute(
+          settings: settings,
+          builder: (context) {
+            return EditPowerBoxView(
+              model: arguments["data"],
+            );
+          });
+
+    case RouterPage.EditPowerPage:
+      return CupertinoPageRoute(
+          settings: settings,
+          builder: (context) {
+            return EditPowerView(
+              model: arguments["data"],
+            );
+          });
+
+    case RouterPage.EditBatteryExchangePage:
+      return CupertinoPageRoute(
+          settings: settings,
+          builder: (context) {
+            return EditBatteryExchangeView(
+              model: arguments["data"],
+            );
+          });
+
+    case RouterPage.EditRouterDevicePage:
+      return CupertinoPageRoute(
+          settings: settings,
+          builder: (context) {
+            return EditRouterView(
+              model: arguments["data"],
             );
           });
 

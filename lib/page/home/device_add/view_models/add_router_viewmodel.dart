@@ -18,6 +18,7 @@ class AddRouterViewModel extends BaseViewModelRefresh<dynamic> {
   List<IdNameValue> inOutList = [];
   List<IdNameValue> routerTypeList = [];
   TextEditingController routerIpController = TextEditingController();
+  String? mac;
 
   @override
   void initState() async {
@@ -36,11 +37,20 @@ class AddRouterViewModel extends BaseViewModelRefresh<dynamic> {
     ];
 
     // 获取当前子网的默认网关
+    LoadingUtils.show(data: "获取路由中...");
     String? subnet = await DeviceUtils.getSubnet();
     if (null != subnet && subnet.isNotEmpty) {
       subnet = '$subnet.1';
-      routerIpController.text = subnet;
+      mac = await DeviceUtils.getMacAddressByIp(ip: subnet);
+      LoadingUtils.dismiss();
+      if (mac != null) {
+        routerIpController.text = subnet;
+      }else{
+        LoadingUtils.show(data: "获取路由信息失败！");
+      }
+
     }
+
   }
 
   @override
@@ -57,13 +67,14 @@ class AddRouterViewModel extends BaseViewModelRefresh<dynamic> {
   // 安装路由器
   void installRouter() {
     // 检查参数
+    if (routerIpController.text.isEmpty) {
+      LoadingUtils.showToast(data: '没有识别到路由器');
+      return;
+    }
+
     // 路由器需要检查参数
     if (selectedRouterInOut?.id == null || selectedRouterType?.id == null) {
       LoadingUtils.showToast(data: '请选择进出口/有线无线类型');
-      return;
-    }
-    if (routerIpController.text.isEmpty) {
-      LoadingUtils.showToast(data: '没有识别到路由器');
       return;
     }
 
@@ -71,6 +82,7 @@ class AddRouterViewModel extends BaseViewModelRefresh<dynamic> {
     HttpQuery.share.installService.routerInstall(
       pNodeCode: pNodeCode,
       ip: routerIpController.text,
+      mac: mac!,
       type: selectedRouterType!.id!,
       passId: selectedRouterInOut!.id!,
       onSuccess: (data) {

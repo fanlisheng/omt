@@ -16,6 +16,7 @@ import 'package:omt/bean/home/home_page/device_detail_exchange_entity.dart';
 import 'package:omt/bean/home/home_page/device_detail_nvr_entity.dart';
 import 'package:omt/bean/home/home_page/device_detail_power_box_entity.dart';
 import 'package:omt/bean/home/home_page/device_detail_power_entity.dart';
+import 'package:omt/bean/home/home_page/device_detail_router_entity_entity.dart';
 import 'package:omt/bean/home/home_page/device_entity.dart';
 import 'package:omt/bean/home/home_page/device_unbound_entity.dart';
 import 'package:omt/bean/home/home_page/home_page_data.dart';
@@ -278,6 +279,14 @@ class JsonConvert {
       return data.map<DeviceDetailPowerData>((Map<String, dynamic> e) =>
           DeviceDetailPowerData.fromJson(e)).toList() as M;
     }
+    if (<DeviceDetailRouterEntity>[] is M) {
+      return data.map<DeviceDetailRouterEntity>((Map<String, dynamic> e) =>
+          DeviceDetailRouterEntity.fromJson(e)).toList() as M;
+    }
+    if (<DeviceDetailRouterData>[] is M) {
+      return data.map<DeviceDetailRouterData>((Map<String, dynamic> e) =>
+          DeviceDetailRouterData.fromJson(e)).toList() as M;
+    }
     if (<DeviceEntity>[] is M) {
       return data.map<DeviceEntity>((Map<String, dynamic> e) =>
           DeviceEntity.fromJson(e)).toList() as M;
@@ -422,6 +431,8 @@ class JsonConvertClassCollection {
         .toString(): DeviceDetailPowerBoxDataDcInterfaces.fromJson,
     (DeviceDetailPowerEntity).toString(): DeviceDetailPowerEntity.fromJson,
     (DeviceDetailPowerData).toString(): DeviceDetailPowerData.fromJson,
+    (DeviceDetailRouterEntity).toString(): DeviceDetailRouterEntity.fromJson,
+    (DeviceDetailRouterData).toString(): DeviceDetailRouterData.fromJson,
     (DeviceEntity).toString(): DeviceEntity.fromJson,
     (DeviceScanEntity).toString(): DeviceScanEntity.fromJson,
     (DeviceUnboundEntity).toString(): DeviceUnboundEntity.fromJson,

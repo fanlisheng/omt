@@ -86,13 +86,16 @@ class DetailCameraViewModel extends BaseViewModelRefresh<dynamic> {
     notifyListeners();
   }
 
-  // 删除
-  deleteEventAction(int index) {
-    notifyListeners();
-  }
-
   //编辑
-  editEventAction(int index) {
+  editEventAction() {
+    IntentUtils.share
+        .push(context!, routeName: RouterPage.EditCameraPage, data: {
+      "data": deviceInfo,
+    })?.then((value) {
+      if (IntentUtils.share.isResultOk(value)) {
+        requestData();
+      }
+    });
     notifyListeners();
   }
 

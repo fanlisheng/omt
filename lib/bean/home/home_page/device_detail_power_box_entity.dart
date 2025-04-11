@@ -48,6 +48,8 @@ class DeviceDetailPowerBoxData {
 	String? version;
 	@JSONField(name: "dc_interfaces")
 	List<DeviceDetailPowerBoxDataDcInterfaces>? dcInterfaces;
+	@JSONField(name: "node_id")
+	String? nodeId;
 
 	DeviceDetailPowerBoxData();
 
