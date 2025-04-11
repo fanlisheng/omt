@@ -7,6 +7,7 @@ import 'package:omt/utils/hikvision_utils.dart';
 import 'package:ping_discover_network_forked/ping_discover_network_forked.dart';
 
 import '../bean/home/home_page/device_entity.dart';
+import 'arp_utils.dart'; // 引入新的 ArpUtils 类
 
 class DeviceUtils {
   /// MAC 地址前缀映射设备类型
@@ -18,8 +19,10 @@ class DeviceUtils {
   };
 
   /// 扫描设备并获取设备信息，支持中断
-  static Future<List<DeviceEntity>> scanAndFetchDevicesInfo(
-      {required bool Function() shouldStop}) async {
+  static Future<List<DeviceEntity>> scanAndFetchDevicesInfo({
+    bool Function()? shouldStop,
+    String? deviceType,
+  }) async {
     List<DeviceEntity> infoList = [];
 
     // 1. 获取本机 IP（确定局域网段）
@@ -29,88 +32,82 @@ class DeviceUtils {
       return infoList;
     }
 
-    // // 2. 获取并发任务，分批处理
+    // 2. 获取并发任务，分批处理
     List<Future<void>> pingTasks = [];
-    const batchSize = 70; // 每批次同时处理的数量
+    const batchSize = 70;
     for (int i = 1; i < 255; i++) {
       String ip = "$subnet.$i";
-      pingTasks.add(pingDevice(ip, shouldStop));
+      pingTasks.add(pingDevice(ip, shouldStop ?? (() => false)));
 
-      // 每批次执行 `batchSize` 个任务
       if (pingTasks.length == batchSize || i == 254) {
         await Future.wait(pingTasks);
-        pingTasks.clear(); // 清空当前任务队列
+        pingTasks.clear();
       }
 
-      if (shouldStop()) {
+      if (shouldStop?.call() ?? false) {
         print("扫描被中断");
-        return infoList; // 中断时退出循环
+        return infoList;
       }
     }
 
-    // 3. 获取所有IP的mac地址（支持中断）
-    Map<String, String>? ipMac = await getMacAddresses(shouldStop: shouldStop);
+    // 3. 获取所有 IP 的 MAC 地址
+    Map<String, String>? ipMac =
+        await getMacAddresses(shouldStop: shouldStop ?? (() => false));
     if (ipMac == null) {
       print("无法获取 MAC 地址");
       return infoList;
     }
 
-    // 4. 循环所有 ipMac（支持中断）
+    // 4. 循环所有 ipMac
     List<Future<void>> getInfoTasks = [];
     for (var entry in ipMac.entries) {
       getInfoTasks.add(Future<void>(() async {
-        if (shouldStop()) {
+        if (shouldStop?.call() ?? false) {
           print("扫描被中断");
-          return; // 中断时退出循环
+          return;
         }
 
         String ip = entry.key;
         String mac = entry.value;
-
-        if (ip == "192.168.101.82") {
-          print("------------");
-        }
         String deviceTypeText = getDeviceTypeForMacAddress(mac);
 
-        if (ip == "$subnet.1") {
-          //路由器
-          infoList.add(DeviceEntity(
-              ip: ip,
-              mac: mac,
-              deviceTypeText: "路由器",
-              deviceType: getDeviceTypeInt("路由器"),
-              deviceCode: ""));
-        } else {
-          if (deviceTypeText.isNotEmpty) {
-            DeviceEntity deviceEntity = DeviceEntity(
-                ip: ip,
-                mac: mac,
-                deviceTypeText: deviceTypeText,
-                deviceType: getDeviceTypeInt(deviceTypeText),
-                deviceCode: "");
-            if (deviceTypeText == "AI设备" || deviceTypeText == "NVR") {
-              String deviceCode = mac.replaceAll(":", "");
-              deviceCode = deviceCode.toLowerCase();
-              deviceEntity.deviceCode = deviceCode;
-              infoList.add(deviceEntity);
-            } else {
-              // 通过海康系统登录验证
-              try {
-                DeviceEntity? a = await hikvisionDeviceInfo(ipAddress: ip);
-                if (a != null) {
-                  deviceEntity.deviceCode = a.deviceCode;
-                  infoList.add(deviceEntity);
-                }
-              } catch (e) {
-                print("海康系统登录验证失败");
-              }
-            }
-          }
+        if (deviceType != null && deviceTypeText != deviceType) {
+          return;
         }
 
-        if (shouldStop()) {
-          print("扫描被中断");
-          return; // 中断时退出循环
+        if (ip == "$subnet.1") {
+          if (deviceType == null || deviceType == "6") {
+            infoList.add(DeviceEntity(
+              ip: ip,
+              mac: mac,
+              deviceTypeText: "路由arez器",
+              deviceType: getDeviceTypeInt("路由器"),
+              deviceCode: "",
+            ));
+          }
+        } else if (deviceTypeText.isNotEmpty) {
+          DeviceEntity deviceEntity = DeviceEntity(
+            ip: ip,
+            mac: mac,
+            deviceTypeText: deviceTypeText,
+            deviceType: getDeviceTypeInt(deviceTypeText),
+            deviceCode: "",
+          );
+          if (deviceTypeText == "AI设备" || deviceTypeText == "NVR") {
+            String deviceCode = getDeviceCodeByMacAddress(macAddress: mac);
+            deviceEntity.deviceCode = deviceCode;
+            infoList.add(deviceEntity);
+          } else {
+            try {
+              DeviceEntity? a = await hikvisionDeviceInfo(ipAddress: ip);
+              if (a != null) {
+                deviceEntity.deviceCode = a.deviceCode;
+                infoList.add(deviceEntity);
+              }
+            } catch (e) {
+              print("海康系统登录验证失败");
+            }
+          }
         }
       }));
     }
@@ -119,145 +116,54 @@ class DeviceUtils {
     return infoList;
   }
 
-  /// 发送 ping 请求，强制设备进入 ARP 表，支持中断
+  /// 发送 ping 请求，强制设备进入 ARP 表
   static Future<void> pingDevice(String ip, bool Function() shouldStop) async {
-    // 检查是否需要停止
     if (shouldStop()) {
       print("停止 ping 扫描");
-      return; // 如果满足中断条件，立即返回
+      return;
     }
     try {
       final isWindows = Platform.isWindows;
-      final List<String> arguments;
-
-      if (isWindows) {
-        // Windows CMD 参数
-        arguments = ['-n', '1', '-w', '1000', ip];
-      } else {
-        // Linux/macOS 参数
-        arguments = ['-c', '1', '-W', '1', ip];
-      }
+      final List<String> arguments = isWindows
+          ? ['-n', '1', '-w', '1000', ip]
+          : ['-c', '1', '-W', '1', ip];
       final result = await Process.run('ping', arguments);
-      if (result.exitCode == 0) {
-        print('Ping 成功: $ip');
-      } else {
-        print('Ping 失败: $ip');
-      }
+      print(result.exitCode == 0 ? 'Ping 成功: $ip' : 'Ping 失败: $ip');
     } catch (e) {
       print('Ping 错误: $e');
     }
   }
 
-  /// 获取 MAC 地址列表（适用于 macOS/Linux/Windows），支持中断
-  static Future<Map<String, String>?> getMacAddresses(
-      {required bool Function() shouldStop}) async {
-    Map<String, String> ipMacMap = {};
-
-    ProcessResult result;
-    if (Platform.isMacOS || Platform.isLinux || Platform.isWindows) {
-      result = await Process.run('arp', ['-a']);
-    } else {
-      throw Exception("不支持的平台");
-    }
-
-    final lines = result.stdout.split("\n");
-    final isWindows = Platform.isWindows;
-    for (var line in lines) {
-      if (shouldStop != null && shouldStop()) {
-        print("停止获取 MAC 地址");
-        return ipMacMap;
-      }
-      line = line.trim();
-      if (line.isEmpty) continue;
-
-      if (isWindows) {
-        if (line.contains("Interface") || line.contains("Internet Address"))
-          continue;
-        final parts = line.split(RegExp(r'\s+'));
-        if (parts.length >= 3 &&
-            RegExp(r'^\d+\.\d+\.\d+\.\d+$').hasMatch(parts[0])) {
-          final ip = parts[0];
-          final mac = parts[1].toUpperCase();
-          final normalizedMac = normalizeMacAddress(mac);
-          if (RegExp(r'([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}')
-              .hasMatch(normalizedMac)) {
-            ipMacMap[ip] = normalizedMac;
-          }
-        }
-      } else {
-        if (!line.contains(RegExp(r'\d+\.\d+\.\d+\.\d+'))) continue;
-        line = line.replaceAll("at", "");
-        final parts = line.split(RegExp(r'\s+'));
-        if (parts.length >= 3) {
-          final ip = parts[1].replaceAll("(", "").replaceAll(")", "");
-          final mac = parts[2].toUpperCase();
-          final normalizedMac = normalizeMacAddress(mac);
-          if (RegExp(r'([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}')
-              .hasMatch(normalizedMac)) {
-            ipMacMap[ip] = normalizedMac;
-          }
-        }
-      }
-    }
-
-    return ipMacMap;
+  /// 获取 MAC 地址列表
+  static Future<Map<String, String>?> getMacAddresses({
+    required bool Function() shouldStop,
+  }) async {
+    final ipMacMap = await ArpUtils.parseArpTable(shouldStop: shouldStop);
+    return ipMacMap.isNotEmpty ? ipMacMap : null;
   }
 
-  /// 格式化 MAC 地址，确保每组都有两个字符
-  static String normalizeMacAddress(String mac) {
-    // 处理空输入或无效输入
-    if (mac.isEmpty ||
-        !RegExp(r'^([0-9A-Fa-f]{1,2}[:-]){5}[0-9A-Fa-f]{1,2}$').hasMatch(mac)) {
-      return mac; // 返回原始输入或抛出异常，取决于需求
-    }
-
-    // 统一分隔符为冒号，并移除多余字符
-    final normalized = mac.replaceAll('-', ':').toUpperCase();
-
-    // 分割并补齐前导零
-    return normalized.split(':').map((part) {
-      return part.padLeft(2, '0'); // 补前导零至两位
-    }).join(':');
-  }
-
-  /// 根据 MAC 地址返回设备类型
-  static String getDeviceTypeForMacAddress(String macAddress) {
-    String macPrefix = macAddress.toUpperCase().substring(0, 8);
-    return DeviceUtils().macDeviceTypeMap[macPrefix] ?? "";
-  }
-
+  /// 获取当前设备 MAC 地址
   static Future<String?> getCurrentDeviceMacAddress() async {
-    ProcessResult result;
-
     try {
+      ProcessResult result;
       if (Platform.isMacOS) {
-        // macOS: 使用 networksetup 或 ifconfig 获取当前设备的 MAC
-        result = await Process.run('ifconfig', ['en0']); // en0 通常是 Wi-Fi 接口
-        String output = result.stdout.toString();
-        RegExp macRegExp = RegExp(r'ether\s([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}');
-        Match? match = macRegExp.firstMatch(output);
-        if (match != null) {
+        result = await Process.run('ifconfig', ['en0']);
+        final match = RegExp(r'ether\s([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}')
+            .firstMatch(result.stdout.toString());
+        if (match != null)
           return match.group(0)!.replaceAll('ether ', '').trim();
-        }
       } else if (Platform.isLinux) {
-        // Linux: 使用 ip 或 ifconfig 获取 MAC
         result = await Process.run('ip', ['link', 'show']);
-        String output = result.stdout.toString();
-        RegExp macRegExp =
-            RegExp(r'link/ether\s([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}');
-        Match? match = macRegExp.firstMatch(output);
+        final match = RegExp(r'link/ether\s([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}')
+            .firstMatch(result.stdout.toString());
         if (match != null) {
           return match.group(0)!.replaceAll('link/ether ', '').trim();
         }
       } else if (Platform.isWindows) {
-        // Windows: 使用 getmac 或 ipconfig 获取 MAC
         result = await Process.run('getmac', []);
-        String output = result.stdout.toString();
-        RegExp macRegExp = RegExp(r'([0-9A-Fa-f]{2}-){5}[0-9A-Fa-f]{2}');
-        Match? match = macRegExp.firstMatch(output);
-        if (match != null) {
-          return match.group(0)!.replaceAll('-', ':');
-        }
+        final match = RegExp(r'([0-9A-Fa-f]{2}-){5}[0-9A-Fa-f]{2}')
+            .firstMatch(result.stdout.toString());
+        if (match != null) return match.group(0)!.replaceAll('-', ':');
       } else {
         throw Exception("不支持的平台");
       }
@@ -267,12 +173,12 @@ class DeviceUtils {
     return null;
   }
 
-  /// 获取本机 IP 的子网前缀（如 192.168.1）
+  /// 获取本机 IP 的子网前缀
   static Future<String?> getSubnet() async {
     for (var interface in await NetworkInterface.list()) {
       for (var addr in interface.addresses) {
         if (addr.address.startsWith("192.168.")) {
-          List<String> parts = addr.address.split(".");
+          final parts = addr.address.split(".");
           return "${parts[0]}.${parts[1]}.${parts[2]}";
         }
       }
@@ -280,9 +186,107 @@ class DeviceUtils {
     return null;
   }
 
-  // device_type：设备类型
-  // 5:电源箱；6：路由器；8：NVR；9：交换机；10：AI设备（工控机）；11：摄像头；
-// 设备类型映射
+  /// 根据 IP 获取 MAC 地址
+  static Future<String?> getMacAddressByIp({
+    required String ip,
+    bool Function()? shouldStop,
+  }) async {
+    await pingDevice(ip, shouldStop ?? () => false);
+    final arpTable =
+        await ArpUtils.parseArpTable(shouldStop: shouldStop ?? () => false);
+    return arpTable[ip];
+  }
+
+  /// 根据 MAC 地址获取 IP 地址
+  static Future<String?> getIpAddressByMac({
+    required String macAddress,
+    bool Function()? shouldStop,
+  }) async {
+    final normalizedInputMac = normalizeMacAddress(macAddress).toUpperCase();
+    final arpTable =
+        await ArpUtils.parseArpTable(shouldStop: shouldStop ?? () => false);
+    return arpTable.entries
+            .firstWhere(
+              (entry) => entry.value == normalizedInputMac,
+              orElse: () => const MapEntry("", ""),
+            )
+            .key
+            .isNotEmpty
+        ? arpTable.entries
+            .firstWhere((entry) => entry.value == normalizedInputMac)
+            .key
+        : null;
+  }
+
+  /// 获取网络 MAC 地址
+  static Future<void> getNetworkMac({ValueChanged<String?>? onData}) async {
+    final subnet = await getSubnet();
+    String? mac;
+    if (subnet != null && subnet.isNotEmpty) {
+      mac = await getMacAddressByIp(ip: '$subnet.1', shouldStop: () => false);
+    }
+    onData?.call(mac);
+  }
+
+  /// 根据 MAC 获取 DeviceCode
+  static String getDeviceCodeByMacAddress({required String macAddress}) {
+    return macAddress.replaceAll(":", "").toLowerCase();
+  }
+
+  /// 根据 DeviceCode 获取 MAC 地址
+  static String getMacAddressByDeviceCode({required String deviceCode}) {
+    if (deviceCode.length != 12) {
+      throw const FormatException("Mac地址不正确");
+    }
+    String macAddress = '';
+    for (int i = 0; i < deviceCode.length; i += 2) {
+      macAddress += deviceCode.substring(i, i + 2);
+      if (i < deviceCode.length - 2) macAddress += ':';
+    }
+    return macAddress.toUpperCase();
+  }
+
+  /// 从 RTSP 地址中提取 IP 地址
+  static String? getIpFromRtsp(String rtspUrl) {
+    try {
+      // RTSP 地址的典型格式: rtsp://[username]:[password]@[ip_address]:[port]/[path]
+      // 使用正则表达式提取 IP 地址部分
+      final ipRegExp = RegExp(r'(\d+\.\d+\.\d+\.\d+)');
+      final match = ipRegExp.firstMatch(rtspUrl);
+
+      if (match != null) {
+        final ip = match.group(0);
+        // 验证提取的 IP 是否有效
+        if (ip != null && _isValidIp(ip)) {
+          return ip;
+        }
+      }
+
+      // 如果正则匹配失败，尝试手动解析
+      final uri = Uri.tryParse(rtspUrl);
+      if (uri != null && uri.host.isNotEmpty && _isValidIp(uri.host)) {
+        return uri.host;
+      }
+
+      return null; // 如果无法提取有效 IP，返回 null
+    } catch (e) {
+      print("提取 RTSP IP 失败: $e");
+      return null;
+    }
+  }
+
+  /// 格式化 MAC 地址
+  static String normalizeMacAddress(String mac) {
+    if (mac.isEmpty ||
+        !RegExp(r'^([0-9A-Fa-f]{1,2}[:-]){5}[0-9A-Fa-f]{1,2}$').hasMatch(mac)) {
+      return mac;
+    }
+    return mac.replaceAll('-', ':').toUpperCase().split(':').map((part) {
+      return part.padLeft(2, '0');
+    }).join(':');
+  }
+
+  // 设备类型映射
   static const Map<String, int> _deviceTypeMap = {
     "电源箱": 5,
     "路由器": 6,
@@ -292,7 +296,6 @@ class DeviceUtils {
     "摄像头": 11,
   };
 
-  // 设备类型名称映射
   static const Map<DeviceType, String> _deviceTypeNameMap = {
     DeviceType.ai: "AI设备",
     DeviceType.power: "电源",
@@ -303,42 +306,48 @@ class DeviceUtils {
     DeviceType.camera: "摄像头",
   };
 
-  // 设备图片映射
   static const Map<String, String> _deviceImageMap = {
-    "NVR": "home/ic_device_nvr2",
-    "AI设备": "home/ic_device_aisb",
-    "摄像头": "home/ic_device_sxt",
-    "路由器": "home/ic_device_lyq",
+    "8": "home/ic_device_nvr2",
+    "10": "home/ic_device_aisb",
+    "11": "home/ic_device_sxt",
+    "6": "home/ic_device_lyq",
+    "9": "home/ic_device_jhj",
+    "12": "home/ic_device_sd",
+    "13": "home/ic_device_dc",
+    "5": "home/ic_device_dyx",
+    "7": "home/ic_device_yxwl",
   };
 
   static const Map<int, DeviceType> intToDeviceTypeMap = {
     5: DeviceType.powerBox,
-    6: DeviceType.router, // 如果没有 router，需补充到 DeviceType 枚举
+    6: DeviceType.router,
     8: DeviceType.nvr,
     9: DeviceType.exchange,
     10: DeviceType.ai,
     11: DeviceType.camera,
   };
 
-  /// 获取设备类型（根据设备名称）
   static int getDeviceTypeInt(String deviceTypeText) {
     return _deviceTypeMap[deviceTypeText] ?? 0;
+  }
+
+  static String getDeviceTypeForMacAddress(String macAddress) {
+    String macPrefix = macAddress.toUpperCase().substring(0, 8);
+    return DeviceUtils().macDeviceTypeMap[macPrefix] ?? "";
   }
 
   static String getDeviceTypeString(int deviceType) {
     final entry = _deviceTypeMap.entries.firstWhere(
       (element) => element.value == deviceType,
-      orElse: () => const MapEntry('', -1), // 如果没有找到对应的 value，返回空的 MapEntry
+      orElse: () => const MapEntry('', -1),
     );
-    return entry.key.isNotEmpty ? entry.key : "-"; // 如果找到 key，则返回，否则返回 null
+    return entry.key.isNotEmpty ? entry.key : "-";
   }
 
-  /// 获取设备图片路径
   static String getDeviceImage(int deviceType) {
-    return _deviceImageMap[getDeviceTypeString(deviceType)] ?? "";
+    return _deviceImageMap["$deviceType"] ?? "";
   }
 
-  /// 获取设备类型名称
   static String getDeviceTypeName(DeviceType type) {
     return _deviceTypeNameMap[type] ?? "未知设备";
   }
@@ -347,70 +356,18 @@ class DeviceUtils {
     return intToDeviceTypeMap[value];
   }
 
-  static Future<String?> getMacAddressByIp(
-      {required String ip, required bool Function() shouldStop}) async {
-    ProcessResult result;
-    if (Platform.isMacOS || Platform.isLinux || Platform.isWindows) {
-      result = await Process.run('arp', ['-a']);
-    } else {
-      throw Exception("不支持的平台");
-    }
-
-    final lines = result.stdout.split("\n");
-    final isWindows = Platform.isWindows;
-
-    for (var line in lines) {
-      if (shouldStop()) {
-        print("停止获取 MAC 地址");
-        return null;
-      }
-      line = line.trim();
-      if (line.isEmpty) continue;
-
-      if (isWindows) {
-        if (line.contains("Interface") || line.contains("Internet Address"))
-          continue;
-        final parts = line.split(RegExp(r'\s+'));
-        if (parts.length >= 3 &&
-            RegExp(r'^\d+\.\d+\.\d+\.\d+$').hasMatch(parts[0])) {
-          final currentIp = parts[0];
-          if (currentIp == ip) {
-            final mac = parts[1].toUpperCase();
-            final normalizedMac = normalizeMacAddress(mac);
-            if (RegExp(r'([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}')
-                .hasMatch(normalizedMac)) {
-              return normalizedMac;
-            }
-          }
-        }
-      } else {
-        if (!line.contains(RegExp(r'\d+\.\d+\.\d+\.\d+'))) continue;
-        line = line.replaceAll("at", "");
-        final parts = line.split(RegExp(r'\s+'));
-        if (parts.length >= 3) {
-          final currentIp = parts[1].replaceAll("(", "").replaceAll(")", "");
-          if (currentIp == ip) {
-            final mac = parts[2].toUpperCase();
-            final normalizedMac = normalizeMacAddress(mac);
-            if (RegExp(r'([0-9A-Fa-f]{2}[:-]){5}[0-9A-Fa-f]{2}')
-                .hasMatch(normalizedMac)) {
-              return normalizedMac;
-            }
-          }
-        }
+  /// 验证是否为有效 IP 地址
+  static bool _isValidIp(String ip) {
+    final parts = ip.split('.');
+    if (parts.length != 4) return false;
+    for (var part in parts) {
+      if (part.isEmpty ||
+          int.tryParse(part) == null ||
+          int.parse(part) > 255 ||
+          int.parse(part) < 0) {
+        return false;
       }
     }
-
-    return null; // 如果没有找到匹配的 IP，返回 null
-  }
-
-  static getNetworkMac({ValueChanged<String?>? onData}) async {
-    var subnet = await getSubnet();
-    String? mac = '';
-    if (null != subnet && subnet.isNotEmpty) {
-      subnet = '$subnet.1';
-      mac = await getMacAddressByIp(ip: subnet, shouldStop: () => false);
-    }
-    onData?.call(mac);
+    return true;
   }
 }

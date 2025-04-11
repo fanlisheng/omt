@@ -6,34 +6,30 @@ import 'package:kayo_package/utils/base_sys_utils.dart';
 import 'package:kayo_package/views/widget/base/clickable.dart';
 import 'package:kayo_package/views/widget/base/dash_line.dart';
 import 'package:media_kit_video/media_kit_video.dart';
+import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/bean/home/home_page/camera_device_entity.dart';
 import 'package:omt/page/home/device_add/view_models/add_camera_viewmodel.dart';
-import 'package:omt/page/home/device_add/widgets/second_step_view.dart';
 import 'package:omt/utils/color_utils.dart';
 
-import '../view_models/add_ai_viewmodel.dart';
-import '../view_models/device_add_viewmodel.dart';
+import '../../../../bean/home/home_page/device_detail_ai_entity.dart';
+import '../../../../theme.dart';
 
 class AddCameraView extends StatelessWidget {
-  final DeviceType deviceType;
-  final StepNumber stepNumber;
-  final bool? isInstall; //是安装 默认否
+  final AddCameraViewModel model;
 
-  const AddCameraView({super.key, required this.deviceType, required this.stepNumber, this.isInstall});
-  // final AddCameraViewModel model;
-  // const AddCameraView(this.model, {super.key});
+  const AddCameraView({super.key, required this.model});
 
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<AddCameraViewModel>(
-        model: AddCameraViewModel(deviceType,stepNumber,isInstall ?? false)..themeNotifier = true,
+        model: model..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
-          return cameraView(context, model);
+          return cameraView(model, context);
         });
   }
 
-  Column cameraView(BuildContext context, AddCameraViewModel model) {
+  Column cameraView(AddCameraViewModel model, BuildContext context) {
     var windowWidth = BaseSysUtils.getWidth(context);
     var row = windowWidth > 600 * 2 + 200;
     var showDraw = windowWidth > 600 + 200;
@@ -45,7 +41,10 @@ class AddCameraView extends StatelessWidget {
           margin: const EdgeInsets.only(left: 16, right: 16),
           padding:
               const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),
-          color: ColorUtils.colorBackgroundLine,
+          decoration: BoxDecoration(
+            color: ColorUtils.colorBackgroundLine,
+            borderRadius: BorderRadius.circular(3),
+          ),
           width: double.infinity,
           child: const Text(
             "第三步：添加摄像头",
@@ -59,8 +58,8 @@ class AddCameraView extends StatelessWidget {
         const SizedBox(height: 10),
         Expanded(
             child: ListView(
-          children: model.deviceList.asMap().keys.map((index) {
-            CameraDeviceEntity e = model.deviceList[index];
+          children: model.cameraDeviceList.asMap().keys.map((index) {
+            CameraDeviceEntity e = model.cameraDeviceList[index];
             double height = 194;
             if ((e.rtsp ?? "").isNotEmpty) {
               height = 237;
@@ -73,11 +72,14 @@ class AddCameraView extends StatelessWidget {
               margin: const EdgeInsets.only(left: 16, right: 16, bottom: 10),
               padding: const EdgeInsets.only(
                   left: 16, right: 16, top: 16, bottom: 16),
-              color: ColorUtils.colorBackgroundLine,
+              decoration: BoxDecoration(
+                color: ColorUtils.colorBackgroundLine,
+                borderRadius: BorderRadius.circular(3),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if(e.readOnly)...[
+                  if (e.readOnly) ...[
                     Row(
                       children: [
                         Expanded(
@@ -92,7 +94,7 @@ class AddCameraView extends StatelessWidget {
                         ),
                         Button(
                           onPressed: () {
-                            model.deleteEventAction(index);
+                            model.deleteCameraAction(index);
                           },
                           child: Row(
                             children: [
@@ -142,7 +144,7 @@ class AddCameraView extends StatelessWidget {
                               ],
                             ),
                             onPressed: () {
-                              model.editEventAction(index);
+                              model.editCameraAction(index);
                             }),
                       ],
                     ),
@@ -174,24 +176,24 @@ class AddCameraView extends StatelessWidget {
                               ],
                             ),
                             const SizedBox(height: 8),
-                            ComboBox<String>(
+                            ComboBox<DeviceDetailAiData>(
                               isExpanded: true,
-                              value: model.selectedAiIp,
+                              value: model.selectedAi,
                               items: model.aiDeviceList
-                                  .map<ComboBoxItem<String>>((e) {
-                                return ComboBoxItem<String>(
-                                  value: e.ip,
+                                  .map<ComboBoxItem<DeviceDetailAiData>>((e) {
+                                return ComboBoxItem<DeviceDetailAiData>(
+                                  value: e,
                                   child: Text(
                                     e.ip ?? "",
                                     textAlign: TextAlign.start,
                                     style: const TextStyle(
                                         fontSize: 12,
-                                        color: ColorUtils.colorBlackLiteLite),
+                                        color: ColorUtils.colorWhite),
                                   ),
                                 );
                               }).toList(),
                               onChanged: (a) {
-                                model.selectedAiIp = a!;
+                                model.selectedAi = a!;
                                 model.notifyListeners();
                               },
                               placeholder: const Text(
@@ -256,12 +258,15 @@ class AddCameraView extends StatelessWidget {
                         onTap: e.readOnly
                             ? null
                             : () {
-                                model.connectEventAction();
+                                model.connectCameraAction(index);
                               },
                         child: Container(
                           padding: const EdgeInsets.only(
                               left: 12, right: 12, top: 6, bottom: 6),
-                          color: ColorUtils.colorGreen,
+                          decoration: BoxDecoration(
+                            color: ColorUtils.colorGreen,
+                            borderRadius: BorderRadius.circular(3),
+                          ),
                           child: const Text(
                             "连接",
                             style: TextStyle(
@@ -271,7 +276,7 @@ class AddCameraView extends StatelessWidget {
                       ),
                     ],
                   ),
-                  if ((e.rtsp ?? "").isNotEmpty) ...[
+                  if ((e.code ?? "").isNotEmpty) ...[
                     const SizedBox(height: 16),
                     Row(
                       children: [
@@ -302,23 +307,23 @@ class AddCameraView extends StatelessWidget {
                     ),
                     if (e.isOpen ?? false) ...[
                       const SizedBox(height: 16),
-                      const Row(
+                      Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(
                             flex: 1,
                             child: Row(
                               children: [
-                                Text(
+                                const Text(
                                   "设备编码:",
                                   style: TextStyle(
                                       fontSize: 12,
                                       color: ColorUtils.colorBlackLiteLite),
                                 ),
-                                SizedBox(width: 10),
+                                const SizedBox(width: 10),
                                 Text(
-                                  "设备编码",
-                                  style: TextStyle(
+                                  e.code ?? "",
+                                  style: const TextStyle(
                                       fontSize: 12,
                                       color: ColorUtils.colorGreenLiteLite),
                                 )
@@ -329,18 +334,18 @@ class AddCameraView extends StatelessWidget {
                             flex: 1,
                             child: Row(
                               children: [
-                                Text(
+                                const Text(
                                   "RTSP:",
                                   style: TextStyle(
                                       fontSize: 12,
                                       color: ColorUtils.colorBlackLiteLite),
                                 ),
-                                SizedBox(width: 10),
+                                const SizedBox(width: 10),
                                 Expanded(
                                   child: Text(
-                                    "rtsp://admin:flm2020hb@192.168.101.236:554/Streaming/Channels/101",
+                                    e.rtspController.text ?? '',
                                     maxLines: 2,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 12,
                                       color: ColorUtils.colorGreenLiteLite,
                                     ),
@@ -392,15 +397,15 @@ class AddCameraView extends StatelessWidget {
                           ),
                           enabled: !e.readOnly,
                         ),
-                        two: ComboBox<String>(
+                        two: ComboBox<IdNameValue>(
                           isExpanded: true,
                           value: e.selectedCameraType,
                           items: model.cameraTypeList
-                              .map<ComboBoxItem<String>>((e) {
-                            return ComboBoxItem<String>(
+                              .map<ComboBoxItem<IdNameValue>>((e) {
+                            return ComboBoxItem<IdNameValue>(
                               value: e,
                               child: Text(
-                                e,
+                                e.name ?? "",
                                 textAlign: TextAlign.start,
                                 style: const TextStyle(
                                   fontSize: 12,
@@ -435,15 +440,15 @@ class AddCameraView extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       EquallyRow(
-                        one: ComboBox<String>(
+                        one: ComboBox<IdNameValue>(
                           isExpanded: true,
                           value: e.selectedEntryExit,
-                          items: model.entryExitList
-                              .map<ComboBoxItem<String>>((e) {
-                            return ComboBoxItem<String>(
+                          items: model.inOutList
+                              .map<ComboBoxItem<IdNameValue>>((e) {
+                            return ComboBoxItem<IdNameValue>(
                               value: e,
                               child: Text(
-                                e,
+                                e.name ?? "",
                                 textAlign: TextAlign.start,
                                 style: const TextStyle(
                                   fontSize: 12,
@@ -466,15 +471,15 @@ class AddCameraView extends StatelessWidget {
                                 color: ColorUtils.colorBlackLiteLite),
                           ),
                         ),
-                        two: ComboBox<String>(
+                        two: ComboBox<IdNameValue>(
                           isExpanded: true,
-                          value: e.isRegulation,
+                          value: e.selectedRegulation,
                           items: model.regulationList
-                              .map<ComboBoxItem<String>>((e) {
-                            return ComboBoxItem<String>(
+                              .map<ComboBoxItem<IdNameValue>>((e) {
+                            return ComboBoxItem<IdNameValue>(
                               value: e,
                               child: Text(
-                                e,
+                                e.name ?? "",
                                 textAlign: TextAlign.start,
                                 style: const TextStyle(
                                     fontSize: 12,
@@ -485,7 +490,7 @@ class AddCameraView extends StatelessWidget {
                           onChanged: e.readOnly
                               ? null
                               : (a) {
-                                  e.selectedEntryExit = a!;
+                                  e.selectedRegulation = a!;
                                   model.notifyListeners();
                                 },
                           placeholder: const Text(
@@ -530,7 +535,10 @@ class AddCameraView extends StatelessWidget {
                                 child: Container(
                                   padding: const EdgeInsets.only(
                                       left: 30, right: 30, top: 8, bottom: 8),
-                                  color: ColorUtils.colorGreen,
+                                  decoration: BoxDecoration(
+                                    color: ColorUtils.colorGreen,
+                                    borderRadius: BorderRadius.circular(3),
+                                  ),
                                   child: const Text(
                                     "完成",
                                     style: TextStyle(
@@ -539,7 +547,8 @@ class AddCameraView extends StatelessWidget {
                                   ),
                                 ),
                                 onTap: () {
-                                  model.completeEventAction();
+                                  showConfirmDialog(context, e);
+                                  // model.completeCameraAction(e);
                                 },
                               ),
                             ] else ...[
@@ -562,7 +571,7 @@ class AddCameraView extends StatelessWidget {
                                   ),
                                 ),
                                 onTap: () {
-                                  model.restartRecognitionEventAction();
+                                  model.restartRecognitionAction(e);
                                 },
                               ),
                               const SizedBox(width: 18),
@@ -585,7 +594,7 @@ class AddCameraView extends StatelessWidget {
                                   ),
                                 ),
                                 onTap: () {
-                                  model.photoPreviewEventAction();
+                                  model.photoPreviewAction(e);
                                 },
                               ),
                             ],
@@ -610,10 +619,93 @@ class AddCameraView extends StatelessWidget {
       height: 360,
       child: Stack(
         children: [
-          Video(controller: model.controller),
+          Video(controller: model.videoController),
         ],
       ),
     ));
+  }
+
+  // 显示确认弹窗
+  void showConfirmDialog(
+      BuildContext context, CameraDeviceEntity cameraDeviceEntity) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.6),
+      barrierDismissible: false,
+      builder: (context2) {
+        return Center(
+          child: Container(
+            width: 980,
+            height: 640,
+            decoration: BoxDecoration(
+              color: ColorUtils.colorBackgroundLine,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 20),
+                const Text(
+                  '请确认摄像头添加信息是否有误，摄像头信息将更新至服务端',
+                  style: TextStyle(fontSize: 16, color: ColorUtils.colorWhite),
+                ),
+                const SizedBox(height: 28),
+                _videoView(model),
+                const SizedBox(height: 40),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text(
+                        '设备名称: ${cameraDeviceEntity.deviceNameController.text}'),
+                    Text(
+                        '摄像头类型: ${cameraDeviceEntity.selectedCameraType?.name ?? ""}'),
+                    Text(
+                        '进/出口: ${cameraDeviceEntity.selectedEntryExit?.name ?? ""}'),
+                    Text(
+                        '是否纳入监管: ${cameraDeviceEntity.selectedRegulation?.name ?? ""}'),
+                  ],
+                ),
+                const SizedBox(height: 60),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(width: 16),
+                    FilledButton(
+                      onPressed: () {
+                        Navigator.pop(context2);
+                      },
+                      style: const ButtonStyle(
+                        backgroundColor:
+                            WidgetStatePropertyAll(ColorUtils.colorRed),
+                      ),
+                      child: const Text(
+                        "返回修改",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    const SizedBox(width: 24),
+                    FilledButton(
+                      onPressed: () => model.completeCameraAction(
+                          context2, cameraDeviceEntity),
+                      style: ButtonStyle(
+                        backgroundColor:
+                            WidgetStatePropertyAll(AppTheme().color),
+                      ),
+                      child: const Text(
+                        "提交       ",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }
 

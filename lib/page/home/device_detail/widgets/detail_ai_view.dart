@@ -3,7 +3,7 @@ import 'package:kayo_package/extension/_index_extension.dart';
 import 'package:kayo_package/mvvm/base/provider_widget.dart';
 import 'package:kayo_package/views/widget/base/clickable.dart';
 import 'package:kayo_package/views/widget/base/dash_line.dart';
-import 'package:omt/page/home/device_add/widgets/second_step_view.dart';
+import 'package:omt/theme.dart';
 import 'package:omt/utils/color_utils.dart';
 import 'package:omt/utils/log_utils.dart';
 
@@ -89,18 +89,18 @@ class DetailAiView extends StatelessWidget {
                     RowItemInfoView(
                       name: "主程版本",
                       value: model.deviceInfo.programVersion,
-                      // buttonName: "升级",
-                      // buttonAction: () {
-                      //   LogUtils.info(msg: "点击--主程版本-升级");
-                      // },
+                      buttonName: "升级",
+                      buttonAction: () {
+                        LogUtils.info(msg: "点击--主程版本-升级");
+                      },
                     ),
                     RowItemInfoView(
                       name: "识别版本",
                       value: model.deviceInfo.identityVersion,
-                      // buttonName: "升级",
-                      // buttonAction: () {
-                      //   LogUtils.info(msg: "点击--识别版本-升级");
-                      // },
+                      buttonName: "升级",
+                      buttonAction: () {
+                        LogUtils.info(msg: "点击--识别版本-升级");
+                      },
                     ),
                   ],
                 ),
@@ -129,24 +129,26 @@ class DetailAiView extends StatelessWidget {
         const SizedBox(
           height: 20,
         ),
-        const Row(
+        Row(
           children: [
-            SizedBox(
+            const SizedBox(
               width: 16,
             ),
-            // Clickable(
-            //   onTap: () {},
-            //   child: Container(
-            //     padding: const EdgeInsets.only(
-            //         left: 25, right: 25, top: 6, bottom: 6),
-            //     color: ColorUtils.colorGreen,
-            //     child: const Text(
-            //       "重启主程",
-            //       style: TextStyle(fontSize: 12, color: ColorUtils.colorWhite),
-            //     ),
-            //   ),
-            // ),
-            SizedBox(
+            Clickable(
+              onTap: () {
+                model.restartAction();
+              },
+              child: Container(
+                padding: const EdgeInsets.only(
+                    left: 25, right: 25, top: 6, bottom: 6),
+                color: AppTheme().color,
+                child: const Text(
+                  "重启主程",
+                  style: TextStyle(fontSize: 12, color: ColorUtils.colorWhite),
+                ),
+              ),
+            ),
+            const SizedBox(
               width: 16,
             ),
           ],

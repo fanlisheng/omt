@@ -38,7 +38,7 @@ class DetailCameraViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   void requestData() {
-     HttpQuery.share.homePageService.deviceDetailCamera(
+    HttpQuery.share.homePageService.deviceDetailCamera(
         nodeCode: nodeCode,
         onSuccess: (DeviceDetailCameraData? a) {
           deviceInfo = a ?? DeviceDetailCameraData();
@@ -71,8 +71,14 @@ class DetailCameraViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   //重启识别
-  restartRecognitionEventAction() {
+  restartRecognitionAction() {
     notifyListeners();
+    HttpQuery.share.homePageService.manualSnapCamera(
+        deviceCode: deviceInfo.deviceCode ?? "",
+        aiDeviceCode: deviceInfo.aiDeviceCode ?? "",
+        onSuccess: (a) {
+          LoadingUtils.show(data: "重启识别成功!");
+        });
   }
 
   //图片
@@ -97,8 +103,8 @@ class DetailCameraViewModel extends BaseViewModelRefresh<dynamic> {
           deviceCode: deviceInfo.deviceCode ?? "",
           dayBasicPhoto: deviceInfo.dayBasicPhoto,
           nightBasicPhoto: deviceInfo.nightBasicPhoto)
-    })?.then((value){
-      if( IntentUtils.share.isResultOk(value)){
+    })?.then((value) {
+      if (IntentUtils.share.isResultOk(value)) {
         requestData();
       }
     });

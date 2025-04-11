@@ -4,23 +4,18 @@ import 'package:kayo_package/mvvm/base/provider_widget.dart';
 import 'package:omt/page/home/device_add/widgets/add_camera_view.dart';
 import 'package:omt/utils/color_utils.dart';
 
+import '../../../../bean/common/id_name_value.dart';
 import '../view_models/add_battery_exchange_viewmodel.dart';
-import '../view_models/device_add_viewmodel.dart';
 
 class AddBatteryExchangeView extends StatelessWidget {
-  final DeviceType deviceType;
-  final StepNumber stepNumber;
-  final bool? isInstall; //是安装 默认否
+  final AddBatteryExchangeViewModel model;
 
-  const AddBatteryExchangeView(this.deviceType, this.stepNumber,
-      {super.key, this.isInstall});
+  const AddBatteryExchangeView({super.key, required this.model});
 
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<AddBatteryExchangeViewModel>(
-        model: AddBatteryExchangeViewModel(
-            deviceType, stepNumber, isInstall ?? false)
-          ..themeNotifier = true,
+        model: model..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
           return contentView(model);
@@ -41,18 +36,17 @@ class AddBatteryExchangeView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "第${model.isInstall ? "六" : "二"}步：添加${model.deviceType == DeviceType.battery ? "电池" : "交换机"}",
+                "第${model.isInstall ? "六" : "二"}步：添加${model.isBattery ? "电池" : "交换机"}",
                 style: const TextStyle(
                   fontSize: 14,
                   color: ColorUtils.colorGreenLiteLite,
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              if (model.isInstall)...batteryView(model),
-              if (model.isInstall)...exchangeView(model),
-              if (!model.isInstall && model.deviceType == DeviceType.battery) ...batteryView(model),
-              if (!model.isInstall && model.deviceType == DeviceType.exchange)
-                ...exchangeView(model),
+              if (model.isInstall && model.isBattery) ...batteryView(model),
+              if (model.isInstall && !model.isBattery) ...exchangeView(model),
+              if (!model.isInstall && model.isBattery) ...batteryView(model),
+              if (!model.isInstall && !model.isBattery) ...exchangeView(model),
             ],
           ),
         ),
@@ -105,7 +99,58 @@ class AddBatteryExchangeView extends StatelessWidget {
 
   List<Widget> exchangeView(AddBatteryExchangeViewModel model) {
     return [
-      const SizedBox(height: 16),
+      const SizedBox(height: 20),
+      const Row(
+        children: [
+          Text(
+            "*",
+            style: TextStyle(
+                fontSize: 12,
+                color: ColorUtils.colorRed,
+                fontWeight: FontWeight.w500),
+          ),
+          SizedBox(width: 2),
+          Text(
+            "进/出口",
+            style: TextStyle(
+                fontSize: 12,
+                color: ColorUtils.colorWhite,
+                fontWeight: FontWeight.w500),
+          ),
+        ],
+      ),
+      const SizedBox(height: 5),
+      EquallyRow(
+        one: ComboBox<IdNameValue>(
+          isExpanded: true,
+          value: model.selectedInOut,
+          items: model.inOutList.map<ComboBoxItem<IdNameValue>>((e) {
+            return ComboBoxItem<IdNameValue>(
+              value: e,
+              child: SizedBox(
+                child: Text(
+                  e.name ?? "",
+                  textAlign: TextAlign.start,
+                  style: const TextStyle(
+                      fontSize: 12, color: ColorUtils.colorWhite),
+                ),
+              ),
+            );
+          }).toList(),
+          onChanged: (a) {
+            model.selectedInOut = a!;
+            model.notifyListeners();
+          },
+          placeholder: const Text(
+            "请选择进/出口",
+            textAlign: TextAlign.start,
+            style: TextStyle(
+                fontSize: 12, color: ColorUtils.colorBlackLiteLite),
+          ),
+        ),
+        two: Container(),
+      ),
+      const SizedBox(height: 20),
       const RowTitle(name: "交换机接口数量"),
       EquallyRow(
         one: Wrap(
@@ -126,7 +171,7 @@ class AddBatteryExchangeView extends StatelessWidget {
                       model.notifyListeners();
                     },
                   ),
-                  Text(option,
+                  Text("$option口",
                       style: TextStyle(
                           fontSize: 12,
                           color: model.selectedPortNumber != option

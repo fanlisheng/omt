@@ -11,7 +11,6 @@ import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/bean/common/name_value.dart';
 import 'package:omt/bean/home/home_page/camera_device_entity.dart';
 import 'package:omt/page/home/device_add/view_models/add_camera_viewmodel.dart';
-import 'package:omt/page/home/device_add/widgets/second_step_view.dart';
 import 'package:omt/page/home/device_detail/widgets/detail_ai_view.dart';
 import 'package:omt/utils/color_utils.dart';
 import 'package:omt/utils/date_time_utils.dart';
@@ -322,21 +321,23 @@ class DetailCameraView extends StatelessWidget {
         ),
         Row(
           children: [
-            // const SizedBox(
-            //   width: 16,
-            // ),
-            // Clickable(
-            //   onTap: () {},
-            //   child: Container(
-            //     padding: const EdgeInsets.only(
-            //         left: 25, right: 25, top: 6, bottom: 6),
-            //     color: ColorUtils.colorGreen,
-            //     child: const Text(
-            //       "重启主程",
-            //       style: TextStyle(fontSize: 12, color: ColorUtils.colorWhite),
-            //     ),
-            //   ),
-            // ),
+            const SizedBox(
+              width: 16,
+            ),
+            Clickable(
+              onTap: () {
+                model.restartRecognitionAction();
+              },
+              child: Container(
+                padding: const EdgeInsets.only(
+                    left: 25, right: 25, top: 6, bottom: 6),
+                color: ColorUtils.colorGreen,
+                child: const Text(
+                  "重启识别",
+                  style: TextStyle(fontSize: 12, color: ColorUtils.colorWhite),
+                ),
+              ),
+            ),
             const SizedBox(
               width: 16,
             ),

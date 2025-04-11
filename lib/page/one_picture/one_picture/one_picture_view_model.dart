@@ -681,7 +681,11 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
     }
     IntentUtils.share.push(context,
         routeName: RouterPage.DeviceAddPage,
-        data: {"pNodeCode": data.nodeCode});
+        data: {"pNodeCode": data.nodeCode})?.then((value) {
+      if (IntentUtils.share.isResultOk(value)) {
+        requestData();
+      }
+    });
   }
 
   void _powerSub(OnePictureDataData opd,

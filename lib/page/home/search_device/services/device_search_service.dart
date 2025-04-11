@@ -12,68 +12,63 @@ import 'dart:async';
 
 class DeviceSearchService {
   static final DeviceSearchService _instance = DeviceSearchService._internal();
-  
+
   factory DeviceSearchService() {
     return _instance;
   }
-  
+
   DeviceSearchService._internal();
 
   // 获取实例列表
   Future<List<StrIdNameValue>> getInstanceList() async {
     final completer = Completer<List<StrIdNameValue>>();
-    
-    HttpQuery.share.homePageService.getInstanceList(
-      "5101",
-      onSuccess: (List<StrIdNameValue>? data) {
-        completer.complete(data ?? []);
-      },
-      onError: (String error) {
-        LogUtils.info(msg: "获取实例列表失败: $error");
-        completer.complete([]);
-      }
-    );
-    
+
+    HttpQuery.share.homePageService.getInstanceList("5101",
+        onSuccess: (List<StrIdNameValue>? data) {
+      completer.complete(data ?? []);
+    }, onError: (String error) {
+      LogUtils.info(msg: "获取实例列表失败: $error");
+      completer.complete([]);
+    });
+
     return completer.future;
   }
 
   // 获取大门列表
   Future<List<IdNameValue>> getGateList() async {
     final completer = Completer<List<IdNameValue>>();
-    
+
     HttpQuery.share.homePageService.getGateList(
-      onSuccess: (List<IdNameValue>? data) {
-        completer.complete(data ?? []);
-      },
-      onError: (String error) {
-        LogUtils.info(msg: "获取大门列表失败: $error");
-        completer.complete([]);
-      }
-    );
-    
+        onSuccess: (List<IdNameValue>? data) {
+      completer.complete(data ?? []);
+    }, onError: (String error) {
+      LogUtils.info(msg: "获取大门列表失败: $error");
+      completer.complete([]);
+    });
+
     return completer.future;
   }
 
   // 获取进出口列表
   Future<List<IdNameValue>> getInOutList() async {
     final completer = Completer<List<IdNameValue>>();
-    
+
     HttpQuery.share.homePageService.getInOutList(
-      onSuccess: (List<IdNameValue>? data) {
-        completer.complete(data ?? []);
-      },
-      onError: (String error) {
-        LogUtils.info(msg: "获取进出口列表失败: $error");
-        completer.complete([]);
-      }
-    );
-    
+        onSuccess: (List<IdNameValue>? data) {
+      completer.complete(data ?? []);
+    }, onError: (String error) {
+      LogUtils.info(msg: "获取进出口列表失败: $error");
+      completer.complete([]);
+    });
+
     return completer.future;
   }
 
   // 扫描设备并获取信息
-  Future<List<DeviceEntity>> scanDevices({required bool Function() shouldStop}) async {
-    return await DeviceUtils.scanAndFetchDevicesInfo(shouldStop: shouldStop);
+  Future<List<DeviceEntity>> scanDevices(
+      {required bool Function() shouldStop, String? deviceType}) async {
+    return await DeviceUtils.scanAndFetchDevicesInfo(
+        shouldStop: shouldStop, deviceType: deviceType);
   }
 
   // 上传设备扫描数据
@@ -87,7 +82,7 @@ class DeviceSearchService {
       unboundDevices: [],
       statistics: "",
     );
-    
+
     HttpQuery.share.homePageService.deviceScan(
       instanceId: instanceId,
       deviceList: deviceList,
@@ -102,23 +97,24 @@ class DeviceSearchService {
         completer.complete(result);
       },
     );
-    
+
     return completer.future;
   }
-  
+
   // 获取未绑定设备
-  Future<DeviceUnboundResult> getUnboundDevices({required String instanceId}) async {
+  Future<DeviceUnboundResult> getUnboundDevices(
+      {required String instanceId}) async {
     final completer = Completer<DeviceUnboundResult>();
     final result = DeviceUnboundResult(
       unboundDevices: [],
       statistics: "",
     );
-    
+
     HttpQuery.share.homePageService.getUnboundDevices(
       instanceId: instanceId,
       onSuccess: (DeviceUnboundEntity? data) {
         result.unboundDevices = data?.unboundDevices ?? [];
-        
+
         // 生成统计信息
         StringBuffer countStr = StringBuffer();
         for (DeviceUnboundAllCount item in data?.allCount ?? []) {
@@ -130,7 +126,7 @@ class DeviceSearchService {
         } else {
           result.statistics = statistics;
         }
-        
+
         completer.complete(result);
       },
       onError: (String error) {
@@ -138,7 +134,7 @@ class DeviceSearchService {
         completer.complete(result);
       },
     );
-    
+
     return completer.future;
   }
 
@@ -160,7 +156,8 @@ class DeviceSearchService {
     Map<int, int> deviceCount = {};
     for (var device in deviceList) {
       if (deviceTypeMap.containsKey(device.deviceType)) {
-        deviceCount[device.deviceType!] = (deviceCount[device.deviceType] ?? 0) + 1;
+        deviceCount[device.deviceType!] =
+            (deviceCount[device.deviceType] ?? 0) + 1;
       }
     }
 
@@ -173,26 +170,26 @@ class DeviceSearchService {
     return stats.join(" / ");
   }
 
-  
   // 初始化设备搜索数据
   Future<DeviceSearchInitData> initSearchData() async {
     DeviceSearchInitData data = DeviceSearchInitData();
-    
+
     // 并行加载数据
     Future<List<StrIdNameValue>> instancesFuture = getInstanceList();
     Future<List<IdNameValue>> doorsFuture = getGateList();
     Future<List<IdNameValue>> inOutFuture = getInOutList();
-    
+
     // 等待所有数据加载完成
-    List results = await Future.wait([instancesFuture, doorsFuture, inOutFuture]);
-    
+    List results =
+        await Future.wait([instancesFuture, doorsFuture, inOutFuture]);
+
     data.instanceList = results[0] as List<StrIdNameValue>;
     data.doorList = results[1] as List<IdNameValue>;
     data.inOutList = results[2] as List<IdNameValue>;
-    
+
     return data;
   }
-  
+
   // 扫描设备和处理状态
   Future<DeviceSearchResult> scanAndProcessDevices({
     required String? instanceId,
@@ -204,36 +201,37 @@ class DeviceSearchService {
       unboundDevices: [],
       statistics: "",
     );
-    
+
     // 参数校验
     if (instanceId == null || instanceId.isEmpty) {
       result.state = DeviceSearchState.notSearched;
       return result;
     }
-    
+
     // 扫描设备
-    List<DeviceEntity> scannedDevices = await scanDevices(shouldStop: shouldStop);
-    
+    List<DeviceEntity> scannedDevices =
+        await scanDevices(shouldStop: shouldStop);
+
     // 检查是否中断
     if (shouldStop()) {
       result.state = DeviceSearchState.notSearched;
       return result;
     }
-    
+
     // 上传扫描结果
     DeviceScanResult scanResult = await uploadScanData(
       instanceId: instanceId,
       deviceList: scannedDevices,
     );
-    
+
     // 更新结果
     result.devices = scanResult.devices;
     result.unboundDevices = scanResult.unboundDevices;
     result.statistics = scanResult.statistics;
-    
+
     return result;
   }
-  
+
   // 获取未绑定设备并处理状态
   Future<DeviceSearchResult> getUnboundDevicesWithState({
     required String? instanceId,
@@ -248,22 +246,22 @@ class DeviceSearchService {
       unboundDevices: [],
       statistics: "",
     );
-    
+
     // 参数校验
     if (instanceId == null || instanceId.isEmpty) {
       result.state = DeviceSearchState.notSearched;
       return result;
     }
-    
+
     // 获取未绑定设备
     DeviceUnboundResult unboundResult = await getUnboundDevices(
       instanceId: instanceId,
     );
-    
+
     // 更新结果
     result.unboundDevices = unboundResult.unboundDevices;
     result.statistics = unboundResult.statistics;
-    
+
     // 刷新一张图页面
     picturePageKey.currentState?.refresh(
       instanceName: instanceName,
@@ -271,7 +269,7 @@ class DeviceSearchService {
       gateId: gateId,
       passId: passId,
     );
-    
+
     return result;
   }
 }
@@ -281,7 +279,7 @@ class DeviceScanResult {
   List<DeviceEntity> devices;
   List<DeviceEntity> unboundDevices;
   String statistics;
-  
+
   DeviceScanResult({
     required this.devices,
     required this.unboundDevices,
@@ -293,7 +291,7 @@ class DeviceScanResult {
 class DeviceUnboundResult {
   List<DeviceEntity> unboundDevices;
   String statistics;
-  
+
   DeviceUnboundResult({
     required this.unboundDevices,
     required this.statistics,
@@ -313,11 +311,11 @@ class DeviceSearchResult {
   List<DeviceEntity> devices;
   List<DeviceEntity> unboundDevices;
   String statistics;
-  
+
   DeviceSearchResult({
     required this.state,
     required this.devices,
     required this.unboundDevices,
     required this.statistics,
   });
-} 
+}

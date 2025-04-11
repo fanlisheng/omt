@@ -1,27 +1,37 @@
+import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
-import 'package:omt/bean/common/code_data.dart';
+import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/http/http_query.dart';
-import 'device_add_viewmodel.dart';
+import 'package:omt/utils/intent_utils.dart';
 
 class AddBatteryExchangeViewModel extends BaseViewModelRefresh<dynamic> {
-  final DeviceType deviceType;
-  final StepNumber stepNumber;
-  final bool isInstall;//是安装 默认否
-  AddBatteryExchangeViewModel(this.deviceType, this.stepNumber, this.isInstall);
+  final String pNodeCode;
+  final bool isInstall;
+  final bool isBattery;
 
-  // 容量80
+  AddBatteryExchangeViewModel(this.pNodeCode,
+      {this.isInstall = false, this.isBattery = false});
+
+  // ===== 电池/交换机相关属性 =====
   bool isCapacity80 = true;
-
-  List<String> portNumber = ["5口", "8口"];
+  List<String> portNumber = ["5", "8"];
   String? selectedPortNumber;
-
   List<String> supplyMethod = ["POE", "DC", "AC"];
   String? selectedSupplyMethod;
+  IdNameValue? selectedInOut;
+  List<IdNameValue> inOutList = [];
 
   @override
-  void initState() async {
+  void initState() {
     super.initState();
+    // 初始化进/出口列表
+    HttpQuery.share.homePageService.getInOutList(
+      onSuccess: (List<IdNameValue>? data) {
+        inOutList = data ?? [];
+        notifyListeners();
+      },
+    );
   }
 
   @override
@@ -35,62 +45,52 @@ class AddBatteryExchangeViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   // 安装交换机
-  installSwitch({
-    String? pNodeCode,
-    required String deviceCode,
-    required String ip,
-    required String mac,
-    required String interfaceNum,
-    required String powerMethod,
-    String? instanceId,
-    int? gateId,
-    int? passId,
-  }) {
+  installSwitch() {
+    // 检查参数
+    if (selectedInOut?.id == null) {
+      LoadingUtils.showToast(data: '请选择进出口');
+      return;
+    }
+    if (selectedPortNumber == null || selectedSupplyMethod == null) {
+      LoadingUtils.showToast(data: '请选择交换机接口数量和供电方式');
+      return;
+    }
+
+    // 执行交换机安装
     HttpQuery.share.installService.switchInstall(
-      pNodeCode: pNodeCode,
-      deviceCode: deviceCode,
-      ip: ip,
-      mac: mac,
-      interfaceNum: interfaceNum,
-      powerMethod: powerMethod,
-      instanceId: instanceId,
-      gateId: gateId,
-      passId: passId,
-      onSuccess: (data) {
-        LoadingUtils.showToast(data: '交换机安装成功');
-      },
-      onError: (error) {
-        LoadingUtils.showToast(data: '交换机安装失败: $error');
-      }
-    );
+        pNodeCode: pNodeCode,
+        interfaceNum: int.parse(selectedPortNumber!),
+        powerMethod: selectedSupplyMethod!,
+        passId: selectedInOut!.id!,
+        onSuccess: (data) {
+          LoadingUtils.showToast(data: '交换机安装成功');
+          IntentUtils.share.popResultOk(context!);
+        },
+        onError: (error) {
+          LoadingUtils.showToast(data: '交换机安装失败: $error');
+        });
   }
 
-  // 安装路由器
-  installRouter({
-    String? pNodeCode,
-    required String deviceCode,
-    required String ip,
-    required String mac,
-    required int type,
-    String? instanceId,
-    int? gateId,
-    int? passId,
-  }) {
-    HttpQuery.share.installService.routerInstall(
-      pNodeCode: pNodeCode,
-      deviceCode: deviceCode,
-      ip: ip,
-      mac: mac,
-      type: type,
-      instanceId: instanceId,
-      gateId: gateId,
-      passId: passId,
-      onSuccess: (data) {
-        LoadingUtils.showToast(data: '路由器安装成功');
-      },
-      onError: (error) {
-        LoadingUtils.showToast(data: '路由器安装失败: $error');
-      }
-    );
+  // 安装电池
+  void installBattery() {
+    // 检查参数
+    // if (selectedInOut?.id == null) {
+    //   LoadingUtils.showToast(data: '请选择进出口');
+    //   return;
+    // }
+    //
+    // // 执行电池安装
+    // HttpQuery.share.installService.batteryInstall(
+    //   pNodeCode: pNodeCode,
+    //   type: selectedInOut!.id!,
+    //   memo: memoController.text,
+    //   onSuccess: (data) {
+    //     LoadingUtils.showToast(data: '电池安装成功');
+    //     IntentUtils.share.popResultOk(context!);
+    //   },
+    //   onError: (error) {
+    //     LoadingUtils.showToast(data: '电池安装失败: $error');
+    //   },
+    // );
   }
 }

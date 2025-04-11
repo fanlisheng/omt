@@ -1,68 +1,49 @@
-import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
-import 'package:omt/bean/common/code_data.dart';
+import 'package:omt/bean/common/id_name_value.dart';
+import 'package:omt/bean/home/home_page/device_detail_power_box_entity.dart';
 import 'package:omt/http/http_query.dart';
-import '../../../../bean/home/home_page/device_entity.dart';
-import 'device_add_viewmodel.dart';
+import 'package:omt/utils/intent_utils.dart';
 
 class AddPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
-  // Function()? subNotifyListeners;
-
-  // AiAddViewModel({this.subNotifyListeners});
-
-  final DeviceType deviceType;
-  final StepNumber stepNumber;
+  // 父节点code
+  final String pNodeCode;
   final bool isInstall; //是安装 默认否
 
-  AddPowerBoxViewModel(this.deviceType, this.stepNumber, this.isInstall);
+  AddPowerBoxViewModel(this.pNodeCode, {this.isInstall = false});
 
-  List<DeviceEntity> deviceList = [DeviceEntity()];
-
-  // 进/出口选项
-  String selectedEntryExit = "";
-  List entryExitList = ["显示进口", "出口", "共用进出口"];
-
-  String selectedPowerBoxCoding = "";
-  List powerBoxCodingList = ["1", "2"];
-
-  bool isPowerBoxNeeded = false;
-
-  // ed接口信息
-  List<Map<String, String>> edPortInfo = [];
+  // ===== 电源箱相关属性 =====
+  IdNameValue? selectedPowerBoxInOut;
+  DeviceDetailPowerBoxData? selectedDeviceDetailPowerBox;
+  bool isPowerBoxNeeded = true;
+  List<DeviceDetailPowerBoxData> powerBoxList = [];
+  List<IdNameValue> inOutList = [];
+  // String powerBoxMemo = "";
+  // final TextEditingController powerBoxMemoController = TextEditingController();
 
   @override
   void initState() async {
     super.initState();
-    edPortInfo = [
-      {
-        "DC": "1",
-        "状态": "正在录像",
-        "电压": "正常",
-        "电流": "2024-09-25 10:22:34",
-        "运行设备": "未知"
-
+    // 初始化进/出口列表
+    HttpQuery.share.homePageService.getInOutList(
+      onSuccess: (List<IdNameValue>? data) {
+        inOutList = data ?? [];
+        notifyListeners();
       },
-      {
-        "DC": "1",
-        "状态": "正在录像",
-        "电压": "正常",
-        "电流": "2024-09-25 10:22:34",
-        "运行设备": "未知"
+    );
+    // 初始化电源箱列表
+    HttpQuery.share.installService.getUnboundPowerBox(
+      onSuccess: (List<DeviceDetailPowerBoxData>? data) {
+        powerBoxList = data ?? [];
+        notifyListeners();
       },
-      {
-        "DC": "1",
-        "状态": "正在录像",
-        "电压": "正常",
-        "电流": "2024-09-25 10:22:34",
-        "运行设备": "未知"
-      }
-    ];
+    );
   }
 
   @override
   void dispose() {
+    // powerBoxMemoController.dispose();
     super.dispose();
   }
 
@@ -71,51 +52,42 @@ class AddPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
     ///网络请求
   }
 
-  // 安装电源箱
-  installPowerBox({
-    String? pNodeCode,
-    required String deviceCode,
-    required String ip,
-    required String mac,
-    String? instanceId,
-    int? gateId,
-    int? passId,
-  }) {
-    HttpQuery.share.installService.powerBoxInstall(
-      pNodeCode: pNodeCode,
-      deviceCode: deviceCode,
-      ip: ip,
-      mac: mac,
-      instanceId: instanceId,
-      gateId: gateId,
-      passId: passId,
-      onSuccess: (data) {
-        LoadingUtils.showToast(data: '电源箱安装成功');
-      },
-      onError: (error) {
-        LoadingUtils.showToast(data: '电源箱安装失败: $error');
-      }
-    );
+  //选择电源箱code
+  selectedPowerBoxCode(DeviceDetailPowerBoxData? a) {
+    if (a == null) return;
+    
+    HttpQuery.share.homePageService.deviceDetailPowerBox(
+        deviceCode: a.deviceCode ?? "",
+        onSuccess: (data) {
+          selectedDeviceDetailPowerBox = a;
+          selectedDeviceDetailPowerBox?.dcInterfaces = data?.dcInterfaces ?? [];
+          notifyListeners();
+        });
   }
 
-  // 安装电源信息
-  installPower({
-    String? pNodeCode,
-    String? instanceId,
-    int? gateId,
-    int? passId,
-  }) {
-    HttpQuery.share.installService.powerInstall(
-      pNodeCode: pNodeCode,
-      instanceId: instanceId,
-      gateId: gateId,
-      passId: passId,
-      onSuccess: (data) {
-        LoadingUtils.showToast(data: '电源信息安装成功');
-      },
-      onError: (error) {
-        LoadingUtils.showToast(data: '电源信息安装失败: $error');
-      }
-    );
+  // 安装电源箱
+  void installPowerBox() {
+    // 检查是否已选择电源箱
+    if (selectedPowerBoxInOut?.id == null) {
+      LoadingUtils.showToast(data: '请选择进出口');
+      return;
+    }
+    if (selectedDeviceDetailPowerBox?.deviceCode == null) {
+      LoadingUtils.showToast(data: '请先选择电源箱');
+      return;
+    }
+
+    HttpQuery.share.installService.powerBoxInstall(
+        pNodeCode: pNodeCode,
+        deviceCode: selectedDeviceDetailPowerBox!.deviceCode!,
+        passId: selectedPowerBoxInOut!.id!,
+        onSuccess: (data) {
+          LoadingUtils.showToast(data: '电源箱安装成功');
+          IntentUtils.share.popResultOk(context!);
+        },
+        onError: (error) {
+          LoadingUtils.showToast(data: '电源箱安装失败: $error');
+        });
+
   }
 }

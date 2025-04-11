@@ -11,6 +11,7 @@ import '../../device_add/view_models/device_add_viewmodel.dart';
 
 class DetailAiViewModel extends BaseViewModelRefresh<dynamic> {
   final String nodeCode;
+
   DetailAiViewModel(this.nodeCode);
 
   DeviceDetailAiData deviceInfo = DeviceDetailAiData();
@@ -18,6 +19,10 @@ class DetailAiViewModel extends BaseViewModelRefresh<dynamic> {
   @override
   void initState() async {
     super.initState();
+    _requestData();
+  }
+
+  void _requestData() {
     HttpQuery.share.homePageService.deviceDetailAi(
         nodeCode: nodeCode,
         onSuccess: (DeviceDetailAiData? a) {
@@ -39,4 +44,31 @@ class DetailAiViewModel extends BaseViewModelRefresh<dynamic> {
   ///点击事件
   //连接
   connectEventAction(int index) async {}
+
+  //重起
+  restartAction() {
+    HttpQuery.share.homePageService.restartAiDevice(
+        deviceCode: deviceInfo.deviceCode ?? "",
+        onSuccess: (a) {
+          LoadingUtils.show(data: "重启成功!");
+        });
+  }
+
+  //升级主程版本
+  upgradeProgramAction() {
+    HttpQuery.share.homePageService.upgradeAiDeviceProgram(
+        deviceCode: deviceInfo.deviceCode ?? "",
+        onSuccess: (a) {
+          _requestData();
+        });
+  }
+
+  //升级识别版本
+  upgradeIdentityAction() {
+    HttpQuery.share.homePageService.upgradeAiDeviceIdentity(
+        deviceCode: deviceInfo.deviceCode ?? "",
+        onSuccess: (a) {
+          _requestData();
+        });
+  }
 }

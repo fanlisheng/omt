@@ -63,6 +63,23 @@ class HomePageService {
 
   get _getUnboundDevices => '${API.share.host}api/device/devices';
 
+  get _restartAiDevice => '${API.share.host}api/device/ai_device/restart';
+
+  get _upgradeAiDeviceProgram =>
+      '${API.share.host}api/device/ai_device/upgrade_program';
+
+  get _upgradeAiDeviceIdentity =>
+      '${API.share.host}api/device/ai_device/upgrade_identity';
+
+  get _manualSnapCamera => '${API.share.host}api/device/camera/manual_snap';
+
+  get _restartPowerBox => '${API.share.host}api/device/power_box/restart';
+
+  get _dcInterfaceControl =>
+      '${API.share.host}api/device/power_box/dc_interface_control';
+
+  get _deleteNvrChannel => '${API.share.host}api/device/nvr/delete_channel';
+
   getInstanceList(
     String areaCode, {
     required ValueChanged<List<StrIdNameValue>?>? onSuccess,
@@ -108,8 +125,8 @@ class HomePageService {
       await _inOutList,
       {},
       method: 'GET',
-      autoHideDialog: true,
-      autoShowDialog: true,
+      autoHideDialog: false,
+      autoShowDialog: false,
       onSuccess: onSuccess,
       onCache: onCache,
       onError: onError,
@@ -191,9 +208,7 @@ class HomePageService {
     }
     HttpManager.share.doHttpPost<DeviceDetailAiData>(
       await _deviceDetailAi,
-      {
-        "node_code": nodeCode,
-      },
+      params,
       method: 'POST',
       autoHideDialog: true,
       autoShowDialog: true,
@@ -204,16 +219,23 @@ class HomePageService {
   }
 
   deviceDetailNvr({
-    required String nodeCode,
+    String? nodeCode,
+    String? deviceCode, //mac地址去掉间隔小写
     required ValueChanged<DeviceDetailNvrData?> onSuccess,
     ValueChanged<DeviceDetailNvrData?>? onCache,
     ValueChanged<String>? onError,
   }) async {
+    Map<String, dynamic> params = {};
+
+    if (nodeCode != null) {
+      params["node_code"] = nodeCode;
+    }
+    if (deviceCode != null) {
+      params["device_code"] = deviceCode;
+    }
     HttpManager.share.doHttpPost<DeviceDetailNvrData>(
       await _deviceDetailNvr,
-      {
-        "node_code": nodeCode,
-      },
+      params,
       method: 'POST',
       autoHideDialog: true,
       autoShowDialog: true,
@@ -224,16 +246,23 @@ class HomePageService {
   }
 
   deviceDetailPowerBox({
-    required String nodeCode,
+    String? nodeCode,
+    String? deviceCode, //mac地址去掉间隔小写
     required ValueChanged<DeviceDetailPowerBoxData?> onSuccess,
     ValueChanged<DeviceDetailPowerBoxData?>? onCache,
     ValueChanged<String>? onError,
   }) async {
+    Map<String, dynamic> params = {};
+
+    if (nodeCode != null) {
+      params["node_code"] = nodeCode;
+    }
+    if (deviceCode != null) {
+      params["device_code"] = deviceCode;
+    }
     HttpManager.share.doHttpPost<DeviceDetailPowerBoxData>(
       await _deviceDetailPowerBox,
-      {
-        "node_code": nodeCode,
-      },
+      params,
       method: 'POST',
       autoHideDialog: true,
       autoShowDialog: true,
@@ -370,6 +399,161 @@ class HomePageService {
     );
   }
 
+  /// 重启AI设备
+  restartAiDevice({
+    required String deviceCode,
+    required ValueChanged<CodeMessageData?> onSuccess,
+    ValueChanged<CodeMessageData?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<CodeMessageData>(
+      await _restartAiDevice,
+      {
+        'device_code': deviceCode,
+      },
+      method: 'POST',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  /// 升级AI设备主程版本
+  upgradeAiDeviceProgram({
+    required String deviceCode,
+    required ValueChanged<CodeMessageData?> onSuccess,
+    ValueChanged<CodeMessageData?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<CodeMessageData>(
+      await _upgradeAiDeviceProgram,
+      {
+        'device_code': deviceCode,
+      },
+      method: 'POST',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  /// 升级AI设备识别版本
+  upgradeAiDeviceIdentity({
+    required String deviceCode,
+    required ValueChanged<CodeMessageData?> onSuccess,
+    ValueChanged<CodeMessageData?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<CodeMessageData>(
+      await _upgradeAiDeviceIdentity,
+      {
+        'device_code': deviceCode,
+      },
+      method: 'POST',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  /// 摄像头手动抓拍
+  manualSnapCamera({
+    required String aiDeviceCode,
+    required String deviceCode,
+    required ValueChanged<CodeMessageData?> onSuccess,
+    ValueChanged<CodeMessageData?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<CodeMessageData>(
+      await _manualSnapCamera,
+      {
+        'ai_device_code': aiDeviceCode,
+        'device_code': deviceCode,
+      },
+      method: 'POST',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  /// 重启电源箱
+  restartPowerBox({
+    required String deviceCode,
+    required ValueChanged<CodeMessageData?> onSuccess,
+    ValueChanged<CodeMessageData?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<CodeMessageData>(
+      await _restartPowerBox,
+      {
+        'device_code': deviceCode,
+      },
+      method: 'POST',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  /// 开关电源箱DC接口
+  /// [status] 1：关闭；2：打开
+  dcInterfaceControl({
+    required String deviceCode,
+    required List<int> ids,
+    required int status,
+    required ValueChanged<CodeMessageData?> onSuccess,
+    ValueChanged<CodeMessageData?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<CodeMessageData>(
+      await _dcInterfaceControl,
+      {
+        'device_code': deviceCode,
+        'ids': ids,
+        'status': status,
+      },
+      method: 'POST',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  /// 删除NVR通道
+  deleteNvrChannel({
+    required String deviceCode,
+    required List<int> channelIds,
+    required ValueChanged<CodeMessageData?> onSuccess,
+    ValueChanged<CodeMessageData?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<CodeMessageData>(
+      await _deleteNvrChannel,
+      {
+        'device_code': deviceCode,
+        'channel_ids': channelIds,
+      },
+      method: 'POST',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
 //
 // detail(
 //   Map map, {

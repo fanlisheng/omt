@@ -3,6 +3,9 @@ import 'package:omt/bean/common/code_data.dart';
 import 'package:omt/http/api.dart';
 import 'package:omt/http/http_manager.dart';
 
+import '../../../bean/common/id_name_value.dart';
+import '../../../bean/home/home_page/device_detail_power_box_entity.dart';
+
 ///
 ///  omt
 ///  install.dart
@@ -13,12 +16,27 @@ import 'package:omt/http/http_manager.dart';
 ///
 
 class InstallService {
-  get _aiDeviceCameraInstall => '${API.share.host}api/device/ai_device_camera/install';
+  get _aiDeviceCameraInstall =>
+      '${API.share.host}api/device/aidevice_camera/install';
+
   get _nvrInstall => '${API.share.host}api/device/nvr/install';
+
   get _switchInstall => '${API.share.host}api/device/switch/install';
+
   get _routerInstall => '${API.share.host}api/device/router/install';
+
   get _powerBoxInstall => '${API.share.host}api/device/power_box/install';
+
   get _powerInstall => '${API.share.host}api/device/power/install';
+
+  get _getUnboundPowerBox =>
+      '${API.share.host}api/device/power_box/unbound_list';
+
+  get _getCameraStatus =>
+      '${API.share.host}api/device/camera/control_status_map';
+
+  get _getCameraType =>
+      '${API.share.host}api/device/camera/camera_type_map';
 
   /// AI设备和摄像头安装
   aiDeviceCameraInstall({
@@ -65,7 +83,6 @@ class InstallService {
   /// NVR安装
   nvrInstall({
     String? pNodeCode,
-    required String deviceCode,
     required String ip,
     required String mac,
     String? instanceId,
@@ -76,7 +93,6 @@ class InstallService {
     ValueChanged<String>? onError,
   }) async {
     Map<String, dynamic> params = {
-      "device_code": deviceCode,
       "ip": ip,
       "mac": mac,
     };
@@ -109,10 +125,7 @@ class InstallService {
   /// 交换机安装
   switchInstall({
     String? pNodeCode,
-    required String deviceCode,
-    required String ip,
-    required String mac,
-    required String interfaceNum,
+    required int interfaceNum,
     required String powerMethod,
     String? instanceId,
     int? gateId,
@@ -122,24 +135,12 @@ class InstallService {
     ValueChanged<String>? onError,
   }) async {
     Map<String, dynamic> params = {
-      "device_code": deviceCode,
-      "ip": ip,
-      "mac": mac,
       "interface_num": interfaceNum,
       "power_method": powerMethod,
     };
 
     if (pNodeCode != null) {
       params["p_node_code"] = pNodeCode;
-    }
-    if (instanceId != null) {
-      params["instance_id"] = instanceId;
-    }
-    if (gateId != null) {
-      params["gate_id"] = gateId;
-    }
-    if (passId != null) {
-      params["pass_id"] = passId;
     }
 
     HttpManager.share.doHttpPost<CodeMessageData>(
@@ -157,35 +158,21 @@ class InstallService {
   /// 路由器安装
   routerInstall({
     String? pNodeCode,
-    required String deviceCode,
     required String ip,
-    required String mac,
     required int type,
-    String? instanceId,
-    int? gateId,
-    int? passId,
+    required int passId,
     required ValueChanged<CodeMessageData?> onSuccess,
     ValueChanged<CodeMessageData?>? onCache,
     ValueChanged<String>? onError,
   }) async {
     Map<String, dynamic> params = {
-      "device_code": deviceCode,
       "ip": ip,
-      "mac": mac,
       "type": type,
+      "pass_id": passId,
     };
 
     if (pNodeCode != null) {
       params["p_node_code"] = pNodeCode;
-    }
-    if (instanceId != null) {
-      params["instance_id"] = instanceId;
-    }
-    if (gateId != null) {
-      params["gate_id"] = gateId;
-    }
-    if (passId != null) {
-      params["pass_id"] = passId;
     }
 
     HttpManager.share.doHttpPost<CodeMessageData>(
@@ -204,8 +191,6 @@ class InstallService {
   powerBoxInstall({
     String? pNodeCode,
     required String deviceCode,
-    required String ip,
-    required String mac,
     String? instanceId,
     int? gateId,
     int? passId,
@@ -215,8 +200,6 @@ class InstallService {
   }) async {
     Map<String, dynamic> params = {
       "device_code": deviceCode,
-      "ip": ip,
-      "mac": mac,
     };
 
     if (pNodeCode != null) {
@@ -247,26 +230,28 @@ class InstallService {
   /// 电源信息安装
   powerInstall({
     String? pNodeCode,
-    String? instanceId,
-    int? gateId,
-    int? passId,
+    required bool hasBatteryMains, //有市电
+    int? batteryCap, //电池信息
+    required int type,
     required ValueChanged<CodeMessageData?> onSuccess,
     ValueChanged<CodeMessageData?>? onCache,
     ValueChanged<String>? onError,
   }) async {
-    Map<String, dynamic> params = {};
+    List<Map<String, dynamic>> items = [];
 
+    if (hasBatteryMains == true) {
+      items.add({"type": 12});
+    }
+
+    if (batteryCap != null) {
+      items.add({"type": 13, "battery_cap": batteryCap});
+    }
+    Map<String, dynamic> params = {
+      "items": items,
+      "type": type,
+    };
     if (pNodeCode != null) {
       params["p_node_code"] = pNodeCode;
-    }
-    if (instanceId != null) {
-      params["instance_id"] = instanceId;
-    }
-    if (gateId != null) {
-      params["gate_id"] = gateId;
-    }
-    if (passId != null) {
-      params["pass_id"] = passId;
     }
 
     HttpManager.share.doHttpPost<CodeMessageData>(
@@ -280,4 +265,60 @@ class InstallService {
       onError: onError,
     );
   }
-} 
+
+  /// 未绑定实例电源箱列表
+  getUnboundPowerBox({
+    required ValueChanged<List<DeviceDetailPowerBoxData>?> onSuccess,
+    ValueChanged<List<DeviceDetailPowerBoxData>?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    Map<String, dynamic> params = {};
+
+    HttpManager.share.doHttpPost<List<DeviceDetailPowerBoxData>>(
+      await _getUnboundPowerBox,
+      params,
+      method: 'POST',
+      autoHideDialog: true,
+      autoShowDialog: false,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  getCameraType({
+    required ValueChanged<List<IdNameValue>?>? onSuccess,
+    ValueChanged<List<IdNameValue>?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<List<IdNameValue>>(
+      await _getCameraType,
+      {},
+      method: 'POST',
+      autoHideDialog: false,
+      autoShowDialog: false,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  getCameraStatus({
+    required ValueChanged<List<IdNameValue>?>? onSuccess,
+    ValueChanged<List<IdNameValue>?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<List<IdNameValue>>(
+      await _getCameraStatus,
+      {},
+      method: 'POST',
+      autoHideDialog: false,
+      autoShowDialog: false,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+
+}

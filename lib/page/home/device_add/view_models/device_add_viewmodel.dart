@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:kayo_package/kayo_package.dart';
 import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
 import 'package:omt/bean/common/id_name_value.dart';
-import 'package:omt/page/home/device_add/view_models/second_step_viewmodel.dart';
-import 'package:omt/page/home/device_add/view_models/third_step_viewmodel.dart';
-import 'package:omt/utils/log_utils.dart';
+import 'package:omt/http/http_query.dart';
+import 'package:omt/utils/device_utils.dart';
+import 'package:omt/utils/intent_utils.dart';
+
+import 'add_ai_viewmodel.dart';
+import 'add_battery_exchange_viewmodel.dart';
+import 'add_camera_viewmodel.dart';
+import 'add_nvr_viewmodel.dart';
+import 'add_power_box_viewmodel.dart';
+import 'add_power_viewmodel.dart';
+import 'add_router_viewmodel.dart';
 
 enum DeviceType {
   power, // 电源
@@ -28,20 +37,30 @@ class DeviceAddViewModel extends BaseViewModelRefresh<dynamic> {
   // 父节点code
   final String pNodeCode;
 
-  DeviceAddViewModel(this.pNodeCode,);
+  DeviceAddViewModel(this.pNodeCode);
 
-  //第几步
-  StepNumber stepNumber = StepNumber.first;
-  //设备类型
-  DeviceType? deviceType;
-  //电源类型
-  String portType = "";
-  List portTypes = ["显示进口", "出口", "共用进出口"];
-  bool batteryMains = false; //市电
-  bool battery = false; //电池
+  StepNumber stepNumber = StepNumber.first; //第几步
+  DeviceType? deviceType; //设备类型
+  bool isInstall = false; //是安装 默认否
 
   IdNameValue? deviceTypeSelected;
   List deviceTypes = [];
+
+  // ===== 共用 进出口 =====
+  // List<IdNameValue> inOutList = [];
+
+  // ===== 网络环境相关属性 =====
+  String selectedNetworkEnv = "";
+  List<IdNameValue> networkEnvList = [];
+
+  // ===== 各个子ViewModel =====
+  AddAiViewModel? aiViewModel;
+  AddCameraViewModel? cameraViewModel;
+  AddNvrViewModel? nvrViewModel;
+  AddPowerBoxViewModel? powerBoxViewModel;
+  AddBatteryExchangeViewModel? batteryExchangeViewModel;
+  AddPowerViewModel? powerViewModel;
+  AddRouterViewModel? routerViewModel;
 
   @override
   void initState() async {
@@ -52,13 +71,29 @@ class DeviceAddViewModel extends BaseViewModelRefresh<dynamic> {
       IdNameValue(id: 3, name: "NVR"),
       IdNameValue(id: 4, name: "电源箱"),
       IdNameValue(id: 5, name: "交换机"),
-      IdNameValue(id: 6, name: "电池"),
+      IdNameValue(id: 6, name: "电源"),
       IdNameValue(id: 7, name: "路由器"),
+    ];
+
+    // 初始化进/出口列表
+    // HttpQuery.share.homePageService.getInOutList(
+    //   onSuccess: (List<IdNameValue>? data) {
+    //     inOutList = data ?? [];
+    //     notifyListeners();
+    //   },
+    // );
+
+    // 初始化网络环境列表
+    networkEnvList = [
+      IdNameValue(id: 1, name: "环境1"),
+      IdNameValue(id: 2, name: "环境2"),
+      IdNameValue(id: 3, name: "环境3")
     ];
   }
 
   @override
   void dispose() {
+    // 销毁所有控制器
     super.dispose();
   }
 
@@ -69,9 +104,9 @@ class DeviceAddViewModel extends BaseViewModelRefresh<dynamic> {
 
   ///确定电源类型
   confirmPowerEventAction() {
-    if (portType.isNotEmpty && (battery || batteryMains)) {
-      LogUtils.info(msg: "confirmPowerEventAction");
-    }
+    // if (portType.isNotEmpty && (battery || batteryMains)) {
+    //   LogUtils.info(msg: "confirmPowerEventAction");
+    // }
   }
 
   //选择设备类型
@@ -94,7 +129,10 @@ class DeviceAddViewModel extends BaseViewModelRefresh<dynamic> {
         deviceType = DeviceType.exchange;
         break;
       case 6:
-        deviceType = DeviceType.battery;
+        deviceType = DeviceType.power;
+        break;
+      case 7:
+        deviceType = DeviceType.router;
         break;
     }
     notifyListeners();
@@ -116,23 +154,203 @@ class DeviceAddViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   //下一步
-  nextStepEventAction() {
+  //下一步
+  nextStepEventAction() async {
+    switch (stepNumber) {
+      case StepNumber.first:
+        if ((deviceTypeSelected?.name ?? "").isEmpty) {
+          return;
+        }
+        // 根据选择的设备类型创建对应的 ViewModel
+        switch (deviceType) {
+          case DeviceType.ai:
+            aiViewModel = AddAiViewModel(pNodeCode);
+            break;
+          case DeviceType.camera:
+            aiViewModel = AddAiViewModel(pNodeCode);
+            break;
+          case DeviceType.nvr:
+            nvrViewModel = AddNvrViewModel(pNodeCode);
+            break;
+          case DeviceType.powerBox:
+            powerBoxViewModel =
+                AddPowerBoxViewModel(pNodeCode, isInstall: isInstall);
+            break;
+          case DeviceType.exchange:
+            batteryExchangeViewModel = AddBatteryExchangeViewModel(pNodeCode,
+                isInstall: isInstall, isBattery: false);
+            break;
+          case DeviceType.battery:
+            batteryExchangeViewModel = AddBatteryExchangeViewModel(pNodeCode,
+                isInstall: isInstall, isBattery: true);
+            break;
+          case DeviceType.power:
+            powerViewModel = AddPowerViewModel(pNodeCode, isInstall: isInstall);
+            break;
+          case DeviceType.router:
+            routerViewModel =
+                AddRouterViewModel(pNodeCode, isInstall: isInstall);
+            break;
+          default:
+            break;
+        }
+        stepNumber = StepNumber.second;
+      case StepNumber.second:
+        // 处理不同设备类型的下一步操作
+        switch (deviceType) {
+          case DeviceType.ai:
+            // AI设备
+            if (aiViewModel != null &&
+                aiViewModel!.aiDeviceList.isNotEmpty &&
+                aiViewModel!.aiDeviceList.first.mac != null) {
+              cameraViewModel =
+                  AddCameraViewModel(pNodeCode, aiViewModel?.aiDeviceList ?? []);
+              stepNumber = StepNumber.third;
+            } else {
+              LoadingUtils.showToast(data: '请先连接AI设备');
+              return;
+            }
+            break;
+          case DeviceType.camera:
+            // 摄像头
+            if (cameraViewModel != null) {
+              stepNumber = StepNumber.third;
+            } else {
+              return;
+            }
+            break;
+          case DeviceType.nvr:
+            // NVR设备
+            if (nvrViewModel != null) {
+              nvrViewModel!.installNvrAction();
+            }
+            return;
+          case DeviceType.powerBox:
+            // 电源箱
+            if (powerBoxViewModel != null) {
+              powerBoxViewModel!.installPowerBox();
+            }
+            return;
+          case DeviceType.exchange:
+            // 交换机
+            if (batteryExchangeViewModel != null &&
+                !batteryExchangeViewModel!.isBattery) {
+              batteryExchangeViewModel!.installSwitch();
+            }
+            return;
+          case DeviceType.battery:
+            // 电池
+            // if (batteryExchangeViewModel != null && batteryExchangeViewModel!.isBattery) {
+            //   batteryExchangeViewModel!.installBattery();
+            // }
+            return;
+          case DeviceType.power:
+            // 电源
+            if (powerViewModel != null) {
+              powerViewModel!.installPower();
+            }
+            return;
+          case DeviceType.router:
+            // 路由器
+            if (routerViewModel != null) {
+              routerViewModel!.installRouter();
+            }
+            return;
+          default:
+            return;
+        }
+        break;
+      case StepNumber.third:
+        stepNumber = StepNumber.four;
+        break;
+      case StepNumber.four:
+        //完成
+        break;
+    }
+    notifyListeners();
+  }
+
+  nextStepEventAction2() async {
     switch (stepNumber) {
       case StepNumber.first:
         if ((deviceTypeSelected?.name ?? "").isEmpty) {
           return;
         }
         stepNumber = StepNumber.second;
+        notifyListeners();
+        break;
       case StepNumber.second:
-        stepNumber = StepNumber.third;
-      case StepNumber.third:
-        if (deviceType == DeviceType.ai || deviceType == DeviceType.camera) {
-          stepNumber = StepNumber.four;
+        // 根据设备类型执行不同的操作
+        switch (deviceType) {
+          case DeviceType.ai:
+            // AI设备
+            if (aiViewModel != null &&
+                aiViewModel!.aiDeviceList.isNotEmpty &&
+                aiViewModel!.aiDeviceList.first.mac != null &&
+                aiViewModel?.aiDeviceList.first.ip != null) {
+              cameraViewModel = AddCameraViewModel(
+                  pNodeCode, aiViewModel?.aiDeviceList ?? []);
+              stepNumber = StepNumber.third;
+            } else {
+              LoadingUtils.showToast(data: '请先连接AI设备');
+              return;
+            }
+            break;
+          case DeviceType.camera:
+            // 摄像头
+            if (cameraViewModel != null) {
+              stepNumber = StepNumber.third;
+            } else {
+              return;
+            }
+            break;
+          case DeviceType.nvr:
+            // NVR设备
+            if (nvrViewModel != null) {
+              nvrViewModel!.installNvrAction();
+            }
+            return;
+          case DeviceType.powerBox:
+            // 电源箱
+            if (powerBoxViewModel != null) {
+              powerBoxViewModel!.installPowerBox();
+            }
+            return;
+          case DeviceType.exchange:
+            // 交换机
+            if (batteryExchangeViewModel != null &&
+                !batteryExchangeViewModel!.isBattery) {
+              batteryExchangeViewModel!.installSwitch();
+            }
+            return;
+          case DeviceType.battery:
+            // 电池
+            return;
+          case DeviceType.power:
+            // 电源
+            if (powerViewModel != null) {
+              powerViewModel!.installPower();
+            }
+            return;
+          case DeviceType.router:
+            // 路由器
+            if (routerViewModel != null) {
+              routerViewModel!.installRouter();
+            }
+            return;
+          default:
+            break;
         }
-      //完成
+        stepNumber = StepNumber.third;
+        notifyListeners();
+        break;
+      case StepNumber.third:
+        stepNumber = StepNumber.four;
+        notifyListeners();
+        break;
       case StepNumber.four:
-      //完成
+        // 完成
+        break;
     }
-    notifyListeners();
   }
 }

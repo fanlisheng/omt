@@ -9,6 +9,7 @@ import 'package:omt/page/install/widgets/install_device_screen.dart';
 import 'package:omt/page/label/label_me/label_me_page.dart';
 import 'package:omt/page/label_management/widgets/label_management_screen.dart';
 import 'package:omt/page/one_picture/one_picture/one_picture_page.dart';
+import 'package:omt/page/remove/widgets/remove_screen.dart';
 import 'package:omt/page/tools/terminal/terminal_page.dart';
 import 'package:omt/page/video/video_configuration/video_configuration_page.dart';
 import 'package:omt/page/video/video_frame/video_frame_page.dart';
@@ -19,7 +20,6 @@ import 'package:omt/utils/sys_utils.dart';
 import 'package:omt/widget/combobox.dart';
 
 import '../../../test/select_detail_page.dart';
-import '../../dismantle/widgets/dismantle_screen.dart';
 import '../search_device/widgets/search_device_screen.dart';
 import 'keep_alive_page.dart';
 
@@ -116,24 +116,24 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
       //   ),
       //   onTap: () => debugPrint('安装'),
       // ),
-      // PaneItem(
-      //   icon: PaneImage(
-      //     name: "home/ic_pane_delete",
-      //     selectedName: 'home/ic_pane_delete',
-      //     index: 2,
-      //     selectedIndex: topIndex,
-      //   ),
-      //   title: Text(
-      //     "拆除",
-      //     style: TextStyle(
-      //         fontSize: 12,
-      //         color: 2 == topIndex ? "#F3FFFF".toColor() : "#678384".toColor()),
-      //   ),
-      //   body: const KeepAlivePage(
-      //     child: DismantleScreen(),
-      //   ),
-      //   onTap: () => debugPrint('拆除'),
-      // ),
+      PaneItem(
+        icon: PaneImage(
+          name: "home/ic_pane_delete",
+          selectedName: 'home/ic_pane_delete',
+          index: 2,
+          selectedIndex: topIndex,
+        ),
+        title: Text(
+          "拆除",
+          style: TextStyle(
+              fontSize: 12,
+              color: 2 == topIndex ? "#F3FFFF".toColor() : "#678384".toColor()),
+        ),
+        body: const KeepAlivePage(
+          child: RemoveScreen(),
+        ),
+        onTap: () => debugPrint('拆除'),
+      ),
       PaneItemExpander(
         icon: PaneImage(
           name: "home/ic_pane_set",
