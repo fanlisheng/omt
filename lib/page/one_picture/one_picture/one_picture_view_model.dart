@@ -590,7 +590,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
                               next.type == OnePictureType.GDSB.index))
                       ? ColorUtils.transparent
                       : opd.lineColor.toColor(),
-                arrowTitle: next.showName == true ? next.showNameText : '',
+                arrowTitle: next.showName == true ? next.showNameText(arrow: true) : '',
                 arrowTitleColor: ColorUtils.colorBlackLite.dark);
             doSetDataToGraph(graph, next, parentNode: nodeNext);
 
