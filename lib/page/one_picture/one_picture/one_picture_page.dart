@@ -161,25 +161,38 @@ class OnePicturePageState extends State<OnePicturePage> {
             )
           ],
         ),
-      ).addRightIcon(
+      )
+          .addRightIcon(
           onTap: onePictureDataData?.showAddBtn != true
               ? null
               : () {
                   model.onTapItemNew(onePictureDataData);
-                });
+                })
+      ;
     }
 
     return GestureDetector(
+
         onTap: () {
           // print('tapped' + '${onePictureDataData?.toString()}');
           model.onTapItem(onePictureDataData);
         },
         child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: '#347979'.toColor(), width: 1),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: _item(onePictureDataData)));
+                decoration: BoxDecoration(
+                  border: Border.all(color: '#347979'.toColor(), width: 1),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                padding: onePictureDataData?.showAddBtnDM != true
+                    ? null
+                    : const EdgeInsetsDirectional.only(top: 50),
+                child: _item(onePictureDataData))
+            .addRightIcon(
+                onTap: onePictureDataData?.showAddBtnDM != true
+                    ? null
+                    : () {
+                        model.onTapItemNew(onePictureDataData);
+                      })
+    );
   }
 
   Widget rectangleSubWidget2(
@@ -346,7 +359,7 @@ class OnePicturePageState extends State<OnePicturePage> {
                   //     : TextView(data?.showNameText, size: _titleSize()),
                   Container(
                     padding: EdgeInsets.only(
-                        top: data?.showAddBtn == true ? 0 : 0,
+                        top: data?.showAddBtn  == true ? 50 : 0,
                         bottom: data?.showAddBtn == true ? 16 : 0,
                         left: 0,
                         right: data?.showAddBtn == true ? 20 : 0),
@@ -374,7 +387,7 @@ class OnePicturePageState extends State<OnePicturePage> {
                     ),
                   )
                       .addRightIcon(
-                          onTap: data.ignore != true
+                          onTap: data.ignore != true || (data.type != OnePictureType.DM.index && data.type != OnePictureType.JCK.index)
                               ? null
                               : () {
                                   model.onTapItemNew(data);
