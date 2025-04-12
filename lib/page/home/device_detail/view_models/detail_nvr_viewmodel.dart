@@ -8,6 +8,7 @@ import '../../../../bean/home/home_page/device_entity.dart';
 import '../../../../http/http_query.dart';
 import '../../../../router_utils.dart';
 import '../../../../utils/intent_utils.dart';
+import '../../../remove/widgets/remove_dialog_page.dart';
 import '../../device_add/view_models/device_add_viewmodel.dart';
 
 class DetailNvrViewModel extends BaseViewModelRefresh<dynamic> {
@@ -43,6 +44,7 @@ class DetailNvrViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   ///点击事件
+  //删除通道
   removeChannelAction(DeviceDetailNvrDataChannels info) {
     HttpQuery.share.homePageService.deleteNvrChannel(
         deviceCode: deviceInfo.deviceCode ?? "",
@@ -81,5 +83,14 @@ class DetailNvrViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   //删除
-  removeAction() {}
+  removeAction() {
+    RemoveDialogPage.showAndSubmit(
+      context: context!,
+      instanceId: deviceInfo.instanceId ?? "",
+      removeIds: [(deviceInfo.nodeId ?? "0").toInt()],
+      onSuccess: () {
+        IntentUtils.share.popResultOk(context!);
+      },
+    );
+  }
 }

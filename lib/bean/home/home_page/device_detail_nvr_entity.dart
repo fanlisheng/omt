@@ -36,6 +36,8 @@ class DeviceDetailNvrData {
 	List<DeviceDetailNvrDataChannels>? channels;
 	@JSONField(name: "node_id")
 	String? nodeId;
+	@JSONField(name: "instance_id")
+	String? instanceId;
 
 	DeviceDetailNvrData();
 

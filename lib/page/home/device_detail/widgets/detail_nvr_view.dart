@@ -229,7 +229,7 @@ class DetailNvrView extends StatelessWidget {
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: const Text(
-                    "拆除信息",
+                    "拆除设备",
                     style: TextStyle(
                       fontSize: 14,
                       color: ColorUtils.colorWhite,

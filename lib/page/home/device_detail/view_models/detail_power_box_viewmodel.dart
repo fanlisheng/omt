@@ -9,6 +9,7 @@ import '../../../../router_utils.dart';
 import '../../../../utils/intent_utils.dart';
 import '../../../remove/widgets/remove_dialog_page.dart';
 import '../../device_add/view_models/device_add_viewmodel.dart';
+import '../../device_add/widgets/power_box_bind_device_dialog_page.dart';
 
 class DetailPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
   final String nodeId;
@@ -49,9 +50,6 @@ class DetailPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   //
-  changeDeviceStateAction(info) {
-    notifyListeners();
-  }
 
   restartAction() {
     HttpQuery.share.homePageService.restartPowerBox(
@@ -90,22 +88,36 @@ class DetailPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
         });
   }
 
+  //记录 （绑定设备）
+  void recordDeviceAction(DeviceDetailPowerBoxDataDcInterfaces a) {
+    PowerBoxBindDeviceDialogPage.showAndSubmit(
+        context: context!,
+        deviceCode: deviceInfo.deviceCode ?? "",
+        dcId: a.id ?? 0,
+        onSuccess: () {
+          LoadingUtils.show(data: "记录成功!");
+          _requestData();
+        });
+  }
+
   //修改
   editAction() {
-    IntentUtils.share.push(context!, routeName: RouterPage.EditPowerBoxPage, data: {
-      "data": deviceInfo,
-    })?.then((value) {
-      if (IntentUtils.share.isResultOk(value)) {
-        isChange = true;
-        onChange(isChange);
-        _requestData();
-      }
-    });
+    // IntentUtils.share
+    //     .push(context!, routeName: RouterPage.EditPowerBoxPage, data: {
+    //   "data": deviceInfo,
+    // })?.then((value) {
+    //   if (IntentUtils.share.isResultOk(value)) {
+    //     isChange = true;
+    //     onChange(isChange);
+    //     _requestData();
+    //   }
+    // });
   }
 
   //替换
   replaceAction() {
-    IntentUtils.share.push(context!, routeName: RouterPage.EditPowerBoxPage, data: {
+    IntentUtils.share
+        .push(context!, routeName: RouterPage.EditPowerBoxPage, data: {
       "data": deviceInfo,
       "isReplace": true,
     })?.then((value) {

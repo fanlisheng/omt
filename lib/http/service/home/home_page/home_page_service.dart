@@ -83,6 +83,12 @@ class HomePageService {
 
   get _deleteNvrChannel => '${API.share.host}api/device/nvr/delete_channel';
 
+  /// 电源箱DC接口绑定设备类型数据字典
+  get _dcInterfaceDeviceTypeMap => '${API.share.host}api/device/power_box/dc_interface/device_type_map';
+
+  /// 电源箱DC接口绑定设备
+  get _dcInterfaceBindDevice => '${API.share.host}api/device/power_box/dc_interface/bind_device';
+
   /// 新增编辑接口URL
   get _editCamera => '${API.share.host}api/device/camera/edit';
 
@@ -565,6 +571,49 @@ class HomePageService {
         'device_code': deviceCode,
         'ids': ids,
         'status': status,
+      },
+      method: 'POST',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  /// 获取电源箱DC接口绑定设备类型数据字典
+  getDcInterfaceDeviceTypeMap({
+    required ValueChanged<List<IdNameValue>?>? onSuccess,
+    ValueChanged<List<IdNameValue>?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<List<IdNameValue>>(
+      await _dcInterfaceDeviceTypeMap,
+      {},
+      method: 'POST',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  /// 电源箱DC接口绑定设备
+  dcInterfaceBindDevice({
+    required String deviceCode,
+    required int id,
+    required int deviceType,
+    required ValueChanged<CodeMessageData?> onSuccess,
+    ValueChanged<CodeMessageData?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<CodeMessageData>(
+      await _dcInterfaceBindDevice,
+      {
+        'device_code': deviceCode,
+        'id': id,
+        'device_type': deviceType,
       },
       method: 'POST',
       autoHideDialog: true,

@@ -4,6 +4,7 @@ import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
 import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/bean/home/home_page/device_detail_power_box_entity.dart';
 import 'package:omt/http/http_query.dart';
+import 'package:omt/page/home/device_add/widgets/power_box_bind_device_dialog_page.dart';
 import 'package:omt/utils/intent_utils.dart';
 
 class AddPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
@@ -19,6 +20,7 @@ class AddPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
   bool isPowerBoxNeeded = true;
   List<DeviceDetailPowerBoxData> powerBoxList = [];
   List<IdNameValue> inOutList = [];
+
   // String powerBoxMemo = "";
   // final TextEditingController powerBoxMemoController = TextEditingController();
 
@@ -55,14 +57,7 @@ class AddPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
   //选择电源箱code
   selectedPowerBoxCode(DeviceDetailPowerBoxData? a) {
     if (a == null) return;
-    
-    HttpQuery.share.homePageService.deviceDetailPowerBox(
-        deviceCode: a.deviceCode ?? "",
-        onSuccess: (data) {
-          selectedDeviceDetailPowerBox = a;
-          selectedDeviceDetailPowerBox?.dcInterfaces = data?.dcInterfaces ?? [];
-          notifyListeners();
-        });
+    _requestDcInterfaceData(a);
   }
 
   // 安装电源箱
@@ -88,6 +83,40 @@ class AddPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
         onError: (error) {
           LoadingUtils.showToast(data: '电源箱安装失败: $error');
         });
+  }
 
+  openDcAction(DeviceDetailPowerBoxDataDcInterfaces a) {
+    HttpQuery.share.homePageService.dcInterfaceControl(
+        deviceCode: selectedDeviceDetailPowerBox?.deviceCode ?? "",
+        ids: [a.id ?? 0],
+        status: a.statusText == "打开" ? 1 : 2,
+        onSuccess: (data) {
+          selectedDeviceDetailPowerBox?.dcInterfaces?.remove(a);
+          LoadingUtils.show(data: "${(a.statusText == "打开") ? "关闭" : "打开"}成功!");
+          // _requestData();
+        });
+  }
+
+  //记录 （绑定设备）
+  void recordDeviceAction(DeviceDetailPowerBoxDataDcInterfaces a) {
+    PowerBoxBindDeviceDialogPage.showAndSubmit(
+        context: context!,
+        deviceCode: selectedDeviceDetailPowerBox?.deviceCode ?? "",
+        dcId: a.id ?? 0,
+        onSuccess: () {
+          LoadingUtils.show(data: "记录成功!");
+          _requestDcInterfaceData(selectedDeviceDetailPowerBox!);
+        });
+  }
+
+  //请求电源箱接口信息
+  void _requestDcInterfaceData(DeviceDetailPowerBoxData a) {
+    HttpQuery.share.homePageService.deviceDetailPowerBox(
+        deviceCode: a.deviceCode ?? "",
+        onSuccess: (data) {
+          selectedDeviceDetailPowerBox = a;
+          selectedDeviceDetailPowerBox?.dcInterfaces = data?.dcInterfaces ?? [];
+          notifyListeners();
+        });
   }
 }

@@ -319,7 +319,7 @@ class EditPowerBoxView extends StatelessWidget {
                       children: [
                         OutlinedButton(
                           onPressed: () {
-                            model.changeDeviceStateAction(info);
+                            model.openDcAction(info);
                           },
                           style: ButtonStyle(
                             padding: const WidgetStatePropertyAll(
@@ -345,7 +345,7 @@ class EditPowerBoxView extends StatelessWidget {
                         ),
                         OutlinedButton(
                           onPressed: () {
-                            model.openDcAction(info);
+                            model.recordDeviceAction(info);
                           },
                           style: ButtonStyle(
                             padding: const WidgetStatePropertyAll(
