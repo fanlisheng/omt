@@ -234,7 +234,7 @@ class InstallService {
     String? pNodeCode,
     required bool hasBatteryMains, //有市电
     int? batteryCap, //电池信息
-    required int type,
+    required int passId,
     required ValueChanged<CodeMessageData?> onSuccess,
     ValueChanged<CodeMessageData?>? onCache,
     ValueChanged<String>? onError,
@@ -250,7 +250,7 @@ class InstallService {
     }
     Map<String, dynamic> params = {
       "items": items,
-      "type": type,
+      "pass_id": passId,
     };
     if (pNodeCode != null) {
       params["p_node_code"] = pNodeCode;

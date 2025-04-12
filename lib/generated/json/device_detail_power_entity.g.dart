@@ -61,6 +61,10 @@ DeviceDetailPowerData $DeviceDetailPowerDataFromJson(
   if (nodeId != null) {
     deviceDetailPowerData.nodeId = nodeId;
   }
+  final String? instanceId = jsonConvert.convert<String>(json['instance_id']);
+  if (instanceId != null) {
+    deviceDetailPowerData.instanceId = instanceId;
+  }
   return deviceDetailPowerData;
 }
 
@@ -74,6 +78,7 @@ Map<String, dynamic> $DeviceDetailPowerDataToJson(
   data['power_type'] = entity.powerType;
   data['battery_capacity'] = entity.batteryCapacity;
   data['node_id'] = entity.nodeId;
+  data['instance_id'] = entity.instanceId;
   return data;
 }
 
@@ -86,6 +91,7 @@ extension DeviceDetailPowerDataExtension on DeviceDetailPowerData {
     String? powerType,
     int? batteryCapacity,
     String? nodeId,
+    String? instanceId,
   }) {
     return DeviceDetailPowerData()
       ..instanceName = instanceName ?? this.instanceName
@@ -94,6 +100,7 @@ extension DeviceDetailPowerDataExtension on DeviceDetailPowerData {
       ..labelName = labelName ?? this.labelName
       ..powerType = powerType ?? this.powerType
       ..batteryCapacity = batteryCapacity ?? this.batteryCapacity
-      ..nodeId = nodeId ?? this.nodeId;
+      ..nodeId = nodeId ?? this.nodeId
+      ..instanceId = instanceId ?? this.instanceId;
   }
 }

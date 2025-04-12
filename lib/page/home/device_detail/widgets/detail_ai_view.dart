@@ -12,17 +12,17 @@ import '../../device_add/view_models/device_add_viewmodel.dart';
 import '../view_models/detail_ai_viewmodel.dart';
 
 class DetailAiView extends StatelessWidget {
-  final String nodeCode;
+  final String nodeId;
 
   const DetailAiView({
     super.key,
-    required this.nodeCode,
+    required this.nodeId,
   });
 
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<DetailAiViewModel>(
-        model: DetailAiViewModel(nodeCode)..themeNotifier = true,
+        model: DetailAiViewModel(nodeId)..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
           return aiView(model);
@@ -39,7 +39,7 @@ class DetailAiView extends StatelessWidget {
                 const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),
             decoration: BoxDecoration(
               color: ColorUtils.colorBackgroundLine,
-                borderRadius: BorderRadius.circular(3),
+              borderRadius: BorderRadius.circular(3),
             ),
             width: double.infinity,
             child: ListView(
@@ -139,14 +139,39 @@ class DetailAiView extends StatelessWidget {
                 model.restartAction();
               },
               child: Container(
-                padding: const EdgeInsets.only(
-                    left: 25, right: 25, top: 6, bottom: 6),
-                color: AppTheme().color,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
+                decoration: BoxDecoration(
+                  color: "#2F94DD".toColor(),
+                  borderRadius: BorderRadius.circular(4),
+                ),
                 child: const Text(
                   "重启主程",
                   style: TextStyle(fontSize: 12, color: ColorUtils.colorWhite),
                 ),
               ),
+            ),
+            Expanded(child: Container()),
+            Clickable(
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
+                decoration: BoxDecoration(
+                  color: "#2F94DD".toColor(),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  "替换设备",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: ColorUtils.colorWhite,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              onTap: () {
+                model.replaceAction();
+              },
             ),
             const SizedBox(
               width: 16,

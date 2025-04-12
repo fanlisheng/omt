@@ -44,6 +44,7 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
     HttpQuery.share.homePageService.getInOutList(
       onSuccess: (List<IdNameValue>? data) {
         inOutList = data ?? [];
+        inOutList.removeAt(0);
         notifyListeners();
       },
     );
@@ -67,7 +68,7 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
     e.ip = DeviceUtils.getIpFromRtsp(e.rtsp!);
     try {
       DeviceEntity? deviceEntity =
-      await hikvisionDeviceInfo(ipAddress: e.ip ?? "");
+          await hikvisionDeviceInfo(ipAddress: e.ip ?? "");
       if (deviceEntity != null) {
         e.code = deviceEntity.deviceCode ?? "";
         e.mac = deviceEntity.mac;
@@ -84,15 +85,14 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   // 完成摄像头设置
-  void completeCameraAction(BuildContext context,
-      CameraDeviceEntity cameraDeviceEntity) {
+  void completeCameraAction(
+      BuildContext context, CameraDeviceEntity cameraDeviceEntity) {
     CameraDeviceEntity cameraDevice = cameraDeviceList.first;
     if ((cameraDevice.deviceNameController.text.isEmpty) ||
         ((cameraDevice.selectedCameraType?.value ?? -1) == -1) ||
         ((cameraDevice.selectedRegulation?.value ?? -1) == -1) ||
         ((cameraDevice.selectedEntryExit?.id ?? -1) == -1)) {
-      LoadingUtils.showToast(
-          data: '"设备名称、摄像头类型、进出口、是否纳入监管"不能为空！');
+      LoadingUtils.showToast(data: '"设备名称、摄像头类型、进出口、是否纳入监管"不能为空！');
       return;
     }
     Map<String, dynamic> aiParams = {
@@ -107,8 +107,8 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
       "rtsp_url": cameraDeviceEntity.rtsp,
       "pass_id": cameraDeviceEntity.selectedEntryExit?.id ?? -1,
       "camera_type": cameraDeviceEntity.selectedCameraType?.value.toInt() ?? 0,
-      "control_status": cameraDeviceEntity.selectedRegulation?.value.toInt() ??
-          0,
+      "control_status":
+          cameraDeviceEntity.selectedRegulation?.value.toInt() ?? 0,
     };
     if (cameraDeviceEntity.videoIdController.text.isNotEmpty) {
       cameraParams["camera_code"] = cameraDeviceEntity.videoIdController.text;
@@ -132,7 +132,7 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
   restartRecognitionAction(CameraDeviceEntity cameraDeviceEntity) {
     notifyListeners();
     HttpQuery.share.homePageService.manualSnapCamera(
-        deviceCode: cameraDeviceEntity.code??"",
+        deviceCode: cameraDeviceEntity.code ?? "",
         aiDeviceCode: selectedAi?.deviceCode ?? "",
         onSuccess: (a) {
           LoadingUtils.show(data: "重启识别成功!");
@@ -195,9 +195,10 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   @override
-  loadData({ValueChanged? onSuccess,
-    ValueChanged? onCache,
-    ValueChanged<String>? onError}) {
+  loadData(
+      {ValueChanged? onSuccess,
+      ValueChanged? onCache,
+      ValueChanged<String>? onError}) {
     // TODO: implement loadData
     throw UnimplementedError();
   }

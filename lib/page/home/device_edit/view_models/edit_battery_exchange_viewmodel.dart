@@ -5,13 +5,13 @@ import 'package:omt/bean/common/id_name_value.dart';
 
 import '../../../../bean/home/home_page/device_detail_exchange_entity.dart';
 import '../../../../http/http_query.dart';
+import '../../../../utils/intent_utils.dart';
 
 class EditBatteryExchangeViewModel extends BaseViewModelRefresh<dynamic> {
-  final String pNodeCode;
   final DeviceDetailExchangeData deviceInfo;
   final bool isBattery;
 
-  EditBatteryExchangeViewModel(this.pNodeCode, this.deviceInfo,
+  EditBatteryExchangeViewModel( this.deviceInfo,
       {this.isBattery = false});
 
   // ===== 电池/交换机相关属性 =====
@@ -61,11 +61,7 @@ class EditBatteryExchangeViewModel extends BaseViewModelRefresh<dynamic> {
         onSuccess: (result) {
           LoadingUtils.dismiss();
           LoadingUtils.showToast(data: "编辑保存成功");
-
-          // 更新后退出
-          if (context != null) {
-            Navigator.of(context!).pop(true);
-          }
+          IntentUtils.share.popResultOk(context!);
         },
         onError: (error) {
           LoadingUtils.dismiss();

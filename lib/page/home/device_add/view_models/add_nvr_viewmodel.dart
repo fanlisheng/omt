@@ -10,7 +10,7 @@ import 'package:omt/utils/sys_utils.dart';
 
 import '../../../../bean/home/home_page/device_entity.dart';
 
-class AddNvrViewModel extends BaseViewModelRefresh<dynamic> {
+class AddNvrViewModel extends BaseViewModel {
   final String pNodeCode;
 
   AddNvrViewModel(this.pNodeCode);
@@ -19,7 +19,6 @@ class AddNvrViewModel extends BaseViewModelRefresh<dynamic> {
   List<DeviceEntity> nvrDeviceList = [];
   bool isNvrNeeded = true;
   DeviceEntity? selectedNvr;
-  List<DeviceEntity> nvrIpList = [];
   DeviceDetailNvrData nvrData = DeviceDetailNvrData();
   bool isNvrSearching = false;
   IdNameValue? selectedNarInOut;
@@ -65,6 +64,10 @@ class AddNvrViewModel extends BaseViewModelRefresh<dynamic> {
     //请求通道信息
     String deviceCode =
         DeviceUtils.getDeviceCodeByMacAddress(macAddress: selectedNvr!.mac!);
+    _requestData(deviceCode);
+  }
+
+  void _requestData(String deviceCode) {
     HttpQuery.share.homePageService.deviceDetailNvr(
         deviceCode: deviceCode,
         onSuccess: (data) {
@@ -80,11 +83,10 @@ class AddNvrViewModel extends BaseViewModelRefresh<dynamic> {
     LoadingUtils.show(data: "正在获取当前网络下的NVR设备");
     DeviceUtils.scanAndFetchDevicesInfo(deviceType: "NVR")
         .then((List<DeviceEntity> data) {
-      LoadingUtils.show(data: "正在获取当前网络下的NVR设备");
-      nvrIpList.clear();
+      nvrDeviceList.clear();
       for (var a in data) {
         if (a.ip != null) {
-          nvrIpList.add(a);
+          nvrDeviceList.add(a);
         }
       }
       isNvrSearching = false;
@@ -118,13 +120,14 @@ class AddNvrViewModel extends BaseViewModelRefresh<dynamic> {
           LoadingUtils.showToast(data: 'NVR安装失败: $error');
         });
   }
-}
 
-@override
-loadData(
-    {ValueChanged? onSuccess,
-    ValueChanged? onCache,
-    ValueChanged<String>? onError}) {
-  // TODO: implement loadData
-  throw UnimplementedError();
+  removeChannelAction(DeviceDetailNvrDataChannels info) {
+    HttpQuery.share.homePageService.deleteNvrChannel(
+        deviceCode: selectedNvr?.deviceCode ?? "",
+        channelIds: [info.id ?? 0],
+        onSuccess: (data) {
+          LoadingUtils.show(data: "移除成功!");
+          _requestData(selectedNvr?.deviceCode ?? "");
+        });
+  }
 }

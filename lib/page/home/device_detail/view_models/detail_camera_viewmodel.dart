@@ -14,9 +14,9 @@ import '../../../../utils/intent_utils.dart';
 import '../../device_add/view_models/device_add_viewmodel.dart';
 
 class DetailCameraViewModel extends BaseViewModelRefresh<dynamic> {
-  final String nodeCode;
+  final String nodeId;
 
-  DetailCameraViewModel(this.nodeCode);
+  DetailCameraViewModel(this.nodeId);
 
   int photoCurrentIndex = 0;
 
@@ -39,7 +39,7 @@ class DetailCameraViewModel extends BaseViewModelRefresh<dynamic> {
 
   void requestData() {
     HttpQuery.share.homePageService.deviceDetailCamera(
-        nodeCode: nodeCode,
+        nodeId: nodeId,
         onSuccess: (DeviceDetailCameraData? a) {
           deviceInfo = a ?? DeviceDetailCameraData();
           // player.open(Media('https://user-images.githubusercontent.com/28951144/229373695-22f88f13-d18f-4288-9bf1-c3e078d83722.mp4'));
@@ -96,7 +96,6 @@ class DetailCameraViewModel extends BaseViewModelRefresh<dynamic> {
         requestData();
       }
     });
-    notifyListeners();
   }
 
   gotoPhotoPreviewScreen() {

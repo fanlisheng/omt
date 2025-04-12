@@ -83,12 +83,23 @@ class HomePageService {
 
   get _deleteNvrChannel => '${API.share.host}api/device/nvr/delete_channel';
 
-  // 新增编辑接口URL
+  /// 新增编辑接口URL
   get _editCamera => '${API.share.host}api/device/camera/edit';
+
   get _editNvr => '${API.share.host}api/device/nvr/edit';
+
   get _editPowerBox => '${API.share.host}api/device/power_box/edit';
+
   get _editRouter => '${API.share.host}api/device/router/edit';
+
   get _editSwitch => '${API.share.host}api/device/switch/edit';
+
+  /// 替换设备
+  get _replaceAi => '${API.share.host}api/device/ai_device/replace';
+
+  get _replaceNvr => '${API.share.host}api/device/nvr/replace';
+
+  get _replacePowerBox => '${API.share.host}api/device/power_box/replace';
 
   getInstanceList(
     String areaCode, {
@@ -202,7 +213,7 @@ class HomePageService {
   }
 
   deviceDetailAi({
-    String? nodeCode,
+    String? nodeId,
     String? deviceCode,
     required ValueChanged<DeviceDetailAiData?> onSuccess,
     ValueChanged<DeviceDetailAiData?>? onCache,
@@ -210,8 +221,8 @@ class HomePageService {
   }) async {
     Map<String, dynamic> params = {};
 
-    if (nodeCode != null) {
-      params["node_code"] = deviceCode;
+    if (nodeId != null) {
+      params["node_id"] = nodeId.toInt();
     }
     if (deviceCode != null) {
       params["device_code"] = deviceCode;
@@ -229,7 +240,7 @@ class HomePageService {
   }
 
   deviceDetailNvr({
-    String? nodeCode,
+    String? nodeId,
     String? deviceCode, //mac地址去掉间隔小写
     required ValueChanged<DeviceDetailNvrData?> onSuccess,
     ValueChanged<DeviceDetailNvrData?>? onCache,
@@ -237,8 +248,8 @@ class HomePageService {
   }) async {
     Map<String, dynamic> params = {};
 
-    if (nodeCode != null) {
-      params["node_code"] = nodeCode;
+    if (nodeId != null) {
+      params["node_id"] = nodeId.toInt();
     }
     if (deviceCode != null) {
       params["device_code"] = deviceCode;
@@ -256,7 +267,7 @@ class HomePageService {
   }
 
   deviceDetailPowerBox({
-    String? nodeCode,
+    String? nodeId,
     String? deviceCode, //mac地址去掉间隔小写
     required ValueChanged<DeviceDetailPowerBoxData?> onSuccess,
     ValueChanged<DeviceDetailPowerBoxData?>? onCache,
@@ -264,8 +275,8 @@ class HomePageService {
   }) async {
     Map<String, dynamic> params = {};
 
-    if (nodeCode != null) {
-      params["node_code"] = nodeCode;
+    if (nodeId != null) {
+      params["node_id"] = nodeId.toInt();
     }
     if (deviceCode != null) {
       params["device_code"] = deviceCode;
@@ -283,7 +294,7 @@ class HomePageService {
   }
 
   deviceDetailPower({
-    required String nodeCode,
+    required String nodeId,
     required ValueChanged<DeviceDetailPowerData?> onSuccess,
     ValueChanged<DeviceDetailPowerData?>? onCache,
     ValueChanged<String>? onError,
@@ -291,7 +302,7 @@ class HomePageService {
     HttpManager.share.doHttpPost<DeviceDetailPowerData>(
       await _deviceDetailPower,
       {
-        "node_code": nodeCode,
+        "node_id": nodeId.toInt(),
       },
       method: 'POST',
       autoHideDialog: true,
@@ -303,7 +314,7 @@ class HomePageService {
   }
 
   deviceDetailExchange({
-    required String nodeCode,
+    required String nodeId,
     required ValueChanged<DeviceDetailExchangeData?> onSuccess,
     ValueChanged<DeviceDetailExchangeData?>? onCache,
     ValueChanged<String>? onError,
@@ -311,7 +322,7 @@ class HomePageService {
     HttpManager.share.doHttpPost<DeviceDetailExchangeData>(
       await _deviceDetailExchange,
       {
-        "node_code": nodeCode,
+        "node_id": nodeId.toInt(),
       },
       method: 'POST',
       autoHideDialog: true,
@@ -323,7 +334,7 @@ class HomePageService {
   }
 
   deviceDetailCamera({
-    required String nodeCode,
+    required String nodeId,
     required ValueChanged<DeviceDetailCameraData?> onSuccess,
     ValueChanged<DeviceDetailCameraData?>? onCache,
     ValueChanged<String>? onError,
@@ -331,7 +342,7 @@ class HomePageService {
     HttpManager.share.doHttpPost<DeviceDetailCameraData>(
       await _deviceDetailCamera,
       {
-        "node_code": nodeCode,
+        "node_id": nodeId.toInt(),
       },
       method: 'POST',
       autoHideDialog: true,
@@ -343,7 +354,7 @@ class HomePageService {
   }
 
   deviceDetailRouter({
-    required String nodeCode,
+    required String nodeId,
     required ValueChanged<DeviceDetailRouterData?> onSuccess,
     ValueChanged<DeviceDetailRouterData?>? onCache,
     ValueChanged<String>? onError,
@@ -351,7 +362,7 @@ class HomePageService {
     HttpManager.share.doHttpPost<DeviceDetailRouterData>(
       await _deviceDetailRouter,
       {
-        "node_code": nodeCode,
+        "node_id": nodeId.toInt(),
       },
       method: 'POST',
       autoHideDialog: true,
@@ -586,7 +597,7 @@ class HomePageService {
   }
 
   // 新增编辑接口方法
-  
+
   // 摄像头修改
   editCamera({
     required int nodeId,
@@ -606,11 +617,11 @@ class HomePageService {
       "pass_id": passId,
       "control_status": controlStatus,
     };
-    
+
     if (cameraCode != null && cameraCode.isNotEmpty) {
       params["camera_code"] = cameraCode;
     }
-    
+
     HttpManager.share.doHttpPost<CodeMessageData>(
       await _editCamera,
       params,
@@ -622,7 +633,7 @@ class HomePageService {
       onError: onError,
     );
   }
-  
+
   // NVR修改
   editNvr({
     required int nodeId,
@@ -645,7 +656,7 @@ class HomePageService {
       onError: onError,
     );
   }
-  
+
   // 电源箱修改
   editPowerBox({
     required int nodeId,
@@ -668,7 +679,7 @@ class HomePageService {
       onError: onError,
     );
   }
-  
+
   // 路由器修改
   editRouter({
     required int nodeId,
@@ -691,7 +702,7 @@ class HomePageService {
       onError: onError,
     );
   }
-  
+
   // 交换机修改
   editSwitch({
     required int nodeId,
@@ -709,6 +720,76 @@ class HomePageService {
         "pass_id": passId,
         "interface_num": interfaceNum,
         "power_method": powerMethod,
+      },
+      method: 'POST',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  replaceAi({
+    required int nodeId,
+    required String ip,
+    required String mac,
+    required ValueChanged<CodeMessageData?> onSuccess,
+    ValueChanged<CodeMessageData?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<CodeMessageData>(
+      await _replaceAi,
+      {
+        "node_id": nodeId,
+        "ip": ip,
+        "mac": mac,
+      },
+      method: 'POST',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  replaceNvr({
+    required int nodeId,
+    required String ip,
+    required String mac,
+    required ValueChanged<CodeMessageData?> onSuccess,
+    ValueChanged<CodeMessageData?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<CodeMessageData>(
+      await _replaceNvr,
+      {
+        "node_id": nodeId,
+        "ip": ip,
+        "mac": mac,
+      },
+      method: 'POST',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  replacePowerBox({
+    required int nodeId,
+    required String deviceCode,
+    required ValueChanged<CodeMessageData?> onSuccess,
+    ValueChanged<CodeMessageData?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<CodeMessageData>(
+      await _replacePowerBox,
+      {
+        "node_id": nodeId,
+        "device_code": deviceCode,
       },
       method: 'POST',
       autoHideDialog: true,

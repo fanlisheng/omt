@@ -652,24 +652,23 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
       return;
     }
     DeviceType? type = DeviceUtils.getDeviceTypeFromInt(data?.type ?? 0);
-    String code = data?.nodeCode ?? "";
+    String nodeId = data?.id ?? "";
 
     if ((data?.type == OnePictureType.DC.index) ||
         (data?.type == OnePictureType.SD.index)) {
       type = DeviceType.power;
-      code = data?.parentNodeCode ?? "";
+      nodeId = data?.parentNodeCode ?? "";
     }
 
-    if (code.isEmpty ||
+    if (nodeId.isEmpty ||
         type == null ||
         data?.type == OnePictureType.LYQ.index ||
         data?.type == OnePictureType.YXWL.index) {
-      //路由器不进去
-      return;
+      type = DeviceType.router;
     }
     DeviceDetailViewModel model = DeviceDetailViewModel(
       deviceType: type,
-      nodeCode: code,
+      nodeId: nodeId,
     );
     IntentUtils.share.push(context,
         routeName: RouterPage.DeviceDetailScreen, data: {"data": model});

@@ -6,12 +6,14 @@ import '../../../../bean/home/home_page/device_detail_ai_entity.dart';
 import '../../../../bean/home/home_page/device_detail_nvr_entity.dart';
 import '../../../../bean/home/home_page/device_entity.dart';
 import '../../../../http/http_query.dart';
+import '../../../../router_utils.dart';
+import '../../../../utils/intent_utils.dart';
 import '../../device_add/view_models/device_add_viewmodel.dart';
 
 class DetailNvrViewModel extends BaseViewModelRefresh<dynamic> {
-  final String nodeCode;
+  final String nodeId;
 
-  DetailNvrViewModel(this.nodeCode);
+  DetailNvrViewModel(this.nodeId);
 
   DeviceDetailNvrData deviceInfo = DeviceDetailNvrData();
 
@@ -23,7 +25,7 @@ class DetailNvrViewModel extends BaseViewModelRefresh<dynamic> {
 
   void _requestData() {
     HttpQuery.share.homePageService.deviceDetailNvr(
-        nodeCode: nodeCode,
+        nodeId: nodeId,
         onSuccess: (DeviceDetailNvrData? a) {
           deviceInfo = a ?? DeviceDetailNvrData();
           notifyListeners();
@@ -48,4 +50,30 @@ class DetailNvrViewModel extends BaseViewModelRefresh<dynamic> {
           _requestData();
         });
   }
+
+  //修改
+  editAction() {
+    IntentUtils.share.push(context!, routeName: RouterPage.EditNvrPage, data: {
+      "data": deviceInfo,
+    })?.then((value) {
+      if (IntentUtils.share.isResultOk(value)) {
+        _requestData();
+      }
+    });
+  }
+
+  //替换
+  replaceAction() {
+    IntentUtils.share.push(context!, routeName: RouterPage.EditNvrPage, data: {
+      "data": deviceInfo,
+      "isReplace": true,
+    })?.then((value) {
+      if (IntentUtils.share.isResultOk(value)) {
+        _requestData();
+      }
+    });
+  }
+
+  //删除
+  removeAction() {}
 }

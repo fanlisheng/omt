@@ -304,6 +304,7 @@ class DeviceUtils {
     DeviceType.battery: "电池",
     DeviceType.exchange: "交换机",
     DeviceType.camera: "摄像头",
+    DeviceType.router: "路由器",
   };
 
   static const Map<String, String> _deviceImageMap = {

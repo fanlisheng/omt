@@ -11,17 +11,14 @@ import 'package:omt/utils/sys_utils.dart';
 import '../../../../bean/home/home_page/device_entity.dart';
 
 class EditNvrViewModel extends BaseViewModelRefresh<dynamic> {
-  final String pNodeCode;
-  final DeviceDetailNvrData deviceInfo;
-
-  EditNvrViewModel(this.pNodeCode, this.deviceInfo);
+  final DeviceDetailNvrData? deviceInfo;
+  final bool isReplace; //是替换 默认否
+  EditNvrViewModel(this.deviceInfo, this.isReplace);
 
   // ===== NVR 相关属性 =====
+  DeviceEntity? selectedNvr; //选中nav ip和mac
   List<DeviceEntity> nvrDeviceList = [];
-  bool isNvrNeeded = true;
-  DeviceEntity? selectedNvr;
-  List<DeviceEntity> nvrIpList = [];
-  DeviceDetailNvrData nvrData = DeviceDetailNvrData();
+  DeviceDetailNvrData? nvrData; // 选中的nvr请求数据
   bool isNvrSearching = false;
   IdNameValue? selectedNarInOut;
   List<IdNameValue> inOutList = [];
@@ -31,21 +28,18 @@ class EditNvrViewModel extends BaseViewModelRefresh<dynamic> {
     super.initState();
     // 初始化数据
     nvrData = deviceInfo;
-    
-    // 当前NVR设备初始化
-    DeviceEntity currentNvr = DeviceEntity();
-    currentNvr.ip = deviceInfo.ip;
-    currentNvr.mac = deviceInfo.mac;
-    currentNvr.deviceCode = deviceInfo.deviceCode;
-    selectedNvr = currentNvr;
-    
+
+    if (isReplace) {
+      refreshNvrAction();
+    }
+
     // 初始化进/出口列表
     HttpQuery.share.homePageService.getInOutList(
       onSuccess: (List<IdNameValue>? data) {
         inOutList = data ?? [];
         // 设置当前选中的进出口
         for (var entry in inOutList) {
-          if (entry.name == deviceInfo.passName) {
+          if (entry.name == deviceInfo?.passName) {
             selectedNarInOut = entry;
             break;
           }
@@ -75,7 +69,6 @@ class EditNvrViewModel extends BaseViewModelRefresh<dynamic> {
   void selectNvrIpAction(DeviceEntity nvrDevice) {
     if (nvrDevice.mac == null || nvrDevice == selectedNvr) return;
     selectedNvr = nvrDevice;
-    isNvrNeeded = true;
     notifyListeners();
     //请求通道信息
     String deviceCode =
@@ -95,11 +88,10 @@ class EditNvrViewModel extends BaseViewModelRefresh<dynamic> {
     LoadingUtils.show(data: "正在获取当前网络下的NVR设备");
     DeviceUtils.scanAndFetchDevicesInfo(deviceType: "NVR")
         .then((List<DeviceEntity> data) {
-      LoadingUtils.show(data: "正在获取当前网络下的NVR设备");
-      nvrIpList.clear();
+      nvrDeviceList.clear();
       for (var a in data) {
         if (a.ip != null) {
-          nvrIpList.add(a);
+          nvrDeviceList.add(a);
         }
       }
       isNvrSearching = false;
@@ -121,23 +113,27 @@ class EditNvrViewModel extends BaseViewModelRefresh<dynamic> {
     }
 
     LoadingUtils.show(data: "保存中...");
-    
+
     HttpQuery.share.homePageService.editNvr(
-      nodeId: int.parse(deviceInfo.nodeId ?? "0"),
-      passId: selectedNarInOut!.id ?? 0,
-      onSuccess: (result) {
-        LoadingUtils.dismiss();
-        LoadingUtils.showToast(data: "编辑保存成功");
-        
-        // 更新后退出
-        if (context != null) {
-          Navigator.of(context!).pop(true);
-        }
-      },
-      onError: (error) {
-        LoadingUtils.dismiss();
-        LoadingUtils.showToast(data: "保存失败: $error");
-      }
-    );
+        nodeId: int.parse(deviceInfo?.nodeId ?? "0"),
+        passId: selectedNarInOut!.id ?? 0,
+        onSuccess: (result) {
+          LoadingUtils.dismiss();
+          LoadingUtils.showToast(data: "编辑保存成功");
+          IntentUtils.share.popResultOk(context!);
+        },
+        onError: (error) {
+          LoadingUtils.dismiss();
+          LoadingUtils.showToast(data: "保存失败: $error");
+        });
   }
-} 
+
+  removeChannelAction(DeviceDetailNvrDataChannels? info) {
+    HttpQuery.share.homePageService.deleteNvrChannel(
+        deviceCode: selectedNvr?.deviceCode ?? "",
+        channelIds: [info?.id ?? 0],
+        onSuccess: (data) {
+          LoadingUtils.show(data: "移除成功!");
+        });
+  }
+}

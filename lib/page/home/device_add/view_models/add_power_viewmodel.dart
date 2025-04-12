@@ -64,7 +64,7 @@ class AddPowerViewModel extends BaseViewModelRefresh<dynamic> {
     HttpQuery.share.installService.powerInstall(
       pNodeCode: pNodeCode,
       hasBatteryMains: batteryMains,
-      type: selectedPowerInOut!.id!,
+      passId: selectedPowerInOut!.id!,
       batteryCap: battery == false ? null : (isCapacity80 ? 80 : 160),
       onSuccess: (data) {
         LoadingUtils.showToast(data: '电源信息安装成功');
@@ -75,4 +75,4 @@ class AddPowerViewModel extends BaseViewModelRefresh<dynamic> {
       },
     );
   }
-} 
+}

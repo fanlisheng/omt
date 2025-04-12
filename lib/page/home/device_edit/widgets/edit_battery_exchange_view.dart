@@ -6,20 +6,28 @@ import 'package:omt/page/home/device_add/widgets/add_camera_view.dart';
 import 'package:omt/utils/color_utils.dart';
 
 import '../../../../bean/common/id_name_value.dart';
+import '../../../../bean/home/home_page/device_detail_exchange_entity.dart';
+import '../../../../theme.dart';
+import '../../../../utils/intent_utils.dart';
+import '../../../../widget/nav/dnavigation_view.dart';
 import '../view_models/edit_battery_exchange_viewmodel.dart';
 
 class EditBatteryExchangeView extends StatelessWidget {
-  final EditBatteryExchangeViewModel model;
+  final DeviceDetailExchangeData model;
 
   const EditBatteryExchangeView({super.key, required this.model});
 
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<EditBatteryExchangeViewModel>(
-        model: model..themeNotifier = true,
+        model: EditBatteryExchangeViewModel(model)..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
-          return contentView(model);
+          return DHeaderPage(
+            title: model.isBattery ? "编辑电池" : "编辑交换机",
+            titlePath: model.isBattery ? "首页 / 电池 / " : "首页 / 交换机 / ",
+            content: contentView(model),
+          );
         });
   }
 
@@ -49,38 +57,58 @@ class EditBatteryExchangeView extends StatelessWidget {
             ],
           ),
         ),
-        Container(
-          margin: const EdgeInsets.all(16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Clickable(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: ColorUtils.colorGreen,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: const Text(
-                    "保存",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: ColorUtils.colorWhite,
-                      fontWeight: FontWeight.w500,
-                    ),
+        Expanded(child: Container()),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Clickable(
+              child: Container(
+                padding:
+                const EdgeInsets.symmetric(horizontal: 38, vertical: 8),
+                // width: 120,
+                // height: 36,
+                decoration: BoxDecoration(
+                  color: ColorUtils.colorRed,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  "取消",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: ColorUtils.colorWhite,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                onTap: () {
-                  if (model.isBattery) {
-                    model.saveBatteryEdit();
-                  } else {
-                    model.saveExchangeEdit();
-                  }
-                },
               ),
-            ],
-          ),
+              onTap: () {
+                IntentUtils.share.pop(model.context!);
+              },
+            ),
+            const SizedBox(width: 10),
+            Clickable(
+              child: Container(
+                padding:
+                const EdgeInsets.symmetric(horizontal: 38, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppTheme().color,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  "确认",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: ColorUtils.colorWhite,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              onTap: () {
+                model.saveExchangeEdit();
+              },
+            ),
+          ],
         ),
+        const SizedBox(height: 30),
       ],
     );
   }

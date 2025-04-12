@@ -7,10 +7,9 @@ import 'package:omt/http/http_query.dart';
 import 'package:omt/utils/intent_utils.dart';
 
 class EditPowerViewModel extends BaseViewModelRefresh<dynamic> {
-  final String pNodeCode;
   final DeviceDetailPowerData deviceInfo;
 
-  EditPowerViewModel(this.pNodeCode, this.deviceInfo);
+  EditPowerViewModel(this.deviceInfo);
 
   // ===== 电源设备相关属性 =====
   String portType = "";
@@ -28,13 +27,13 @@ class EditPowerViewModel extends BaseViewModelRefresh<dynamic> {
     if (deviceInfo.powerType == "市电") {
       batteryMains = true;
     }
-    
+
     // 设置电池信息
     if (deviceInfo.batteryCapacity != null && deviceInfo.batteryCapacity! > 0) {
       battery = true;
       isCapacity80 = deviceInfo.batteryCapacity == 80;
     }
-    
+
     // 初始化进/出口列表
     HttpQuery.share.homePageService.getInOutList(
       onSuccess: (List<IdNameValue>? data) {
@@ -82,11 +81,12 @@ class EditPowerViewModel extends BaseViewModelRefresh<dynamic> {
 
     // TODO: 实现保存编辑后的电源信息的API调用
     LoadingUtils.show(data: "保存中...");
-    
+
     // 这里添加保存电源信息编辑的API调用
     // 例如：HttpQuery.share.editService.editPower(...)
-    
+    // IntentUtils.share.popResultOk(context!);
+
     LoadingUtils.dismiss();
     LoadingUtils.showToast(data: "编辑保存成功");
   }
-} 
+}

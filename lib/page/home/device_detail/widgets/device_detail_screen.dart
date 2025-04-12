@@ -11,6 +11,7 @@ import 'package:omt/page/home/device_detail/widgets/detail_battery_exchange_view
 import 'package:omt/page/home/device_detail/widgets/detail_camera_view.dart';
 import 'package:omt/page/home/device_detail/widgets/detail_nvr_view.dart';
 import 'package:omt/page/home/device_detail/widgets/detail_power_view.dart';
+import 'package:omt/page/home/device_detail/widgets/detail_router_view.dart';
 import 'package:omt/widget/nav/dnavigation_view.dart';
 import '../../../../utils/color_utils.dart';
 import '../../../../utils/device_utils.dart';
@@ -67,32 +68,33 @@ class DeviceDetailScreen extends StatelessWidget {
     switch (model.deviceType) {
       case DeviceType.ai:
         return DetailAiView(
-          nodeCode: model.nodeCode,
+          nodeId: model.nodeId,
         );
       case DeviceType.camera:
         return DetailCameraView(
-          nodeCode: model.nodeCode,
+          nodeId: model.nodeId,
         );
       case DeviceType.powerBox:
         return DetailPowerBoxView(
-          nodeCode: model.nodeCode,
+          nodeId: model.nodeId,
         );
       case DeviceType.nvr:
         return DetailNvrView(
-          nodeCode: model.nodeCode,
+          nodeId: model.nodeId,
         );
       case DeviceType.power:
         return DetailPowerView(
-          nodeCode: model.nodeCode,
+          nodeId: model.nodeId,
         );
       case DeviceType.battery:
       case DeviceType.exchange:
         return DetailBatteryExchangeView(
-          nodeCode: model.nodeCode,
+          nodeId: model.nodeId,
         );
       case DeviceType.router:
-        // TODO: Handle this case.
-        throw UnimplementedError();
+        return DetailRouterView(
+          nodeId: model.nodeId,
+        );
     }
   }
 

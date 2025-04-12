@@ -5,12 +5,14 @@ import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
 import '../../../../bean/home/home_page/device_detail_power_box_entity.dart';
 import '../../../../bean/home/home_page/device_entity.dart';
 import '../../../../http/http_query.dart';
+import '../../../../utils/intent_utils.dart';
+import '../../../remove/widgets/remove_dialog_page.dart';
 import '../../device_add/view_models/device_add_viewmodel.dart';
 
 class DetailPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
-  final String nodeCode;
+  final String nodeId;
 
-  DetailPowerBoxViewModel(this.nodeCode);
+  DetailPowerBoxViewModel(this.nodeId);
 
   String selectedPowerBoxCoding = "";
   List powerBoxCodingList = ["1", "2"];
@@ -29,7 +31,7 @@ class DetailPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
 
   void _requestData() {
     HttpQuery.share.homePageService.deviceDetailPowerBox(
-        nodeCode: nodeCode,
+        nodeId: nodeId,
         onSuccess: (DeviceDetailPowerBoxData? a) {
           deviceInfo = a ?? DeviceDetailPowerBoxData();
           notifyListeners();
@@ -86,5 +88,27 @@ class DetailPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
           LoadingUtils.show(data: "${(a.statusText == "打开") ? "关闭" : "打开"}成功!");
           _requestData();
         });
+  }
+
+  //修改
+  editAction(){
+
+  }
+
+  //替换
+  replaceAction(){
+
+  }
+
+  //删除
+  removeAction(){
+    RemoveDialogPage.showAndSubmit(
+      context: context!,
+      instanceId: deviceInfo.instanceId ?? "",
+      removeIds: [(deviceInfo.nodeId ?? "0").toInt()],
+      onSuccess: () {
+        IntentUtils.share.popResultOk(context!);
+      },
+    );
   }
 }

@@ -9,12 +9,12 @@ import '../../device_add/view_models/device_add_viewmodel.dart';
 class DeviceDetailViewModel extends BaseViewModelRefresh<dynamic> {
   final int? id;
   late final DeviceType deviceType;
-  final String nodeCode;
+  final String nodeId;
 
   DeviceDetailViewModel({
     this.id,
     required this.deviceType,
-    required this.nodeCode,
+    required this.nodeId,
   });
 
   @override

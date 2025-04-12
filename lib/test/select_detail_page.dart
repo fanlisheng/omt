@@ -55,7 +55,7 @@ class SelectDetailPage extends StatelessWidget {
                   DeviceDetailViewModel model2 = DeviceDetailViewModel(
                     deviceType: deviceType,
                     // nodeCode: '124#12812-2#2-3#1-11#0',
-                    nodeCode: model.controller.text,
+                    nodeId: model.controller.text,
                   );
 
                   // GoRouter.of(context!).push(Routes.deviceDetail, extra: model);

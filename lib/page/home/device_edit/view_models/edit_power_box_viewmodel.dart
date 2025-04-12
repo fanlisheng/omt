@@ -6,12 +6,12 @@ import 'package:omt/bean/home/home_page/device_detail_power_box_entity.dart';
 import 'package:omt/http/http_query.dart';
 import 'package:omt/utils/intent_utils.dart';
 
+import '../../device_detail/view_models/detail_power_box_viewmodel.dart';
+
 class EditPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
-  // 父节点code
-  final String pNodeCode;
   final DeviceDetailPowerBoxData deviceInfo;
 
-  EditPowerBoxViewModel(this.pNodeCode, this.deviceInfo);
+  EditPowerBoxViewModel( this.deviceInfo);
 
   // ===== 电源箱相关属性 =====
   IdNameValue? selectedPowerBoxInOut;
@@ -24,7 +24,7 @@ class EditPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
   void initState() async {
     super.initState();
     // 初始化数据
-    selectedDeviceDetailPowerBox = deviceInfo;
+    // selectedDeviceDetailPowerBox = deviceInfo;
     
     // 初始化进/出口列表
     HttpQuery.share.homePageService.getInOutList(
@@ -97,16 +97,48 @@ class EditPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
       onSuccess: (result) {
         LoadingUtils.dismiss();
         LoadingUtils.showToast(data: "编辑保存成功");
-        
-        // 更新后退出
-        if (context != null) {
-          Navigator.of(context!).pop(true);
-        }
+        IntentUtils.share.popResultOk(context!);
       },
       onError: (error) {
         LoadingUtils.dismiss();
         LoadingUtils.showToast(data: "保存失败: $error");
       }
     );
+  }
+
+  //替换电源箱
+  void replaceDevice() {
+
+    if (selectedDeviceDetailPowerBox?.deviceCode == null) {
+      LoadingUtils.showToast(data: '请先选择电源箱');
+      return;
+    }
+
+    HttpQuery.share.homePageService.replacePowerBox(
+        nodeId: int.parse(deviceInfo.nodeId ?? "0"),
+        deviceCode: deviceInfo.deviceCode ?? "",
+        onSuccess: (result) {
+          LoadingUtils.showToast(data: "编辑保存成功");
+          IntentUtils.share.popResultOk(context!);
+        },
+        onError: (error) {
+          LoadingUtils.dismiss();
+          LoadingUtils.showToast(data: "保存失败: $error");
+        });
+  }
+
+  changeDeviceStateAction(info) {
+    notifyListeners();
+  }
+
+  openDcAction(DeviceDetailPowerBoxDataDcInterfaces a) {
+    HttpQuery.share.homePageService.dcInterfaceControl(
+        deviceCode: deviceInfo.deviceCode ?? "",
+        ids: [a.id ?? 0],
+        status: a.statusText == "打开" ? 1 : 2,
+        onSuccess: (data) {
+          LoadingUtils.show(data: "${(a.statusText == "打开") ? "关闭" : "打开"}成功!");
+          // _requestData();
+        });
   }
 } 

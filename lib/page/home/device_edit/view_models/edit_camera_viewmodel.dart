@@ -20,7 +20,7 @@ import '../../../../utils/image_utils.dart';
 class EditCameraViewModel extends BaseViewModelRefresh<dynamic> {
   final DeviceDetailCameraData deviceInfo;
 
-  EditCameraViewModel( this.deviceInfo);
+  EditCameraViewModel(this.deviceInfo);
 
   // ===== 摄像头相关属性 =====
   List<IdNameValue> inOutList = [];
@@ -98,6 +98,7 @@ class EditCameraViewModel extends BaseViewModelRefresh<dynamic> {
         cameraType: (cameraDevice.selectedCameraType?.value ?? "0").toInt(),
         passId: cameraDevice.selectedEntryExit?.id ?? 0,
         controlStatus: (cameraDevice.selectedRegulation?.value ?? "0").toInt(),
+        cameraCode: cameraDevice.videoIdController.text,
         onSuccess: (CodeMessageData? value) {
           LoadingUtils.show(data: "修改成功!");
           IntentUtils.share.popResultOk(context!);

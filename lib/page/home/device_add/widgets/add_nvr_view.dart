@@ -12,6 +12,7 @@ import 'package:omt/utils/color_utils.dart';
 import '../../../../bean/common/id_name_value.dart';
 import '../../../../bean/home/home_page/device_detail_nvr_entity.dart';
 import '../../../../bean/home/home_page/device_entity.dart';
+import '../view_models/device_add_viewmodel.dart';
 
 class AddNvrView extends StatelessWidget {
   final AddNvrViewModel model;
@@ -45,7 +46,6 @@ class AddNvrView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                // "第${(model.isInstall == false) ? "二" : "四"}步：添加Nvr设备",
                 "第二步：添加Nvr设备",
                 style: TextStyle(
                   fontSize: 14,
@@ -138,6 +138,7 @@ class AddNvrView extends StatelessWidget {
                           const SizedBox(height: 8),
                           ui.ComboBox<IdNameValue>(
                             isExpanded: true,
+                            value: model.selectedNarInOut,
                             items: model.inOutList
                                 .map<ui.ComboBoxItem<IdNameValue>>((e) {
                               return ui.ComboBoxItem<IdNameValue>(
@@ -154,7 +155,7 @@ class AddNvrView extends StatelessWidget {
                               );
                             }).toList(),
                             onChanged: (a) {
-                              // Handle selection
+                              model.selectedNarInOut = a!;
                               model.notifyListeners();
                             },
                             placeholder: const Text(
@@ -220,14 +221,17 @@ class AddNvrView extends StatelessWidget {
                             children: List.generate(
                               model.nvrDeviceList.length, // 动态生成子元素数量
                               (index) {
-                                var device = model.nvrDeviceList[index];
+                                DeviceEntity device =
+                                    model.nvrDeviceList[index];
                                 return Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Radio(
-                                      value: device.ip,
-                                      groupValue: device.ip,
-                                      activeColor: ColorUtils.colorGreen,
+                                      value: device,
+                                      groupValue: model.selectedNvr,
+                                      activeColor: model.selectedNvr == device
+                                          ? ColorUtils.colorGreen
+                                          : ColorUtils.colorWhite,
                                       onChanged: (value) {
                                         model.selectNvrIpAction(device);
                                       },
@@ -236,7 +240,7 @@ class AddNvrView extends StatelessWidget {
                                       "${device.ip}",
                                       style: TextStyle(
                                         fontSize: 12,
-                                        color: true
+                                        color: model.selectedNvr == device
                                             ? ColorUtils.colorGreen
                                             : ColorUtils.colorWhite,
                                       ),
@@ -256,6 +260,120 @@ class AddNvrView extends StatelessWidget {
             ],
           ),
         ),
+
+        // NVR 信息表格
+        if (model.isNvrNeeded == true && model.selectedNvr != null) ...[
+          const SizedBox(height: 10),
+          Expanded(
+            child: Container(
+              margin: const EdgeInsets.only(left: 16, right: 16, bottom: 20),
+              padding: const EdgeInsets.only(
+                  left: 16, right: 16, top: 10, bottom: 10),
+              color: ColorUtils.colorBackgroundLine,
+              width: double.infinity,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text("NVR信息",
+                      style:
+                          TextStyle(fontWeight: FontWeight.w500, fontSize: 14)),
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: DataTable(
+                          decoration: BoxDecoration(color: "#3B3F3F".toColor()),
+                          dataRowHeight: 40,
+                          headingRowHeight: 40,
+                          dividerThickness: 0.01,
+                          columns: const [
+                            DataColumn(
+                                label: Text("通道号",
+                                    style: TextStyle(fontSize: 12))),
+                            DataColumn(
+                                label: Text("是否在录像",
+                                    style: TextStyle(fontSize: 12))),
+                            DataColumn(
+                                label: Text("信号状态",
+                                    style: TextStyle(fontSize: 12))),
+                            DataColumn(
+                                label: Text("更新时间",
+                                    style: TextStyle(fontSize: 12))),
+                            DataColumn(
+                                label:
+                                    Text("操作", style: TextStyle(fontSize: 12))),
+                          ],
+                          rows: (model.nvrData.channels ?? [])
+                              .asMap()
+                              .keys
+                              .map((index) {
+                            DeviceDetailNvrDataChannels info =
+                                model.nvrData.channels![index];
+                            return DataRow(
+                                color: WidgetStateProperty.all(index % 2 == 0
+                                    ? "#4E5353".toColor()
+                                    : "#3B3F3F".toColor()),
+                                cells: [
+                                  DataCell(Text(
+                                    "${info.channelNum ?? 0}",
+                                    style: const TextStyle(fontSize: 12),
+                                  )),
+                                  DataCell(Text(
+                                    info.recordStatus ?? "",
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        color:
+                                            (info.recordStatus ?? "") == "正在录像"
+                                                ? ColorUtils.colorGreen
+                                                : ColorUtils.colorRed),
+                                  )),
+                                  DataCell(Text(info.signalStatus ?? "",
+                                      style: const TextStyle(fontSize: 12))),
+                                  DataCell(Text(info.updatedAt ?? "",
+                                      style: const TextStyle(fontSize: 12))),
+                                  DataCell(
+                                    OutlinedButton(
+                                      onPressed: () {
+                                        // model.nvrInfo.remove(info);
+                                        // model.refreshNvrAction();
+                                        model.removeChannelAction(info);
+                                      },
+                                      style: ButtonStyle(
+                                        padding: const WidgetStatePropertyAll(
+                                          EdgeInsets.symmetric(
+                                              vertical: 0.0, horizontal: 16),
+                                        ),
+                                        shape: WidgetStatePropertyAll(
+                                          //圆角
+                                          RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(5)),
+                                        ),
+                                        side: const WidgetStatePropertyAll(
+                                            BorderSide(
+                                                color: ColorUtils.colorRed,
+                                                width: 1.0)),
+                                      ),
+                                      child: const Text(
+                                        "删除通道",
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            color: ColorUtils.colorRed),
+                                      ),
+                                    ),
+                                  ),
+                                ]);
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ],
     );
   }
