@@ -188,7 +188,7 @@ class OnePictureDataData {
     return show;
   }
 
-  String? get showNameText {
+  String? showNameText({bool arrow = false}) {
     if (type == OnePictureType.GDSB.index
         // || type == OnePictureType.DYX.index
         // || type == OnePictureType.NVR.index
@@ -198,7 +198,10 @@ class OnePictureDataData {
       return '';
     } else if (type == OnePictureType.SXT.index) {
       return typeText.defaultStr(data: name);
-    }else if (type == OnePictureType.DM.index && children.isEmpty && nextList.isEmpty) {
+    } else if (!arrow &&
+        type == OnePictureType.DM.index &&
+        children.isEmpty &&
+        nextList.isEmpty) {
       return '未绑定设备';
     } else {
       return name.defaultStr(data: typeText);

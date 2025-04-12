@@ -451,7 +451,7 @@ class OnePicturePageState extends State<OnePicturePage> {
                       width: 22,
                     ),
               TextView(
-                '${oData?.showNameText}',
+                '${oData?.showNameText()}',
                 color: '#30E7E3'.toColor(),
                 size: oData?.type == OnePictureType.SL.index ? 18 : 14,
                 fontWeight: FontWeight.w500,
