@@ -10,12 +10,18 @@ class DeviceDetailViewModel extends BaseViewModelRefresh<dynamic> {
   final int? id;
   late final DeviceType deviceType;
   final String nodeId;
+  bool isChange = false;
 
   DeviceDetailViewModel({
     this.id,
     required this.deviceType,
     required this.nodeId,
   });
+
+  void setChange(bool value) {
+    isChange = value;
+    notifyListeners();
+  }
 
   @override
   void initState() async {

@@ -52,9 +52,11 @@ class DeviceDetailScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  onTap: () {
-                    IntentUtils.share.popResultOk(context);
-                  },
+                  onTap: model.isChange
+                      ? () {
+                          IntentUtils.share.popResultOk(context);
+                        }
+                      : null,
                 ),
               ),
               content: contentView(model),
@@ -74,31 +76,38 @@ class DeviceDetailScreen extends StatelessWidget {
       case DeviceType.ai:
         return DetailAiView(
           nodeId: model.nodeId,
+          onChange: (value) => model.setChange(value),
         );
       case DeviceType.camera:
         return DetailCameraView(
           nodeId: model.nodeId,
+          onChange: (value) => model.setChange(value),
         );
       case DeviceType.powerBox:
         return DetailPowerBoxView(
           nodeId: model.nodeId,
+          onChange: (value) => model.setChange(value),
         );
       case DeviceType.nvr:
         return DetailNvrView(
           nodeId: model.nodeId,
+          onChange: (value) => model.setChange(value),
         );
       case DeviceType.power:
         return DetailPowerView(
           nodeId: model.nodeId,
+          onChange: (value) => model.setChange(value),
         );
       case DeviceType.battery:
       case DeviceType.exchange:
         return DetailBatteryExchangeView(
           nodeId: model.nodeId,
+          onChange: (value) => model.setChange(value),
         );
       case DeviceType.router:
         return DetailRouterView(
           nodeId: model.nodeId,
+          onChange: (value) => model.setChange(value),
         );
     }
   }

@@ -11,13 +11,14 @@ import 'detail_ai_view.dart';
 
 class DetailPowerView extends StatelessWidget {
   final String nodeId;
+  final Function(bool) onChange;
 
-  const DetailPowerView({super.key, required this.nodeId});
+  const DetailPowerView({super.key, required this.nodeId, required this.onChange});
 
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<DetailPowerViewModel>(
-        model: DetailPowerViewModel(nodeId)..themeNotifier = true,
+        model: DetailPowerViewModel(nodeId, onChange: onChange)..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
           return contentView(model);

@@ -8,9 +8,10 @@ import '../../../remove/widgets/remove_dialog_page.dart';
 
 class DetailBatteryExchangeViewModel extends BaseViewModelRefresh<dynamic> {
   final String nodeId;
+  final Function(bool) onChange;
   bool isChange = false;
 
-  DetailBatteryExchangeViewModel(this.nodeId);
+  DetailBatteryExchangeViewModel(this.nodeId, {required this.onChange});
 
   DeviceDetailExchangeData deviceInfo = DeviceDetailExchangeData();
 
@@ -41,12 +42,12 @@ class DetailBatteryExchangeViewModel extends BaseViewModelRefresh<dynamic> {
 
   //修改
   editAction() {
-    IntentUtils.share
-        .push(context!, routeName: RouterPage.EditBatteryExchangePage, data: {
+    IntentUtils.share.push(context!, routeName: RouterPage.EditBatteryExchangePage, data: {
       "data": deviceInfo,
     })?.then((value) {
       if (IntentUtils.share.isResultOk(value)) {
         isChange = true;
+        onChange(isChange);
         _requestData();
       }
     });

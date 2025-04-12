@@ -674,7 +674,12 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
       nodeId: nodeId,
     );
     IntentUtils.share.push(context,
-        routeName: RouterPage.DeviceDetailScreen, data: {"data": model});
+        routeName: RouterPage.DeviceDetailScreen,
+        data: {"data": model})?.then((value) {
+      if (IntentUtils.share.isResultOk(value)) {
+        requestData();
+      }
+    });
   }
 
   void onTapItemNew(OnePictureDataData? data) {

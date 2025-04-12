@@ -12,9 +12,10 @@ import '../../device_add/view_models/device_add_viewmodel.dart';
 
 class DetailPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
   final String nodeId;
+  final Function(bool) onChange;
   bool isChange = false;
 
-  DetailPowerBoxViewModel(this.nodeId);
+  DetailPowerBoxViewModel(this.nodeId, {required this.onChange});
 
   bool isPowerBoxNeeded = false;
 
@@ -90,33 +91,34 @@ class DetailPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   //修改
-  editAction(){
-    IntentUtils.share
-        .push(context!, routeName: RouterPage.EditPowerBoxPage, data: {
+  editAction() {
+    IntentUtils.share.push(context!, routeName: RouterPage.EditPowerBoxPage, data: {
       "data": deviceInfo,
     })?.then((value) {
       if (IntentUtils.share.isResultOk(value)) {
-        _requestData();
         isChange = true;
+        onChange(isChange);
+        _requestData();
       }
     });
   }
 
   //替换
-  replaceAction(){
+  replaceAction() {
     IntentUtils.share.push(context!, routeName: RouterPage.EditPowerBoxPage, data: {
       "data": deviceInfo,
       "isReplace": true,
     })?.then((value) {
       if (IntentUtils.share.isResultOk(value)) {
-        _requestData();
         isChange = true;
+        onChange(isChange);
+        _requestData();
       }
     });
   }
 
   //删除
-  removeAction(){
+  removeAction() {
     RemoveDialogPage.showAndSubmit(
       context: context!,
       instanceId: deviceInfo.instanceId ?? "",

@@ -11,9 +11,10 @@ import '../../device_add/view_models/device_add_viewmodel.dart';
 
 class DetailRouterViewModel extends BaseViewModelRefresh<dynamic> {
   final String nodeId;
+  final Function(bool) onChange;
   bool isChange = false;
 
-  DetailRouterViewModel(this.nodeId);
+  DetailRouterViewModel(this.nodeId, {required this.onChange});
 
   DeviceDetailRouterData deviceInfo = DeviceDetailRouterData();
 
@@ -44,11 +45,12 @@ class DetailRouterViewModel extends BaseViewModelRefresh<dynamic> {
 
   //修改
   editAction() {
-    IntentUtils.share
-        .push(context!, routeName: RouterPage.EditRouterDevicePage, data: {
+    IntentUtils.share.push(context!, routeName: RouterPage.EditRouterDevicePage, data: {
       "data": deviceInfo,
     })?.then((value) {
       if (IntentUtils.share.isResultOk(value)) {
+        isChange = true;
+        onChange(isChange);
         _requestData();
       }
     });

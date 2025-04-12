@@ -11,13 +11,14 @@ import 'detail_ai_view.dart';
 
 class DetailBatteryExchangeView extends StatelessWidget {
   final String nodeId;
+  final Function(bool) onChange;
 
-  const DetailBatteryExchangeView({super.key, required this.nodeId});
+  const DetailBatteryExchangeView({super.key, required this.nodeId, required this.onChange});
 
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<DetailBatteryExchangeViewModel>(
-        model: DetailBatteryExchangeViewModel(nodeId)..themeNotifier = true,
+        model: DetailBatteryExchangeViewModel(nodeId, onChange: onChange)..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
           return contentView(model);

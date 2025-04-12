@@ -14,9 +14,10 @@ import '../../device_add/view_models/device_add_viewmodel.dart';
 
 class DetailPowerViewModel extends BaseViewModelRefresh<dynamic> {
   final String nodeId;
+  final Function(bool) onChange;
   bool isChange = false;
 
-  DetailPowerViewModel(this.nodeId);
+  DetailPowerViewModel(this.nodeId, {required this.onChange});
 
   DeviceDetailPowerData deviceInfo = DeviceDetailPowerData();
 
@@ -47,13 +48,13 @@ class DetailPowerViewModel extends BaseViewModelRefresh<dynamic> {
 
   //修改
   editAction() {
-    IntentUtils.share
-        .push(context!, routeName: RouterPage.EditPowerPage, data: {
+    IntentUtils.share.push(context!, routeName: RouterPage.EditPowerPage, data: {
       "data": deviceInfo,
     })?.then((value) {
       if (IntentUtils.share.isResultOk(value)) {
-        _requestData();
         isChange = true;
+        onChange(isChange);
+        _requestData();
       }
     });
   }
