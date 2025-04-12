@@ -207,6 +207,7 @@ class DeviceAddViewModel extends BaseViewModelRefresh<dynamic> {
         // 处理不同设备类型的下一步操作
         switch (deviceType) {
           case DeviceType.ai:
+          case DeviceType.camera:
             // AI设备
             if (aiViewModel != null &&
                 aiViewModel!.aiDeviceList.isNotEmpty &&
@@ -216,14 +217,6 @@ class DeviceAddViewModel extends BaseViewModelRefresh<dynamic> {
               stepNumber = StepNumber.third;
             } else {
               LoadingUtils.showToast(data: '请先连接AI设备');
-              return;
-            }
-            break;
-          case DeviceType.camera:
-            // 摄像头
-            if (cameraViewModel != null) {
-              stepNumber = StepNumber.third;
-            } else {
               return;
             }
             break;

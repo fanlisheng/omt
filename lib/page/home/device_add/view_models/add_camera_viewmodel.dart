@@ -14,7 +14,9 @@ import 'package:omt/utils/sys_utils.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import '../../../../bean/home/home_page/device_detail_ai_entity.dart';
 import '../../../../bean/home/home_page/device_detail_camera_entity.dart';
+import '../../../../router_utils.dart';
 import '../../../../utils/image_utils.dart';
+import '../../photo_preview/widgets/photo_preview_screen.dart';
 import '../../search_device/services/device_search_service.dart';
 
 class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
@@ -27,13 +29,11 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
   // ===== 摄像头相关属性 =====
 
   List<IdNameValue> inOutList = [];
+  List<IdNameValue> cameraTypeList = [];
+  List<IdNameValue> regulationList = [];
   late final player = Player();
   late var videoController = VideoController(player);
   List<CameraDeviceEntity> cameraDeviceList = [CameraDeviceEntity()];
-  List<TextEditingController> deviceDetailNvr = [TextEditingController()];
-  List<IdNameValue> cameraTypeList = [];
-  List<IdNameValue> regulationList = [];
-  DeviceDetailAiData? selectedAi;
 
   @override
   void initState() {
@@ -49,6 +49,9 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
         notifyListeners();
       },
     );
+    if (aiDeviceList.length == 1) {
+      cameraDeviceList.first.selectedAi = aiDeviceList.first;
+    }
   }
 
   @override
@@ -97,8 +100,8 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
       return;
     }
     Map<String, dynamic> aiParams = {
-      "ip": selectedAi?.ip ?? "",
-      "mac": selectedAi?.mac ?? "",
+      "ip": cameraDevice.selectedAi?.ip ?? "",
+      "mac": cameraDevice.selectedAi?.mac ?? "",
     };
     Map<String, dynamic> cameraParams = {
       "device_code": cameraDeviceEntity.code ?? "",
@@ -135,7 +138,7 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
     notifyListeners();
     HttpQuery.share.homePageService.manualSnapCamera(
         deviceCode: cameraDeviceEntity.code ?? "",
-        aiDeviceCode: selectedAi?.deviceCode ?? "",
+        aiDeviceCode: cameraDeviceEntity.selectedAi?.deviceCode ?? "",
         onSuccess: (a) {
           LoadingUtils.show(data: "重启识别成功!");
         });
@@ -143,27 +146,34 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
 
   // 图片预览
   photoPreviewAction(CameraDeviceEntity cameraDeviceEntity) {
-    HttpQuery.share.homePageService.cameraPhotoList(
-      page: 1,
-      deviceCode: cameraDeviceEntity.code ?? "",
-      type: 1,
-      snapAts: [],
-      onSuccess: (DeviceDetailCameraSnapList? data) {
-        if (data != null) {
-          ImageUtils.share.showBigImg(
-            context!,
-            url: ImageUtils.share.getImageUrl(
-              url: data.data?.last.url ?? "",
-            ),
-          );
-        }
-      },
-      onError: (error) {
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   const SnackBar(content: Text('已经是这天的最后一张了')),
-        // );
-      },
-    );
+    IntentUtils.share
+        .push(context!, routeName: RouterPage.PhotoPreviewScreen, data: {
+      "data": PhotoPreviewScreenData(
+          deviceCode: cameraDeviceEntity.code ?? "",
+          dayBasicPhoto: null,
+          nightBasicPhoto: null)
+    })?.then((value) {});
+    // HttpQuery.share.homePageService.cameraPhotoList(
+    //   page: 1,
+    //   deviceCode: cameraDeviceEntity.code ?? "",
+    //   type: 1,
+    //   snapAts: [],
+    //   onSuccess: (DeviceDetailCameraSnapList? data) {
+    //     if (data != null) {
+    //       ImageUtils.share.showBigImg(
+    //         context!,
+    //         url: ImageUtils.share.getImageUrl(
+    //           url: data.data?.last.url ?? "",
+    //         ),
+    //       );
+    //     }
+    //   },
+    //   onError: (error) {
+    //     // ScaffoldMessenger.of(context).showSnackBar(
+    //     //   const SnackBar(content: Text('已经是这天的最后一张了')),
+    //     // );
+    //   },
+    // );
   }
 
   // 删除摄像头
@@ -172,7 +182,10 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   // 编辑摄像头
-  editCameraAction(int index) {
+  editCameraAction(CameraDeviceEntity e) {
+    e.readOnly = false;
+    e.isOpen = true;
+    e.isAddEnd = false;
     notifyListeners();
   }
 
@@ -198,11 +211,19 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
 
   //添加完成
   void addComplete() {
-    for (var device in cameraDeviceList) {
-      if (device.isAddEnd == true) {
-        IntentUtils.share.popResultOk(context!);
-        return;
-      }
+    // for (var device in cameraDeviceList) {
+    //   if (device.isAddEnd == true) {
+    //     IntentUtils.share.popResultOk(context!);
+    //     return;
+    //   }
+    // }
+    bool allAddEnd = cameraDeviceList.every((device) => device.isAddEnd == true);
+    if (allAddEnd) {
+      IntentUtils.share.popResultOk(context!);
+      return;
+    }else{
+      LoadingUtils.showToast(data: "请先提交所有设备的数据");
+
     }
   }
 

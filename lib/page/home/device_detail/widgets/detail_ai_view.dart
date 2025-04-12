@@ -24,7 +24,8 @@ class DetailAiView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<DetailAiViewModel>(
-        model: DetailAiViewModel(nodeId, onChange: onChange)..themeNotifier = true,
+        model: DetailAiViewModel(nodeId, onChange: onChange)
+          ..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
           return aiView(model);
@@ -254,7 +255,10 @@ class RowItemInfoView extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.only(
                     left: 12, right: 12, top: 2, bottom: 2),
-                color: ColorUtils.colorGreen,
+                decoration: BoxDecoration(
+                  color: ColorUtils.colorGreen,
+                  borderRadius: BorderRadius.circular(3),
+                ),
                 child: Text(
                   buttonName ?? "",
                   style: const TextStyle(
