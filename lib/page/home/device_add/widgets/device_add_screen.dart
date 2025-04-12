@@ -34,6 +34,8 @@ class DeviceAddScreen extends StatelessWidget {
                   model.deviceType != DeviceType.ai &&
                   model.deviceType != DeviceType.camera) ||
               (model.stepNumber == StepNumber.third);
+          bool showTooltip = model.stepNumber == StepNumber.third;
+          // bool showTooltip = true;
           return Container(
             color: "#3B3F3F".toColor(),
             child: fu.ScaffoldPage(
@@ -67,23 +69,30 @@ class DeviceAddScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 10),
-                        Clickable(
-                          child: Container(
-                            padding: const EdgeInsets.only(
-                                left: 12, right: 12, top: 4, bottom: 4),
-                            decoration: BoxDecoration(
-                              color: AppTheme().color,
-                              borderRadius: BorderRadius.circular(3),
-                            ),
-                            child: Text(
-                              complete ? "添加完成" : "下一步",
-                              style: const TextStyle(
-                                  fontSize: 12, color: ColorUtils.colorWhite),
-                            ),
+                        fu.Tooltip(
+                          message: showTooltip ? '有背景照片上传成功，才点击“下一步"哦' : "",
+                          useMousePosition: false,
+                          style: const fu.TooltipThemeData(
+                            waitDuration: Duration(),
                           ),
-                          onTap: () {
-                            model.nextStepEventAction();
-                          },
+                          child: Clickable(
+                            child: Container(
+                              padding: const EdgeInsets.only(
+                                  left: 12, right: 12, top: 4, bottom: 4),
+                              decoration: BoxDecoration(
+                                color: AppTheme().color,
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                              child: Text(
+                                complete ? "添加完成" : "下一步",
+                                style: const TextStyle(
+                                    fontSize: 12, color: ColorUtils.colorWhite),
+                              ),
+                            ),
+                            onTap: () {
+                              model.nextStepEventAction();
+                            },
+                          ),
                         ),
                       ],
                     ),

@@ -17,13 +17,15 @@ import '../view_models/edit_power_box_viewmodel.dart';
 
 class EditPowerBoxView extends StatelessWidget {
   final DeviceDetailPowerBoxData model;
+  final bool? isReplace; //是替换 默认否
 
-  const EditPowerBoxView({super.key, required this.model});
+  const EditPowerBoxView({super.key, required this.model, this.isReplace});
 
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<EditPowerBoxViewModel>(
-        model: EditPowerBoxViewModel(model)..themeNotifier = true,
+        model: EditPowerBoxViewModel(model, isReplace ?? false)
+          ..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
           return DHeaderPage(
@@ -34,7 +36,7 @@ class EditPowerBoxView extends StatelessWidget {
         });
   }
 
-  Widget powerBoxView(EditPowerBoxViewModel model) {
+  Widget editPowerBoxView(EditPowerBoxViewModel model) {
     return ListView(
       children: [
         Container(
@@ -60,64 +62,40 @@ class EditPowerBoxView extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               EquallyRow(
-                  one: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const RowTitle(name: "进/出口"),
-                      const SizedBox(height: 8),
-                      ui.ComboBox<IdNameValue>(
-                        isExpanded: true,
-                        value: model.selectedPowerBoxInOut,
-                        items: model.inOutList
-                            .map<ui.ComboBoxItem<IdNameValue>>((e) {
-                          return ui.ComboBoxItem<IdNameValue>(
-                            value: e,
-                            child: SizedBox(
-                              child: Text(
-                                e.name ?? "",
-                                textAlign: TextAlign.start,
-                              ),
+                one: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const RowTitle(name: "进/出口"),
+                    const SizedBox(height: 8),
+                    ui.ComboBox<IdNameValue>(
+                      isExpanded: true,
+                      value: model.selectedPowerBoxInOut,
+                      items: model.inOutList
+                          .map<ui.ComboBoxItem<IdNameValue>>((e) {
+                        return ui.ComboBoxItem<IdNameValue>(
+                          value: e,
+                          child: SizedBox(
+                            child: Text(
+                              e.name ?? "",
+                              textAlign: TextAlign.start,
                             ),
-                          );
-                        }).toList(),
-                        onChanged: (a) {
-                          model.selectedPowerBoxInOut = a!;
-                          model.notifyListeners();
-                        },
-                        placeholder: const Text(
-                          "请选择进/出口",
-                          textAlign: TextAlign.start,
-                          style: TextStyle(
-                              fontSize: 12,
-                              color: ColorUtils.colorBlackLiteLite),
-                        ),
-                      ),
-                    ],
-                  ),
-                  two: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const RowTitle(name: "电源箱编码"),
-                      const SizedBox(height: 8),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color:
-                              ColorUtils.colorBackgroundLine.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(3),
-                        ),
-                        child: Text(
-                          model.selectedDeviceDetailPowerBox?.deviceCode ??
-                              "未选择",
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: ColorUtils.colorWhite,
                           ),
-                        ),
+                        );
+                      }).toList(),
+                      onChanged: (a) {
+                        model.selectedPowerBoxInOut = a!;
+                        model.notifyListeners();
+                      },
+                      placeholder: const Text(
+                        "请选择进/出口",
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                            fontSize: 12, color: ColorUtils.colorBlackLiteLite),
                       ),
-                    ],
-                  )),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -142,7 +120,7 @@ class EditPowerBoxView extends StatelessWidget {
             Clickable(
               child: Container(
                 padding:
-                const EdgeInsets.symmetric(horizontal: 38, vertical: 8),
+                    const EdgeInsets.symmetric(horizontal: 38, vertical: 8),
                 // width: 120,
                 // height: 36,
                 decoration: BoxDecoration(
@@ -166,7 +144,7 @@ class EditPowerBoxView extends StatelessWidget {
             Clickable(
               child: Container(
                 padding:
-                const EdgeInsets.symmetric(horizontal: 38, vertical: 8),
+                    const EdgeInsets.symmetric(horizontal: 38, vertical: 8),
                 decoration: BoxDecoration(
                   color: AppTheme().color,
                   borderRadius: BorderRadius.circular(4),
@@ -192,52 +170,93 @@ class EditPowerBoxView extends StatelessWidget {
   }
 
   Widget replaceBoxView(EditPowerBoxViewModel model) {
-    return Column(
+    return ListView(
+      // crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            // crossAxisAlignment: CrossAxisAlignment.start,
-            child: Column(
-              children: [
-                Container(
-                  margin: const EdgeInsets.only(
-                    left: 16,
-                    right: 16,
-                    bottom: 16,
-                  ),
-                  padding: const EdgeInsets.only(
-                      left: 16, right: 16, top: 16, bottom: 16),
-                  decoration: BoxDecoration(
-                    color: ColorUtils.colorBackgroundLine,
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                  width: double.infinity,
-                  child: infoView(model),
+        Container(
+          margin: const EdgeInsets.only(
+            left: 16,
+            right: 16,
+            bottom: 16,
+          ),
+          padding:
+              const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 16),
+          color: ColorUtils.colorBackgroundLine,
+          width: double.infinity,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "替换",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: ColorUtils.colorGreenLiteLite,
+                  fontWeight: FontWeight.w500,
                 ),
-                Container(
-                  padding: const EdgeInsets.only(
-                      left: 16, right: 16, top: 16, bottom: 16),
-                  margin:
-                  const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-                  decoration: BoxDecoration(
-                    color: ColorUtils.colorBackgroundLine,
-                    borderRadius: BorderRadius.circular(3),
+              ),
+              const SizedBox(height: 10),
+              EquallyRow(
+                  one: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const RowTitle(name: "电源箱编码"),
+                  const SizedBox(height: 8),
+                  ui.ComboBox<DeviceDetailPowerBoxData>(
+                    isExpanded: true,
+                    value: model.selectedDeviceDetailPowerBox,
+                    items: model.powerBoxList
+                        .map<ui.ComboBoxItem<DeviceDetailPowerBoxData>>((e) {
+                      return ui.ComboBoxItem<DeviceDetailPowerBoxData>(
+                        value: e,
+                        child: SizedBox(
+                          child: Text(
+                            e.deviceCode ?? '',
+                            textAlign: TextAlign.start,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (a) {
+                      model.selectedPowerBoxCode(a);
+                    },
+                    placeholder: const Text(
+                      "请选择电源箱编码",
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                          fontSize: 12, color: ColorUtils.colorBlackLiteLite),
+                    ),
                   ),
-                  width: double.infinity,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: edInfoView(model),
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            ),
+                ],
+              )),
+            ],
           ),
         ),
-        const SizedBox(height: 16),
+        if (model.selectedDeviceDetailPowerBox != null) ...[
+          Container(
+            margin: const EdgeInsets.only(
+              left: 16,
+              right: 16,
+              bottom: 16,
+            ),
+            padding:
+                const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 16),
+            color: ColorUtils.colorBackgroundLine,
+            width: double.infinity,
+            child: infoView(model),
+          ),
+          Container(
+            margin: const EdgeInsets.only(
+              left: 16,
+              right: 16,
+              bottom: 16,
+            ),
+            padding:
+                const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 16),
+            color: ColorUtils.colorBackgroundLine,
+            width: double.infinity,
+            child: edInfoView(model),
+          ),
+        ]
       ],
     );
   }
@@ -274,9 +293,9 @@ class EditPowerBoxView extends StatelessWidget {
               DataColumn(label: Text("操作", style: TextStyle(fontSize: 12))),
             ],
             rows:
-            (model.deviceInfo.dcInterfaces ?? []).asMap().keys.map((index) {
+                (model.deviceInfo.dcInterfaces ?? []).asMap().keys.map((index) {
               DeviceDetailPowerBoxDataDcInterfaces info =
-              (model.deviceInfo.dcInterfaces ?? [])[index];
+                  (model.deviceInfo.dcInterfaces ?? [])[index];
               return DataRow(
                   color: WidgetStateProperty.all(index % 2 == 0
                       ? "#4E5353".toColor()

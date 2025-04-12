@@ -12,6 +12,7 @@ import '../../device_add/view_models/device_add_viewmodel.dart';
 
 class DetailNvrViewModel extends BaseViewModelRefresh<dynamic> {
   final String nodeId;
+  bool isChange = false;
 
   DetailNvrViewModel(this.nodeId);
 
@@ -70,6 +71,7 @@ class DetailNvrViewModel extends BaseViewModelRefresh<dynamic> {
     })?.then((value) {
       if (IntentUtils.share.isResultOk(value)) {
         _requestData();
+        isChange = true;
       }
     });
   }

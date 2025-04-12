@@ -5,17 +5,16 @@ import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
 import '../../../../bean/home/home_page/device_detail_power_box_entity.dart';
 import '../../../../bean/home/home_page/device_entity.dart';
 import '../../../../http/http_query.dart';
+import '../../../../router_utils.dart';
 import '../../../../utils/intent_utils.dart';
 import '../../../remove/widgets/remove_dialog_page.dart';
 import '../../device_add/view_models/device_add_viewmodel.dart';
 
 class DetailPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
   final String nodeId;
+  bool isChange = false;
 
   DetailPowerBoxViewModel(this.nodeId);
-
-  String selectedPowerBoxCoding = "";
-  List powerBoxCodingList = ["1", "2"];
 
   bool isPowerBoxNeeded = false;
 
@@ -92,12 +91,28 @@ class DetailPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
 
   //修改
   editAction(){
-
+    IntentUtils.share
+        .push(context!, routeName: RouterPage.EditPowerBoxPage, data: {
+      "data": deviceInfo,
+    })?.then((value) {
+      if (IntentUtils.share.isResultOk(value)) {
+        _requestData();
+        isChange = true;
+      }
+    });
   }
 
   //替换
   replaceAction(){
-
+    IntentUtils.share.push(context!, routeName: RouterPage.EditPowerBoxPage, data: {
+      "data": deviceInfo,
+      "isReplace": true,
+    })?.then((value) {
+      if (IntentUtils.share.isResultOk(value)) {
+        _requestData();
+        isChange = true;
+      }
+    });
   }
 
   //删除

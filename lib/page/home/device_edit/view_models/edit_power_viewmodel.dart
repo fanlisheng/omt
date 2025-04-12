@@ -24,9 +24,8 @@ class EditPowerViewModel extends BaseViewModelRefresh<dynamic> {
     super.initState();
     // 初始化数据
     // 设置电源类型
-    if (deviceInfo.powerType == "市电") {
-      batteryMains = true;
-    }
+    batteryMains = (deviceInfo.powerType ?? []).contains(1); // 如果包含 1，batteryMains = true
+    battery = (deviceInfo.powerType ?? []).contains(2); //
 
     // 设置电池信息
     if (deviceInfo.batteryCapacity != null && deviceInfo.batteryCapacity! > 0) {
@@ -60,13 +59,6 @@ class EditPowerViewModel extends BaseViewModelRefresh<dynamic> {
     ///网络请求
   }
 
-  // 确认电源类型
-  confirmPowerEventAction() {
-    if (portType.isNotEmpty && (battery || batteryMains)) {
-      // 执行操作
-    }
-  }
-
   // 保存电源编辑
   void savePowerEdit() {
     // 电源需要检查参数
@@ -78,15 +70,24 @@ class EditPowerViewModel extends BaseViewModelRefresh<dynamic> {
       LoadingUtils.showToast(data: '请选择电源类型');
       return;
     }
-
-    // TODO: 实现保存编辑后的电源信息的API调用
-    LoadingUtils.show(data: "保存中...");
-
-    // 这里添加保存电源信息编辑的API调用
-    // 例如：HttpQuery.share.editService.editPower(...)
-    // IntentUtils.share.popResultOk(context!);
-
-    LoadingUtils.dismiss();
-    LoadingUtils.showToast(data: "编辑保存成功");
+    List<int> powerType = [];
+    if (batteryMains) {
+      powerType.add(1);
+    }
+    if (battery) {
+      powerType.add(2);
+    }
+    HttpQuery.share.homePageService.editPower(
+        nodeId: int.parse(deviceInfo.nodeId ?? "0"),
+        passId: selectedPowerInOut!.id ?? 0,
+        powerType: powerType,
+        batteryCapacity: battery ? (isCapacity80 ? 80 : 160) : null,
+        onSuccess: (result) {
+          LoadingUtils.showToast(data: "修改信息成功");
+          IntentUtils.share.popResultOk(context!);
+        },
+        onError: (error) {
+          LoadingUtils.showToast(data: "保存失败: $error");
+        });
   }
 }

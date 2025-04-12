@@ -10,8 +10,8 @@ import '../../device_detail/view_models/detail_power_box_viewmodel.dart';
 
 class EditPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
   final DeviceDetailPowerBoxData deviceInfo;
-
-  EditPowerBoxViewModel( this.deviceInfo);
+  final bool isReplace; //是替换 默认否
+  EditPowerBoxViewModel(this.deviceInfo, this.isReplace);
 
   // ===== 电源箱相关属性 =====
   IdNameValue? selectedPowerBoxInOut;
@@ -25,7 +25,7 @@ class EditPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
     super.initState();
     // 初始化数据
     // selectedDeviceDetailPowerBox = deviceInfo;
-    
+
     // 初始化进/出口列表
     HttpQuery.share.homePageService.getInOutList(
       onSuccess: (List<IdNameValue>? data) {
@@ -40,13 +40,14 @@ class EditPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
         notifyListeners();
       },
     );
-    
+
     // 获取可选电源箱列表
     HttpQuery.share.installService.getUnboundPowerBox(
       onSuccess: (List<DeviceDetailPowerBoxData>? data) {
         powerBoxList = data ?? [];
         // 添加当前电源箱到列表
-        if (!powerBoxList.any((element) => element.deviceCode == deviceInfo.deviceCode)) {
+        if (!powerBoxList
+            .any((element) => element.deviceCode == deviceInfo.deviceCode)) {
           powerBoxList.add(deviceInfo);
         }
         notifyListeners();
@@ -67,7 +68,6 @@ class EditPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
   //选择电源箱code
   selectedPowerBoxCode(DeviceDetailPowerBoxData? a) {
     if (a == null) return;
-    
     HttpQuery.share.homePageService.deviceDetailPowerBox(
         deviceCode: a.deviceCode ?? "",
         onSuccess: (data) {
@@ -84,31 +84,22 @@ class EditPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
       LoadingUtils.showToast(data: '请选择进出口');
       return;
     }
-    if (selectedDeviceDetailPowerBox?.deviceCode == null) {
-      LoadingUtils.showToast(data: '请先选择电源箱');
-      return;
-    }
 
-    LoadingUtils.show(data: "保存中...");
-    
     HttpQuery.share.homePageService.editPowerBox(
-      nodeId: int.parse(deviceInfo.nodeId ?? "0"),
-      passId: selectedPowerBoxInOut!.id ?? 0,
-      onSuccess: (result) {
-        LoadingUtils.dismiss();
-        LoadingUtils.showToast(data: "编辑保存成功");
-        IntentUtils.share.popResultOk(context!);
-      },
-      onError: (error) {
-        LoadingUtils.dismiss();
-        LoadingUtils.showToast(data: "保存失败: $error");
-      }
-    );
+        nodeId: int.parse(deviceInfo.nodeId ?? "0"),
+        passId: selectedPowerBoxInOut!.id ?? 0,
+        onSuccess: (result) {
+          LoadingUtils.showToast(data: "修改信息成功");
+          IntentUtils.share.popResultOk(context!);
+        },
+        onError: (error) {
+          LoadingUtils.dismiss();
+          LoadingUtils.showToast(data: "保存失败: $error");
+        });
   }
 
   //替换电源箱
   void replaceDevice() {
-
     if (selectedDeviceDetailPowerBox?.deviceCode == null) {
       LoadingUtils.showToast(data: '请先选择电源箱');
       return;
@@ -118,7 +109,7 @@ class EditPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
         nodeId: int.parse(deviceInfo.nodeId ?? "0"),
         deviceCode: deviceInfo.deviceCode ?? "",
         onSuccess: (result) {
-          LoadingUtils.showToast(data: "编辑保存成功");
+          LoadingUtils.showToast(data: "修改信息成功");
           IntentUtils.share.popResultOk(context!);
         },
         onError: (error) {
@@ -133,12 +124,13 @@ class EditPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
 
   openDcAction(DeviceDetailPowerBoxDataDcInterfaces a) {
     HttpQuery.share.homePageService.dcInterfaceControl(
-        deviceCode: deviceInfo.deviceCode ?? "",
+        deviceCode: selectedDeviceDetailPowerBox?.deviceCode ?? "",
         ids: [a.id ?? 0],
         status: a.statusText == "打开" ? 1 : 2,
         onSuccess: (data) {
+          selectedDeviceDetailPowerBox?.dcInterfaces?.remove(a);
           LoadingUtils.show(data: "${(a.statusText == "打开") ? "关闭" : "打开"}成功!");
           // _requestData();
         });
   }
-} 
+}

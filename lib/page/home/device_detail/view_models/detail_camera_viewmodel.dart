@@ -15,6 +15,7 @@ import '../../device_add/view_models/device_add_viewmodel.dart';
 
 class DetailCameraViewModel extends BaseViewModelRefresh<dynamic> {
   final String nodeId;
+  bool isChange = false;
 
   DetailCameraViewModel(this.nodeId);
 
@@ -93,6 +94,7 @@ class DetailCameraViewModel extends BaseViewModelRefresh<dynamic> {
       "data": deviceInfo,
     })?.then((value) {
       if (IntentUtils.share.isResultOk(value)) {
+        isChange = true;
         requestData();
       }
     });

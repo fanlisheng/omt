@@ -11,6 +11,7 @@ import '../../device_add/view_models/device_add_viewmodel.dart';
 
 class DetailRouterViewModel extends BaseViewModelRefresh<dynamic> {
   final String nodeId;
+  bool isChange = false;
 
   DetailRouterViewModel(this.nodeId);
 

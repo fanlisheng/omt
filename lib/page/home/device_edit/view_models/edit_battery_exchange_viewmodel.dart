@@ -51,16 +51,13 @@ class EditBatteryExchangeViewModel extends BaseViewModelRefresh<dynamic> {
       return;
     }
 
-    LoadingUtils.show(data: "保存中...");
-
     HttpQuery.share.homePageService.editSwitch(
         nodeId: int.parse(deviceInfo.nodeId ?? "0"),
         passId: selectedInOut!.id ?? 0,
         interfaceNum: int.parse(selectedPortNumber!),
         powerMethod: selectedSupplyMethod!,
         onSuccess: (result) {
-          LoadingUtils.dismiss();
-          LoadingUtils.showToast(data: "编辑保存成功");
+          LoadingUtils.showToast(data: "修改信息成功");
           IntentUtils.share.popResultOk(context!);
         },
         onError: (error) {
@@ -84,6 +81,6 @@ class EditBatteryExchangeViewModel extends BaseViewModelRefresh<dynamic> {
     // 例如：HttpQuery.share.editService.editBattery(...)
 
     LoadingUtils.dismiss();
-    LoadingUtils.showToast(data: "编辑保存成功");
+    LoadingUtils.showToast(data: "修改信息成功");
   }
 }

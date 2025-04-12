@@ -94,6 +94,8 @@ class HomePageService {
 
   get _editSwitch => '${API.share.host}api/device/switch/edit';
 
+  get _editPower => '${API.share.host}api/device/power/edit';
+
   /// 替换设备
   get _replaceAi => '${API.share.host}api/device/ai_device/replace';
 
@@ -721,6 +723,36 @@ class HomePageService {
         "interface_num": interfaceNum,
         "power_method": powerMethod,
       },
+      method: 'POST',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  editPower({
+    required int nodeId,
+    required int passId,
+    required List<int> powerType,
+    int? batteryCapacity,
+    required ValueChanged<CodeMessageData?> onSuccess,
+    ValueChanged<CodeMessageData?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    Map<String, dynamic> params = {
+      "node_id": nodeId,
+      "pass_id": passId,
+      "PowerType": powerType,
+    };
+
+    if (batteryCapacity != null) {
+      params["battery_capacity"] = batteryCapacity;
+    }
+    HttpManager.share.doHttpPost<CodeMessageData>(
+      await _editPower,
+      params,
       method: 'POST',
       autoHideDialog: true,
       autoShowDialog: true,

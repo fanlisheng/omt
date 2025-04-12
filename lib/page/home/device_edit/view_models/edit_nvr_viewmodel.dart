@@ -15,6 +15,8 @@ class EditNvrViewModel extends BaseViewModelRefresh<dynamic> {
   final bool isReplace; //是替换 默认否
   EditNvrViewModel(this.deviceInfo, this.isReplace);
 
+  bool stopScanning = false;
+
   // ===== NVR 相关属性 =====
   DeviceEntity? selectedNvr; //选中nav ip和mac
   List<DeviceEntity> nvrDeviceList = [];
@@ -51,6 +53,8 @@ class EditNvrViewModel extends BaseViewModelRefresh<dynamic> {
 
   @override
   void dispose() {
+    stopScanning = true;
+    LoadingUtils.dismiss();
     super.dispose();
   }
 
@@ -86,7 +90,8 @@ class EditNvrViewModel extends BaseViewModelRefresh<dynamic> {
     isNvrSearching = true;
     notifyListeners();
     LoadingUtils.show(data: "正在获取当前网络下的NVR设备");
-    DeviceUtils.scanAndFetchDevicesInfo(deviceType: "NVR")
+    DeviceUtils.scanAndFetchDevicesInfo(
+            deviceType: "NVR", shouldStop: _shouldStop)
         .then((List<DeviceEntity> data) {
       nvrDeviceList.clear();
       for (var a in data) {
@@ -112,18 +117,14 @@ class EditNvrViewModel extends BaseViewModelRefresh<dynamic> {
       return;
     }
 
-    LoadingUtils.show(data: "保存中...");
-
     HttpQuery.share.homePageService.editNvr(
         nodeId: int.parse(deviceInfo?.nodeId ?? "0"),
         passId: selectedNarInOut!.id ?? 0,
         onSuccess: (result) {
-          LoadingUtils.dismiss();
-          LoadingUtils.showToast(data: "编辑保存成功");
+          LoadingUtils.showToast(data: "修改信息成功");
           IntentUtils.share.popResultOk(context!);
         },
         onError: (error) {
-          LoadingUtils.dismiss();
           LoadingUtils.showToast(data: "保存失败: $error");
         });
   }
@@ -133,7 +134,12 @@ class EditNvrViewModel extends BaseViewModelRefresh<dynamic> {
         deviceCode: selectedNvr?.deviceCode ?? "",
         channelIds: [info?.id ?? 0],
         onSuccess: (data) {
+          nvrData?.channels?.remove(info);
           LoadingUtils.show(data: "移除成功!");
         });
+  }
+
+  bool _shouldStop() {
+    return stopScanning; // 当 stopAiScanning 为 true 时停止
   }
 }

@@ -145,7 +145,7 @@ class EditAiViewModel extends BaseViewModel {
         ip: device.ip ?? "",
         mac: device.mac ?? "",
         onSuccess: (result) {
-          LoadingUtils.showToast(data: "编辑保存成功");
+          LoadingUtils.showToast(data: "修改信息成功");
           IntentUtils.share.popResultOk(context!);
         },
         onError: (error) {

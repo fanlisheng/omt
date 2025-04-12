@@ -21,6 +21,7 @@ class CameraDeviceEntity {
 
   //不允许编辑
   bool readOnly = false;
+  bool isAddEnd = false; //添加完成的标识
   TextEditingController rtspController = TextEditingController();
 
   //设备名称

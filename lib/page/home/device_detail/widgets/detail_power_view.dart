@@ -73,10 +73,11 @@ class DetailPowerView extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   RowItemInfoView(
-                      name: "现场接电方式", value: model.deviceInfo.powerType),
+                      name: "现场接电方式",
+                      value: (model.deviceInfo.powerTypeText ?? []).join("、")),
                   RowItemInfoView(
                       name: "电池容量",
-                      value: "${model.deviceInfo.batteryCapacity}"),
+                      value: "${model.deviceInfo.batteryCapacity ?? 0}"),
                 ],
               ),
               const SizedBox(height: 12),

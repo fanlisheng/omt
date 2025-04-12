@@ -94,6 +94,14 @@ class DeviceAddViewModel extends BaseViewModelRefresh<dynamic> {
   @override
   void dispose() {
     // 销毁所有控制器
+    // aiViewModel?.dispose();
+    // cameraViewModel?.dispose();
+    // nvrViewModel?.dispose();
+    // powerBoxViewModel?.dispose();
+    // batteryExchangeViewModel?.dispose();
+    // powerViewModel?.dispose();
+    // routerViewModel?.dispose();
+    LoadingUtils.dismiss();
     super.dispose();
   }
 
@@ -203,8 +211,8 @@ class DeviceAddViewModel extends BaseViewModelRefresh<dynamic> {
             if (aiViewModel != null &&
                 aiViewModel!.aiDeviceList.isNotEmpty &&
                 aiViewModel!.aiDeviceList.first.mac != null) {
-              cameraViewModel =
-                  AddCameraViewModel(pNodeCode, aiViewModel?.aiDeviceList ?? []);
+              cameraViewModel = AddCameraViewModel(
+                  pNodeCode, aiViewModel?.aiDeviceList ?? []);
               stepNumber = StepNumber.third;
             } else {
               LoadingUtils.showToast(data: '请先连接AI设备');
@@ -261,10 +269,15 @@ class DeviceAddViewModel extends BaseViewModelRefresh<dynamic> {
         }
         break;
       case StepNumber.third:
-        stepNumber = StepNumber.four;
+        switch (deviceType) {
+          case DeviceType.ai:
+          case DeviceType.camera:
+            cameraViewModel!.addComplete();
+          default:
+            return;
+        }
         break;
       case StepNumber.four:
-        //完成
         break;
     }
     notifyListeners();

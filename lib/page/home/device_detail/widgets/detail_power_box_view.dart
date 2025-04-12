@@ -205,7 +205,7 @@ class DetailPowerBoxView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "电源${model.selectedPowerBoxCoding}箱信息",
+            "电源${model.deviceInfo.deviceCode ?? ""}箱信息",
             style: const TextStyle(
               fontSize: 14,
               color: ColorUtils.colorGreenLiteLite,

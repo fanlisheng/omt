@@ -78,18 +78,14 @@ class EditRouterViewModel extends BaseViewModelRefresh<dynamic> {
       return;
     }
 
-    LoadingUtils.show(data: "保存中...");
-
     HttpQuery.share.homePageService.editRouter(
         nodeId: int.parse(deviceInfo.nodeId ?? "0"),
         passId: selectedRouterInOut!.id ?? 0,
         onSuccess: (result) {
-          LoadingUtils.dismiss();
-          LoadingUtils.showToast(data: "编辑保存成功");
+          LoadingUtils.showToast(data: "修改信息成功");
           IntentUtils.share.popResultOk(context!);
         },
         onError: (error) {
-          LoadingUtils.dismiss();
           LoadingUtils.showToast(data: "保存失败: $error");
         });
   }

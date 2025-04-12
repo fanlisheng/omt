@@ -9,6 +9,7 @@ import 'package:omt/bean/home/home_page/device_entity.dart';
 import 'package:omt/http/http_query.dart';
 import 'package:omt/utils/device_utils.dart';
 import 'package:omt/utils/hikvision_utils.dart';
+import 'package:omt/utils/intent_utils.dart';
 import 'package:omt/utils/sys_utils.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import '../../../../bean/home/home_page/device_detail_ai_entity.dart';
@@ -120,6 +121,7 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
         camera: cameraParams,
         onSuccess: (data) {
           cameraDeviceEntity.readOnly = true;
+          cameraDeviceEntity.isAddEnd = true;
           Navigator.pop(context);
           notifyListeners();
         },
@@ -192,6 +194,16 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
         notifyListeners();
       },
     );
+  }
+
+  //添加完成
+  void addComplete() {
+    for (var device in cameraDeviceList) {
+      if (device.isAddEnd == true) {
+        IntentUtils.share.popResultOk(context!);
+        return;
+      }
+    }
   }
 
   @override

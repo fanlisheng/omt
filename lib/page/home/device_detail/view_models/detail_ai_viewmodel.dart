@@ -13,6 +13,7 @@ import '../../device_add/view_models/device_add_viewmodel.dart';
 
 class DetailAiViewModel extends BaseViewModelRefresh<dynamic> {
   final String nodeId;
+  bool isChange = false;
 
   DetailAiViewModel(this.nodeId);
 
@@ -62,6 +63,7 @@ class DetailAiViewModel extends BaseViewModelRefresh<dynamic> {
       "data": deviceInfo,
     })?.then((value) {
       if (IntentUtils.share.isResultOk(value)) {
+        isChange = true;
         _requestData();
       }
     });

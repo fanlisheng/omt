@@ -23,6 +23,7 @@ class AddNvrViewModel extends BaseViewModel {
   bool isNvrSearching = false;
   IdNameValue? selectedNarInOut;
   List<IdNameValue> inOutList = [];
+  bool stopScanning = false;
 
   @override
   void initState() {
@@ -41,6 +42,7 @@ class AddNvrViewModel extends BaseViewModel {
 
   @override
   void dispose() {
+    stopScanning = true;
     super.dispose();
   }
 
@@ -81,7 +83,8 @@ class AddNvrViewModel extends BaseViewModel {
     isNvrSearching = true;
     notifyListeners();
     LoadingUtils.show(data: "正在获取当前网络下的NVR设备");
-    DeviceUtils.scanAndFetchDevicesInfo(deviceType: "NVR")
+    DeviceUtils.scanAndFetchDevicesInfo(
+            deviceType: "NVR", shouldStop: _shouldStop)
         .then((List<DeviceEntity> data) {
       nvrDeviceList.clear();
       for (var a in data) {
@@ -129,5 +132,9 @@ class AddNvrViewModel extends BaseViewModel {
           LoadingUtils.show(data: "移除成功!");
           _requestData(selectedNvr?.deviceCode ?? "");
         });
+  }
+
+  bool _shouldStop() {
+    return stopScanning; // 当 stopAiScanning 为 true 时停止
   }
 }

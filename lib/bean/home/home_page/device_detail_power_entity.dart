@@ -30,13 +30,15 @@ class DeviceDetailPowerData {
 	@JSONField(name: "label_name")
 	String? labelName;
 	@JSONField(name: "power_type")
-	String? powerType;
+	List<int>? powerType;
 	@JSONField(name: "battery_capacity")
 	int? batteryCapacity;
 	@JSONField(name: "node_id")
 	String? nodeId;
 	@JSONField(name: "instance_id")
 	String? instanceId;
+	@JSONField(name: "power_type_text")
+	List<String>? powerTypeText;
 
 	DeviceDetailPowerData();
 
