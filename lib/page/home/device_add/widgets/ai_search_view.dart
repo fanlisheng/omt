@@ -13,7 +13,7 @@ Future<String?> showAiSearchDialog(BuildContext context) {
     barrierColor: Colors.black.withOpacity(0.6),
     barrierDismissible: false,
     builder: (context) {
-      return AiSearchDialog();
+      return const AiSearchDialog();
     },
   );
 }

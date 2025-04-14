@@ -8,6 +8,7 @@ import 'package:omt/utils/device_utils.dart';
 import 'package:omt/utils/sys_utils.dart';
 
 import '../../../../utils/intent_utils.dart';
+import '../../device_add/widgets/ai_search_view.dart';
 import '../../search_device/services/device_search_service.dart';
 
 import '../../search_device/services/device_search_service.dart';
@@ -78,23 +79,10 @@ class EditAiViewModel extends BaseViewModel {
 
   // 开始搜索AI设备
   void startAiSearch() async {
-    isAiSearching = true;
-    aiSearchResults.clear();
-    selectedAiIp = null;
-    notifyListeners();
-    // 扫描设备
-    List<DeviceEntity> searchDevices = await DeviceSearchService()
-        .scanDevices(shouldStop: _shouldStopAi, deviceType: "AI设备");
-    if (_shouldStopAi()) {
-      stopAiSearch();
-      return;
-    }
-    List<DeviceEntity> aiDevices =
-        searchDevices.where((device) => device.deviceType == 10).toList();
-    // 搜索完成后调用：
-    aiSearchResults = List.from(aiDevices); // 设置搜索结果
-    isAiSearching = false;
-    notifyListeners();
+    showAiSearchDialog(context!).then((ip) {
+      selectedAiIp = ip;
+      handleSelectedAiIp();
+    });
   }
 
   // 停止搜索AI设备
@@ -128,7 +116,6 @@ class EditAiViewModel extends BaseViewModel {
 
   // 替换AI设备编辑
   void replaceAiDevice() {
-
     // 这里添加保存AI设备编辑的API调用
     // 例如：HttpQuery.share.editService.editAiDevice(...)
     if (aiDeviceList.isEmpty) {

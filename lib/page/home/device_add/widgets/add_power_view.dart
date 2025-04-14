@@ -121,7 +121,7 @@ class _AddPowerViewState extends State<AddPowerView> {
                     ),
                     SizedBox(width: 2),
                     Text(
-                      "进/出口",
+                      "现场接电方式",
                       style: TextStyle(
                           fontSize: 12,
                           color: ColorUtils.colorWhite,
@@ -180,7 +180,7 @@ class _AddPowerViewState extends State<AddPowerView> {
                         children: [
                           FCheckbox(
                             checked: model.isCapacity80,
-                            label: '80',
+                            label: '80AH',
                             onChanged: (isChecked) {
                               model.isCapacity80 = isChecked;
                               model.notifyListeners();
@@ -188,7 +188,7 @@ class _AddPowerViewState extends State<AddPowerView> {
                           ),
                           FCheckbox(
                             checked: !model.isCapacity80,
-                            label: '160',
+                            label: '160AH',
                             onChanged: (isChecked) {
                               model.isCapacity80 = !isChecked;
                               model.notifyListeners();

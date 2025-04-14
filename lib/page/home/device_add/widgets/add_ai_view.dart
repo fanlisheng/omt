@@ -55,11 +55,14 @@ class AddAiView extends StatelessWidget {
               ),
               const ui.SizedBox(width: 10),
               Clickable(
-                onTap: (){
-                  showAiSearchDialog(context).then((ip){
-                    model.selectedAiIp = ip;
-                    model.notifyListeners();
-                  });
+                onTap: () {
+                  model.selectedAiIp = null;
+                  model.startAiSearch();
+                  // model.selectedAiIp = null;
+                  // showAiSearchDialog(context).then((ip) {
+                  //   model.selectedAiIp = ip;
+                  //   model.handleSelectedAiIp();
+                  // });
                 },
                 child: Container(
                   padding:
@@ -244,5 +247,4 @@ class AddAiView extends StatelessWidget {
       ],
     );
   }
-
 }

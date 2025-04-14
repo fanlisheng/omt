@@ -85,6 +85,16 @@ DeviceDetailAiData $DeviceDetailAiDataFromJson(Map<String, dynamic> json) {
   if (mac != null) {
     deviceDetailAiData.mac = mac;
   }
+  final bool? isProgramLatest = jsonConvert.convert<bool>(
+      json['is_program_latest']);
+  if (isProgramLatest != null) {
+    deviceDetailAiData.isProgramLatest = isProgramLatest;
+  }
+  final bool? isIdentityLatest = jsonConvert.convert<bool>(
+      json['is_identity_latest']);
+  if (isIdentityLatest != null) {
+    deviceDetailAiData.isIdentityLatest = isIdentityLatest;
+  }
   return deviceDetailAiData;
 }
 
@@ -103,6 +113,8 @@ Map<String, dynamic> $DeviceDetailAiDataToJson(DeviceDetailAiData entity) {
   data['server_host'] = entity.serverHost;
   data['node_id'] = entity.nodeId;
   data['mac'] = entity.mac;
+  data['is_program_latest'] = entity.isProgramLatest;
+  data['is_identity_latest'] = entity.isIdentityLatest;
   return data;
 }
 
@@ -121,6 +133,8 @@ extension DeviceDetailAiDataExtension on DeviceDetailAiData {
     String? serverHost,
     String? nodeId,
     String? mac,
+    bool? isProgramLatest,
+    bool? isIdentityLatest,
   }) {
     return DeviceDetailAiData()
       ..instanceName = instanceName ?? this.instanceName
@@ -135,6 +149,8 @@ extension DeviceDetailAiDataExtension on DeviceDetailAiData {
       ..iotConnectStatus = iotConnectStatus ?? this.iotConnectStatus
       ..serverHost = serverHost ?? this.serverHost
       ..nodeId = nodeId ?? this.nodeId
-      ..mac = mac ?? this.mac;
+      ..mac = mac ?? this.mac
+      ..isProgramLatest = isProgramLatest ?? this.isProgramLatest
+      ..isIdentityLatest = isIdentityLatest ?? this.isIdentityLatest;
   }
 }

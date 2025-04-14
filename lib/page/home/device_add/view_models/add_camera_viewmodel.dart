@@ -14,6 +14,7 @@ import 'package:omt/utils/sys_utils.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import '../../../../bean/home/home_page/device_detail_ai_entity.dart';
 import '../../../../bean/home/home_page/device_detail_camera_entity.dart';
+import '../../../../bean/video/video_configuration/Video_Connect_entity.dart';
 import '../../../../router_utils.dart';
 import '../../../../utils/image_utils.dart';
 import '../../photo_preview/widgets/photo_preview_screen.dart';
@@ -89,8 +90,8 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   // 完成摄像头设置
-  void completeCameraAction(
-      BuildContext context, CameraDeviceEntity cameraDeviceEntity) {
+  Future<void> completeCameraAction(
+      BuildContext context, CameraDeviceEntity cameraDeviceEntity) async {
     CameraDeviceEntity cameraDevice = cameraDeviceList.first;
     if ((cameraDevice.deviceNameController.text.isEmpty) ||
         ((cameraDevice.selectedCameraType?.value ?? -1) == -1) ||
@@ -99,6 +100,19 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
       LoadingUtils.showToast(data: '"设备名称、摄像头类型、进出口、是否纳入监管"不能为空！');
       return;
     }
+
+    var webcam = VideoInfoCamEntity()
+      ..name = cameraDeviceEntity.deviceNameController.text
+      ..rtsp = cameraDeviceEntity.rtsp
+      ..in_out = cameraDeviceEntity.selectedEntryExit?.id;
+
+    bool isSuccess =
+        await HttpQuery.share.homePageService.configAi(data: webcam);
+    if (isSuccess == false) {
+      LoadingUtils.showError(data: "配置本地AI设备信息失败");
+      return;
+    }
+
     Map<String, dynamic> aiParams = {
       "ip": cameraDevice.selectedAi?.ip ?? "",
       "mac": cameraDevice.selectedAi?.mac ?? "",
@@ -217,13 +231,13 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
     //     return;
     //   }
     // }
-    bool allAddEnd = cameraDeviceList.every((device) => device.isAddEnd == true);
+    bool allAddEnd =
+        cameraDeviceList.every((device) => device.isAddEnd == true);
     if (allAddEnd) {
       IntentUtils.share.popResultOk(context!);
       return;
-    }else{
+    } else {
       LoadingUtils.showToast(data: "请先提交所有设备的数据");
-
     }
   }
 

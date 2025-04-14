@@ -109,6 +109,8 @@ class DeviceDetailScreen extends StatelessWidget {
           nodeId: model.nodeId,
           onChange: (value) => model.setChange(value),
         );
+      case DeviceType.aiAndCamera:
+        return Container();
     }
   }
 
