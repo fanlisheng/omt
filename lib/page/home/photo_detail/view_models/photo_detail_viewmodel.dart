@@ -105,6 +105,7 @@ class PhotoDetailViewModel extends BaseViewModelRefresh<dynamic> {
       deviceCode: pageNeedData.deviceCode ?? "",
       type: type,
       url: images[currentImageIndex].url ?? "",
+      nodeId: pageNeedData.nodeId,
       onSuccess: (CodeMessageData? data) {
         IntentUtils.share.pop(context!,
             data: {"data": images[currentImageIndex], "type": type});

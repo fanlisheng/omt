@@ -11,11 +11,9 @@ class EditBatteryExchangeViewModel extends BaseViewModelRefresh<dynamic> {
   final DeviceDetailExchangeData deviceInfo;
   final bool isBattery;
 
-  EditBatteryExchangeViewModel( this.deviceInfo,
-      {this.isBattery = false});
+  EditBatteryExchangeViewModel(this.deviceInfo, {this.isBattery = false});
 
   // ===== 电池/交换机相关属性 =====
-  bool isCapacity80 = true;
   List<String> portNumber = ["5", "8"];
   String? selectedPortNumber;
   List<String> supplyMethod = ["POE", "DC", "AC"];
@@ -27,6 +25,24 @@ class EditBatteryExchangeViewModel extends BaseViewModelRefresh<dynamic> {
   void initState() {
     super.initState();
     // 初始化数据
+
+    selectedPortNumber = deviceInfo.interfaceNum?.toString();
+    selectedSupplyMethod = deviceInfo.powerMethod;
+
+    // 初始化进/出口列表
+    HttpQuery.share.homePageService.getInOutList(
+      onSuccess: (List<IdNameValue>? data) {
+        inOutList = data ?? [];
+        // 设置选中的进出口
+        for (var entry in inOutList) {
+          if (entry.name == deviceInfo.passName) {
+            selectedInOut = entry;
+            break;
+          }
+        }
+        notifyListeners();
+      },
+    );
   }
 
   @override

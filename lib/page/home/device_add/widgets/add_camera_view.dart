@@ -549,9 +549,9 @@ class AddCameraView extends StatelessWidget {
                                   ),
                                 ),
                                 onTap: () {
-                                  e.readOnly = true;
-                                  model.notifyListeners();
-                                  // showConfirmDialog(context, e);
+                                  // e.readOnly = true;
+                                  // model.notifyListeners();
+                                  showConfirmDialog(context, e);
                                   // model.completeCameraAction(e);
                                 },
                               ),

@@ -132,7 +132,10 @@ class EditNvrViewModel extends BaseViewModelRefresh<dynamic> {
   removeChannelAction(DeviceDetailNvrDataChannels? info) {
     HttpQuery.share.homePageService.deleteNvrChannel(
         deviceCode: selectedNvr?.deviceCode ?? "",
-        channelIds: [info?.id ?? 0],
+        nodeId: deviceInfo?.nodeId ?? "",
+        channels: [
+          {"id": info?.id ?? 0, "channel_num": info?.channelNum}
+        ],
         onSuccess: (data) {
           nvrData?.channels?.remove(info);
           LoadingUtils.show(data: "移除成功!");

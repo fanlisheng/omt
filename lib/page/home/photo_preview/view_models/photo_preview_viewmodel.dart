@@ -54,10 +54,12 @@ class PhotoPreviewViewModel extends BaseViewModelRefresh<dynamic> {
     await HttpQuery.share.homePageService.cameraPhotoList(
       page: page,
       deviceCode: photoPreviewScreenData.deviceCode,
-      type: selectedType == "抓拍照片" ? 2 : (selectedType == "背景照片" ? 1 :0)  ,
+      type: selectedType == "抓拍照片" ? 2 : (selectedType == "背景照片" ? 1 : 0),
       snapAts: [
-        BaseTimeUtils.dateToTimeStr(selectedDateTime,format: "yyyy-MM-dd 00:00:00"),
-        BaseTimeUtils.dateToTimeStr(selectedDateTime,format: "yyyy-MM-dd 23:59:59"),
+        BaseTimeUtils.dateToTimeStr(selectedDateTime,
+            format: "yyyy-MM-dd 00:00:00"),
+        BaseTimeUtils.dateToTimeStr(selectedDateTime,
+            format: "yyyy-MM-dd 23:59:59"),
       ],
       onSuccess: (DeviceDetailCameraSnapList? data) {
         if (data != null) {
@@ -130,6 +132,7 @@ class PhotoPreviewViewModel extends BaseViewModelRefresh<dynamic> {
         limit: pageLimit,
         photoData: gridViewKey.currentState?.getItems() ?? [],
         deviceCode: photoPreviewScreenData.deviceCode,
+        nodeId: photoPreviewScreenData.nodeId,
         type: selectedType == "全部照片" ? 0 : (selectedType == "抓拍照片" ? 2 : 1),
         snapAts: [
           DateTime(selectedDateTime.year, selectedDateTime.month,

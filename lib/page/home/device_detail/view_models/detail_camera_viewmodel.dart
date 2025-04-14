@@ -107,6 +107,7 @@ class DetailCameraViewModel extends BaseViewModelRefresh<dynamic> {
         .push(context!, routeName: RouterPage.PhotoPreviewScreen, data: {
       "data": PhotoPreviewScreenData(
           deviceCode: deviceInfo.deviceCode ?? "",
+          nodeId: nodeId,
           dayBasicPhoto: deviceInfo.dayBasicPhoto,
           nightBasicPhoto: deviceInfo.nightBasicPhoto)
     })?.then((value) {

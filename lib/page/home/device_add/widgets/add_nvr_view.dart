@@ -269,7 +269,10 @@ class AddNvrView extends StatelessWidget {
               margin: const EdgeInsets.only(left: 16, right: 16, bottom: 20),
               padding: const EdgeInsets.only(
                   left: 16, right: 16, top: 10, bottom: 10),
-              color: ColorUtils.colorBackgroundLine,
+              decoration: BoxDecoration(
+                color: ColorUtils.colorBackgroundLine,
+                borderRadius: BorderRadius.circular(3),
+              ),
               width: double.infinity,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

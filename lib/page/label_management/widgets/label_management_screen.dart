@@ -110,7 +110,10 @@ class LabelManagementScreen extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.only(
                   left: 10, right: 10, top: 10, bottom: 10),
-              color: ColorUtils.colorBackgroundLine,
+              decoration: BoxDecoration(
+                color: ColorUtils.colorBackgroundLine,
+                borderRadius: BorderRadius.circular(3),
+              ),
               width: double.infinity,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

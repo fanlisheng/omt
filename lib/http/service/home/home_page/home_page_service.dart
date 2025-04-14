@@ -84,10 +84,12 @@ class HomePageService {
   get _deleteNvrChannel => '${API.share.host}api/device/nvr/delete_channel';
 
   /// 电源箱DC接口绑定设备类型数据字典
-  get _dcInterfaceDeviceTypeMap => '${API.share.host}api/device/power_box/dc_interface/device_type_map';
+  get _dcInterfaceDeviceTypeMap =>
+      '${API.share.host}api/device/power_box/dc_interface/device_type_map';
 
   /// 电源箱DC接口绑定设备
-  get _dcInterfaceBindDevice => '${API.share.host}api/device/power_box/dc_interface/bind_device';
+  get _dcInterfaceBindDevice =>
+      '${API.share.host}api/device/power_box/dc_interface/bind_device';
 
   /// 新增编辑接口URL
   get _editCamera => '${API.share.host}api/device/camera/edit';
@@ -412,13 +414,23 @@ class HomePageService {
     required String deviceCode,
     required int type,
     required String url,
+    String? nodeId,
     required ValueChanged<CodeMessageData?>? onSuccess,
     ValueChanged<CodeMessageData?>? onCache,
     ValueChanged<String>? onError,
   }) async {
+    Map<String, dynamic> params = {
+      "device_code": deviceCode,
+      "type": type,
+      "url": url,
+    };
+
+    if (nodeId != null) {
+      params["node_id"] = nodeId.toInt();
+    }
     HttpManager.share.doHttpPost<CodeMessageData>(
       await _setCameraBasicPhoto,
-      {"device_code": deviceCode, "type": type, "url": url},
+      params,
       method: 'POST',
       autoHideDialog: true,
       autoShowDialog: true,
@@ -627,17 +639,23 @@ class HomePageService {
   /// 删除NVR通道
   deleteNvrChannel({
     required String deviceCode,
-    required List<int> channelIds,
+    required List<Map> channels,
+    String? nodeId,
     required ValueChanged<CodeMessageData?> onSuccess,
     ValueChanged<CodeMessageData?>? onCache,
     ValueChanged<String>? onError,
   }) async {
+    Map<String, dynamic> params = {
+      'device_code': deviceCode,
+      'channels': channels,
+    };
+
+    if (nodeId != null) {
+      params["node_id"] = nodeId.toInt();
+    }
     HttpManager.share.doHttpPost<CodeMessageData>(
       await _deleteNvrChannel,
-      {
-        'device_code': deviceCode,
-        'channel_ids': channelIds,
-      },
+      params,
       method: 'POST',
       autoHideDialog: true,
       autoShowDialog: true,
