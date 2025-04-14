@@ -7,19 +7,19 @@ import 'package:omt/http/http_query.dart';
 import 'package:omt/utils/device_utils.dart';
 import 'package:omt/utils/sys_utils.dart';
 
+import '../../../../utils/intent_utils.dart';
 import '../../search_device/services/device_search_service.dart';
 
 import '../../search_device/services/device_search_service.dart';
 
-class EditAiViewModel extends BaseViewModelRefresh<dynamic> {
-  final String pNodeCode;
+class EditAiViewModel extends BaseViewModel {
   final DeviceDetailAiData deviceInfo;
 
-  EditAiViewModel(this.pNodeCode, this.deviceInfo);
+  EditAiViewModel(this.deviceInfo);
 
   // ===== AI设备相关属性 =====
-  List<DeviceDetailAiData> aiDeviceList = [];
-  List<TextEditingController> aiControllers = [];
+  List<DeviceDetailAiData> aiDeviceList = [DeviceDetailAiData()];
+  List<TextEditingController> aiControllers = [TextEditingController()];
   bool isAiSearching = false;
   String? selectedAiIp;
   List<DeviceEntity> aiSearchResults = [];
@@ -29,8 +29,8 @@ class EditAiViewModel extends BaseViewModelRefresh<dynamic> {
   void initState() {
     super.initState();
     // 初始化AI设备列表和控制器
-    aiDeviceList = [deviceInfo];
-    aiControllers = [TextEditingController(text: deviceInfo.ip)];
+    // aiDeviceList = [deviceInfo];
+    // aiControllers = [TextEditingController(text: deviceInfo.ip)];
   }
 
   @override
@@ -126,20 +126,39 @@ class EditAiViewModel extends BaseViewModelRefresh<dynamic> {
     return stopAiScanning; // 当 stopAiScanning 为 true 时停止
   }
 
-  // 保存AI设备编辑
-  void saveAiDevice() {
-    // TODO: 实现保存编辑后的AI设备信息
-    LoadingUtils.show(data: "保存中...");
-    
+  // 替换AI设备编辑
+  void replaceAiDevice() {
+
     // 这里添加保存AI设备编辑的API调用
     // 例如：HttpQuery.share.editService.editAiDevice(...)
-    
-    LoadingUtils.dismiss();
-    LoadingUtils.showToast(data: "编辑保存成功");
+    if (aiDeviceList.isEmpty) {
+      LoadingUtils.showToast(data: "请先连接设备");
+      return;
+    }
+    DeviceDetailAiData? device = aiDeviceList.first;
+    if (device.ip == null) {
+      LoadingUtils.showToast(data: "请先连接设备");
+      return;
+    }
+    HttpQuery.share.homePageService.replaceAi(
+        nodeId: int.parse(deviceInfo.nodeId ?? "0"),
+        ip: device.ip ?? "",
+        mac: device.mac ?? "",
+        onSuccess: (result) {
+          LoadingUtils.showToast(data: "修改信息成功");
+          IntentUtils.share.popResultOk(context!);
+        },
+        onError: (error) {
+          LoadingUtils.dismiss();
+          LoadingUtils.showToast(data: "保存失败: $error");
+        });
   }
 
   @override
-  loadData({ValueChanged? onSuccess, ValueChanged? onCache, ValueChanged<String>? onError}) {
+  loadData(
+      {ValueChanged? onSuccess,
+      ValueChanged? onCache,
+      ValueChanged<String>? onError}) {
     // 实现数据加载
   }
-} 
+}

@@ -9,10 +9,9 @@ import 'package:omt/utils/intent_utils.dart';
 import '../../../../bean/home/home_page/device_detail_router_entity_entity.dart';
 
 class EditRouterViewModel extends BaseViewModelRefresh<dynamic> {
-  final String pNodeCode;
   final DeviceDetailRouterData deviceInfo;
 
-  EditRouterViewModel(this.pNodeCode, this.deviceInfo);
+  EditRouterViewModel(this.deviceInfo);
 
   // ===== 路由器相关属性 =====
   IdNameValue? selectedRouterType;
@@ -26,6 +25,18 @@ class EditRouterViewModel extends BaseViewModelRefresh<dynamic> {
     super.initState();
     // 初始化数据
     routerIpController.text = deviceInfo.ip ?? "";
+
+    routerTypeList = [
+      IdNameValue(id: 6, name: "无线"),
+      IdNameValue(id: 7, name: "有线")
+    ];
+    if (deviceInfo.typeText == "有线网络") {
+      selectedRouterType =
+          routerTypeList.firstWhere((entry) => entry.name == "有线");
+    } else if (deviceInfo.typeText == "路由器") {
+      selectedRouterType =
+          routerTypeList.firstWhere((entry) => entry.name == "无线");
+    }
 
     // 初始化进/出口列表
     HttpQuery.share.homePageService.getInOutList(
@@ -67,24 +78,15 @@ class EditRouterViewModel extends BaseViewModelRefresh<dynamic> {
       return;
     }
 
-    LoadingUtils.show(data: "保存中...");
-    
     HttpQuery.share.homePageService.editRouter(
-      nodeId: int.parse(deviceInfo.nodeId ?? "0"),
-      passId: selectedRouterInOut!.id ?? 0,
-      onSuccess: (result) {
-        LoadingUtils.dismiss();
-        LoadingUtils.showToast(data: "编辑保存成功");
-        
-        // 更新后退出
-        if (context != null) {
-          Navigator.of(context!).pop(true);
-        }
-      },
-      onError: (error) {
-        LoadingUtils.dismiss();
-        LoadingUtils.showToast(data: "保存失败: $error");
-      }
-    );
+        nodeId: int.parse(deviceInfo.nodeId ?? "0"),
+        passId: selectedRouterInOut!.id ?? 0,
+        onSuccess: (result) {
+          LoadingUtils.showToast(data: "修改信息成功");
+          IntentUtils.share.popResultOk(context!);
+        },
+        onError: (error) {
+          LoadingUtils.showToast(data: "保存失败: $error");
+        });
   }
-} 
+}

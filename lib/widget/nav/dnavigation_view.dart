@@ -1,3 +1,4 @@
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kayo_package/kayo_package_utils.dart';
@@ -7,6 +8,43 @@ import 'package:omt/test/test.dart';
 
 import '../../utils/color_utils.dart';
 import '../../utils/intent_utils.dart';
+
+class DHeaderPage extends StatelessWidget {
+  final String title;
+  final Widget content;
+  final String titlePath;
+
+  const DHeaderPage({
+    super.key,
+    required this.title,
+    required this.content,
+    this.titlePath = "首页 / ",
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: ColorUtils.colorBackgroundLine,
+      child: ScaffoldPage(
+        header: PageHeader(
+          title: DNavigationView(
+            title: title,
+            titlePass: titlePath,
+            rightWidget: const Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  SizedBox(width: 10),
+                ],
+              ),
+            ),
+          ),
+        ),
+        content: content,
+      ),
+    );
+  }
+}
 
 class DNavigationView extends StatelessWidget {
   final String title;

@@ -41,6 +41,7 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
             return false;
           });
       if (mac == null) {
+        LoadingUtils.dismiss();
         LoadingUtils.showToast(data: '该设备不在线');
         return;
       }
@@ -115,9 +116,11 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
     return stopAiScanning; // 当 stopAiScanning 为 true 时停止
   }
 
-
   @override
-  loadData({ValueChanged? onSuccess, ValueChanged? onCache, ValueChanged<String>? onError}) {
+  loadData(
+      {ValueChanged? onSuccess,
+      ValueChanged? onCache,
+      ValueChanged<String>? onError}) {
     // TODO: implement loadData
     throw UnimplementedError();
   }

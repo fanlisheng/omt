@@ -102,7 +102,10 @@ class InstallDeviceScreen extends StatelessWidget {
               const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 20),
           padding:
               const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 16),
-          color: ColorUtils.colorBackgroundLine,
+          decoration: BoxDecoration(
+            color: ColorUtils.colorBackgroundLine,
+            borderRadius: BorderRadius.circular(3),
+          ),
           width: double.infinity,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -201,7 +204,10 @@ class InstallDeviceScreen extends StatelessWidget {
   Widget topView(InstallDeviceViewModel model) {
     return Container(
       height: 100,
-      color: ColorUtils.colorBackgroundLine,
+      decoration: BoxDecoration(
+        color: ColorUtils.colorBackgroundLine,
+        borderRadius: BorderRadius.circular(3),
+      ),
       margin: const EdgeInsets.symmetric(
         horizontal: 16,
       ),

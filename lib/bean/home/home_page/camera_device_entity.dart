@@ -3,6 +3,8 @@ import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/generated/json/base/json_field.dart';
 import 'dart:convert';
 
+import 'device_detail_ai_entity.dart';
+
 // @JsonSerializable()
 //
 class CameraDeviceEntity {
@@ -10,19 +12,14 @@ class CameraDeviceEntity {
   String? rtsp;
   String? code;
 
-  // String? name;
-  // String? type;
   String? mac;
-
-  // String? entryExit;
-  // String? isRegulation;
-  // String? id;
   String? ip;
 
   //不允许编辑
   bool readOnly = false;
+  bool isAddEnd = false; //添加完成的标识
+  DeviceDetailAiData? selectedAi; //对应的ai设备
   TextEditingController rtspController = TextEditingController();
-
   //设备名称
   TextEditingController deviceNameController = TextEditingController();
   TextEditingController videoIdController = TextEditingController();

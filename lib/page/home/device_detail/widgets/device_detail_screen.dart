@@ -1,5 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kayo_package/extension/_index_extension.dart';
 import 'package:kayo_package/kayo_package.dart';
@@ -11,6 +12,8 @@ import 'package:omt/page/home/device_detail/widgets/detail_battery_exchange_view
 import 'package:omt/page/home/device_detail/widgets/detail_camera_view.dart';
 import 'package:omt/page/home/device_detail/widgets/detail_nvr_view.dart';
 import 'package:omt/page/home/device_detail/widgets/detail_power_view.dart';
+import 'package:omt/page/home/device_detail/widgets/detail_router_view.dart';
+import 'package:omt/utils/intent_utils.dart';
 import 'package:omt/widget/nav/dnavigation_view.dart';
 import '../../../../utils/color_utils.dart';
 import '../../../../utils/device_utils.dart';
@@ -49,6 +52,11 @@ class DeviceDetailScreen extends StatelessWidget {
                       ],
                     ),
                   ),
+                  onTap: model.isChange
+                      ? () {
+                          IntentUtils.share.popResultOk(context);
+                        }
+                      : null,
                 ),
               ),
               content: contentView(model),
@@ -67,79 +75,87 @@ class DeviceDetailScreen extends StatelessWidget {
     switch (model.deviceType) {
       case DeviceType.ai:
         return DetailAiView(
-          nodeCode: model.nodeCode,
+          nodeId: model.nodeId,
+          onChange: (value) => model.setChange(value),
         );
       case DeviceType.camera:
         return DetailCameraView(
-          nodeCode: model.nodeCode,
+          nodeId: model.nodeId,
+          onChange: (value) => model.setChange(value),
         );
       case DeviceType.powerBox:
         return DetailPowerBoxView(
-          nodeCode: model.nodeCode,
+          nodeId: model.nodeId,
+          onChange: (value) => model.setChange(value),
         );
       case DeviceType.nvr:
         return DetailNvrView(
-          nodeCode: model.nodeCode,
+          nodeId: model.nodeId,
+          onChange: (value) => model.setChange(value),
         );
       case DeviceType.power:
         return DetailPowerView(
-          nodeCode: model.nodeCode,
+          nodeId: model.nodeId,
+          onChange: (value) => model.setChange(value),
         );
       case DeviceType.battery:
       case DeviceType.exchange:
         return DetailBatteryExchangeView(
-          nodeCode: model.nodeCode,
+          nodeId: model.nodeId,
+          onChange: (value) => model.setChange(value),
         );
       case DeviceType.router:
-        // TODO: Handle this case.
-        throw UnimplementedError();
+        return DetailRouterView(
+          nodeId: model.nodeId,
+          onChange: (value) => model.setChange(value),
+        );
     }
   }
 
-  // Widget portView(DeviceDetailViewModel model) {
-  //   return Column(
-  //     spacing: 0,
-  //     children: [
-  //       Expanded(
-  //         child: Container(
-  //           margin: const EdgeInsets.only(left: 16, right: 16),
-  //           color: ColorUtils.colorBackgroundLine,
-  //           child: Column(
-  //             children: [
-  //               DetailPowerView(
-  //                 nodeCode: model.nodeCode,
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //       ),
-  //       bottomView(model),
-  //     ],
-  //   );
-  // }
+// Widget portView(DeviceDetailViewModel model) {
+//   return Column(
+//     spacing: 0,
+//     children: [
+//       Expanded(
+//         child: Container(
+//           margin: const EdgeInsets.only(left: 16, right: 16),
+//           color: ColorUtils.colorBackgroundLine,
+//           child: Column(
+//             children: [
+//               DetailPowerView(
+//                 nodeCode: model.nodeCode,
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//       bottomView(model),
+//     ],
+//   );
+// }
 
-  // Widget bottomView(DeviceDetailViewModel model) {
-  //   return Container(
-  //     margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-  //     child: Row(
-  //       mainAxisAlignment: MainAxisAlignment.center,
-  //       children: [
-  //         Clickable(
-  //           child: Container(
-  //             padding:
-  //                 const EdgeInsets.only(left: 25, right: 25, top: 6, bottom: 6),
-  //             color: ColorUtils.colorGreen,
-  //             child: const Text(
-  //               "确定",
-  //               style: TextStyle(fontSize: 12, color: ColorUtils.colorWhite),
-  //             ),
-  //           ),
-  //           onTap: () {
-  //             model.confirmPowerEventAction();
-  //           },
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
+// Widget bottomView(DeviceDetailViewModel model) {
+//   return Container(
+//     margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+//     child: Row(
+//       mainAxisAlignment: MainAxisAlignment.center,
+//       children: [
+//         Clickable(
+//           child: Container(
+//             padding:
+//                 const EdgeInsets.only(left: 25, right: 25, top: 6, bottom: 6),
+//             color: ColorUtils.colorGreen,
+//             child: const Text(
+//               "确定",
+//               style: TextStyle(fontSize: 12, color: ColorUtils.colorWhite),
+//             ),
+//           ),
+//           onTap: () {
+//             model.confirmPowerEventAction();
+//           },
+//         ),
+//       ],
+//     ),
+//   );
+// }
 }

@@ -119,7 +119,10 @@ class RemoveScreen extends StatelessWidget {
         margin: const EdgeInsets.only(left: 16, right: 16, top: 0, bottom: 10),
         padding:
             const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 16),
-        color: ColorUtils.colorBackgroundLine,
+        decoration: BoxDecoration(
+            color: ColorUtils.colorBackgroundLine,
+            borderRadius: BorderRadius.circular(3),
+        ),
         width: double.infinity,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -186,7 +189,10 @@ class RemoveScreen extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),
       padding: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 16),
-      color: ColorUtils.colorBackgroundLine,
+      decoration: BoxDecoration(
+        color: ColorUtils.colorBackgroundLine,
+        borderRadius: BorderRadius.circular(3),
+      ),
       width: double.infinity,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -298,7 +304,10 @@ class RemoveScreen extends StatelessWidget {
             two: Clickable(
               child: Container(
                 padding: const EdgeInsets.only(top: 8, bottom: 8),
-                color: ColorUtils.colorGreen,
+                decoration: BoxDecoration(
+                  color: ColorUtils.colorGreen,
+                    borderRadius: BorderRadius.circular(3),
+                ),
                 alignment: Alignment.center,
                 child: const Text(
                   "搜索",
@@ -388,7 +397,8 @@ class RemoveScreen extends StatelessWidget {
                               margin: const EdgeInsets.only(
                                   left: 2, right: 2, bottom: 4),
                               child: Text(
-                                deviceData[index].ip ?? "",
+                                deviceData[index].ip.defaultStr(
+                                    data: deviceData[index].desc ?? ''),
                                 style: const TextStyle(
                                     color: ColorUtils.colorWhite, fontSize: 10),
                               ),

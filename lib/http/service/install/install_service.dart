@@ -35,8 +35,7 @@ class InstallService {
   get _getCameraStatus =>
       '${API.share.host}api/device/camera/control_status_map';
 
-  get _getCameraType =>
-      '${API.share.host}api/device/camera/camera_type_map';
+  get _getCameraType => '${API.share.host}api/device/camera/camera_type_map';
 
   /// AI设备和摄像头安装
   aiDeviceCameraInstall({
@@ -234,26 +233,28 @@ class InstallService {
     String? pNodeCode,
     required bool hasBatteryMains, //有市电
     int? batteryCap, //电池信息
-    required int type,
+    required int passId,
     required ValueChanged<CodeMessageData?> onSuccess,
     ValueChanged<CodeMessageData?>? onCache,
     ValueChanged<String>? onError,
   }) async {
-    List<Map<String, dynamic>> items = [];
+    List<int> items = [];
 
-    if (hasBatteryMains == true) {
-      items.add({"type": 12});
+    if (hasBatteryMains) {
+      items.add(1);
     }
-
     if (batteryCap != null) {
-      items.add({"type": 13, "battery_cap": batteryCap});
+      items.add(2);
     }
     Map<String, dynamic> params = {
-      "items": items,
-      "type": type,
+      "PowerType": items,
+      "pass_id": passId,
     };
     if (pNodeCode != null) {
       params["p_node_code"] = pNodeCode;
+    }
+    if (batteryCap != null) {
+      params["battery_capacity"] = batteryCap;
     }
 
     HttpManager.share.doHttpPost<CodeMessageData>(
@@ -321,6 +322,4 @@ class InstallService {
       onError: onError,
     );
   }
-
-
 }

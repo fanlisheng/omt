@@ -10,7 +10,7 @@ import 'package:omt/utils/sys_utils.dart';
 
 import '../../../../bean/home/home_page/device_entity.dart';
 
-class AddNvrViewModel extends BaseViewModelRefresh<dynamic> {
+class AddNvrViewModel extends BaseViewModel {
   final String pNodeCode;
 
   AddNvrViewModel(this.pNodeCode);
@@ -19,11 +19,11 @@ class AddNvrViewModel extends BaseViewModelRefresh<dynamic> {
   List<DeviceEntity> nvrDeviceList = [];
   bool isNvrNeeded = true;
   DeviceEntity? selectedNvr;
-  List<DeviceEntity> nvrIpList = [];
   DeviceDetailNvrData nvrData = DeviceDetailNvrData();
   bool isNvrSearching = false;
   IdNameValue? selectedNarInOut;
   List<IdNameValue> inOutList = [];
+  bool stopScanning = false;
 
   @override
   void initState() {
@@ -42,6 +42,7 @@ class AddNvrViewModel extends BaseViewModelRefresh<dynamic> {
 
   @override
   void dispose() {
+    stopScanning = true;
     super.dispose();
   }
 
@@ -65,6 +66,10 @@ class AddNvrViewModel extends BaseViewModelRefresh<dynamic> {
     //请求通道信息
     String deviceCode =
         DeviceUtils.getDeviceCodeByMacAddress(macAddress: selectedNvr!.mac!);
+    _requestData(deviceCode);
+  }
+
+  void _requestData(String deviceCode) {
     HttpQuery.share.homePageService.deviceDetailNvr(
         deviceCode: deviceCode,
         onSuccess: (data) {
@@ -78,13 +83,13 @@ class AddNvrViewModel extends BaseViewModelRefresh<dynamic> {
     isNvrSearching = true;
     notifyListeners();
     LoadingUtils.show(data: "正在获取当前网络下的NVR设备");
-    DeviceUtils.scanAndFetchDevicesInfo(deviceType: "NVR")
+    DeviceUtils.scanAndFetchDevicesInfo(
+            deviceType: "NVR", shouldStop: _shouldStop)
         .then((List<DeviceEntity> data) {
-      LoadingUtils.show(data: "正在获取当前网络下的NVR设备");
-      nvrIpList.clear();
+      nvrDeviceList.clear();
       for (var a in data) {
         if (a.ip != null) {
-          nvrIpList.add(a);
+          nvrDeviceList.add(a);
         }
       }
       isNvrSearching = false;
@@ -118,13 +123,18 @@ class AddNvrViewModel extends BaseViewModelRefresh<dynamic> {
           LoadingUtils.showToast(data: 'NVR安装失败: $error');
         });
   }
-}
 
-@override
-loadData(
-    {ValueChanged? onSuccess,
-    ValueChanged? onCache,
-    ValueChanged<String>? onError}) {
-  // TODO: implement loadData
-  throw UnimplementedError();
+  removeChannelAction(DeviceDetailNvrDataChannels info) {
+    HttpQuery.share.homePageService.deleteNvrChannel(
+        deviceCode: selectedNvr?.deviceCode ?? "",
+        channels: [{"id":info.id ??0 ,"channel_num":info.channelNum}],
+        onSuccess: (data) {
+          LoadingUtils.show(data: "移除成功!");
+          _requestData(selectedNvr?.deviceCode ?? "");
+        });
+  }
+
+  bool _shouldStop() {
+    return stopScanning; // 当 stopAiScanning 为 true 时停止
+  }
 }

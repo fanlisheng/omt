@@ -6,12 +6,17 @@ import '../../../../bean/home/home_page/device_detail_ai_entity.dart';
 import '../../../../bean/home/home_page/device_detail_nvr_entity.dart';
 import '../../../../bean/home/home_page/device_entity.dart';
 import '../../../../http/http_query.dart';
+import '../../../../router_utils.dart';
+import '../../../../utils/intent_utils.dart';
+import '../../../remove/widgets/remove_dialog_page.dart';
 import '../../device_add/view_models/device_add_viewmodel.dart';
 
 class DetailNvrViewModel extends BaseViewModelRefresh<dynamic> {
-  final String nodeCode;
+  final String nodeId;
+  final Function(bool) onChange;
+  bool isChange = false;
 
-  DetailNvrViewModel(this.nodeCode);
+  DetailNvrViewModel(this.nodeId, {required this.onChange});
 
   DeviceDetailNvrData deviceInfo = DeviceDetailNvrData();
 
@@ -23,7 +28,7 @@ class DetailNvrViewModel extends BaseViewModelRefresh<dynamic> {
 
   void _requestData() {
     HttpQuery.share.homePageService.deviceDetailNvr(
-        nodeCode: nodeCode,
+        nodeId: nodeId,
         onSuccess: (DeviceDetailNvrData? a) {
           deviceInfo = a ?? DeviceDetailNvrData();
           notifyListeners();
@@ -39,13 +44,56 @@ class DetailNvrViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   ///点击事件
+  //删除通道
   removeChannelAction(DeviceDetailNvrDataChannels info) {
     HttpQuery.share.homePageService.deleteNvrChannel(
         deviceCode: deviceInfo.deviceCode ?? "",
-        channelIds: [info.id ?? 0],
+        nodeId: deviceInfo.nodeId ?? "",
+        channels: [
+          {"id": info.id ?? 0, "channel_num": info.channelNum}
+        ],
         onSuccess: (data) {
           LoadingUtils.show(data: "移除成功!");
           _requestData();
         });
+  }
+
+  //修改
+  editAction() {
+    IntentUtils.share.push(context!, routeName: RouterPage.EditNvrPage, data: {
+      "data": deviceInfo,
+    })?.then((value) {
+      if (IntentUtils.share.isResultOk(value)) {
+        isChange = true;
+        onChange(isChange);
+        _requestData();
+      }
+    });
+  }
+
+  //替换
+  replaceAction() {
+    IntentUtils.share.push(context!, routeName: RouterPage.EditNvrPage, data: {
+      "data": deviceInfo,
+      "isReplace": true,
+    })?.then((value) {
+      if (IntentUtils.share.isResultOk(value)) {
+        isChange = true;
+        onChange(isChange);
+        _requestData();
+      }
+    });
+  }
+
+  //删除
+  removeAction() {
+    RemoveDialogPage.showAndSubmit(
+      context: context!,
+      instanceId: deviceInfo.instanceId ?? "",
+      removeIds: [(deviceInfo.nodeId ?? "0").toInt()],
+      onSuccess: () {
+        IntentUtils.share.popResultOk(context!);
+      },
+    );
   }
 }

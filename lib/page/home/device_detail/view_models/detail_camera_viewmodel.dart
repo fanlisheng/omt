@@ -14,9 +14,11 @@ import '../../../../utils/intent_utils.dart';
 import '../../device_add/view_models/device_add_viewmodel.dart';
 
 class DetailCameraViewModel extends BaseViewModelRefresh<dynamic> {
-  final String nodeCode;
+  final String nodeId;
+  final Function(bool) onChange;
+  bool isChange = false;
 
-  DetailCameraViewModel(this.nodeCode);
+  DetailCameraViewModel(this.nodeId, {required this.onChange});
 
   int photoCurrentIndex = 0;
 
@@ -39,7 +41,7 @@ class DetailCameraViewModel extends BaseViewModelRefresh<dynamic> {
 
   void requestData() {
     HttpQuery.share.homePageService.deviceDetailCamera(
-        nodeCode: nodeCode,
+        nodeId: nodeId,
         onSuccess: (DeviceDetailCameraData? a) {
           deviceInfo = a ?? DeviceDetailCameraData();
           // player.open(Media('https://user-images.githubusercontent.com/28951144/229373695-22f88f13-d18f-4288-9bf1-c3e078d83722.mp4'));
@@ -93,10 +95,11 @@ class DetailCameraViewModel extends BaseViewModelRefresh<dynamic> {
       "data": deviceInfo,
     })?.then((value) {
       if (IntentUtils.share.isResultOk(value)) {
+        isChange = true;
+        onChange(isChange);
         requestData();
       }
     });
-    notifyListeners();
   }
 
   gotoPhotoPreviewScreen() {
@@ -104,6 +107,7 @@ class DetailCameraViewModel extends BaseViewModelRefresh<dynamic> {
         .push(context!, routeName: RouterPage.PhotoPreviewScreen, data: {
       "data": PhotoPreviewScreenData(
           deviceCode: deviceInfo.deviceCode ?? "",
+          nodeId: nodeId,
           dayBasicPhoto: deviceInfo.dayBasicPhoto,
           nightBasicPhoto: deviceInfo.nightBasicPhoto)
     })?.then((value) {

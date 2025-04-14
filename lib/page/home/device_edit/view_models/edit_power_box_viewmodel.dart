@@ -6,12 +6,13 @@ import 'package:omt/bean/home/home_page/device_detail_power_box_entity.dart';
 import 'package:omt/http/http_query.dart';
 import 'package:omt/utils/intent_utils.dart';
 
-class EditPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
-  // 父节点code
-  final String pNodeCode;
-  final DeviceDetailPowerBoxData deviceInfo;
+import '../../device_add/widgets/power_box_bind_device_dialog_page.dart';
+import '../../device_detail/view_models/detail_power_box_viewmodel.dart';
 
-  EditPowerBoxViewModel(this.pNodeCode, this.deviceInfo);
+class EditPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
+  final DeviceDetailPowerBoxData deviceInfo;
+  final bool isReplace; //是替换 默认否
+  EditPowerBoxViewModel(this.deviceInfo, this.isReplace);
 
   // ===== 电源箱相关属性 =====
   IdNameValue? selectedPowerBoxInOut;
@@ -24,8 +25,8 @@ class EditPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
   void initState() async {
     super.initState();
     // 初始化数据
-    selectedDeviceDetailPowerBox = deviceInfo;
-    
+    // selectedDeviceDetailPowerBox = deviceInfo;
+
     // 初始化进/出口列表
     HttpQuery.share.homePageService.getInOutList(
       onSuccess: (List<IdNameValue>? data) {
@@ -40,13 +41,14 @@ class EditPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
         notifyListeners();
       },
     );
-    
+
     // 获取可选电源箱列表
     HttpQuery.share.installService.getUnboundPowerBox(
       onSuccess: (List<DeviceDetailPowerBoxData>? data) {
         powerBoxList = data ?? [];
         // 添加当前电源箱到列表
-        if (!powerBoxList.any((element) => element.deviceCode == deviceInfo.deviceCode)) {
+        if (!powerBoxList
+            .any((element) => element.deviceCode == deviceInfo.deviceCode)) {
           powerBoxList.add(deviceInfo);
         }
         notifyListeners();
@@ -67,14 +69,7 @@ class EditPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
   //选择电源箱code
   selectedPowerBoxCode(DeviceDetailPowerBoxData? a) {
     if (a == null) return;
-    
-    HttpQuery.share.homePageService.deviceDetailPowerBox(
-        deviceCode: a.deviceCode ?? "",
-        onSuccess: (data) {
-          selectedDeviceDetailPowerBox = a;
-          selectedDeviceDetailPowerBox?.dcInterfaces = data?.dcInterfaces ?? [];
-          notifyListeners();
-        });
+    _requestDcInterfaceData(a);
   }
 
   // 保存电源箱编辑
@@ -84,29 +79,76 @@ class EditPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
       LoadingUtils.showToast(data: '请选择进出口');
       return;
     }
+
+    HttpQuery.share.homePageService.editPowerBox(
+        nodeId: int.parse(deviceInfo.nodeId ?? "0"),
+        passId: selectedPowerBoxInOut!.id ?? 0,
+        onSuccess: (result) {
+          LoadingUtils.showToast(data: "修改信息成功");
+          IntentUtils.share.popResultOk(context!);
+        },
+        onError: (error) {
+          LoadingUtils.dismiss();
+          LoadingUtils.showToast(data: "保存失败: $error");
+        });
+  }
+
+  //替换电源箱
+  void replaceDevice() {
     if (selectedDeviceDetailPowerBox?.deviceCode == null) {
       LoadingUtils.showToast(data: '请先选择电源箱');
       return;
     }
 
-    LoadingUtils.show(data: "保存中...");
-    
-    HttpQuery.share.homePageService.editPowerBox(
-      nodeId: int.parse(deviceInfo.nodeId ?? "0"),
-      passId: selectedPowerBoxInOut!.id ?? 0,
-      onSuccess: (result) {
-        LoadingUtils.dismiss();
-        LoadingUtils.showToast(data: "编辑保存成功");
-        
-        // 更新后退出
-        if (context != null) {
-          Navigator.of(context!).pop(true);
-        }
-      },
-      onError: (error) {
-        LoadingUtils.dismiss();
-        LoadingUtils.showToast(data: "保存失败: $error");
-      }
-    );
+    HttpQuery.share.homePageService.replacePowerBox(
+        nodeId: int.parse(deviceInfo.nodeId ?? "0"),
+        deviceCode: deviceInfo.deviceCode ?? "",
+        onSuccess: (result) {
+          LoadingUtils.showToast(data: "修改信息成功");
+          IntentUtils.share.popResultOk(context!);
+        },
+        onError: (error) {
+          LoadingUtils.dismiss();
+          LoadingUtils.showToast(data: "保存失败: $error");
+        });
   }
-} 
+
+  changeDeviceStateAction(info) {
+    notifyListeners();
+  }
+
+  openDcAction(DeviceDetailPowerBoxDataDcInterfaces a) {
+    HttpQuery.share.homePageService.dcInterfaceControl(
+        deviceCode: selectedDeviceDetailPowerBox?.deviceCode ?? "",
+        ids: [a.id ?? 0],
+        status: a.statusText == "打开" ? 1 : 2,
+        onSuccess: (data) {
+          selectedDeviceDetailPowerBox?.dcInterfaces?.remove(a);
+          LoadingUtils.show(data: "${(a.statusText == "打开") ? "关闭" : "打开"}成功!");
+          // _requestData();
+        });
+  }
+
+  //记录 （绑定设备）
+  void recordDeviceAction(DeviceDetailPowerBoxDataDcInterfaces a) {
+    PowerBoxBindDeviceDialogPage.showAndSubmit(
+        context: context!,
+        deviceCode: selectedDeviceDetailPowerBox?.deviceCode ?? "",
+        dcId: a.id ?? 0,
+        onSuccess: () {
+          LoadingUtils.show(data: "记录成功!");
+          _requestDcInterfaceData(selectedDeviceDetailPowerBox!);
+        });
+  }
+
+  //请求电源箱接口信息
+  void _requestDcInterfaceData(DeviceDetailPowerBoxData a) {
+    HttpQuery.share.homePageService.deviceDetailPowerBox(
+        deviceCode: a.deviceCode ?? "",
+        onSuccess: (data) {
+          selectedDeviceDetailPowerBox = a;
+          selectedDeviceDetailPowerBox?.dcInterfaces = data?.dcInterfaces ?? [];
+          notifyListeners();
+        });
+  }
+}

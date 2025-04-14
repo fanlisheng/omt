@@ -64,6 +64,10 @@ DeviceDetailExchangeData $DeviceDetailExchangeDataFromJson(
   if (nodeId != null) {
     deviceDetailExchangeData.nodeId = nodeId;
   }
+  final String? instanceId = jsonConvert.convert<String>(json['instance_id']);
+  if (instanceId != null) {
+    deviceDetailExchangeData.instanceId = instanceId;
+  }
   return deviceDetailExchangeData;
 }
 
@@ -78,6 +82,7 @@ Map<String, dynamic> $DeviceDetailExchangeDataToJson(
   data['interface_num'] = entity.interfaceNum;
   data['power_method'] = entity.powerMethod;
   data['node_id'] = entity.nodeId;
+  data['instance_id'] = entity.instanceId;
   return data;
 }
 
@@ -91,6 +96,7 @@ extension DeviceDetailExchangeDataExtension on DeviceDetailExchangeData {
     int? interfaceNum,
     String? powerMethod,
     String? nodeId,
+    String? instanceId,
   }) {
     return DeviceDetailExchangeData()
       ..instanceName = instanceName ?? this.instanceName
@@ -100,6 +106,7 @@ extension DeviceDetailExchangeDataExtension on DeviceDetailExchangeData {
       ..deviceCode = deviceCode ?? this.deviceCode
       ..interfaceNum = interfaceNum ?? this.interfaceNum
       ..powerMethod = powerMethod ?? this.powerMethod
-      ..nodeId = nodeId ?? this.nodeId;
+      ..nodeId = nodeId ?? this.nodeId
+      ..instanceId = instanceId ?? this.instanceId;
   }
 }

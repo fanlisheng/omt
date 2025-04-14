@@ -15,9 +15,10 @@ import '../view_models/detail_nvr_viewmodel.dart';
 import 'detail_ai_view.dart';
 
 class DetailNvrView extends StatelessWidget {
-  final String nodeCode;
+  final String nodeId;
+  final Function(bool) onChange;
 
-  const DetailNvrView({super.key, required this.nodeCode});
+  const DetailNvrView({super.key, required this.nodeId, required this.onChange});
 
   // AddNvrViewModel model;
   // AddNvrView(this.model, {super.key});
@@ -25,7 +26,7 @@ class DetailNvrView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<DetailNvrViewModel>(
-        model: DetailNvrViewModel(nodeCode)..themeNotifier = true,
+        model: DetailNvrViewModel(nodeId, onChange: onChange)..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model1, child) {
           return nvrView(model1);
@@ -166,6 +167,86 @@ class DetailNvrView extends StatelessWidget {
               ),
             ),
           ),
+
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Clickable(
+                child: Container(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: ColorUtils.colorGreen,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Text(
+                    "修改信息",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: ColorUtils.colorWhite,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                onTap: () {
+                  model.editAction();
+                },
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              Clickable(
+                child: Container(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: "#2F94DD".toColor(),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Text(
+                    "替换设备",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: ColorUtils.colorWhite,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                onTap: () {
+                  model.replaceAction();
+                },
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              Clickable(
+                child: Container(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: ColorUtils.colorRed,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Text(
+                    "拆除设备",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: ColorUtils.colorWhite,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                onTap: () {
+                  model.removeAction();
+                },
+              ),
+              const SizedBox(
+                width: 16,
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
         ],
       ),
     );

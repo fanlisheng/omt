@@ -590,7 +590,8 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
                               next.type == OnePictureType.GDSB.index))
                       ? ColorUtils.transparent
                       : opd.lineColor.toColor(),
-                arrowTitle: next.showName == true ? next.showNameText(arrow: true) : '',
+                arrowTitle:
+                    next.showName == true ? next.showNameText(arrow: true) : '',
                 arrowTitleColor: ColorUtils.colorBlackLite.dark);
             doSetDataToGraph(graph, next, parentNode: nodeNext);
 
@@ -648,31 +649,37 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
           data?.type == OnePictureType.DC.index) {
         /// 电源未知
       }
-
       return;
     }
+    String nodeId = data?.id ?? "";
+
+    if (nodeId.isEmpty) return;
     DeviceType? type = DeviceUtils.getDeviceTypeFromInt(data?.type ?? 0);
-    String code = data?.nodeCode ?? "";
 
     if ((data?.type == OnePictureType.DC.index) ||
         (data?.type == OnePictureType.SD.index)) {
+      return;
+    }
+    if ((data?.type == OnePictureType.GDSB.index)) {
       type = DeviceType.power;
-      code = data?.parentNodeCode ?? "";
     }
 
-    if (code.isEmpty ||
-        type == null ||
+    if (type == null ||
         data?.type == OnePictureType.LYQ.index ||
         data?.type == OnePictureType.YXWL.index) {
-      //路由器不进去
-      return;
+      type = DeviceType.router;
     }
     DeviceDetailViewModel model = DeviceDetailViewModel(
       deviceType: type,
-      nodeCode: code,
+      nodeId: nodeId,
     );
     IntentUtils.share.push(context,
-        routeName: RouterPage.DeviceDetailScreen, data: {"data": model});
+        routeName: RouterPage.DeviceDetailScreen,
+        data: {"data": model})?.then((value) {
+      if (IntentUtils.share.isResultOk(value)) {
+        requestData();
+      }
+    });
   }
 
   void onTapItemNew(OnePictureDataData? data) {

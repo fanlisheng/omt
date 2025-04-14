@@ -19,6 +19,7 @@ class PhotoDetailScreenData {
   final int? page;
   final int? limit;
   final String? deviceCode;
+  final String? nodeId;
   final int? type;
   final List<String>? snapAts;
   final List<DeviceDetailCameraDataPhoto> photoData;
@@ -30,6 +31,7 @@ class PhotoDetailScreenData {
     this.page,
     this.limit,
     this.deviceCode,
+    this.nodeId,
     this.type,
     this.snapAts,
   });

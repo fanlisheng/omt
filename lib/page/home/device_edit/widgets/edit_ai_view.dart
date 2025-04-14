@@ -5,27 +5,33 @@ import 'package:kayo_package/mvvm/base/provider_widget.dart';
 import 'package:kayo_package/views/widget/base/clickable.dart';
 import 'package:kayo_package/views/widget/base/dash_line.dart';
 import 'package:omt/utils/color_utils.dart';
+import 'package:omt/widget/nav/dnavigation_view.dart';
 
 import '../../../../bean/home/home_page/device_detail_ai_entity.dart';
 import '../../../../bean/home/home_page/device_entity.dart';
 import '../../../../theme.dart';
 import '../../../../utils/device_utils.dart';
+import '../../../../utils/intent_utils.dart';
 import '../../device_detail/widgets/detail_ai_view.dart';
 import '../view_models/edit_ai_viewmodel.dart';
 import '../../device_add/widgets/ai_search_view.dart';
 
 class EditAiView extends StatelessWidget {
-  final EditAiViewModel model;
+  final DeviceDetailAiData model;
 
   const EditAiView({super.key, required this.model});
 
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<EditAiViewModel>(
-        model: model..themeNotifier = true,
+        model: EditAiViewModel(model)..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
-          return aiView(model, context);
+          return DHeaderPage(
+            title: "替换AI设备",
+            titlePath: "首页 / AI设备 / ",
+            content: aiView(model, context),
+          );
         });
   }
 
@@ -37,12 +43,15 @@ class EditAiView extends StatelessWidget {
           margin: const EdgeInsets.only(left: 16, right: 16),
           padding:
               const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),
-          color: ColorUtils.colorBackgroundLine,
+          decoration: BoxDecoration(
+            color: ColorUtils.colorBackgroundLine,
+            borderRadius: BorderRadius.circular(3),
+          ),
           width: double.infinity,
           child: Row(
             children: [
               const Text(
-                "编辑AI设备",
+                "替换AI设备",
                 style: TextStyle(
                   fontSize: 14,
                   color: ColorUtils.colorGreenLiteLite,
@@ -51,8 +60,8 @@ class EditAiView extends StatelessWidget {
               ),
               const ui.SizedBox(width: 10),
               Clickable(
-                onTap: (){
-                  showAiSearchDialog(context).then((ip){
+                onTap: () {
+                  showAiSearchDialog(context).then((ip) {
                     model.selectedAiIp = ip;
                     model.notifyListeners();
                   });
@@ -90,7 +99,10 @@ class EditAiView extends StatelessWidget {
                 margin: const EdgeInsets.only(left: 16, right: 16, bottom: 10),
                 padding: const EdgeInsets.only(
                     left: 16, right: 16, top: 16, bottom: 16),
-                color: ColorUtils.colorBackgroundLine,
+                decoration: BoxDecoration(
+                  color: ColorUtils.colorBackgroundLine,
+                  borderRadius: BorderRadius.circular(3),
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -234,20 +246,23 @@ class EditAiView extends StatelessWidget {
             }).toList(),
           ),
         ),
-        Container(
-          margin: const EdgeInsets.all(16),
-          child: Row(
+        if (model.aiDeviceList.isNotEmpty && (model.aiDeviceList.first.ip?.isNotEmpty ?? false)) ...[
+          Expanded(child: Container()),
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Clickable(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 38, vertical: 8),
+                  // width: 120,
+                  // height: 36,
                   decoration: BoxDecoration(
-                    color: ColorUtils.colorGreen,
+                    color: ColorUtils.colorRed,
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: const Text(
-                    "保存",
+                    "取消",
                     style: TextStyle(
                       fontSize: 14,
                       color: ColorUtils.colorWhite,
@@ -256,13 +271,36 @@ class EditAiView extends StatelessWidget {
                   ),
                 ),
                 onTap: () {
-                  model.saveAiDevice();
+                  IntentUtils.share.pop(model.context!);
+                },
+              ),
+              const SizedBox(width: 10),
+              Clickable(
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: AppTheme().color,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Text(
+                    "确认替换",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: ColorUtils.colorWhite,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                onTap: () {
+                  model.replaceAiDevice();
                 },
               ),
             ],
           ),
-        ),
+        ],
+        const SizedBox(height: 30),
       ],
     );
   }
-} 
+}

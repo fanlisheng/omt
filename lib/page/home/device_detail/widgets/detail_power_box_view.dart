@@ -15,14 +15,15 @@ import '../view_models/detail_power_box_viewmodel.dart';
 import 'detail_ai_view.dart';
 
 class DetailPowerBoxView extends StatelessWidget {
-  final String nodeCode;
+  final String nodeId;
+  final Function(bool) onChange;
 
-  const DetailPowerBoxView({super.key, required this.nodeCode});
+  const DetailPowerBoxView({super.key, required this.nodeId, required this.onChange});
 
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<DetailPowerBoxViewModel>(
-        model: DetailPowerBoxViewModel(nodeCode)..themeNotifier = true,
+        model: DetailPowerBoxViewModel(nodeId,onChange: onChange)..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
           return powerBoxView(model);
@@ -86,9 +87,12 @@ class DetailPowerBoxView extends StatelessWidget {
                 model.restartAction();
               },
               child: Container(
-                padding: const EdgeInsets.only(
-                    left: 25, right: 25, top: 6, bottom: 6),
-                color: AppTheme().color,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
+                decoration: BoxDecoration(
+                  color: ColorUtils.colorGreen,
+                  borderRadius: BorderRadius.circular(4),
+                ),
                 child: const Text(
                   "重启主程",
                   style: TextStyle(fontSize: 12, color: ColorUtils.colorWhite),
@@ -96,24 +100,97 @@ class DetailPowerBoxView extends StatelessWidget {
               ),
             ),
             const SizedBox(
-              width: 8,
+              width: 10,
             ),
             Clickable(
               onTap: () {
                 model.openDcAllAction();
               },
               child: Container(
-                padding: const EdgeInsets.only(
-                    left: 25, right: 25, top: 6, bottom: 6),
-                color: AppTheme().color,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
+                decoration: BoxDecoration(
+                  color: ColorUtils.colorGreen,
+                  borderRadius: BorderRadius.circular(4),
+                ),
                 child: const Text(
                   "打开所有DC",
                   style: TextStyle(fontSize: 12, color: ColorUtils.colorWhite),
                 ),
               ),
             ),
+            Expanded(child: Container()),
+            Clickable(
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
+                decoration: BoxDecoration(
+                  color: ColorUtils.colorGreen,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  "修改信息",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: ColorUtils.colorWhite,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              onTap: () {
+                model.editAction();
+              },
+            ),
             const SizedBox(
               width: 10,
+            ),
+            Clickable(
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
+                decoration: BoxDecoration(
+                  color: "#2F94DD".toColor(),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  "替换设备",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: ColorUtils.colorWhite,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              onTap: () {
+                model.replaceAction();
+              },
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            Clickable(
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
+                decoration: BoxDecoration(
+                  color: ColorUtils.colorRed,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  "拆除信息",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: ColorUtils.colorWhite,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              onTap: () {
+                model.removeAction();
+              },
+            ),
+            const SizedBox(
+              width: 16,
             ),
           ],
         ),
@@ -129,7 +206,7 @@ class DetailPowerBoxView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "电源${model.selectedPowerBoxCoding}箱信息",
+            "电源${model.deviceInfo.deviceCode ?? ""}箱信息",
             style: const TextStyle(
               fontSize: 14,
               color: ColorUtils.colorGreenLiteLite,
@@ -268,7 +345,7 @@ class DetailPowerBoxView extends StatelessWidget {
                       children: [
                         OutlinedButton(
                           onPressed: () {
-                            model.changeDeviceStateAction(info);
+                            model.openDcAction(info);
                           },
                           style: ButtonStyle(
                             padding: const WidgetStatePropertyAll(
@@ -294,7 +371,7 @@ class DetailPowerBoxView extends StatelessWidget {
                         ),
                         OutlinedButton(
                           onPressed: () {
-                            model.openDcAction(info);
+                            model.recordDeviceAction(info);
                           },
                           style: ButtonStyle(
                             padding: const WidgetStatePropertyAll(

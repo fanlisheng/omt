@@ -5,15 +5,18 @@ import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
 import '../../../../bean/home/home_page/device_detail_power_box_entity.dart';
 import '../../../../bean/home/home_page/device_entity.dart';
 import '../../../../http/http_query.dart';
+import '../../../../router_utils.dart';
+import '../../../../utils/intent_utils.dart';
+import '../../../remove/widgets/remove_dialog_page.dart';
 import '../../device_add/view_models/device_add_viewmodel.dart';
+import '../../device_add/widgets/power_box_bind_device_dialog_page.dart';
 
 class DetailPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
-  final String nodeCode;
+  final String nodeId;
+  final Function(bool) onChange;
+  bool isChange = false;
 
-  DetailPowerBoxViewModel(this.nodeCode);
-
-  String selectedPowerBoxCoding = "";
-  List powerBoxCodingList = ["1", "2"];
+  DetailPowerBoxViewModel(this.nodeId, {required this.onChange});
 
   bool isPowerBoxNeeded = false;
 
@@ -29,7 +32,7 @@ class DetailPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
 
   void _requestData() {
     HttpQuery.share.homePageService.deviceDetailPowerBox(
-        nodeCode: nodeCode,
+        nodeId: nodeId,
         onSuccess: (DeviceDetailPowerBoxData? a) {
           deviceInfo = a ?? DeviceDetailPowerBoxData();
           notifyListeners();
@@ -47,9 +50,6 @@ class DetailPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   //
-  changeDeviceStateAction(info) {
-    notifyListeners();
-  }
 
   restartAction() {
     HttpQuery.share.homePageService.restartPowerBox(
@@ -86,5 +86,58 @@ class DetailPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
           LoadingUtils.show(data: "${(a.statusText == "打开") ? "关闭" : "打开"}成功!");
           _requestData();
         });
+  }
+
+  //记录 （绑定设备）
+  void recordDeviceAction(DeviceDetailPowerBoxDataDcInterfaces a) {
+    PowerBoxBindDeviceDialogPage.showAndSubmit(
+        context: context!,
+        deviceCode: deviceInfo.deviceCode ?? "",
+        dcId: a.id ?? 0,
+        onSuccess: () {
+          LoadingUtils.show(data: "记录成功!");
+          _requestData();
+        });
+  }
+
+  //修改
+  editAction() {
+    // IntentUtils.share
+    //     .push(context!, routeName: RouterPage.EditPowerBoxPage, data: {
+    //   "data": deviceInfo,
+    // })?.then((value) {
+    //   if (IntentUtils.share.isResultOk(value)) {
+    //     isChange = true;
+    //     onChange(isChange);
+    //     _requestData();
+    //   }
+    // });
+  }
+
+  //替换
+  replaceAction() {
+    IntentUtils.share
+        .push(context!, routeName: RouterPage.EditPowerBoxPage, data: {
+      "data": deviceInfo,
+      "isReplace": true,
+    })?.then((value) {
+      if (IntentUtils.share.isResultOk(value)) {
+        isChange = true;
+        onChange(isChange);
+        _requestData();
+      }
+    });
+  }
+
+  //删除
+  removeAction() {
+    RemoveDialogPage.showAndSubmit(
+      context: context!,
+      instanceId: deviceInfo.instanceId ?? "",
+      removeIds: [(deviceInfo.nodeId ?? "0").toInt()],
+      onSuccess: () {
+        IntentUtils.share.popResultOk(context!);
+      },
+    );
   }
 }

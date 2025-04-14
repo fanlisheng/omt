@@ -20,13 +20,16 @@ import '../view_models/photo_preview_viewmodel.dart';
 
 class PhotoPreviewScreenData {
   final String deviceCode;
+  String? nodeId;
   DeviceDetailCameraDataPhoto? dayBasicPhoto;
   DeviceDetailCameraDataPhoto? nightBasicPhoto;
 
-  PhotoPreviewScreenData(
-      {required this.deviceCode,
-      required this.dayBasicPhoto,
-      required this.nightBasicPhoto});
+  PhotoPreviewScreenData({
+    required this.deviceCode,
+    required this.dayBasicPhoto,
+    required this.nightBasicPhoto,
+    this.nodeId,
+  });
 }
 
 class PhotoPreviewScreen extends StatelessWidget {

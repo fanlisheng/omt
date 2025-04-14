@@ -6,6 +6,7 @@ import 'package:omt/page/home/device_detail/widgets/device_detail_screen.dart';
 import 'package:omt/page/home/device_edit/widgets/edit_ai_view.dart';
 import 'package:omt/page/home/device_edit/widgets/edit_battery_exchange_view.dart';
 import 'package:omt/page/home/device_edit/widgets/edit_camera_view.dart';
+import 'package:omt/page/home/device_edit/widgets/edit_nvr_view.dart';
 import 'package:omt/page/home/device_edit/widgets/edit_power_box_view.dart';
 import 'package:omt/page/home/device_edit/widgets/edit_power_view.dart';
 import 'package:omt/page/home/device_edit/widgets/edit_router_view.dart';
@@ -261,8 +262,9 @@ Route<dynamic> generateRoute(RouteSettings settings, {uniqueId}) {
       return CupertinoPageRoute(
           settings: settings,
           builder: (context) {
-            return EditCameraView(
+            return EditNvrView(
               model: arguments["data"],
+              isReplace: arguments["isReplace"],
             );
           });
 
@@ -272,6 +274,7 @@ Route<dynamic> generateRoute(RouteSettings settings, {uniqueId}) {
           builder: (context) {
             return EditPowerBoxView(
               model: arguments["data"],
+              isReplace: arguments["isReplace"],
             );
           });
 

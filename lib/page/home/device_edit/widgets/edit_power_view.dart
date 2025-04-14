@@ -5,11 +5,15 @@ import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/utils/color_utils.dart';
 import 'package:omt/widget/checkbox.dart';
 import '../../../../bean/common/id_name_value.dart';
+import '../../../../bean/home/home_page/device_detail_power_entity.dart';
+import '../../../../theme.dart';
+import '../../../../utils/intent_utils.dart';
+import '../../../../widget/nav/dnavigation_view.dart';
 import '../view_models/edit_power_viewmodel.dart';
 import '../../device_add/widgets/add_camera_view.dart';
 
 class EditPowerView extends StatefulWidget {
-  final EditPowerViewModel model;
+  final DeviceDetailPowerData model;
 
   const EditPowerView({super.key, required this.model});
 
@@ -21,10 +25,14 @@ class _EditPowerViewState extends State<EditPowerView> {
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<EditPowerViewModel>(
-        model: widget.model..themeNotifier = true,
+        model: EditPowerViewModel(widget.model)..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
-          return contentView(widget.model);
+          return DHeaderPage(
+            title: "编辑电源信息",
+            titlePath: "首页 / 电源 / ",
+            content: contentView(model),
+          );
         });
   }
 
@@ -35,7 +43,10 @@ class _EditPowerViewState extends State<EditPowerView> {
         Container(
           margin: const EdgeInsets.only(left: 16, right: 16),
           padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-          color: ColorUtils.colorBackgroundLine,
+          decoration: BoxDecoration(
+            color: ColorUtils.colorBackgroundLine,
+            borderRadius: BorderRadius.circular(3),
+          ),
           width: double.infinity,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -199,35 +210,59 @@ class _EditPowerViewState extends State<EditPowerView> {
             ],
           ),
         ),
-        Container(
-          margin: const EdgeInsets.all(16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Clickable(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: ColorUtils.colorGreen,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: const Text(
-                    "保存",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: ColorUtils.colorWhite,
-                      fontWeight: FontWeight.w500,
-                    ),
+        Expanded(child: Container()),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Clickable(
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 38, vertical: 8),
+                // width: 120,
+                // height: 36,
+                decoration: BoxDecoration(
+                  color: ColorUtils.colorRed,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  "取消",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: ColorUtils.colorWhite,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                onTap: () {
-                  model.savePowerEdit();
-                },
               ),
-            ],
-          ),
+              onTap: () {
+                IntentUtils.share.pop(model.context!);
+              },
+            ),
+            const SizedBox(width: 10),
+            Clickable(
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 38, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppTheme().color,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  "确认",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: ColorUtils.colorWhite,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              onTap: () {
+                model.savePowerEdit();
+              },
+            ),
+          ],
         ),
+        const SizedBox(height: 30),
       ],
     );
   }
-} 
+}

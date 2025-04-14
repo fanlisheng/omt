@@ -38,7 +38,10 @@ class AddAiView extends StatelessWidget {
           margin: const EdgeInsets.only(left: 16, right: 16),
           padding:
               const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),
-          color: ColorUtils.colorBackgroundLine,
+          decoration: BoxDecoration(
+            color: ColorUtils.colorBackgroundLine,
+            borderRadius: BorderRadius.circular(3),
+          ),
           width: double.infinity,
           child: Row(
             children: [
@@ -91,7 +94,10 @@ class AddAiView extends StatelessWidget {
                 margin: const EdgeInsets.only(left: 16, right: 16, bottom: 10),
                 padding: const EdgeInsets.only(
                     left: 16, right: 16, top: 16, bottom: 16),
-                color: ColorUtils.colorBackgroundLine,
+                decoration: BoxDecoration(
+                  color: ColorUtils.colorBackgroundLine,
+                  borderRadius: BorderRadius.circular(3),
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

@@ -5,17 +5,15 @@ import 'package:omt/bean/common/id_name_value.dart';
 
 import '../../../../bean/home/home_page/device_detail_exchange_entity.dart';
 import '../../../../http/http_query.dart';
+import '../../../../utils/intent_utils.dart';
 
 class EditBatteryExchangeViewModel extends BaseViewModelRefresh<dynamic> {
-  final String pNodeCode;
   final DeviceDetailExchangeData deviceInfo;
   final bool isBattery;
 
-  EditBatteryExchangeViewModel(this.pNodeCode, this.deviceInfo,
-      {this.isBattery = false});
+  EditBatteryExchangeViewModel(this.deviceInfo, {this.isBattery = false});
 
   // ===== 电池/交换机相关属性 =====
-  bool isCapacity80 = true;
   List<String> portNumber = ["5", "8"];
   String? selectedPortNumber;
   List<String> supplyMethod = ["POE", "DC", "AC"];
@@ -27,6 +25,24 @@ class EditBatteryExchangeViewModel extends BaseViewModelRefresh<dynamic> {
   void initState() {
     super.initState();
     // 初始化数据
+
+    selectedPortNumber = deviceInfo.interfaceNum?.toString();
+    selectedSupplyMethod = deviceInfo.powerMethod;
+
+    // 初始化进/出口列表
+    HttpQuery.share.homePageService.getInOutList(
+      onSuccess: (List<IdNameValue>? data) {
+        inOutList = data ?? [];
+        // 设置选中的进出口
+        for (var entry in inOutList) {
+          if (entry.name == deviceInfo.passName) {
+            selectedInOut = entry;
+            break;
+          }
+        }
+        notifyListeners();
+      },
+    );
   }
 
   @override
@@ -51,21 +67,14 @@ class EditBatteryExchangeViewModel extends BaseViewModelRefresh<dynamic> {
       return;
     }
 
-    LoadingUtils.show(data: "保存中...");
-
     HttpQuery.share.homePageService.editSwitch(
         nodeId: int.parse(deviceInfo.nodeId ?? "0"),
         passId: selectedInOut!.id ?? 0,
         interfaceNum: int.parse(selectedPortNumber!),
         powerMethod: selectedSupplyMethod!,
         onSuccess: (result) {
-          LoadingUtils.dismiss();
-          LoadingUtils.showToast(data: "编辑保存成功");
-
-          // 更新后退出
-          if (context != null) {
-            Navigator.of(context!).pop(true);
-          }
+          LoadingUtils.showToast(data: "修改信息成功");
+          IntentUtils.share.popResultOk(context!);
         },
         onError: (error) {
           LoadingUtils.dismiss();
@@ -88,6 +97,6 @@ class EditBatteryExchangeViewModel extends BaseViewModelRefresh<dynamic> {
     // 例如：HttpQuery.share.editService.editBattery(...)
 
     LoadingUtils.dismiss();
-    LoadingUtils.showToast(data: "编辑保存成功");
+    LoadingUtils.showToast(data: "修改信息成功");
   }
 }

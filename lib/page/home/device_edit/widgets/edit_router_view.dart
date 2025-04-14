@@ -6,22 +6,30 @@ import 'package:kayo_package/extension/_index_extension.dart';
 import 'package:kayo_package/mvvm/base/provider_widget.dart';
 import 'package:kayo_package/views/widget/base/clickable.dart';
 import 'package:kayo_package/views/widget/base/dash_line.dart';
+import 'package:omt/theme.dart';
 import 'package:omt/utils/color_utils.dart';
+import 'package:omt/utils/intent_utils.dart';
 import '../../../../bean/common/id_name_value.dart';
+import '../../../../bean/home/home_page/device_detail_router_entity_entity.dart';
+import '../../../../widget/nav/dnavigation_view.dart';
 import '../view_models/edit_router_viewmodel.dart';
 
 class EditRouterView extends StatelessWidget {
-  final EditRouterViewModel model;
+  final DeviceDetailRouterData model;
 
   const EditRouterView({super.key, required this.model});
 
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<EditRouterViewModel>(
-        model: model..themeNotifier = true,
+        model: EditRouterViewModel(model)..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
-          return routerView(model);
+          return DHeaderPage(
+            title: "修改信息",
+            titlePath: "首页 / 路由器 / ",
+            content: routerView(model),
+          );
         });
   }
 
@@ -220,59 +228,58 @@ class EditRouterView extends StatelessWidget {
             ],
           ),
         ),
-        Container(
-          margin: const EdgeInsets.all(16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Clickable(
-                child: Container(
-                  // padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
-                  width: 120,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: ColorUtils.colorGreen,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: const Text(
-                    "取消",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: ColorUtils.colorWhite,
-                      fontWeight: FontWeight.w500,
-                    ),
+        Expanded(child: Container()),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Clickable(
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 38, vertical: 8),
+                // width: 120,
+                // height: 36,
+                decoration: BoxDecoration(
+                  color: ColorUtils.colorRed,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  "取消",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: ColorUtils.colorWhite,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                onTap: () {
-                  model.saveRouterEdit();
-                },
               ),
-              const SizedBox(width: 10),
-              Clickable(
-                child: Container(
-                  // padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
-                  width: 120,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: ColorUtils.colorGreen,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: const Text(
-                    "确认修改",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: ColorUtils.colorWhite,
-                      fontWeight: FontWeight.w500,
-                    ),
+              onTap: () {
+                IntentUtils.share.pop(model.context!);
+              },
+            ),
+            const SizedBox(width: 10),
+            Clickable(
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 38, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppTheme().color,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  "确认",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: ColorUtils.colorWhite,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                onTap: () {
-                  model.saveRouterEdit();
-                },
               ),
-            ],
-          ),
+              onTap: () {
+                model.saveRouterEdit();
+              },
+            ),
+          ],
         ),
+        const SizedBox(height: 30),
       ],
     );
   }

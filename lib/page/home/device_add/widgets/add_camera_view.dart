@@ -62,7 +62,7 @@ class AddCameraView extends StatelessWidget {
             CameraDeviceEntity e = model.cameraDeviceList[index];
             double height = 194;
             if ((e.rtsp ?? "").isNotEmpty) {
-              height = 237;
+              height = 248;
               if (e.isOpen == true) {
                 height = 990;
               }
@@ -92,33 +92,33 @@ class AddCameraView extends StatelessWidget {
                             ),
                           ),
                         ),
-                        Button(
-                          onPressed: () {
-                            model.deleteCameraAction(index);
-                          },
-                          child: Row(
-                            children: [
-                              ImageView(
-                                src: source(
-                                  "home/ic_camera_delete",
-                                ),
-                                width: 10,
-                                height: 18,
-                                color: ColorUtils.colorRed,
-                              ),
-                              const SizedBox(
-                                width: 4,
-                              ),
-                              const Text(
-                                "删除设备",
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: ColorUtils.colorRed,
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
+                        // Button(
+                        //   onPressed: () {
+                        //     model.deleteCameraAction(index);
+                        //   },
+                        //   child: Row(
+                        //     children: [
+                        //       ImageView(
+                        //         src: source(
+                        //           "home/ic_camera_delete",
+                        //         ),
+                        //         width: 10,
+                        //         height: 18,
+                        //         color: ColorUtils.colorRed,
+                        //       ),
+                        //       const SizedBox(
+                        //         width: 4,
+                        //       ),
+                        //       const Text(
+                        //         "删除设备",
+                        //         style: TextStyle(
+                        //           fontSize: 12,
+                        //           color: ColorUtils.colorRed,
+                        //         ),
+                        //       )
+                        //     ],
+                        //   ),
+                        // ),
                         const SizedBox(width: 10),
                         Button(
                             child: Row(
@@ -144,7 +144,7 @@ class AddCameraView extends StatelessWidget {
                               ],
                             ),
                             onPressed: () {
-                              model.editCameraAction(index);
+                              model.editCameraAction(e);
                             }),
                       ],
                     ),
@@ -178,7 +178,7 @@ class AddCameraView extends StatelessWidget {
                             const SizedBox(height: 8),
                             ComboBox<DeviceDetailAiData>(
                               isExpanded: true,
-                              value: model.selectedAi,
+                              value: e.selectedAi,
                               items: model.aiDeviceList
                                   .map<ComboBoxItem<DeviceDetailAiData>>((e) {
                                 return ComboBoxItem<DeviceDetailAiData>(
@@ -192,10 +192,12 @@ class AddCameraView extends StatelessWidget {
                                   ),
                                 );
                               }).toList(),
-                              onChanged: (a) {
-                                model.selectedAi = a!;
-                                model.notifyListeners();
-                              },
+                              onChanged: e.readOnly
+                                  ? null
+                                  : (a) {
+                                      e.selectedAi = a!;
+                                      model.notifyListeners();
+                                    },
                               placeholder: const Text(
                                 "请选择已添加AI设备IP",
                                 textAlign: TextAlign.start,
@@ -540,13 +542,15 @@ class AddCameraView extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(3),
                                   ),
                                   child: const Text(
-                                    "完成",
+                                    "添加完成",
                                     style: TextStyle(
                                         fontSize: 12,
                                         color: ColorUtils.colorWhite),
                                   ),
                                 ),
                                 onTap: () {
+                                  // e.readOnly = true;
+                                  // model.notifyListeners();
                                   showConfirmDialog(context, e);
                                   // model.completeCameraAction(e);
                                 },
@@ -608,6 +612,27 @@ class AddCameraView extends StatelessWidget {
             );
           }).toList(),
         )),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            const SizedBox(width: 16),
+            Clickable(
+              child: Text(
+                "+继续添加",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: AppTheme().color,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              onTap: () {
+                model.cameraDeviceList.add(CameraDeviceEntity());
+                model.notifyListeners();
+              },
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
       ],
     );
   }

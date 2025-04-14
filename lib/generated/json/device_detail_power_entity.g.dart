@@ -48,7 +48,8 @@ DeviceDetailPowerData $DeviceDetailPowerDataFromJson(
   if (labelName != null) {
     deviceDetailPowerData.labelName = labelName;
   }
-  final String? powerType = jsonConvert.convert<String>(json['power_type']);
+  final List<int>? powerType = (json['power_type'] as List<dynamic>?)?.map(
+          (e) => jsonConvert.convert<int>(e) as int).toList();
   if (powerType != null) {
     deviceDetailPowerData.powerType = powerType;
   }
@@ -60,6 +61,16 @@ DeviceDetailPowerData $DeviceDetailPowerDataFromJson(
   final String? nodeId = jsonConvert.convert<String>(json['node_id']);
   if (nodeId != null) {
     deviceDetailPowerData.nodeId = nodeId;
+  }
+  final String? instanceId = jsonConvert.convert<String>(json['instance_id']);
+  if (instanceId != null) {
+    deviceDetailPowerData.instanceId = instanceId;
+  }
+  final List<String>? powerTypeText = (json['power_type_text'] as List<
+      dynamic>?)?.map(
+          (e) => jsonConvert.convert<String>(e) as String).toList();
+  if (powerTypeText != null) {
+    deviceDetailPowerData.powerTypeText = powerTypeText;
   }
   return deviceDetailPowerData;
 }
@@ -74,6 +85,8 @@ Map<String, dynamic> $DeviceDetailPowerDataToJson(
   data['power_type'] = entity.powerType;
   data['battery_capacity'] = entity.batteryCapacity;
   data['node_id'] = entity.nodeId;
+  data['instance_id'] = entity.instanceId;
+  data['power_type_text'] = entity.powerTypeText;
   return data;
 }
 
@@ -83,9 +96,11 @@ extension DeviceDetailPowerDataExtension on DeviceDetailPowerData {
     String? gateName,
     String? passName,
     String? labelName,
-    String? powerType,
+    List<int>? powerType,
     int? batteryCapacity,
     String? nodeId,
+    String? instanceId,
+    List<String>? powerTypeText,
   }) {
     return DeviceDetailPowerData()
       ..instanceName = instanceName ?? this.instanceName
@@ -94,6 +109,8 @@ extension DeviceDetailPowerDataExtension on DeviceDetailPowerData {
       ..labelName = labelName ?? this.labelName
       ..powerType = powerType ?? this.powerType
       ..batteryCapacity = batteryCapacity ?? this.batteryCapacity
-      ..nodeId = nodeId ?? this.nodeId;
+      ..nodeId = nodeId ?? this.nodeId
+      ..instanceId = instanceId ?? this.instanceId
+      ..powerTypeText = powerTypeText ?? this.powerTypeText;
   }
 }
