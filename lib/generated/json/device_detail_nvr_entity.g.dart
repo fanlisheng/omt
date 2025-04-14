@@ -71,6 +71,10 @@ DeviceDetailNvrData $DeviceDetailNvrDataFromJson(Map<String, dynamic> json) {
   if (nodeId != null) {
     deviceDetailNvrData.nodeId = nodeId;
   }
+  final String? instanceId = jsonConvert.convert<String>(json['instance_id']);
+  if (instanceId != null) {
+    deviceDetailNvrData.instanceId = instanceId;
+  }
   return deviceDetailNvrData;
 }
 
@@ -85,6 +89,7 @@ Map<String, dynamic> $DeviceDetailNvrDataToJson(DeviceDetailNvrData entity) {
   data['mac'] = entity.mac;
   data['channels'] = entity.channels?.map((v) => v.toJson()).toList();
   data['node_id'] = entity.nodeId;
+  data['instance_id'] = entity.instanceId;
   return data;
 }
 
@@ -99,6 +104,7 @@ extension DeviceDetailNvrDataExtension on DeviceDetailNvrData {
     String? mac,
     List<DeviceDetailNvrDataChannels>? channels,
     String? nodeId,
+    String? instanceId,
   }) {
     return DeviceDetailNvrData()
       ..instanceName = instanceName ?? this.instanceName
@@ -109,7 +115,8 @@ extension DeviceDetailNvrDataExtension on DeviceDetailNvrData {
       ..ip = ip ?? this.ip
       ..mac = mac ?? this.mac
       ..channels = channels ?? this.channels
-      ..nodeId = nodeId ?? this.nodeId;
+      ..nodeId = nodeId ?? this.nodeId
+      ..instanceId = instanceId ?? this.instanceId;
   }
 }
 

@@ -60,6 +60,9 @@ class OnePictureDataData {
   String? nodeCode;
   List<String>? fault;
 
+  String? idParent;
+  String? nodeCodeParent;
+
   int? type;
   @JSONField(name: 'type_text')
   String? typeText;
@@ -118,18 +121,18 @@ class OnePictureDataData {
     }
   }
 
-  String? get parentNodeCode {
-    if (nodeCode != null && nodeCode!.contains('-')) {
-      var split = nodeCode!.split('-');
-      split.removeLast();
-      if (split.length > 1) {
-        return split.join('-');
-      } else {
-        return '';
-      }
-    }
-    return '';
-  }
+  // String? get parentNodeCode {
+  //   if (nodeCode != null && nodeCode!.contains('#')) {
+  //     var split = nodeCode!.split('#');
+  //     split.removeLast();
+  //     if (split.length > 1) {
+  //       return split.join('#');
+  //     } else {
+  //       return '';
+  //     }
+  //   }
+  //   return '';
+  // }
 
   bool get showAddBtnDM {
     if (type == OnePictureType.DM.index &&
