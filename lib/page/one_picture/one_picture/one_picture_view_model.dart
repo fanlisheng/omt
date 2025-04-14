@@ -549,21 +549,50 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
           if (dyx.isNotEmpty) {
             opd.children[0].nextList.addAll(dyx);
             _powerSub(opd.children[0].nextList[0],
-                jck: jck, lyq: lyq, nvr: nvr, jhj: jhj, yxwl: yxwl);
+                jck: jck,
+                lyq: lyq,
+                nvr: nvr,
+                jhj: jhj,
+                yxwl: yxwl,
+                aisb: aisb,
+                sxt: sxt);
           } else {
             _powerSub(opd.children[0],
-                jck: jck, lyq: lyq, nvr: nvr, jhj: jhj, yxwl: yxwl);
+                jck: jck,
+                lyq: lyq,
+                nvr: nvr,
+                jhj: jhj,
+                yxwl: yxwl,
+                aisb: aisb,
+                sxt: sxt);
           }
         } else if (dyx.isNotEmpty) {
           opd.children = dyx;
           _powerSub(opd.children[0],
-              jck: jckf == null ? [] : [jckf], lyq: lyq, yxwl: yxwl, jhj: jhj);
+              jck: jck.isEmpty && opd.type == OnePictureType.JCK.index
+                  ? jckf == null
+                      ? []
+                      : [jckf]
+                  : jck,
+              lyq: lyq,
+              yxwl: yxwl,
+              jhj: jhj,
+              aisb: aisb,
+              sxt: sxt);
         } else {
           if (jckf != null) {
             opd.children.add(jckf);
+          } else if (opd.type == OnePictureType.JCK.index) {
+            opd.children.addAll(jck);
           }
           if (lyq.isNotEmpty) {
             opd.children.addAll(lyq);
+          }
+          if (aisb.isNotEmpty) {
+            opd.children.addAll(aisb);
+          }
+          if (sxt.isNotEmpty) {
+            opd.children.addAll(sxt);
           }
 
           if (jhj.isNotEmpty) {
@@ -727,7 +756,8 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
       List<OnePictureDataData>? nvr,
       List<OnePictureDataData>? jhj,
       List<OnePictureDataData>? yxwl,
-      List<OnePictureDataData>? aisb}) {
+      List<OnePictureDataData>? aisb,
+      List<OnePictureDataData>? sxt}) {
     if (jck?.isNotEmpty == true) {
       // opd.nextList.addAll(jck!);
       opd.nextList.insert(0, jck![0]);
@@ -738,6 +768,9 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
     }
     if (aisb?.isNotEmpty == true) {
       opd.nextList.addAll(aisb!);
+    }
+    if (sxt?.isNotEmpty == true) {
+      opd.nextList.addAll(sxt!);
     }
     if (jhj?.isNotEmpty == true) {
       if (jhj!.length > 1) {
