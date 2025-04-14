@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -18,6 +19,8 @@ import '../../../../bean/home/home_page/device_detail_nvr_entity.dart';
 import '../../../../bean/home/home_page/device_detail_power_box_entity.dart';
 import '../../../../bean/home/home_page/device_detail_power_entity.dart';
 import '../../../../bean/home/home_page/device_unbound_entity.dart';
+import '../../../../bean/video/video_configuration/Video_Connect_entity.dart';
+import '../../../../utils/json_utils.dart';
 
 // import 'package:omt/utils/shared_utils.dart';
 
@@ -110,6 +113,10 @@ class HomePageService {
   get _replaceNvr => '${API.share.host}api/device/nvr/replace';
 
   get _replacePowerBox => '${API.share.host}api/device/power_box/replace';
+
+  //_configAi
+  get _configAi async =>
+      '${await API.share.hostVideoConfiguration}/webcam/save';
 
   getInstanceList(
     String areaCode, {
@@ -898,6 +905,31 @@ class HomePageService {
       onError: onError,
     );
   }
+
+  Future<bool> configAi({
+    required VideoInfoCamEntity? data,
+    ValueChanged<dynamic>? onCache,
+  }) async {
+    final completer = Completer<bool>();
+
+    await HttpManager.share.doHttpPost<dynamic>(
+      await _configAi,
+      await JsonUtils.getMap(data.toJson2()),
+      method: 'post',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: (result) {
+        completer.complete(true); // 返回 true 表示成功
+      },
+      onCache: onCache,
+      onError: (error) {
+        completer.complete(false); // 返回 false 表示失败
+      },
+    );
+
+    return completer.future;
+  }
+
 //
 // detail(
 //   Map map, {

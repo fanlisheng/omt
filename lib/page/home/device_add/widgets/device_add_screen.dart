@@ -31,8 +31,7 @@ class DeviceAddScreen extends StatelessWidget {
         autoLoadData: true,
         builder: (context, model, child) {
           bool complete = (model.stepNumber == StepNumber.second &&
-                  model.deviceType != DeviceType.ai &&
-                  model.deviceType != DeviceType.camera) ||
+                  model.deviceType != DeviceType.aiAndCamera) ||
               (model.stepNumber == StepNumber.third);
           bool showTooltip = model.stepNumber == StepNumber.third;
           // bool showTooltip = true;
@@ -41,7 +40,7 @@ class DeviceAddScreen extends StatelessWidget {
             child: fu.ScaffoldPage(
               header: fu.PageHeader(
                 title: DNavigationView(
-                  title: "电源",
+                  title: "添加设备",
                   titlePass: "首页 / ",
                   rightWidget: Expanded(
                     child: Row(
@@ -208,8 +207,9 @@ class DeviceAddScreen extends StatelessWidget {
   Widget secondStepView(DeviceAddViewModel model) {
     switch (model.deviceType) {
       case DeviceType.ai:
-        return AddAiView(model: model.aiViewModel!);
       case DeviceType.camera:
+      case DeviceType.aiAndCamera:
+        return AddAiView(model: model.aiViewModel!);
         return AddAiView(model: model.aiViewModel!);
       // return AddCameraView(model: model.cameraViewModel!);
       case DeviceType.nvr:
@@ -234,6 +234,7 @@ class DeviceAddScreen extends StatelessWidget {
         return Container();
       case DeviceType.ai:
       case DeviceType.camera:
+      case DeviceType.aiAndCamera:
         if (model.stepNumber == StepNumber.third) {
           return AddCameraView(model: model.cameraViewModel!);
         } else if (model.stepNumber == StepNumber.four) {

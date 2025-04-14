@@ -7,6 +7,7 @@ import 'package:omt/http/http_query.dart';
 import 'package:omt/utils/device_utils.dart';
 import 'package:omt/utils/sys_utils.dart';
 import '../../search_device/services/device_search_service.dart';
+import '../widgets/ai_search_view.dart';
 
 class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
   final String pNodeCode;
@@ -18,7 +19,7 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
   List<TextEditingController> aiControllers = [TextEditingController()];
   bool isAiSearching = false;
   String? selectedAiIp;
-  List<DeviceEntity> aiSearchResults = [];
+  // List<DeviceEntity> aiSearchResults = [];
   bool stopAiScanning = false;
 
   @override
@@ -67,31 +68,35 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
 
   // 开始搜索AI设备
   void startAiSearch() async {
-    isAiSearching = true;
-    aiSearchResults.clear();
-    selectedAiIp = null;
-    notifyListeners();
-    // 扫描设备
-    List<DeviceEntity> searchDevices = await DeviceSearchService()
-        .scanDevices(shouldStop: _shouldStopAi, deviceType: "AI设备");
-    if (_shouldStopAi()) {
-      stopAiSearch();
-      return;
-    }
-    List<DeviceEntity> aiDevices =
-        searchDevices.where((device) => device.deviceType == 10).toList();
-    // 搜索完成后调用：
-    aiSearchResults = List.from(aiDevices); // 设置搜索结果
-    isAiSearching = false;
-    notifyListeners();
+    showAiSearchDialog(context!).then((ip) {
+      selectedAiIp = ip;
+      handleSelectedAiIp();
+    });
+    // isAiSearching = true;
+    // aiSearchResults.clear();
+    // selectedAiIp = null;
+    // notifyListeners();
+    // // 扫描设备
+    // List<DeviceEntity> searchDevices = await DeviceSearchService()
+    //     .scanDevices(shouldStop: _shouldStopAi, deviceType: "AI设备");
+    // if (_shouldStopAi()) {
+    //   stopAiSearch();
+    //   return;
+    // }
+    // List<DeviceEntity> aiDevices =
+    //     searchDevices.where((device) => device.deviceType == 10).toList();
+    // // 搜索完成后调用：
+    // aiSearchResults = List.from(aiDevices); // 设置搜索结果
+    // isAiSearching = false;
+    // notifyListeners();
   }
 
   // 停止搜索AI设备
-  void stopAiSearch() {
-    isAiSearching = false;
-    aiSearchResults = [];
-    notifyListeners();
-  }
+  // void stopAiSearch() {
+  //   isAiSearching = false;
+  //   // aiSearchResults = [];
+  //   notifyListeners();
+  // }
 
   // 处理选中的AI设备IP
   void handleSelectedAiIp() {
@@ -112,9 +117,9 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   // 定义一个停止条件的回调函数
-  bool _shouldStopAi() {
-    return stopAiScanning; // 当 stopAiScanning 为 true 时停止
-  }
+  // bool _shouldStopAi() {
+  //   return stopAiScanning; // 当 stopAiScanning 为 true 时停止
+  // }
 
   @override
   loadData(

@@ -188,7 +188,7 @@ class _EditPowerViewState extends State<EditPowerView> {
                         children: [
                           FCheckbox(
                             checked: model.isCapacity80,
-                            label: '80',
+                            label: '80AH',
                             onChanged: (isChecked) {
                               model.isCapacity80 = isChecked;
                               model.notifyListeners();
@@ -196,7 +196,7 @@ class _EditPowerViewState extends State<EditPowerView> {
                           ),
                           FCheckbox(
                             checked: !model.isCapacity80,
-                            label: '160',
+                            label: '160AH',
                             onChanged: (isChecked) {
                               model.isCapacity80 = !isChecked;
                               model.notifyListeners();

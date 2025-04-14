@@ -63,7 +63,9 @@ class EditAiView extends StatelessWidget {
                 onTap: () {
                   showAiSearchDialog(context).then((ip) {
                     model.selectedAiIp = ip;
-                    model.notifyListeners();
+                    model.startAiSearch();
+                    // model.selectedAiIp = ip;
+                    // model.notifyListeners();
                   });
                 },
                 child: Container(
