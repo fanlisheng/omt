@@ -45,6 +45,10 @@ class DeviceDetailAiData {
 	@JSONField(name: "node_id")
 	String? nodeId;
 	String? mac;
+	@JSONField(name: "is_program_latest")
+	bool? isProgramLatest;
+	@JSONField(name: "is_identity_latest")
+	bool? isIdentityLatest;
 
 	DeviceDetailAiData();
 

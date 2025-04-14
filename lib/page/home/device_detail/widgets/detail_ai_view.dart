@@ -92,17 +92,23 @@ class DetailAiView extends StatelessWidget {
                     RowItemInfoView(
                       name: "主程版本",
                       value: model.deviceInfo.programVersion,
-                      buttonName: "升级",
+                      buttonName: (model.deviceInfo.isProgramLatest == true)
+                          ? "升级"
+                          : "",
                       buttonAction: () {
-                        LogUtils.info(msg: "点击--主程版本-升级");
+                        // LogUtils.info(msg: "点击--主程版本-升级");
+                        model.upgradeProgramAction();
                       },
                     ),
                     RowItemInfoView(
                       name: "识别版本",
                       value: model.deviceInfo.identityVersion,
-                      buttonName: "升级",
+                      buttonName: (model.deviceInfo.isIdentityLatest == true)
+                          ? "升级"
+                          : "",
                       buttonAction: () {
-                        LogUtils.info(msg: "点击--识别版本-升级");
+                        // LogUtils.info(msg: "点击--识别版本-升级");
+                        model.upgradeIdentityAction();
                       },
                     ),
                   ],
