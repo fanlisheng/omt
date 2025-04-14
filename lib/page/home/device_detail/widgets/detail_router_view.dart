@@ -5,7 +5,6 @@ import 'package:omt/utils/color_utils.dart';
 import 'package:omt/widget/checkbox.dart';
 
 import '../view_models/detail_Router_viewmodel.dart';
-import '../view_models/detail_router_viewmodel.dart';
 import 'detail_ai_view.dart';
 
 class DetailRouterView extends StatelessWidget {

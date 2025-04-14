@@ -58,6 +58,7 @@ class OnePictureDataData {
   String? name;
   @JSONField(name: 'node_code')
   String? nodeCode;
+  List<String>? fault;
 
   int? type;
   @JSONField(name: 'type_text')
@@ -70,6 +71,10 @@ class OnePictureDataData {
   bool sameTypeData = false;
   bool ignore = false;
   bool unknown = false;
+
+  List<String> get faultList {
+    return fault ?? [];
+  }
 
   String? get theNodeId => '${type}_${id}';
 

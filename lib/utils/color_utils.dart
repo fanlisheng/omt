@@ -45,6 +45,7 @@ class ColorUtils {
   static const Color colorRedGradient = Color(0xFFFF6160);
   static const Color colorRedGradient2 = Color(0xFFFF8773);
   static const Color colorRedGradientStart = Color(0xFFFF5542);
+  static const Color colorRed2 = Color(0xFFFF5052);
   static const Color colorRedGradientEnd = Color(0xFFFF8C29);
 
   static const Color colorWhite = Color(0xFFFFFFFF);
