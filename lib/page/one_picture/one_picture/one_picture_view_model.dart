@@ -440,7 +440,25 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
   void setNextList(OnePictureDataData opd) {
     Map<int, List<OnePictureDataData>> typeMap = {};
     if (opd.children.isNotEmpty) {
+      if (opd.type == OnePictureType.GDSB.index) {
+        if (opd.children.isNotEmpty) {
+          for (var c in opd.children) {
+            c.idParent = opd.id;
+            c.nodeCodeParent = opd.nodeCode;
+          }
+        }
+      }
+
       for (var child in opd.children) {
+        if (child.type == OnePictureType.GDSB.index) {
+          if (child.children.isNotEmpty) {
+            for (var c in child.children) {
+              c.idParent = child.id;
+              c.nodeCodeParent = child.nodeCode;
+            }
+          }
+        }
+
         if (child.type == null) {
           continue;
         }
@@ -651,6 +669,13 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
       }
       return;
     }
+    if (null == data?.nodeCode ||
+        data?.type == OnePictureType.SL.index ||
+        data?.type == OnePictureType.DM.index ||
+        data?.type == OnePictureType.JCK.index) {
+      return;
+    }
+
     String nodeId = data?.id ?? "";
 
     if (nodeId.isEmpty) return;
@@ -658,7 +683,8 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
 
     if ((data?.type == OnePictureType.DC.index) ||
         (data?.type == OnePictureType.SD.index)) {
-      return;
+      nodeId = data?.idParent ?? "";
+      type = DeviceType.power;
     }
     if ((data?.type == OnePictureType.GDSB.index)) {
       type = DeviceType.power;

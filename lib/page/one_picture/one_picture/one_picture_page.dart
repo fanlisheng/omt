@@ -161,18 +161,15 @@ class OnePicturePageState extends State<OnePicturePage> {
             )
           ],
         ),
-      )
-          .addRightIcon(
+      ).addRightIcon(
           onTap: onePictureDataData?.showAddBtn != true
               ? null
               : () {
                   model.onTapItemNew(onePictureDataData);
-                })
-      ;
+                });
     }
 
     return GestureDetector(
-
         onTap: () {
           // print('tapped' + '${onePictureDataData?.toString()}');
           model.onTapItem(onePictureDataData);
@@ -191,8 +188,7 @@ class OnePicturePageState extends State<OnePicturePage> {
                     ? null
                     : () {
                         model.onTapItemNew(onePictureDataData);
-                      })
-    );
+                      }));
   }
 
   Widget rectangleSubWidget2(
@@ -359,7 +355,7 @@ class OnePicturePageState extends State<OnePicturePage> {
                   //     : TextView(data?.showNameText, size: _titleSize()),
                   Container(
                     padding: EdgeInsets.only(
-                        top: data?.showAddBtn  == true ? 50 : 0,
+                        top: data?.showAddBtn == true ? 50 : 0,
                         bottom: data?.showAddBtn == true ? 16 : 0,
                         left: 0,
                         right: data?.showAddBtn == true ? 20 : 0),
@@ -387,7 +383,9 @@ class OnePicturePageState extends State<OnePicturePage> {
                     ),
                   )
                       .addRightIcon(
-                          onTap: data.ignore != true || (data.type != OnePictureType.DM.index && data.type != OnePictureType.JCK.index)
+                          onTap: data.ignore != true ||
+                                  (data.type != OnePictureType.DM.index &&
+                                      data.type != OnePictureType.JCK.index)
                               ? null
                               : () {
                                   model.onTapItemNew(data);
@@ -468,6 +466,12 @@ class OnePicturePageState extends State<OnePicturePage> {
                       oData?.showDesc ?? '',
                       style: TextStyle(fontSize: 12),
                     ),
+              if ((oData?.faultList.length ?? 0) > 0)
+                ...(oData!.faultList.map((e) {
+                  return TextView(e, color: ColorUtils.colorRed2,size: 9,border: true,radius: 12,
+                  margin: EdgeInsets.only(top: 6 ),
+                  padding: const EdgeInsets.only(left: 8, right: 8, top: 0, bottom: 0),);
+                }).toList())
             ],
           )),
     );

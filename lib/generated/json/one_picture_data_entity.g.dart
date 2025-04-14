@@ -87,6 +87,20 @@ OnePictureDataData $OnePictureDataDataFromJson(Map<String, dynamic> json) {
   if (nodeCode != null) {
     onePictureDataData.nodeCode = nodeCode;
   }
+  final List<String>? fault = (json['fault'] as List<dynamic>?)?.map(
+          (e) => jsonConvert.convert<String>(e) as String).toList();
+  if (fault != null) {
+    onePictureDataData.fault = fault;
+  }
+  final String? idParent = jsonConvert.convert<String>(json['idParent']);
+  if (idParent != null) {
+    onePictureDataData.idParent = idParent;
+  }
+  final String? nodeCodeParent = jsonConvert.convert<String>(
+      json['nodeCodeParent']);
+  if (nodeCodeParent != null) {
+    onePictureDataData.nodeCodeParent = nodeCodeParent;
+  }
   final int? type = jsonConvert.convert<int>(json['type']);
   if (type != null) {
     onePictureDataData.type = type;
@@ -165,6 +179,9 @@ Map<String, dynamic> $OnePictureDataDataToJson(OnePictureDataData entity) {
   data['id'] = entity.id;
   data['name'] = entity.name;
   data['node_code'] = entity.nodeCode;
+  data['fault'] = entity.fault;
+  data['idParent'] = entity.idParent;
+  data['nodeCodeParent'] = entity.nodeCodeParent;
   data['type'] = entity.type;
   data['type_text'] = entity.typeText;
   data['desc'] = entity.desc;
@@ -188,6 +205,9 @@ extension OnePictureDataDataExtension on OnePictureDataData {
     String? id,
     String? name,
     String? nodeCode,
+    List<String>? fault,
+    String? idParent,
+    String? nodeCodeParent,
     int? type,
     String? typeText,
     String? desc,
@@ -210,6 +230,9 @@ extension OnePictureDataDataExtension on OnePictureDataData {
       ..id = id ?? this.id
       ..name = name ?? this.name
       ..nodeCode = nodeCode ?? this.nodeCode
+      ..fault = fault ?? this.fault
+      ..idParent = idParent ?? this.idParent
+      ..nodeCodeParent = nodeCodeParent ?? this.nodeCodeParent
       ..type = type ?? this.type
       ..typeText = typeText ?? this.typeText
       ..desc = desc ?? this.desc
