@@ -677,6 +677,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
     if ((data?.type == OnePictureType.DC.index) ||
         (data?.type == OnePictureType.SD.index)) {
       nodeId = data?.idParent ?? "";
+      type = DeviceType.power;
     }
     if ((data?.type == OnePictureType.GDSB.index)) {
       type = DeviceType.power;
