@@ -669,6 +669,13 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
       }
       return;
     }
+    if (null == data?.nodeCode ||
+        data?.type == OnePictureType.SL.index ||
+        data?.type == OnePictureType.DM.index ||
+        data?.type == OnePictureType.JCK.index) {
+      return;
+    }
+
     String nodeId = data?.id ?? "";
 
     if (nodeId.isEmpty) return;
