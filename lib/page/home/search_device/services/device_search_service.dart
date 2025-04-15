@@ -115,10 +115,17 @@ class DeviceSearchService {
       onSuccess: (DeviceUnboundEntity? data) {
         result.unboundDevices = data?.unboundDevices ?? [];
 
+
         // 生成统计信息
         StringBuffer countStr = StringBuffer();
         for (DeviceUnboundAllCount item in data?.allCount ?? []) {
-          countStr.write("${item.count}个${item.deviceTypeText} / ");
+          final abnormal = (data?.abnormalCount ?? []).firstWhere(
+                (ab) => ab.deviceType == item.deviceType,
+            orElse: () => DeviceUnboundAbnormalCount(deviceType: item.deviceType, deviceTypeText: item.deviceTypeText, count: 0),
+          );
+          countStr.write(
+            "${item.count}个${item.deviceTypeText}${abnormal.count! > 0 ? '（${abnormal.count}个异常）' : ''} / ",
+          );
         }
         String statistics = countStr.toString();
         if (statistics.length > 2) {

@@ -81,6 +81,7 @@ class EditRouterViewModel extends BaseViewModelRefresh<dynamic> {
     HttpQuery.share.homePageService.editRouter(
         nodeId: int.parse(deviceInfo.nodeId ?? "0"),
         passId: selectedRouterInOut!.id ?? 0,
+        type: selectedRouterType!.id ?? 0,
         onSuccess: (result) {
           LoadingUtils.showToast(data: "修改信息成功");
           IntentUtils.share.popResultOk(context!);

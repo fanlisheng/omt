@@ -29,7 +29,7 @@ class EditCameraView extends StatelessWidget {
         autoLoadData: true,
         builder: (context, model, child) {
           return DHeaderPage(
-            title: "修改摄像头",
+            title: "修改信息",
             titlePath: "首页 / 摄像头 / ",
             content: cameraView(model),
           );
@@ -54,7 +54,7 @@ class EditCameraView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                "修改摄像头信息",
+                "修改信息",
                 style: TextStyle(
                   fontSize: 14,
                   color: ColorUtils.colorGreenLiteLite,

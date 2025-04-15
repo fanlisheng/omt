@@ -31,15 +31,17 @@ class EditPowerBoxView extends StatelessWidget {
         autoLoadData: true,
         builder: (context, model, child) {
           return DHeaderPage(
-            title: "编辑电源箱",
+            title: "修改信息",
             titlePath: "首页 / 电源箱 / ",
-            content: replaceBoxView(model),
+            content: model.isReplace == false
+                ? editPowerBoxView(model)
+                : replaceBoxView(model),
           );
         });
   }
 
   Widget editPowerBoxView(EditPowerBoxViewModel model) {
-    return ListView(
+    return Column(
       children: [
         Container(
           margin: const EdgeInsets.only(
@@ -58,7 +60,7 @@ class EditPowerBoxView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                "编辑电源箱",
+                "修改信息",
                 style: TextStyle(
                   fontSize: 14,
                   color: ColorUtils.colorGreenLiteLite,
@@ -104,23 +106,6 @@ class EditPowerBoxView extends StatelessWidget {
             ],
           ),
         ),
-        if (model.selectedDeviceDetailPowerBox != null) ...[
-          Container(
-            margin: const EdgeInsets.only(
-              left: 16,
-              right: 16,
-              bottom: 16,
-            ),
-            padding:
-                const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 16),
-            decoration: BoxDecoration(
-              color: ColorUtils.colorBackgroundLine,
-              borderRadius: BorderRadius.circular(3),
-            ),
-            width: double.infinity,
-            child: infoView(model),
-          ),
-        ],
         Expanded(child: Container()),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,

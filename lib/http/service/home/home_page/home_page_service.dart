@@ -760,6 +760,7 @@ class HomePageService {
   editRouter({
     required int nodeId,
     required int passId,
+    required int type,
     required ValueChanged<CodeMessageData?> onSuccess,
     ValueChanged<CodeMessageData?>? onCache,
     ValueChanged<String>? onError,
@@ -769,6 +770,7 @@ class HomePageService {
       {
         "node_id": nodeId,
         "pass_id": passId,
+        "type": type,
       },
       method: 'POST',
       autoHideDialog: true,

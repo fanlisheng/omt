@@ -50,7 +50,7 @@ class EditRouterView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                "修改路由器信息",
+                "修改信息",
                 style: TextStyle(
                   fontSize: 14,
                   color: ColorUtils.colorGreenLiteLite,
@@ -148,6 +148,7 @@ class EditRouterView extends StatelessWidget {
                             placeholder: "路由器IP地址",
                             controller: model.routerIpController,
                             style: const TextStyle(fontSize: 12),
+                            enabled: false,
                           ),
                         ),
                         const SizedBox(height: 20),

@@ -29,7 +29,7 @@ class _EditPowerViewState extends State<EditPowerView> {
         autoLoadData: true,
         builder: (context, model, child) {
           return DHeaderPage(
-            title: "编辑电源信息",
+            title: "修改信息",
             titlePath: "首页 / 电源 / ",
             content: contentView(model),
           );
@@ -53,7 +53,7 @@ class _EditPowerViewState extends State<EditPowerView> {
             children: [
               const SizedBox(height: 20),
               const Text(
-                "编辑电源信息",
+                "修改信息",
                 style: TextStyle(
                     fontSize: 16,
                     color: ColorUtils.colorWhite,

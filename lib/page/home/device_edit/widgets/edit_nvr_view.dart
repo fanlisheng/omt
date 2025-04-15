@@ -32,7 +32,7 @@ class EditNvrView extends StatelessWidget {
         autoLoadData: true,
         builder: (context, model, child) {
           return DHeaderPage(
-            title: "编辑NVR设备",
+            title: "修改信息",
             titlePath: "首页 / NVR / ",
             content:
                 model.isReplace == false ? nvrView(model) : _replaceView(model),
@@ -57,7 +57,7 @@ class EditNvrView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                "编辑NVR设备",
+                "修改信息",
                 style: TextStyle(
                   fontSize: 14,
                   color: ColorUtils.colorGreenLiteLite,

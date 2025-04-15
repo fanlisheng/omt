@@ -8,6 +8,8 @@ import 'package:omt/page/home/search_device/widgets/device_list_view.dart';
 import 'package:omt/utils/color_utils.dart';
 import 'package:omt/widget/lib/tfb_spinner.dart';
 import 'dart:math';
+import '../../../../bean/home/home_page/device_unbound_entity.dart';
+import '../services/device_search_service.dart';
 import '../view_models/search_device_viewmodel.dart';
 
 class SearchDeviceScreen extends StatelessWidget {
@@ -58,14 +60,16 @@ class SearchDeviceScreen extends StatelessWidget {
                           style: TextStyle(color: Colors.white),
                         ),
                         Expanded(
-                          child: Text(
-                            model.deviceStatistics,
-                            style: const TextStyle(
-                              color: ColorUtils.colorGreen,
-                              fontSize: 12,
-                            ),
-                            maxLines: 2,
-                          ),
+                          child: buildDeviceStatistics(
+                              statistics: model.deviceStatistics),
+                          // child: Text(
+                          //   model.deviceStatistics,
+                          //   style: const TextStyle(
+                          //     color: ColorUtils.colorGreen,
+                          //     fontSize: 12,
+                          //   ),
+                          //   maxLines: 2,
+                          // ),
                         ),
                       ],
                     ),
@@ -75,5 +79,62 @@ class SearchDeviceScreen extends StatelessWidget {
             ),
           );
         });
+  }
+
+  static Widget buildDeviceStatistics({
+    required String statistics,
+  }) {
+    // 解析 statistics 字符串，拆分为设备统计项
+    final stats = statistics.split(' / ').map((item) {
+      final parts = item.trim().split('（');
+      final nameCount = parts[0].trim();
+      final abnormal = parts.length > 1 ? parts[1].replaceAll('）', '') : '';
+      return {
+        'nameCount': nameCount,
+        'abnormal': abnormal,
+      };
+    }).toList();
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        ...stats.asMap().entries.map((entry) {
+          final stat = entry.value;
+          final isLast = entry.key == stats.length - 1;
+          return RichText(
+            maxLines: 2, // 最多 2 行
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: stat['nameCount'],
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: (stat['abnormal']?.isNotEmpty ?? false)
+                        ? ColorUtils.colorRed
+                        : ColorUtils.colorGreen,
+                  ),
+                ),
+                if (stat['abnormal']?.isNotEmpty ?? false)
+                  TextSpan(
+                    text: '（${stat['abnormal']}）',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: ColorUtils.colorRed,
+                    ),
+                  ),
+                if (!isLast)
+                  const TextSpan(
+                    text: ' / ',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: ColorUtils.colorGreen,
+                    ),
+                  ),
+              ],
+            ),
+          );
+        }),
+      ],
+    );
   }
 }

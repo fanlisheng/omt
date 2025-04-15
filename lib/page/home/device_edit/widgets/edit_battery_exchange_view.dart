@@ -24,7 +24,7 @@ class EditBatteryExchangeView extends StatelessWidget {
         autoLoadData: true,
         builder: (context, model, child) {
           return DHeaderPage(
-            title: model.isBattery ? "编辑电池" : "编辑交换机",
+            title: model.isBattery ? "修改信息" : "修改信息",
             titlePath: model.isBattery ? "首页 / 电池 / " : "首页 / 交换机 / ",
             content: contentView(model),
           );
@@ -48,7 +48,7 @@ class EditBatteryExchangeView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "编辑${model.isBattery ? "电池" : "交换机"}",
+                "修改信息",
                 style: const TextStyle(
                   fontSize: 14,
                   color: ColorUtils.colorGreenLiteLite,

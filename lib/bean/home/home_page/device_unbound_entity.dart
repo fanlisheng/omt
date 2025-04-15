@@ -57,7 +57,9 @@ class DeviceUnboundAbnormalCount {
   String? deviceTypeText;
   int? count;
 
-  DeviceUnboundAbnormalCount();
+
+  DeviceUnboundAbnormalCount(
+      {this.deviceType, this.deviceTypeText, this.count});
 
   factory DeviceUnboundAbnormalCount.fromJson(Map<String, dynamic> json) =>
       $DeviceUnboundAbnormalCountFromJson(json);

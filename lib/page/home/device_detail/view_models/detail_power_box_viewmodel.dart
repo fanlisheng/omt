@@ -110,16 +110,17 @@ class DetailPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
 
   //修改
   editAction() {
-    // IntentUtils.share
-    //     .push(context!, routeName: RouterPage.EditPowerBoxPage, data: {
-    //   "data": deviceInfo,
-    // })?.then((value) {
-    //   if (IntentUtils.share.isResultOk(value)) {
-    //     isChange = true;
-    //     onChange(isChange);
-    //     _requestData();
-    //   }
-    // });
+    IntentUtils.share
+        .push(context!, routeName: RouterPage.EditPowerBoxPage, data: {
+      "data": deviceInfo,
+      "isReplace":false,
+    })?.then((value) {
+      if (IntentUtils.share.isResultOk(value)) {
+        isChange = true;
+        onChange(isChange);
+        requestData();
+      }
+    });
   }
 
   //替换
