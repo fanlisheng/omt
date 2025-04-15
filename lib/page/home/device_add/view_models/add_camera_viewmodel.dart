@@ -17,6 +17,7 @@ import '../../../../bean/home/home_page/device_detail_camera_entity.dart';
 import '../../../../bean/video/video_configuration/Video_Connect_entity.dart';
 import '../../../../router_utils.dart';
 import '../../../../utils/image_utils.dart';
+import '../../../../utils/shared_utils.dart';
 import '../../photo_preview/widgets/photo_preview_screen.dart';
 import '../../search_device/services/device_search_service.dart';
 
@@ -104,46 +105,54 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
     var webcam = VideoInfoCamEntity()
       ..name = cameraDeviceEntity.deviceNameController.text
       ..rtsp = cameraDeviceEntity.rtsp
-      ..in_out = cameraDeviceEntity.selectedEntryExit?.id;
+      ..in_out = cameraDeviceEntity.selectedEntryExit?.id ?? -1;
 
-    bool isSuccess =
-        await HttpQuery.share.homePageService.configAi(data: webcam);
-    if (isSuccess == false) {
-      LoadingUtils.showError(data: "配置本地AI设备信息失败");
-      return;
-    }
+    await SharedUtils.setControlIP(cameraDevice.selectedAi?.ip ?? "");
 
-    Map<String, dynamic> aiParams = {
-      "ip": cameraDevice.selectedAi?.ip ?? "",
-      "mac": cameraDevice.selectedAi?.mac ?? "",
-    };
-    Map<String, dynamic> cameraParams = {
-      "device_code": cameraDeviceEntity.code ?? "",
-      "name": cameraDeviceEntity.deviceNameController.text ?? "",
-      "ip": cameraDeviceEntity.ip ?? "",
-      "mac": cameraDeviceEntity.mac,
-      "rtsp_url": cameraDeviceEntity.rtsp,
-      "pass_id": cameraDeviceEntity.selectedEntryExit?.id ?? -1,
-      "camera_type": cameraDeviceEntity.selectedCameraType?.value.toInt() ?? 0,
-      "control_status":
-          cameraDeviceEntity.selectedRegulation?.value.toInt() ?? 0,
-    };
-    if (cameraDeviceEntity.videoIdController.text.isNotEmpty) {
-      cameraParams["camera_code"] = cameraDeviceEntity.videoIdController.text;
-    }
-
-    HttpQuery.share.installService.aiDeviceCameraInstall(
-        pNodeCode: pNodeCode,
-        aiDevice: aiParams,
-        camera: cameraParams,
+    //修改本地ai设备信息
+    HttpQuery.share.homePageService.configAi(
+        data: webcam,
         onSuccess: (data) {
-          cameraDeviceEntity.readOnly = true;
-          cameraDeviceEntity.isAddEnd = true;
-          Navigator.pop(context);
-          notifyListeners();
+
+          //调用添加
+          Map<String, dynamic> aiParams = {
+            "ip": cameraDevice.selectedAi?.ip ?? "",
+            "mac": cameraDevice.selectedAi?.mac ?? "",
+          };
+          Map<String, dynamic> cameraParams = {
+            "device_code": cameraDeviceEntity.code ?? "",
+            "name": cameraDeviceEntity.deviceNameController.text ?? "",
+            "ip": cameraDeviceEntity.ip ?? "",
+            "mac": cameraDeviceEntity.mac,
+            "rtsp_url": cameraDeviceEntity.rtsp,
+            "pass_id": cameraDeviceEntity.selectedEntryExit?.id ?? -1,
+            "camera_type":
+                cameraDeviceEntity.selectedCameraType?.value.toInt() ?? 0,
+            "control_status":
+                cameraDeviceEntity.selectedRegulation?.value.toInt() ?? 0,
+          };
+          if (cameraDeviceEntity.videoIdController.text.isNotEmpty) {
+            cameraParams["camera_code"] =
+                cameraDeviceEntity.videoIdController.text;
+          }
+
+          HttpQuery.share.installService.aiDeviceCameraInstall(
+              pNodeCode: pNodeCode,
+              aiDevice: aiParams,
+              camera: cameraParams,
+              onSuccess: (data) {
+                cameraDeviceEntity.readOnly = true;
+                cameraDeviceEntity.isAddEnd = true;
+                Navigator.pop(context);
+                notifyListeners();
+              },
+              onError: (error) {
+                LoadingUtils.showToast(data: '安装失败: $error');
+              });
+
         },
-        onError: (error) {
-          LoadingUtils.showToast(data: '安装失败: $error');
+        onError: (e) {
+          LoadingUtils.showError(data: "配置本地AI设备信息失败");
         });
   }
 

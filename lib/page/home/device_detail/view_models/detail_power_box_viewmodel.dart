@@ -6,6 +6,7 @@ import '../../../../bean/home/home_page/device_detail_power_box_entity.dart';
 import '../../../../bean/home/home_page/device_entity.dart';
 import '../../../../http/http_query.dart';
 import '../../../../router_utils.dart';
+import '../../../../utils/dialog_utils.dart';
 import '../../../../utils/intent_utils.dart';
 import '../../../remove/widgets/remove_dialog_page.dart';
 import '../../device_add/view_models/device_add_viewmodel.dart';
@@ -51,7 +52,14 @@ class DetailPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
 
   //
 
-  restartAction() {
+  restartAction() async {
+    final result = await DialogUtils.showContentDialog(
+        context: context!,
+        title: "重启主程",
+        content: "您确定重启主程?",
+        deleteText: "确定");
+    if (result == '取消') return;
+    notifyListeners();
     HttpQuery.share.homePageService.restartPowerBox(
         deviceCode: deviceInfo.deviceCode ?? "",
         onSuccess: (a) {

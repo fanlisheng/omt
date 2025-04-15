@@ -92,7 +92,7 @@ class DetailAiView extends StatelessWidget {
                     RowItemInfoView(
                       name: "主程版本",
                       value: model.deviceInfo.programVersion,
-                      buttonName: (model.deviceInfo.isProgramLatest == true)
+                      buttonName: (model.deviceInfo.isProgramLatest == false)
                           ? "升级"
                           : "",
                       buttonAction: () {
@@ -103,7 +103,7 @@ class DetailAiView extends StatelessWidget {
                     RowItemInfoView(
                       name: "识别版本",
                       value: model.deviceInfo.identityVersion,
-                      buttonName: (model.deviceInfo.isIdentityLatest == true)
+                      buttonName: (model.deviceInfo.isIdentityLatest == false)
                           ? "升级"
                           : "",
                       buttonAction: () {

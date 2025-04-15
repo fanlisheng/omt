@@ -906,28 +906,22 @@ class HomePageService {
     );
   }
 
-  Future<bool> configAi({
+  configAi({
     required VideoInfoCamEntity? data,
+    ValueChanged<dynamic>? onSuccess,
     ValueChanged<dynamic>? onCache,
+    ValueChanged<String>? onError,
   }) async {
-    final completer = Completer<bool>();
-
-    await HttpManager.share.doHttpPost<dynamic>(
+    HttpManager.share.doHttpPost<dynamic>(
       await _configAi,
-      await JsonUtils.getMap(data.toJson2()),
+      JsonUtils.getMap(data.toJson2()),
       method: 'post',
       autoHideDialog: true,
       autoShowDialog: true,
-      onSuccess: (result) {
-        completer.complete(true); // 返回 true 表示成功
-      },
+      onSuccess: onSuccess,
       onCache: onCache,
-      onError: (error) {
-        completer.complete(false); // 返回 false 表示失败
-      },
+      onError: onError,
     );
-
-    return completer.future;
   }
 
 //

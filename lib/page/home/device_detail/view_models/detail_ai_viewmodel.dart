@@ -8,6 +8,7 @@ import '../../../../bean/home/home_page/device_detail_ai_entity.dart';
 import '../../../../bean/home/home_page/device_entity.dart';
 import '../../../../http/http_query.dart';
 import '../../../../router_utils.dart';
+import '../../../../utils/dialog_utils.dart';
 import '../../../../utils/intent_utils.dart';
 import '../../device_add/view_models/device_add_viewmodel.dart';
 
@@ -50,7 +51,13 @@ class DetailAiViewModel extends BaseViewModelRefresh<dynamic> {
   connectEventAction(int index) async {}
 
   //重起
-  restartAction() {
+  restartAction() async{
+    final result = await DialogUtils.showContentDialog(
+        context: context!,
+        title: "重启主程",
+        content: "您确定重启主程?",
+        deleteText: "确定");
+    if (result == '取消') return;
     HttpQuery.share.homePageService.restartAiDevice(
         deviceCode: deviceInfo.deviceCode ?? "",
         onSuccess: (a) {
@@ -72,7 +79,13 @@ class DetailAiViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   //升级主程版本
-  upgradeProgramAction() {
+  upgradeProgramAction() async {
+    final result = await DialogUtils.showContentDialog(
+        context: context!,
+        title: "升级主程版本",
+        content: "您确定升级主程版本?",
+        deleteText: "确定");
+    if (result == '取消') return;
     HttpQuery.share.homePageService.upgradeAiDeviceProgram(
         deviceCode: deviceInfo.deviceCode ?? "",
         onSuccess: (a) {
@@ -81,7 +94,13 @@ class DetailAiViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   //升级识别版本
-  upgradeIdentityAction() {
+  upgradeIdentityAction() async {
+    final result = await DialogUtils.showContentDialog(
+        context: context!,
+        title: "升级识别版本",
+        content: "您确定升级识别版本?",
+        deleteText: "确定");
+    if (result == '取消') return;
     HttpQuery.share.homePageService.upgradeAiDeviceIdentity(
         deviceCode: deviceInfo.deviceCode ?? "",
         onSuccess: (a) {

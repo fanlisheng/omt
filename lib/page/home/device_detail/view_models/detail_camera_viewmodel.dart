@@ -10,6 +10,7 @@ import '../../../../bean/home/home_page/device_detail_camera_entity.dart';
 import '../../../../bean/home/home_page/device_entity.dart';
 import '../../../../http/http_query.dart';
 import '../../../../router_utils.dart';
+import '../../../../utils/dialog_utils.dart';
 import '../../../../utils/intent_utils.dart';
 import '../../device_add/view_models/device_add_viewmodel.dart';
 
@@ -73,7 +74,13 @@ class DetailCameraViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   //重启识别
-  restartRecognitionAction() {
+  restartRecognitionAction() async {
+    final result = await DialogUtils.showContentDialog(
+        context: context!,
+        title: "重启识别",
+        content: "您确定重启识别?",
+        deleteText: "确定");
+    if (result == '取消') return;
     notifyListeners();
     HttpQuery.share.homePageService.manualSnapCamera(
         deviceCode: deviceInfo.deviceCode ?? "",
