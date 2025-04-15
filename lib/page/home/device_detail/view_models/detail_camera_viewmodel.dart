@@ -79,7 +79,7 @@ class DetailCameraViewModel extends BaseViewModelRefresh<dynamic> {
         deviceCode: deviceInfo.deviceCode ?? "",
         aiDeviceCode: deviceInfo.aiDeviceCode ?? "",
         onSuccess: (a) {
-          LoadingUtils.show(data: "重启识别成功!");
+          LoadingUtils.showToast(data: "重启识别成功!");
         });
   }
 

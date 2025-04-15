@@ -440,7 +440,7 @@ class NvrInfoWidget {
         {"id": info.id ?? 0, "channel_num": info.channelNum}
       ],
       onSuccess: (data) {
-        LoadingUtils.show(data: "移除成功!");
+        LoadingUtils.showToast(data: "移除成功!");
         onSuccess?.call();
       },
     );

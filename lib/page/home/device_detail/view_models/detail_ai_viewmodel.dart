@@ -54,7 +54,7 @@ class DetailAiViewModel extends BaseViewModelRefresh<dynamic> {
     HttpQuery.share.homePageService.restartAiDevice(
         deviceCode: deviceInfo.deviceCode ?? "",
         onSuccess: (a) {
-          LoadingUtils.show(data: "重启成功!");
+          LoadingUtils.showToast(data: "重启成功!");
         });
   }
 

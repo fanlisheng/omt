@@ -154,7 +154,7 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
         deviceCode: cameraDeviceEntity.code ?? "",
         aiDeviceCode: cameraDeviceEntity.selectedAi?.deviceCode ?? "",
         onSuccess: (a) {
-          LoadingUtils.show(data: "重启识别成功!");
+          LoadingUtils.showToast(data: "重启识别成功!");
         });
   }
 

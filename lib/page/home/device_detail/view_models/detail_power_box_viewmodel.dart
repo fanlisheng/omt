@@ -55,7 +55,7 @@ class DetailPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
     HttpQuery.share.homePageService.restartPowerBox(
         deviceCode: deviceInfo.deviceCode ?? "",
         onSuccess: (a) {
-          LoadingUtils.show(data: "重启成功!");
+          LoadingUtils.showToast(data: "重启成功!");
         });
   }
 
@@ -72,7 +72,7 @@ class DetailPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
         status: isCloseAllDc ? 1 : 2,
         onSuccess: (data) {
           isCloseAllDc = false;
-          LoadingUtils.show(data: "${isCloseAllDc ? "关闭" : "打开"}成功!");
+          LoadingUtils.showToast(data: "${isCloseAllDc ? "关闭" : "打开"}成功!");
           requestData();
         });
   }

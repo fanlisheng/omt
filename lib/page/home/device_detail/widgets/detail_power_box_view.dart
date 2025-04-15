@@ -76,13 +76,13 @@ class DetailPowerBoxView extends StatelessWidget {
                             deviceCode: model.deviceInfo.deviceCode ?? "",
                             context: model.context!,
                             onOpenDcSuccess: (info) {
-                              LoadingUtils.show(
+                              LoadingUtils.showToast(
                                   data:
                                       "${(info.statusText == "打开") ? "关闭" : "打开"}成功!");
                               model.requestData();
                             },
                             onRecordSuccess: (info) {
-                              LoadingUtils.show(data: "记录成功!");
+                              LoadingUtils.showToast(data: "记录成功!");
                               model.requestData();
                             }),
                       )

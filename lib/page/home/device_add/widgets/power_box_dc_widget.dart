@@ -176,7 +176,7 @@ class PowerBoxDcWidget {
       ids: [info.id ?? 0],
       status: info.statusText == "打开" ? 1 : 2,
       onSuccess: (data) {
-        LoadingUtils.show(
+        LoadingUtils.showToast(
             data: "${(info.statusText == "打开") ? "关闭" : "打开"}成功!");
         onSuccess?.call(info);
       },
@@ -194,7 +194,7 @@ class PowerBoxDcWidget {
       deviceCode: deviceCode,
       dcId: info.id ?? 0,
       onSuccess: () {
-        LoadingUtils.show(data: "记录成功!");
+        LoadingUtils.showToast(data: "记录成功!");
         onSuccess?.call(info);
       },
     );

@@ -100,7 +100,7 @@ class EditCameraViewModel extends BaseViewModelRefresh<dynamic> {
         controlStatus: (cameraDevice.selectedRegulation?.value ?? "0").toInt(),
         cameraCode: cameraDevice.videoIdController.text,
         onSuccess: (CodeMessageData? value) {
-          LoadingUtils.show(data: "修改成功!");
+          LoadingUtils.showToast(data: "修改成功!");
           IntentUtils.share.popResultOk(context!);
         });
   }

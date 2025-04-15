@@ -46,7 +46,7 @@ class AddRouterViewModel extends BaseViewModelRefresh<dynamic> {
       if (mac != null) {
         routerIpController.text = subnet;
       }else{
-        LoadingUtils.show(data: "获取路由信息失败！");
+        LoadingUtils.showToast(data: "获取路由信息失败！");
       }
 
     }
