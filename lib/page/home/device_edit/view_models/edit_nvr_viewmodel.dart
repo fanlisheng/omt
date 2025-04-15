@@ -77,6 +77,10 @@ class EditNvrViewModel extends BaseViewModelRefresh<dynamic> {
     //请求通道信息
     String deviceCode =
         DeviceUtils.getDeviceCodeByMacAddress(macAddress: selectedNvr!.mac!);
+    requestData(deviceCode);
+  }
+
+  void requestData(String deviceCode) {
     HttpQuery.share.homePageService.deviceDetailNvr(
         deviceCode: deviceCode,
         onSuccess: (data) {
@@ -129,18 +133,18 @@ class EditNvrViewModel extends BaseViewModelRefresh<dynamic> {
         });
   }
 
-  removeChannelAction(DeviceDetailNvrDataChannels? info) {
-    HttpQuery.share.homePageService.deleteNvrChannel(
-        deviceCode: selectedNvr?.deviceCode ?? "",
-        nodeId: deviceInfo?.nodeId ?? "",
-        channels: [
-          {"id": info?.id ?? 0, "channel_num": info?.channelNum}
-        ],
-        onSuccess: (data) {
-          nvrData?.channels?.remove(info);
-          LoadingUtils.show(data: "移除成功!");
-        });
-  }
+  // removeChannelAction(DeviceDetailNvrDataChannels? info) {
+  //   HttpQuery.share.homePageService.deleteNvrChannel(
+  //       deviceCode: selectedNvr?.deviceCode ?? "",
+  //       nodeId: deviceInfo?.nodeId ?? "",
+  //       channels: [
+  //         {"id": info?.id ?? 0, "channel_num": info?.channelNum}
+  //       ],
+  //       onSuccess: (data) {
+  //         nvrData?.channels?.remove(info);
+  //         LoadingUtils.show(data: "移除成功!");
+  //       });
+  // }
 
   bool _shouldStop() {
     return stopScanning; // 当 stopAiScanning 为 true 时停止

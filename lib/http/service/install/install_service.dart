@@ -136,6 +136,7 @@ class InstallService {
     Map<String, dynamic> params = {
       "interface_num": interfaceNum,
       "power_method": powerMethod,
+      "pass_id": passId,
     };
 
     if (pNodeCode != null) {

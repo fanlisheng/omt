@@ -154,7 +154,10 @@ class AddBatteryExchangeView extends StatelessWidget {
         two: Container(),
       ),
       const SizedBox(height: 20),
-      const RowTitle(name: "交换机接口数量"),
+      const EquallyRow(
+        one: RowTitle(name: "交换机接口数量"),
+        two: RowTitle(name: "交换机接供电方式"),
+      ),
       EquallyRow(
         one: Wrap(
           spacing: 20.0,

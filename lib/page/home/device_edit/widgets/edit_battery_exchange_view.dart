@@ -265,7 +265,7 @@ class EditBatteryExchangeView extends StatelessWidget {
       // const RowTitle(name: "交换机接口数量"),
       const EquallyRow(
         one: RowTitle(name: "交换机接口数量"),
-        two: RowTitle(name: "供电方式"),
+        two: RowTitle(name: "交换机供电方式"),
       ),
       EquallyRow(
         one: Wrap(

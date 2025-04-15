@@ -66,10 +66,10 @@ class AddNvrViewModel extends BaseViewModel {
     //请求通道信息
     String deviceCode =
         DeviceUtils.getDeviceCodeByMacAddress(macAddress: selectedNvr!.mac!);
-    _requestData(deviceCode);
+    requestData(deviceCode);
   }
 
-  void _requestData(String deviceCode) {
+  void requestData(String deviceCode) {
     HttpQuery.share.homePageService.deviceDetailNvr(
         deviceCode: deviceCode,
         onSuccess: (data) {
@@ -121,16 +121,6 @@ class AddNvrViewModel extends BaseViewModel {
         },
         onError: (error) {
           LoadingUtils.showToast(data: 'NVR安装失败: $error');
-        });
-  }
-
-  removeChannelAction(DeviceDetailNvrDataChannels info) {
-    HttpQuery.share.homePageService.deleteNvrChannel(
-        deviceCode: selectedNvr?.deviceCode ?? "",
-        channels: [{"id":info.id ??0 ,"channel_num":info.channelNum}],
-        onSuccess: (data) {
-          LoadingUtils.show(data: "移除成功!");
-          _requestData(selectedNvr?.deviceCode ?? "");
         });
   }
 

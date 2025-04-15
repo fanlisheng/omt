@@ -23,10 +23,10 @@ class DetailNvrViewModel extends BaseViewModelRefresh<dynamic> {
   @override
   void initState() async {
     super.initState();
-    _requestData();
+    requestData();
   }
 
-  void _requestData() {
+  void requestData() {
     HttpQuery.share.homePageService.deviceDetailNvr(
         nodeId: nodeId,
         onSuccess: (DeviceDetailNvrData? a) {
@@ -44,20 +44,6 @@ class DetailNvrViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   ///点击事件
-  //删除通道
-  removeChannelAction(DeviceDetailNvrDataChannels info) {
-    HttpQuery.share.homePageService.deleteNvrChannel(
-        deviceCode: deviceInfo.deviceCode ?? "",
-        nodeId: deviceInfo.nodeId ?? "",
-        channels: [
-          {"id": info.id ?? 0, "channel_num": info.channelNum}
-        ],
-        onSuccess: (data) {
-          LoadingUtils.show(data: "移除成功!");
-          _requestData();
-        });
-  }
-
   //修改
   editAction() {
     IntentUtils.share.push(context!, routeName: RouterPage.EditNvrPage, data: {
@@ -66,7 +52,7 @@ class DetailNvrViewModel extends BaseViewModelRefresh<dynamic> {
       if (IntentUtils.share.isResultOk(value)) {
         isChange = true;
         onChange(isChange);
-        _requestData();
+        requestData();
       }
     });
   }
@@ -80,7 +66,7 @@ class DetailNvrViewModel extends BaseViewModelRefresh<dynamic> {
       if (IntentUtils.share.isResultOk(value)) {
         isChange = true;
         onChange(isChange);
-        _requestData();
+        requestData();
       }
     });
   }

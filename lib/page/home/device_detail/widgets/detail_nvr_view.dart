@@ -11,6 +11,7 @@ import 'package:omt/utils/color_utils.dart';
 
 import '../../../../bean/home/home_page/device_detail_nvr_entity.dart';
 import '../../device_add/view_models/device_add_viewmodel.dart';
+import '../../device_add/widgets/add_nvr_view.dart';
 import '../view_models/detail_nvr_viewmodel.dart';
 import 'detail_ai_view.dart';
 
@@ -18,7 +19,8 @@ class DetailNvrView extends StatelessWidget {
   final String nodeId;
   final Function(bool) onChange;
 
-  const DetailNvrView({super.key, required this.nodeId, required this.onChange});
+  const DetailNvrView(
+      {super.key, required this.nodeId, required this.onChange});
 
   // AddNvrViewModel model;
   // AddNvrView(this.model, {super.key});
@@ -26,7 +28,8 @@ class DetailNvrView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<DetailNvrViewModel>(
-        model: DetailNvrViewModel(nodeId, onChange: onChange)..themeNotifier = true,
+        model: DetailNvrViewModel(nodeId, onChange: onChange)
+          ..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model1, child) {
           return nvrView(model1);
@@ -86,88 +89,14 @@ class DetailNvrView extends StatelessWidget {
               gap: 3),
           const SizedBox(height: 20),
           Expanded(
-            child: SingleChildScrollView(
-              child: SizedBox(
-                width: double.infinity,
-                child: DataTable(
-                  decoration: BoxDecoration(
-                    color: "#3B3F3F".toColor(),
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                  dataRowHeight: 40,
-                  headingRowHeight: 40,
-                  dividerThickness: 0.01,
-                  columns: const [
-                    DataColumn(
-                        label: Text("通道号", style: TextStyle(fontSize: 12))),
-                    DataColumn(
-                        label: Text("是否在录像", style: TextStyle(fontSize: 12))),
-                    DataColumn(
-                        label: Text("信号状态", style: TextStyle(fontSize: 12))),
-                    DataColumn(
-                        label: Text("更新时间", style: TextStyle(fontSize: 12))),
-                    DataColumn(
-                        label: Text("操作", style: TextStyle(fontSize: 12))),
-                  ],
-                  rows: (model.deviceInfo.channels ?? [])
-                      .asMap()
-                      .keys
-                      .map((index) {
-                    DeviceDetailNvrDataChannels? info =
-                        model.deviceInfo.channels?[index];
-                    return DataRow(
-                        color: WidgetStateProperty.all(index % 2 == 0
-                            ? "#4E5353".toColor()
-                            : "#3B3F3F".toColor()),
-                        cells: [
-                          DataCell(Text(
-                            "${info?.channelNum ?? 0}",
-                            style: const TextStyle(fontSize: 12),
-                          )),
-                          DataCell(Text(
-                            info?.recordStatus ?? "",
-                            style: TextStyle(
-                                fontSize: 12,
-                                color: (info?.recordStatus ?? "") == "正在录像"
-                                    ? ColorUtils.colorGreen
-                                    : ColorUtils.colorRed),
-                          )),
-                          DataCell(Text(info?.signalStatus ?? "",
-                              style: const TextStyle(fontSize: 12))),
-                          DataCell(Text(info?.updatedAt ?? "",
-                              style: const TextStyle(fontSize: 12))),
-                          DataCell(
-                            OutlinedButton(
-                              onPressed: () {
-                                model.removeChannelAction(info!);
-                              },
-                              style: ButtonStyle(
-                                padding: const WidgetStatePropertyAll(
-                                  EdgeInsets.symmetric(
-                                      vertical: 0.0, horizontal: 16),
-                                ),
-                                shape: WidgetStatePropertyAll(
-                                  //圆角
-                                  RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(5)),
-                                ),
-                                side: const WidgetStatePropertyAll(BorderSide(
-                                    color: ColorUtils.colorRed, width: 1.0)),
-                              ),
-                              child: const Text(
-                                "删除通道",
-                                style: TextStyle(
-                                    fontSize: 12, color: ColorUtils.colorRed),
-                              ),
-                            ),
-                          ),
-                        ]);
-                  }).toList(),
-                ),
-              ),
-            ),
+            child: NvrInfoWidget.buildNvrChannelsInfoContainer(
+                channels: model.deviceInfo.channels,
+                deviceCode: model.deviceInfo.deviceCode ?? "",
+                nodeId: model.deviceInfo.nodeId,
+                onRemoveSuccess: () {
+                  model.requestData();
+                }),
           ),
-
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
@@ -175,7 +104,7 @@ class DetailNvrView extends StatelessWidget {
               Clickable(
                 child: Container(
                   padding:
-                  const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
+                      const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
                   decoration: BoxDecoration(
                     color: ColorUtils.colorGreen,
                     borderRadius: BorderRadius.circular(4),
@@ -199,7 +128,7 @@ class DetailNvrView extends StatelessWidget {
               Clickable(
                 child: Container(
                   padding:
-                  const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
+                      const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
                   decoration: BoxDecoration(
                     color: "#2F94DD".toColor(),
                     borderRadius: BorderRadius.circular(4),
@@ -223,7 +152,7 @@ class DetailNvrView extends StatelessWidget {
               Clickable(
                 child: Container(
                   padding:
-                  const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
+                      const EdgeInsets.symmetric(horizontal: 25, vertical: 8),
                   decoration: BoxDecoration(
                     color: ColorUtils.colorRed,
                     borderRadius: BorderRadius.circular(4),
