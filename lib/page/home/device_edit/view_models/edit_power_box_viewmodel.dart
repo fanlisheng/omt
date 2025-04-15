@@ -69,7 +69,7 @@ class EditPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
   //选择电源箱code
   selectedPowerBoxCode(DeviceDetailPowerBoxData? a) {
     if (a == null) return;
-    _requestDcInterfaceData(a);
+    requestDcInterfaceData(a);
   }
 
   // 保存电源箱编辑
@@ -117,32 +117,9 @@ class EditPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
     notifyListeners();
   }
 
-  openDcAction(DeviceDetailPowerBoxDataDcInterfaces a) {
-    HttpQuery.share.homePageService.dcInterfaceControl(
-        deviceCode: selectedDeviceDetailPowerBox?.deviceCode ?? "",
-        ids: [a.id ?? 0],
-        status: a.statusText == "打开" ? 1 : 2,
-        onSuccess: (data) {
-          selectedDeviceDetailPowerBox?.dcInterfaces?.remove(a);
-          LoadingUtils.show(data: "${(a.statusText == "打开") ? "关闭" : "打开"}成功!");
-          // _requestData();
-        });
-  }
-
-  //记录 （绑定设备）
-  void recordDeviceAction(DeviceDetailPowerBoxDataDcInterfaces a) {
-    PowerBoxBindDeviceDialogPage.showAndSubmit(
-        context: context!,
-        deviceCode: selectedDeviceDetailPowerBox?.deviceCode ?? "",
-        dcId: a.id ?? 0,
-        onSuccess: () {
-          LoadingUtils.show(data: "记录成功!");
-          _requestDcInterfaceData(selectedDeviceDetailPowerBox!);
-        });
-  }
 
   //请求电源箱接口信息
-  void _requestDcInterfaceData(DeviceDetailPowerBoxData a) {
+  void requestDcInterfaceData(DeviceDetailPowerBoxData a) {
     HttpQuery.share.homePageService.deviceDetailPowerBox(
         deviceCode: a.deviceCode ?? "",
         onSuccess: (data) {

@@ -2,9 +2,11 @@ import 'package:fluent_ui/fluent_ui.dart' as ui;
 import 'package:flutter/material.dart';
 import 'package:kayo_package/extension/_index_extension.dart';
 import 'package:kayo_package/mvvm/base/provider_widget.dart';
+import 'package:kayo_package/utils/loading_utils.dart';
 import 'package:kayo_package/views/widget/base/clickable.dart';
 import 'package:kayo_package/views/widget/base/dash_line.dart';
 import 'package:omt/page/home/device_add/widgets/add_camera_view.dart';
+import 'package:omt/page/home/device_add/widgets/power_box_dc_widget.dart';
 import 'package:omt/utils/color_utils.dart';
 import '../../../../bean/common/id_name_value.dart';
 import '../../../../bean/home/home_page/device_detail_power_box_entity.dart';
@@ -19,7 +21,6 @@ class AddPowerBoxView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return ProviderWidget<AddPowerBoxViewModel>(
         model: model..themeNotifier = true,
         autoLoadData: true,
@@ -215,7 +216,24 @@ class AddPowerBoxView extends StatelessWidget {
               borderRadius: BorderRadius.circular(3),
             ),
             width: double.infinity,
-            child: edInfoView(model),
+            child: PowerBoxDcWidget.buildPowerBoxDcContainer(
+                dcInterfaces:
+                    model.selectedDeviceDetailPowerBox?.dcInterfaces ?? [],
+                deviceCode:
+                    model.selectedDeviceDetailPowerBox?.deviceCode ?? "",
+                context: model.context!,
+                onOpenDcSuccess: (info) {
+                  model.selectedDeviceDetailPowerBox?.dcInterfaces
+                      ?.remove(info);
+                  model.notifyListeners();
+                  LoadingUtils.show(
+                      data: "${(info.statusText == "打开") ? "关闭" : "打开"}成功!");
+                },
+                onRecordSuccess: (info) {
+                  LoadingUtils.show(data: "记录成功!");
+                  model.requestDcInterfaceData(
+                      model.selectedDeviceDetailPowerBox!);
+                }),
           ),
         ]
       ],
@@ -273,118 +291,4 @@ class AddPowerBoxView extends StatelessWidget {
     );
   }
 
-  Widget edInfoView(AddPowerBoxViewModel model) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          "电源箱DC接口信息",
-          style: TextStyle(
-            fontSize: 14,
-            color: ColorUtils.colorGreenLiteLite,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 12),
-        SizedBox(
-          width: double.infinity,
-          child: DataTable(
-            decoration: BoxDecoration(
-              color: "#3B3F3F".toColor(),
-              borderRadius: BorderRadius.circular(3),
-            ),
-            dataRowHeight: 40,
-            headingRowHeight: 40,
-            dividerThickness: 0.01,
-            columns: const [
-              DataColumn(label: Text("DC", style: TextStyle(fontSize: 12))),
-              DataColumn(label: Text("状态", style: TextStyle(fontSize: 12))),
-              DataColumn(label: Text("电压", style: TextStyle(fontSize: 12))),
-              DataColumn(label: Text("电流", style: TextStyle(fontSize: 12))),
-              DataColumn(label: Text("运行设备", style: TextStyle(fontSize: 12))),
-              DataColumn(label: Text("操作", style: TextStyle(fontSize: 12))),
-            ],
-            rows:
-            (model.selectedDeviceDetailPowerBox?.dcInterfaces ?? []).asMap().keys.map((index) {
-              DeviceDetailPowerBoxDataDcInterfaces info =
-              (model.selectedDeviceDetailPowerBox?.dcInterfaces ?? [])[index];
-              return DataRow(
-                  color: WidgetStateProperty.all(index % 2 == 0
-                      ? "#4E5353".toColor()
-                      : "#3B3F3F".toColor()),
-                  cells: [
-                    DataCell(Text(
-                      (info.interfaceNum ?? 0).toString(),
-                      style: const TextStyle(fontSize: 12),
-                    )),
-                    DataCell(Text(
-                      info.statusText ?? "",
-                      style: const TextStyle(fontSize: 12),
-                    )),
-                    DataCell(Text((info.voltage ?? 0).toString(),
-                        style: const TextStyle(fontSize: 12))),
-                    DataCell(Text((info.current ?? 0).toString(),
-                        style: const TextStyle(fontSize: 12))),
-                    DataCell(Text(info.connectDevice ?? "",
-                        style: const TextStyle(fontSize: 12))),
-                    DataCell(Row(
-                      children: [
-                        OutlinedButton(
-                          onPressed: () {
-                            model.openDcAction(info);
-                          },
-                          style: ButtonStyle(
-                            padding: const WidgetStatePropertyAll(
-                              EdgeInsets.symmetric(
-                                  vertical: -2.0, horizontal: 10),
-                            ),
-                            shape: WidgetStatePropertyAll(
-                              //圆角
-                              RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(5)),
-                            ),
-                            side: const WidgetStatePropertyAll(BorderSide(
-                                color: ColorUtils.colorRed, width: 1.0)),
-                          ),
-                          child: Text(
-                            info.statusText == "关闭" ? "打开" : "关闭",
-                            style: TextStyle(
-                                fontSize: 12,
-                                color: info.statusText == "关闭"
-                                    ? ColorUtils.colorGreen
-                                    : ColorUtils.colorRed),
-                          ),
-                        ),
-                        OutlinedButton(
-                          onPressed: () {
-                            model.recordDeviceAction(info);
-                          },
-                          style: ButtonStyle(
-                            padding: const WidgetStatePropertyAll(
-                              EdgeInsets.symmetric(
-                                  vertical: 0.0, horizontal: 10),
-                            ),
-                            shape: WidgetStatePropertyAll(
-                              //圆角
-                              RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(5)),
-                            ),
-                            side: const WidgetStatePropertyAll(BorderSide(
-                                color: ColorUtils.colorRed, width: 1.0)),
-                          ),
-                          child: const Text(
-                            "记录",
-                            style: TextStyle(
-                                fontSize: 12, color: ColorUtils.colorRed),
-                          ),
-                        ),
-                      ],
-                    )),
-                  ]);
-            }).toList(),
-          ),
-        )
-      ],
-    );
-  }
 }

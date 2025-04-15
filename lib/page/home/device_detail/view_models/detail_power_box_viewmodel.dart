@@ -27,10 +27,10 @@ class DetailPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
   @override
   void initState() async {
     super.initState();
-    _requestData();
+    requestData();
   }
 
-  void _requestData() {
+  void requestData() {
     HttpQuery.share.homePageService.deviceDetailPowerBox(
         nodeId: nodeId,
         onSuccess: (DeviceDetailPowerBoxData? a) {
@@ -73,32 +73,32 @@ class DetailPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
         onSuccess: (data) {
           isCloseAllDc = false;
           LoadingUtils.show(data: "${isCloseAllDc ? "关闭" : "打开"}成功!");
-          _requestData();
+          requestData();
         });
   }
 
-  openDcAction(DeviceDetailPowerBoxDataDcInterfaces a) {
-    HttpQuery.share.homePageService.dcInterfaceControl(
-        deviceCode: deviceInfo.deviceCode ?? "",
-        ids: [a.id ?? 0],
-        status: a.statusText == "打开" ? 1 : 2,
-        onSuccess: (data) {
-          LoadingUtils.show(data: "${(a.statusText == "打开") ? "关闭" : "打开"}成功!");
-          _requestData();
-        });
-  }
+  // openDcAction(DeviceDetailPowerBoxDataDcInterfaces a) {
+  //   HttpQuery.share.homePageService.dcInterfaceControl(
+  //       deviceCode: deviceInfo.deviceCode ?? "",
+  //       ids: [a.id ?? 0],
+  //       status: a.statusText == "打开" ? 1 : 2,
+  //       onSuccess: (data) {
+  //         LoadingUtils.show(data: "${(a.statusText == "打开") ? "关闭" : "打开"}成功!");
+  //         _requestData();
+  //       });
+  // }
 
   //记录 （绑定设备）
-  void recordDeviceAction(DeviceDetailPowerBoxDataDcInterfaces a) {
-    PowerBoxBindDeviceDialogPage.showAndSubmit(
-        context: context!,
-        deviceCode: deviceInfo.deviceCode ?? "",
-        dcId: a.id ?? 0,
-        onSuccess: () {
-          LoadingUtils.show(data: "记录成功!");
-          _requestData();
-        });
-  }
+  // void recordDeviceAction(DeviceDetailPowerBoxDataDcInterfaces a) {
+  //   PowerBoxBindDeviceDialogPage.showAndSubmit(
+  //       context: context!,
+  //       deviceCode: deviceInfo.deviceCode ?? "",
+  //       dcId: a.id ?? 0,
+  //       onSuccess: () {
+  //         LoadingUtils.show(data: "记录成功!");
+  //         requestData();
+  //       });
+  // }
 
   //修改
   editAction() {
@@ -124,7 +124,7 @@ class DetailPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
       if (IntentUtils.share.isResultOk(value)) {
         isChange = true;
         onChange(isChange);
-        _requestData();
+        requestData();
       }
     });
   }
