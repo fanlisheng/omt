@@ -10,6 +10,7 @@ import 'package:omt/page/home/device_add/widgets/power_box_dc_widget.dart';
 import 'package:omt/utils/color_utils.dart';
 import '../../../../bean/common/id_name_value.dart';
 import '../../../../bean/home/home_page/device_detail_power_box_entity.dart';
+import '../../../../widget/searchable_dropdown.dart';
 import '../../device_detail/widgets/detail_ai_view.dart';
 import '../view_models/add_power_box_viewmodel.dart';
 import 'add_ai_view.dart';
@@ -153,32 +154,16 @@ class AddPowerBoxView extends StatelessWidget {
                       children: [
                         const RowTitle(name: "电源箱编码"),
                         const SizedBox(height: 8),
-                        ui.ComboBox<DeviceDetailPowerBoxData>(
-                          isExpanded: true,
-                          value: model.selectedDeviceDetailPowerBox,
-                          items: model.powerBoxList
-                              .map<ui.ComboBoxItem<DeviceDetailPowerBoxData>>(
-                                  (e) {
-                            return ui.ComboBoxItem<DeviceDetailPowerBoxData>(
-                              value: e,
-                              child: SizedBox(
-                                child: Text(
-                                  e.deviceCode ?? '',
-                                  textAlign: TextAlign.start,
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: (a) {
+                        SearchableDropdown<DeviceDetailPowerBoxData>(
+                          asgbKey: model.asgbKey,
+                          focusNode: model.focusNode,
+                          controller: model.controller,
+                          items: model.powerBoxList,
+                          placeholder: "电源箱编码",
+                          labelSelector: (item) => item.deviceCode ?? "",
+                          onSelected: (a) {
                             model.selectedPowerBoxCode(a);
                           },
-                          placeholder: const Text(
-                            "请选择电源箱编码",
-                            textAlign: TextAlign.start,
-                            style: TextStyle(
-                                fontSize: 12,
-                                color: ColorUtils.colorBlackLiteLite),
-                          ),
                         ),
                       ],
                     )),

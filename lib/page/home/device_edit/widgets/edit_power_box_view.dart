@@ -7,6 +7,7 @@ import 'package:kayo_package/views/widget/base/clickable.dart';
 import 'package:kayo_package/views/widget/base/dash_line.dart';
 import 'package:omt/page/home/device_add/widgets/add_camera_view.dart';
 import 'package:omt/utils/color_utils.dart';
+import 'package:omt/widget/searchable_dropdown.dart';
 import '../../../../bean/common/id_name_value.dart';
 import '../../../../bean/home/home_page/device_detail_power_box_entity.dart';
 import '../../../../theme.dart';
@@ -31,7 +32,7 @@ class EditPowerBoxView extends StatelessWidget {
         autoLoadData: true,
         builder: (context, model, child) {
           return DHeaderPage(
-            title: "修改信息",
+            title: model.isReplace == false ? "修改信息" : " 替换设备",
             titlePath: "首页 / 电源箱 / ",
             content: model.isReplace == false
                 ? editPowerBoxView(model)
@@ -163,119 +164,186 @@ class EditPowerBoxView extends StatelessWidget {
   }
 
   Widget replaceBoxView(EditPowerBoxViewModel model) {
-    return ListView(
-      // crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
       children: [
-        Container(
-          margin: const EdgeInsets.only(
-            left: 16,
-            right: 16,
-            bottom: 16,
-          ),
-          padding:
-              const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 16),
-          decoration: BoxDecoration(
-            color: ColorUtils.colorBackgroundLine,
-            borderRadius: BorderRadius.circular(3),
-          ),
-          width: double.infinity,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "替换",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: ColorUtils.colorGreenLiteLite,
-                  fontWeight: FontWeight.w500,
-                ),
+        Expanded(child: ListView(
+          // crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              margin: const EdgeInsets.only(
+                left: 16,
+                right: 16,
+                bottom: 16,
               ),
-              const SizedBox(height: 10),
-              EquallyRow(
-                  one: Column(
+              padding: const EdgeInsets.only(
+                  left: 16, right: 16, top: 16, bottom: 16),
+              decoration: BoxDecoration(
+                color: ColorUtils.colorBackgroundLine,
+                borderRadius: BorderRadius.circular(3),
+              ),
+              width: double.infinity,
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const RowTitle(name: "电源箱编码"),
-                  const SizedBox(height: 8),
-                  ui.ComboBox<DeviceDetailPowerBoxData>(
-                    isExpanded: true,
-                    value: model.selectedDeviceDetailPowerBox,
-                    items: model.powerBoxList
-                        .map<ui.ComboBoxItem<DeviceDetailPowerBoxData>>((e) {
-                      return ui.ComboBoxItem<DeviceDetailPowerBoxData>(
-                        value: e,
-                        child: SizedBox(
-                          child: Text(
-                            e.deviceCode ?? '',
-                            textAlign: TextAlign.start,
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: (a) {
-                      model.selectedPowerBoxCode(a);
-                    },
-                    placeholder: const Text(
-                      "请选择电源箱编码",
-                      textAlign: TextAlign.start,
-                      style: TextStyle(
-                          fontSize: 12, color: ColorUtils.colorBlackLiteLite),
+                  const Text(
+                    "替换",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: ColorUtils.colorGreenLiteLite,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
+                  const SizedBox(height: 10),
+                  EquallyRow(
+                      one: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const RowTitle(name: "电源箱编码"),
+                          const SizedBox(height: 8),
+                          SearchableDropdown<DeviceDetailPowerBoxData>(
+                            asgbKey: model.asgbKey,
+                            focusNode: model.focusNode,
+                            controller: model.controller,
+                            items: model.powerBoxList,
+                            placeholder: "电源箱编码",
+                            labelSelector: (item) => item.deviceCode ?? "",
+                            onSelected: (a) {
+                              model.selectedPowerBoxCode(a);
+                            },
+                          ),
+                          // ui.ComboBox<DeviceDetailPowerBoxData>(
+                          //   isExpanded: true,
+                          //   value: model.selectedDeviceDetailPowerBox,
+                          //   items: model.powerBoxList
+                          //       .map<ui.ComboBoxItem<DeviceDetailPowerBoxData>>((e) {
+                          //     return ui.ComboBoxItem<DeviceDetailPowerBoxData>(
+                          //       value: e,
+                          //       child: SizedBox(
+                          //         child: Text(
+                          //           e.deviceCode ?? '',
+                          //           textAlign: TextAlign.start,
+                          //         ),
+                          //       ),
+                          //     );
+                          //   }).toList(),
+                          //   onChanged: (a) {
+                          //     model.selectedPowerBoxCode(a);
+                          //   },
+                          //   placeholder: const Text(
+                          //     "请选择电源箱编码",
+                          //     textAlign: TextAlign.start,
+                          //     style: TextStyle(
+                          //         fontSize: 12, color: ColorUtils.colorBlackLiteLite),
+                          //   ),
+                          // ),
+                        ],
+                      )),
                 ],
-              )),
-            ],
-          ),
-        ),
-        if (model.selectedDeviceDetailPowerBox != null) ...[
-          Container(
-            margin: const EdgeInsets.only(
-              left: 16,
-              right: 16,
-              bottom: 16,
+              ),
             ),
-            padding:
-                const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 16),
-            decoration: BoxDecoration(
-              color: ColorUtils.colorBackgroundLine,
-              borderRadius: BorderRadius.circular(3),
-            ),
-            width: double.infinity,
-            child: infoView(model),
-          ),
-          Container(
-            margin: const EdgeInsets.only(
-              left: 16,
-              right: 16,
-              bottom: 16,
-            ),
-            padding:
-                const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 16),
-            decoration: BoxDecoration(
-              color: ColorUtils.colorBackgroundLine,
-              borderRadius: BorderRadius.circular(3),
-            ),
-            width: double.infinity,
-            child: PowerBoxDcWidget.buildPowerBoxDcContainer(
-                dcInterfaces:
+            if (model.selectedDeviceDetailPowerBox != null) ...[
+              Container(
+                margin: const EdgeInsets.only(
+                  left: 16,
+                  right: 16,
+                  bottom: 16,
+                ),
+                padding: const EdgeInsets.only(
+                    left: 16, right: 16, top: 16, bottom: 16),
+                decoration: BoxDecoration(
+                  color: ColorUtils.colorBackgroundLine,
+                  borderRadius: BorderRadius.circular(3),
+                ),
+                width: double.infinity,
+                child: infoView(model),
+              ),
+              Container(
+                margin: const EdgeInsets.only(
+                  left: 16,
+                  right: 16,
+                  bottom: 16,
+                ),
+                padding: const EdgeInsets.only(
+                    left: 16, right: 16, top: 16, bottom: 16),
+                decoration: BoxDecoration(
+                  color: ColorUtils.colorBackgroundLine,
+                  borderRadius: BorderRadius.circular(3),
+                ),
+                width: double.infinity,
+                child: PowerBoxDcWidget.buildPowerBoxDcContainer(
+                    dcInterfaces:
                     model.selectedDeviceDetailPowerBox?.dcInterfaces ?? [],
-                deviceCode:
+                    deviceCode:
                     model.selectedDeviceDetailPowerBox?.deviceCode ?? "",
-                context: model.context!,
-                onOpenDcSuccess: (info) {
-                  model.selectedDeviceDetailPowerBox?.dcInterfaces
-                      ?.remove(info);
-                  LoadingUtils.showToast(
-                      data: "${(info.statusText == "打开") ? "关闭" : "打开"}成功!");
-                  model.notifyListeners();
-                },
-                onRecordSuccess: (info) {
-                  LoadingUtils.showToast(data: "记录成功!");
-                  model.requestDcInterfaceData(
-                      model.selectedDeviceDetailPowerBox!);
-                }),
-          ),
-        ]
+                    context: model.context!,
+                    onOpenDcSuccess: (info) {
+                      model.selectedDeviceDetailPowerBox?.dcInterfaces
+                          ?.remove(info);
+                      LoadingUtils.showToast(
+                          data:
+                          "${(info.statusText == "打开") ? "关闭" : "打开"}成功!");
+                      model.notifyListeners();
+                    },
+                    onRecordSuccess: (info) {
+                      LoadingUtils.showToast(data: "记录成功!");
+                      model.requestDcInterfaceData(
+                          model.selectedDeviceDetailPowerBox!);
+                    }),
+              ),
+            ],
+          ],
+        ),),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Clickable(
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 38, vertical: 8),
+                // width: 120,
+                // height: 36,
+                decoration: BoxDecoration(
+                  color: ColorUtils.colorRed,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  "取消",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: ColorUtils.colorWhite,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              onTap: () {
+                IntentUtils.share.pop(model.context!);
+              },
+            ),
+            const SizedBox(width: 10),
+            Clickable(
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 38, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppTheme().color,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  "确认替换",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: ColorUtils.colorWhite,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              onTap: () {
+                model.replaceDevice();
+              },
+            ),
+          ],
+        ),
+        const SizedBox(height: 30),
       ],
     );
   }

@@ -1,3 +1,4 @@
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
@@ -6,8 +7,6 @@ import 'package:omt/bean/home/home_page/device_detail_power_box_entity.dart';
 import 'package:omt/http/http_query.dart';
 import 'package:omt/utils/intent_utils.dart';
 
-import '../../device_add/widgets/power_box_bind_device_dialog_page.dart';
-import '../../device_detail/view_models/detail_power_box_viewmodel.dart';
 
 class EditPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
   final DeviceDetailPowerBoxData deviceInfo;
@@ -20,6 +19,10 @@ class EditPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
   bool isPowerBoxNeeded = true;
   List<DeviceDetailPowerBoxData> powerBoxList = [];
   List<IdNameValue> inOutList = [];
+
+  final asgbKey = GlobalKey<AutoSuggestBoxState>();
+  final focusNode = FocusNode();
+  final controller = TextEditingController();
 
   @override
   void initState() async {
@@ -58,6 +61,7 @@ class EditPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
 
   @override
   void dispose() {
+    controller.dispose;
     super.dispose();
   }
 
@@ -69,6 +73,7 @@ class EditPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
   //选择电源箱code
   selectedPowerBoxCode(DeviceDetailPowerBoxData? a) {
     if (a == null) return;
+    selectedDeviceDetailPowerBox = a;
     requestDcInterfaceData(a);
   }
 
@@ -102,7 +107,7 @@ class EditPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
 
     HttpQuery.share.homePageService.replacePowerBox(
         nodeId: int.parse(deviceInfo.nodeId ?? "0"),
-        deviceCode: deviceInfo.deviceCode ?? "",
+        deviceCode: selectedDeviceDetailPowerBox?.deviceCode ?? "",
         onSuccess: (result) {
           LoadingUtils.showToast(data: "修改信息成功");
           IntentUtils.share.popResultOk(context!);

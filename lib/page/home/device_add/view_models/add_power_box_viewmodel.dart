@@ -1,3 +1,4 @@
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
@@ -20,6 +21,10 @@ class AddPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
   bool isPowerBoxNeeded = true;
   List<DeviceDetailPowerBoxData> powerBoxList = [];
   List<IdNameValue> inOutList = [];
+
+  final asgbKey = GlobalKey<AutoSuggestBoxState>();
+  final focusNode = FocusNode();
+  final controller = TextEditingController();
 
   // String powerBoxMemo = "";
   // final TextEditingController powerBoxMemoController = TextEditingController();
@@ -45,7 +50,7 @@ class AddPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
 
   @override
   void dispose() {
-    // powerBoxMemoController.dispose();
+    controller.dispose();
     super.dispose();
   }
 

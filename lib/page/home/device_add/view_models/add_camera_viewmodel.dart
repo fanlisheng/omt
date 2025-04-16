@@ -104,6 +104,7 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
 
     var webcam = VideoInfoCamEntity()
       ..name = cameraDeviceEntity.deviceNameController.text
+      ..value = cameraDeviceEntity.code ?? ""
       ..rtsp = cameraDeviceEntity.rtsp
       ..in_out = cameraDeviceEntity.selectedEntryExit?.id ?? -1;
 
@@ -113,7 +114,6 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
     HttpQuery.share.homePageService.configAi(
         data: webcam,
         onSuccess: (data) {
-
           //调用添加
           Map<String, dynamic> aiParams = {
             "ip": cameraDevice.selectedAi?.ip ?? "",
@@ -149,7 +149,6 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
               onError: (error) {
                 LoadingUtils.showToast(data: '安装失败: $error');
               });
-
         },
         onError: (e) {
           LoadingUtils.showError(data: "配置本地AI设备信息失败");
