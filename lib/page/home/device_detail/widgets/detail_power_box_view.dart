@@ -268,7 +268,7 @@ class DetailPowerBoxView extends StatelessWidget {
               RowItemInfoView(
                   name: "电池电压", value: "${model.deviceInfo.batteryVoltage}"),
               RowItemInfoView(
-                  name: "电量", value: "${model.deviceInfo.batteryCapacity}"),
+                  name: "电量", value: "${model.deviceInfo.batteryCapacity}%"),
             ],
           ),
           const SizedBox(height: 12),
@@ -285,10 +285,10 @@ class DetailPowerBoxView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               RowItemInfoView(
-                  name: "进风口温度", value: "${model.deviceInfo.inletTemperature}"),
+                  name: "进风口温度", value: "${model.deviceInfo.inletTemperature}℃"),
               RowItemInfoView(
                   name: "出风口温度",
-                  value: "${model.deviceInfo.outletTemperature}"),
+                  value: "${model.deviceInfo.outletTemperature}℃"),
             ],
           ),
           const SizedBox(height: 12),

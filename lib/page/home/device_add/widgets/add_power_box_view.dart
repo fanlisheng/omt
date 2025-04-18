@@ -243,24 +243,30 @@ class AddPowerBoxView extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              RowItemInfoView(name: "电池电压）", value: "电池电压"),
-              RowItemInfoView(name: "电量", value: "100%"),
+              RowItemInfoView(
+                  name: "电池电压）",
+                  value:
+                      "${model.selectedDeviceDetailPowerBox?.batteryVoltage ?? 0}"),
+              RowItemInfoView(
+                  name: "电量",
+                  value:
+                      "${model.selectedDeviceDetailPowerBox?.batteryCapacity ?? 0}%"),
             ],
           ),
           const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              RowItemInfoView(name: "供电状态", value: "供电状态"),
-              RowItemInfoView(name: "工作时长", value: "工作时长"),
+              RowItemInfoView(name: "供电状态", value: "${model.selectedDeviceDetailPowerBox?.powerStatus ?? 0}"),
+              RowItemInfoView(name: "工作时长", value: model.selectedDeviceDetailPowerBox?.workTime ?? ""),
             ],
           ),
           const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              RowItemInfoView(name: "进风口温度", value: "进风口温度"),
-              RowItemInfoView(name: "出风口温度", value: "出风口温度"),
+              RowItemInfoView(name: "进风口温度", value: "${model.selectedDeviceDetailPowerBox?.inletTemperature}℃"),
+              RowItemInfoView(name: "出风口温度", value: "${model.selectedDeviceDetailPowerBox?.outletTemperature}℃"),
             ],
           ),
           const SizedBox(height: 12),
@@ -275,5 +281,4 @@ class AddPowerBoxView extends StatelessWidget {
       ),
     );
   }
-
 }

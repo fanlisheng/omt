@@ -75,7 +75,7 @@ class DetailBatteryExchangeView extends StatelessWidget {
                 children: [
                   RowItemInfoView(
                       name: "交换机接口数量",
-                      value: "${model.deviceInfo.interfaceNum}"),
+                      value: "${model.deviceInfo.interfaceNum}口"),
                   RowItemInfoView(
                       name: "交换机供电方式", value: model.deviceInfo.powerMethod),
                 ],

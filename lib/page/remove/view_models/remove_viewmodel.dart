@@ -88,8 +88,7 @@ class RemoveViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   //拆除设备
-  dismantleEventAction(BuildContext dialogContext,
-      String selectedDismantleCause, String remark) async {
+  dismantleEventAction() async {
     List<int> nodeIds = [];
     for (DeviceListData d in dismantleDeviceList) {
       nodeIds.add(d.id.toInt());

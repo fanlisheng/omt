@@ -61,12 +61,8 @@ class EditAiView extends StatelessWidget {
               const ui.SizedBox(width: 10),
               Clickable(
                 onTap: () {
-                  showAiSearchDialog(context).then((ip) {
-                    model.selectedAiIp = ip;
-                    model.startAiSearch();
-                    // model.selectedAiIp = ip;
-                    // model.notifyListeners();
-                  });
+                  model.selectedAiIp = null;
+                  model.startAiSearch();
                 },
                 child: Container(
                   padding:
@@ -248,7 +244,8 @@ class EditAiView extends StatelessWidget {
             }).toList(),
           ),
         ),
-        if (model.aiDeviceList.isNotEmpty && (model.aiDeviceList.first.ip?.isNotEmpty ?? false)) ...[
+        if (model.aiDeviceList.isNotEmpty &&
+            (model.aiDeviceList.first.ip?.isNotEmpty ?? false)) ...[
           Expanded(child: Container()),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,

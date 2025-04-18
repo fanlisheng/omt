@@ -27,7 +27,7 @@ class RemoveScreen extends StatelessWidget {
             child: fu.ScaffoldPage(
               header: const fu.PageHeader(
                 title: DNavigationView(
-                  title: "安装",
+                  title: "拆除",
                   titlePass: "",
                   hasReturn: false,
                 ),
@@ -74,19 +74,19 @@ class RemoveScreen extends StatelessWidget {
                 ),
               ),
               onTap: () {
-                fu.showDialog(
-                  context: context1,
-                  barrierDismissible: false, // 禁止点击外部关闭
-                  builder: (BuildContext context) {
-                    return RemoveDialog(
-                      onSubmit: (context, dismantleCause, description) {
-                        // 比如调用 ViewModel 的方法
-                        model.dismantleEventAction(
-                            context, dismantleCause, description);
-                      },
-                    );
-                  },
-                );
+                model.dismantleEventAction();
+                // fu.showDialog(
+                //   context: context1,
+                //   barrierDismissible: false, // 禁止点击外部关闭
+                //   builder: (BuildContext context) {
+                //     return RemoveDialog(
+                //       onSubmit: (context, dismantleCause, description) {
+                //         // 比如调用 ViewModel 的方法
+                //
+                //       },
+                //     );
+                //   },
+                // );
               },
             ),
             const SizedBox(width: 120),
@@ -120,8 +120,8 @@ class RemoveScreen extends StatelessWidget {
         padding:
             const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 16),
         decoration: BoxDecoration(
-            color: ColorUtils.colorBackgroundLine,
-            borderRadius: BorderRadius.circular(3),
+          color: ColorUtils.colorBackgroundLine,
+          borderRadius: BorderRadius.circular(3),
         ),
         width: double.infinity,
         child: Column(
@@ -135,7 +135,7 @@ class RemoveScreen extends StatelessWidget {
                   child: Text(
                     "已选择拆除设备",
                     style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 16,
                         color: ColorUtils.colorWhite,
                         fontWeight: FontWeight.bold),
                   ),
@@ -165,7 +165,7 @@ class RemoveScreen extends StatelessWidget {
                     child: Text(
                       "不拆除设备",
                       style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 16,
                           color: ColorUtils.colorWhite,
                           fontWeight: FontWeight.bold),
                     ),
@@ -306,7 +306,7 @@ class RemoveScreen extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 8, bottom: 8),
                 decoration: BoxDecoration(
                   color: ColorUtils.colorGreen,
-                    borderRadius: BorderRadius.circular(3),
+                  borderRadius: BorderRadius.circular(3),
                 ),
                 alignment: Alignment.center,
                 child: const Text(
@@ -334,6 +334,12 @@ class RemoveScreen extends StatelessWidget {
         spacing: 10, // 水平间距
         runSpacing: 10, // 垂直间距
         children: List.generate(deviceData.length, (index) {
+          String? imageUrl;
+          Color? color;
+          if (deviceData[index].selected == true) {
+            imageUrl = "home/ic_device_remove";
+            color = "#FF4D4F".toColor();
+          }
           return Clickable(
             onTap: onTap != null
                 ? () {
@@ -346,14 +352,10 @@ class RemoveScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 border: Border.all(
                   width: 1,
-                  color: deviceData[index].selected == true
-                      ? ColorUtils.colorGreen
-                      : "#5D6666".toColor(),
+                  color: color ?? "#5D6666".toColor(),
                 ),
                 borderRadius: BorderRadius.circular(3),
-                color: deviceData[index].selected == true
-                    ? "#5D6666".toColor()
-                    : ColorUtils.transparent,
+                color: color?.withOpacity(0.1) ?? ColorUtils.transparent,
                 boxShadow: [
                   BoxShadow(
                     color: '#82FFFC'.toColor(opacity: .05),
@@ -409,14 +411,14 @@ class RemoveScreen extends StatelessWidget {
                     ),
                   ),
                   Visibility(
-                    visible: deviceData[index].selected ?? false,
+                    visible: true,
                     child: Positioned(
                       top: 2,
                       right: 2,
                       width: 16,
                       height: 16,
                       child: ImageView(
-                        src: source("home/ic_device_selected"),
+                        src: source(imageUrl ?? "home/ic_device_add"),
                       ),
                     ),
                   ),

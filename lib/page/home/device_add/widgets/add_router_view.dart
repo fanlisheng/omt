@@ -42,7 +42,7 @@ class AddRouterView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                "第二：添加路由器信息",
+                "添加网络信息",
                 style: TextStyle(
                   fontSize: 14,
                   color: ColorUtils.colorGreenLiteLite,

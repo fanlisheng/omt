@@ -17,6 +17,7 @@ class DeviceEntity {
   String? deviceCode;
   String? mac;
   bool? selected;
+  List<String>? fault;
 
   DeviceEntity(
       {this.deviceType,

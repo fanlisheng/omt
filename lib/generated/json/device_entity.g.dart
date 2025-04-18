@@ -34,6 +34,11 @@ DeviceEntity $DeviceEntityFromJson(Map<String, dynamic> json) {
   if (selected != null) {
     deviceEntity.selected = selected;
   }
+  final List<String>? fault = (json['fault'] as List<dynamic>?)?.map(
+          (e) => jsonConvert.convert<String>(e) as String).toList();
+  if (fault != null) {
+    deviceEntity.fault = fault;
+  }
   return deviceEntity;
 }
 
@@ -45,6 +50,7 @@ Map<String, dynamic> $DeviceEntityToJson(DeviceEntity entity) {
   data['device_code'] = entity.deviceCode;
   data['mac'] = entity.mac;
   data['selected'] = entity.selected;
+  data['fault'] = entity.fault;
   return data;
 }
 
@@ -56,6 +62,7 @@ extension DeviceEntityExtension on DeviceEntity {
     String? deviceCode,
     String? mac,
     bool? selected,
+    List<String>? fault,
   }) {
     return DeviceEntity()
       ..deviceType = deviceType ?? this.deviceType
@@ -63,7 +70,8 @@ extension DeviceEntityExtension on DeviceEntity {
       ..ip = ip ?? this.ip
       ..deviceCode = deviceCode ?? this.deviceCode
       ..mac = mac ?? this.mac
-      ..selected = selected ?? this.selected;
+      ..selected = selected ?? this.selected
+      ..fault = fault ?? this.fault;
   }
 }
 

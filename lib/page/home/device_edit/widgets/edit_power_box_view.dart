@@ -386,10 +386,10 @@ class EditPowerBoxView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               RowItemInfoView(
-                  name: "进风口温度", value: "${model.deviceInfo.inletTemperature}"),
+                  name: "进风口温度", value: "${model.deviceInfo.inletTemperature}℃"),
               RowItemInfoView(
                   name: "出风口温度",
-                  value: "${model.deviceInfo.outletTemperature}"),
+                  value: "${model.deviceInfo.outletTemperature}℃"),
             ],
           ),
           const SizedBox(height: 12),

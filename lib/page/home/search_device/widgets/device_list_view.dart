@@ -6,6 +6,7 @@ import 'package:omt/page/home/search_device/view_models/search_device_viewmodel.
 import 'package:omt/utils/device_utils.dart';
 import '../../../../utils/color_utils.dart';
 import '../../../one_picture/one_picture/one_picture_page.dart';
+import 'package:fluent_ui/fluent_ui.dart' as ui;
 
 class DeviceListView extends StatefulWidget {
   final SearchDeviceViewModel viewModel;
@@ -444,55 +445,65 @@ class _DeviceListViewState extends State<DeviceListView> {
           spacing: 10, // 水平间距
           runSpacing: 10, // 垂直间距
           children: List.generate(deviceData.length, (index) {
-            return Container(
-              width: 90, // 固定宽度
-              height: 76, // 固定高度
-              decoration: BoxDecoration(
-                border: Border.all(width: 1, color: "#5D6666".toColor()),
-                borderRadius: BorderRadius.circular(3),
-                boxShadow: [
-                  BoxShadow(
-                      color: '#82FFFC'.toColor(opacity: .05), spreadRadius: 1),
-                ],
+            Color bgColor = ((deviceData[index].fault?.length ?? 0) > 0)
+                ? Colors.red.withOpacity(0.1)
+                : '#82FFFC'.toColor().withOpacity(0.05);
+            String fault =   (deviceData[index].fault??[]).join("\n");
+            return ui.Tooltip(
+              message: fault,
+              useMousePosition: false,
+              style: const ui.TooltipThemeData(
+                waitDuration: Duration(),
               ),
-              child: Column(
-                children: [
-                  const SizedBox(height: 8),
-                  Expanded(
-                    flex: 5,
-                    child: ImageView(
-                      src: source(DeviceUtils.getDeviceImage(
-                          deviceData[index].deviceType ?? 0)),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Expanded(
-                    flex: 2,
-                    child: FittedBox(
-                      fit: BoxFit.contain,
-                      child: Text(
-                        DeviceUtils.getDeviceTypeString(
-                            deviceData[index].deviceType ?? 0),
-                        style: const TextStyle(color: ColorUtils.colorWhite),
+              child: Container(
+                width: 90, // 固定宽度
+                height: 76, // 固定高度
+                decoration: BoxDecoration(
+                  border: Border.all(width: 1, color: "#5D6666".toColor()),
+                  borderRadius: BorderRadius.circular(3),
+                  boxShadow: [
+                    BoxShadow(color: bgColor, spreadRadius: 1),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 8),
+                    Expanded(
+                      flex: 5,
+                      child: ImageView(
+                        src: source(DeviceUtils.getDeviceImage(
+                            deviceData[index].deviceType ?? 0)),
                       ),
                     ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: FittedBox(
-                      fit: BoxFit.contain,
-                      child: Container(
-                        margin:
-                            const EdgeInsets.only(left: 2, right: 2, bottom: 4),
+                    const SizedBox(height: 4),
+                    Expanded(
+                      flex: 2,
+                      child: FittedBox(
+                        fit: BoxFit.contain,
                         child: Text(
-                          deviceData[index].ip ?? "",
-                          style: const TextStyle(
-                              color: ColorUtils.colorWhite, fontSize: 10),
+                          DeviceUtils.getDeviceTypeString(
+                              deviceData[index].deviceType ?? 0),
+                          style: const TextStyle(color: ColorUtils.colorWhite),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                    Expanded(
+                      flex: 2,
+                      child: FittedBox(
+                        fit: BoxFit.contain,
+                        child: Container(
+                          margin:
+                          const EdgeInsets.only(left: 2, right: 2, bottom: 4),
+                          child: Text(
+                            deviceData[index].ip ?? "",
+                            style: const TextStyle(
+                                color: ColorUtils.colorWhite, fontSize: 10),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             );
           }),

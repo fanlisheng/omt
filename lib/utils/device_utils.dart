@@ -317,6 +317,7 @@ class DeviceUtils {
     "13": "home/ic_device_dc",
     "5": "home/ic_device_dyx",
     "7": "home/ic_device_yxwl",
+    "4": "home/ic_device_dc",
   };
 
   static const Map<int, DeviceType> intToDeviceTypeMap = {

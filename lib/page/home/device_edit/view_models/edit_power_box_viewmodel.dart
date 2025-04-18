@@ -109,7 +109,7 @@ class EditPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
         nodeId: int.parse(deviceInfo.nodeId ?? "0"),
         deviceCode: selectedDeviceDetailPowerBox?.deviceCode ?? "",
         onSuccess: (result) {
-          LoadingUtils.showToast(data: "修改信息成功");
+          LoadingUtils.showToast(data: "替换成功");
           IntentUtils.share.popResultOk(context!);
         },
         onError: (error) {

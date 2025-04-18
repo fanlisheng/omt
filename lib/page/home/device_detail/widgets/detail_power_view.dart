@@ -78,7 +78,7 @@ class DetailPowerView extends StatelessWidget {
                       value: (model.deviceInfo.powerTypeText ?? []).join("、")),
                   RowItemInfoView(
                       name: "电池容量",
-                      value: "${model.deviceInfo.batteryCapacity ?? 0}"),
+                      value: "${model.deviceInfo.batteryCapacity ?? 0}AH"),
                 ],
               ),
               const SizedBox(height: 12),
