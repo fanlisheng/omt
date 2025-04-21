@@ -86,10 +86,11 @@ class EditNvrViewModel extends BaseViewModelRefresh<dynamic> {
         onSuccess: (data) {
           nvrData = data ?? DeviceDetailNvrData();
           notifyListeners();
-        },onError: (e){
+        },
+        onError: (e) {
           nvrData = null;
           notifyListeners();
-    });
+        });
   }
 
   // 获取NVR列表
@@ -129,6 +130,27 @@ class EditNvrViewModel extends BaseViewModelRefresh<dynamic> {
         },
         onError: (error) {
           LoadingUtils.showToast(data: "保存失败: $error");
+        });
+  }
+
+  void replaceNvr() {
+    // 检查是否已选择NVR
+    if (selectedNvr == null) {
+      LoadingUtils.showToast(data: '请先选择Nvr');
+      return;
+    }
+
+    HttpQuery.share.homePageService.replaceNvr(
+        nodeId: int.parse(deviceInfo?.nodeId ?? "0"),
+        // passId: selectedNarInOut!.id ?? 0,
+        ip: selectedNvr?.ip ?? "",
+        mac: selectedNvr?.mac ?? "",
+        onSuccess: (result) {
+          LoadingUtils.showToast(data: "替换成功");
+          IntentUtils.share.popResultOk(context!);
+        },
+        onError: (error) {
+          LoadingUtils.showToast(data: "替换失败: $error");
         });
   }
 

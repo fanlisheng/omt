@@ -364,7 +364,7 @@ class EditNvrView extends StatelessWidget {
                 ),
               ),
               onTap: () {
-                model.saveNvrEdit();
+                model.replaceNvr();
               },
             ),
           ],
