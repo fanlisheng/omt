@@ -119,33 +119,33 @@ class AddCameraView extends StatelessWidget {
                         //     ],
                         //   ),
                         // ),
-                        const SizedBox(width: 10),
-                        Button(
-                            child: Row(
-                              children: [
-                                ImageView(
-                                  width: 10,
-                                  height: 18,
-                                  src: source(
-                                    "home/ic_camera_edit",
-                                  ),
-                                  color: ColorUtils.colorGreen,
-                                ),
-                                const SizedBox(
-                                  width: 4,
-                                ),
-                                const Text(
-                                  "编辑",
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: ColorUtils.colorGreen,
-                                  ),
-                                )
-                              ],
-                            ),
-                            onPressed: () {
-                              model.editCameraAction(e);
-                            }),
+                        // const SizedBox(width: 10),
+                        // Button(
+                        //     child: Row(
+                        //       children: [
+                        //         ImageView(
+                        //           width: 10,
+                        //           height: 18,
+                        //           src: source(
+                        //             "home/ic_camera_edit",
+                        //           ),
+                        //           color: ColorUtils.colorGreen,
+                        //         ),
+                        //         const SizedBox(
+                        //           width: 4,
+                        //         ),
+                        //         const Text(
+                        //           "编辑",
+                        //           style: TextStyle(
+                        //             fontSize: 12,
+                        //             color: ColorUtils.colorGreen,
+                        //           ),
+                        //         )
+                        //       ],
+                        //     ),
+                        //     onPressed: () {
+                        //       model.editCameraAction(e);
+                        //     }),
                       ],
                     ),
                   ],

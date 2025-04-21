@@ -116,10 +116,6 @@ class EditNvrViewModel extends BaseViewModelRefresh<dynamic> {
       LoadingUtils.showToast(data: '请先选择进出口');
       return;
     }
-    if (selectedNvr == null) {
-      LoadingUtils.showToast(data: '请先选择NVR设备');
-      return;
-    }
 
     HttpQuery.share.homePageService.editNvr(
         nodeId: int.parse(deviceInfo?.nodeId ?? "0"),
