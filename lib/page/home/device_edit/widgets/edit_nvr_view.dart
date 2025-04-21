@@ -221,83 +221,80 @@ class EditNvrView extends StatelessWidget {
               const SizedBox(height: 10),
               // NVR IP 地址选择
               EquallyRow(
-                one: Expanded(
-                  flex: 1,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Text(
-                            "*",
-                            style: TextStyle(
-                                fontSize: 12, color: ColorUtils.colorRed),
-                          ),
-                          const SizedBox(width: 2),
-                          const Text(
-                            "NVR IP地址",
-                            style: TextStyle(
-                                fontSize: 12, color: ColorUtils.colorWhite),
-                          ),
-                          const SizedBox(width: 10),
-                          Clickable(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(3),
-                                color: model.isNvrSearching == false
-                                    ? ColorUtils.colorGreen
-                                    : ColorUtils.colorGrayLight,
-                              ),
-                              padding: const EdgeInsets.only(
-                                  left: 12, right: 12, top: 2, bottom: 2),
-                              child: const Text(
-                                "刷新",
-                                style: TextStyle(
-                                    fontSize: 12, color: ColorUtils.colorWhite),
-                              ),
+                one: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Text(
+                          "*",
+                          style: TextStyle(
+                              fontSize: 12, color: ColorUtils.colorRed),
+                        ),
+                        const SizedBox(width: 2),
+                        const Text(
+                          "NVR IP地址",
+                          style: TextStyle(
+                              fontSize: 12, color: ColorUtils.colorWhite),
+                        ),
+                        const SizedBox(width: 10),
+                        Clickable(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(3),
+                              color: model.isNvrSearching == false
+                                  ? ColorUtils.colorGreen
+                                  : ColorUtils.colorGrayLight,
                             ),
-                            onTap: () {
-                              model.refreshNvrAction();
-                            },
+                            padding: const EdgeInsets.only(
+                                left: 12, right: 12, top: 2, bottom: 2),
+                            child: const Text(
+                              "刷新",
+                              style: TextStyle(
+                                  fontSize: 12, color: ColorUtils.colorWhite),
+                            ),
                           ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 8.0, // 子元素之间的水平间距
-                        children: List.generate(
-                          model.nvrDeviceList.length, // 动态生成子元素数量
-                          (index) {
-                            DeviceEntity device = model.nvrDeviceList[index];
-                            return Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Radio(
-                                  value: device,
-                                  groupValue: model.selectedNvr,
-                                  activeColor: model.selectedNvr == device
-                                      ? ColorUtils.colorGreen
-                                      : ColorUtils.colorWhite,
-                                  onChanged: (value) {
-                                    model.selectNvrIpAction(device);
-                                  },
-                                ),
-                                Text(
-                                  "${device.ip}",
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: model.selectedNvr == device
-                                        ? ColorUtils.colorGreen
-                                        : ColorUtils.colorWhite,
-                                  ),
-                                ),
-                              ],
-                            );
+                          onTap: () {
+                            model.refreshNvrAction();
                           },
                         ),
-                      )
-                    ],
-                  ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8.0, // 子元素之间的水平间距
+                      children: List.generate(
+                        model.nvrDeviceList.length, // 动态生成子元素数量
+                            (index) {
+                          DeviceEntity device = model.nvrDeviceList[index];
+                          return Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Radio(
+                                value: device,
+                                groupValue: model.selectedNvr,
+                                activeColor: model.selectedNvr == device
+                                    ? ColorUtils.colorGreen
+                                    : ColorUtils.colorWhite,
+                                onChanged: (value) {
+                                  model.selectNvrIpAction(device);
+                                },
+                              ),
+                              Text(
+                                "${device.ip}",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: model.selectedNvr == device
+                                      ? ColorUtils.colorGreen
+                                      : ColorUtils.colorWhite,
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    )
+                  ],
                 ),
               ),
               const SizedBox(height: 16),
@@ -308,7 +305,7 @@ class EditNvrView extends StatelessWidget {
         if (model.selectedNvr != null) ...[
           Expanded(
             child: NvrInfoWidget.buildNvrInfoContainer(
-                channels: model.nvrData?.channels,
+                channels: model.nvrData?.channels ?? [],
                 deviceCode: model.selectedNvr?.deviceCode ?? '',
                 nodeId: model.deviceInfo?.nodeId ?? "",
                 onRemoveSuccess: () {

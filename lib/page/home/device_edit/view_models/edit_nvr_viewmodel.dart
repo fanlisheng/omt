@@ -86,7 +86,10 @@ class EditNvrViewModel extends BaseViewModelRefresh<dynamic> {
         onSuccess: (data) {
           nvrData = data ?? DeviceDetailNvrData();
           notifyListeners();
-        });
+        },onError: (e){
+          nvrData = null;
+          notifyListeners();
+    });
   }
 
   // 获取NVR列表

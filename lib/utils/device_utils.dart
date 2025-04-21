@@ -13,6 +13,7 @@ class DeviceUtils {
   /// MAC 地址前缀映射设备类型
   Map<String, String> macDeviceTypeMap = {
     "24:32:AE": "NVR",
+    "24:28:FD": "NVR",
     "00:04:4B": "AI设备",
     "D4:E8:53": "摄像头",
     "C0:51:7E": "摄像头",
@@ -80,7 +81,7 @@ class DeviceUtils {
             infoList.add(DeviceEntity(
               ip: ip,
               mac: mac,
-              deviceTypeText: "路由arez器",
+              deviceTypeText: "路由器",
               deviceType: getDeviceTypeInt("路由器"),
               deviceCode: "",
             ));
@@ -97,7 +98,7 @@ class DeviceUtils {
             String deviceCode = getDeviceCodeByMacAddress(macAddress: mac);
             deviceEntity.deviceCode = deviceCode;
             infoList.add(deviceEntity);
-          } else {
+          } else { //摄像头
             try {
               DeviceEntity? a = await hikvisionDeviceInfo(ipAddress: ip);
               if (a != null) {
