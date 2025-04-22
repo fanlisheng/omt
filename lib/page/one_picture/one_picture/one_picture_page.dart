@@ -126,15 +126,15 @@ class OnePicturePageState extends State<OnePicturePage> {
               padding: EdgeInsets.only(
                   top: onePictureDataData?.showAddBtn == true
                       ? ((onePictureDataData?.getChildList() ?? []).length > 1
-                          ? 0
+                          ? 50
                           : 50)
                       : 0,
                   bottom: onePictureDataData?.showAddBtn == true &&
                           (onePictureDataData?.getChildList() ?? []).length > 1
                       ? 16
                       : 0,
-                  left: 0,
-                  right: 0),
+                  left: 20,
+                  right: 20),
               decoration: BoxDecoration(
                   border: Border.all(color: '#888888'.toColor(), width: 1),
                   borderRadius: BorderRadius.circular(4)),
@@ -355,10 +355,22 @@ class OnePicturePageState extends State<OnePicturePage> {
                   //     : TextView(data?.showNameText, size: _titleSize()),
                   Container(
                     padding: EdgeInsets.only(
-                        top: data?.showAddBtn == true ? 50 : 0,
-                        bottom: data?.showAddBtn == true ? 16 : 0,
+                        top: data?.onlyOneChildren == true
+                            ? 0
+                            : data?.showAddBtn == true
+                                ? 50
+                                : 0,
+                        bottom: data?.onlyOneChildren == true
+                            ? 0
+                            : data?.showAddBtn == true
+                                ? 16
+                                : 20,
                         left: 0,
-                        right: data?.showAddBtn == true ? 20 : 0),
+                        right: data?.onlyOneChildren == true
+                            ? 0
+                            : data?.showAddBtn == true
+                                ? 20
+                                : 20),
                     // margin: data.getChildList().length > 0
                     //     ? null
                     //     : EdgeInsets.all(16),
@@ -382,14 +394,14 @@ class OnePicturePageState extends State<OnePicturePage> {
                       }).toList(),
                     ),
                   )
-                      .addRightIcon(
-                          onTap: data.ignore != true ||
-                                  (data.type != OnePictureType.DM.index &&
-                                      data.type != OnePictureType.JCK.index)
-                              ? null
-                              : () {
-                                  model.onTapItemNew(data);
-                                })
+                      // .addRightIcon(
+                      //     onTap: data.ignore != true ||
+                      //             (data.type != OnePictureType.DM.index &&
+                      //                 data.type != OnePictureType.JCK.index)
+                      //         ? null
+                      //         : () {
+                      //             model.onTapItemNew(data);
+                      //           })
                       .addDashBorder(
                           color: (data.isCurrentNet != true
                                   ? '#888888'
@@ -468,9 +480,16 @@ class OnePicturePageState extends State<OnePicturePage> {
                     ),
               if ((oData?.faultList.length ?? 0) > 0)
                 ...(oData!.faultList.map((e) {
-                  return TextView(e, color: ColorUtils.colorRed2,size: 9,border: true,radius: 12,
-                  margin: EdgeInsets.only(top: 6 ),
-                  padding: const EdgeInsets.only(left: 8, right: 8, top: 0, bottom: 0),);
+                  return TextView(
+                    e,
+                    color: ColorUtils.colorRed2,
+                    size: 9,
+                    border: true,
+                    radius: 12,
+                    margin: EdgeInsets.only(top: 6),
+                    padding: const EdgeInsets.only(
+                        left: 8, right: 8, top: 0, bottom: 0),
+                  );
                 }).toList())
             ],
           )),

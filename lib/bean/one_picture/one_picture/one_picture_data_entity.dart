@@ -135,11 +135,11 @@ class OnePictureDataData {
   // }
 
   bool get showAddBtnDM {
-    if (type == OnePictureType.DM.index &&
-        children.isEmpty &&
-        nextList.isEmpty) {
-      return true;
-    }
+    // if (type == OnePictureType.DM.index &&
+    //     children.isEmpty &&
+    //     nextList.isEmpty) {
+    //   return true;
+    // }
     return false;
   }
 
@@ -150,20 +150,27 @@ class OnePictureDataData {
       return true;
     }
 
-    if (type == OnePictureType.JCK.index) {
-      if (children.isNotEmpty) {
-        for (var child in children) {
-          if (child.type != OnePictureType.AISB.index &&
-              child.type != OnePictureType.SXT.index &&
-              child.type != OnePictureType.NVR.index) {
-            return true;
-          }
-        }
-        // if(children.length == 1){
-        //   return true;
-        // }
-      }
-    }
+    // if (type == OnePictureType.JCK.index) {
+    //   if (children.isNotEmpty) {
+    //     for (var child in children) {
+    //       if (child.type != OnePictureType.AISB.index &&
+    //           child.type != OnePictureType.SXT.index &&
+    //           child.type != OnePictureType.NVR.index) {
+    //         return true;
+    //       }
+    //     }
+    //     // if(children.length == 1){
+    //     //   return true;
+    //     // }
+    //   }
+    // }
+    return false;
+  }
+
+  bool get onlyOneChildren {
+    // if (children.length == 1 && nextList.length == 1) {
+    //   return true;
+    // }
     return false;
   }
 
@@ -243,6 +250,17 @@ class OnePictureDataData {
     }
 
     return children;
+  }
+
+  bool get addEmptyNode {
+
+    var index = children.indexWhere((e) {
+      return e.showBorder == true;
+    });
+    if (index != -1) {
+      return true;
+    }
+    return false;
   }
 
   bool get showDash {
