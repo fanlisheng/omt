@@ -4,6 +4,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:network_info_plus/network_info_plus.dart';
 import 'package:omt/page/home/device_add/view_models/device_add_viewmodel.dart';
 import 'package:omt/utils/hikvision_utils.dart';
+import 'package:omt/utils/log_utils.dart';
 import 'package:ping_discover_network_forked/ping_discover_network_forked.dart';
 
 import '../bean/home/home_page/device_entity.dart';
@@ -12,11 +13,11 @@ import 'arp_utils.dart'; // 引入新的 ArpUtils 类
 class DeviceUtils {
   /// MAC 地址前缀映射设备类型
   Map<String, String> macDeviceTypeMap = {
-    "24:32:AE": "NVR",
-    "24:28:FD": "NVR",
+    // "24:32:AE": "NVR",
+    // "24:28:FD": "NVR",
     "00:04:4B": "AI设备",
-    "D4:E8:53": "摄像头",
-    "C0:51:7E": "摄像头",
+    // "D4:E8:53": "摄像头",
+    // "C0:51:7E": "摄像头",
   };
 
   /// 扫描设备并获取设备信息，支持中断
@@ -72,44 +73,46 @@ class DeviceUtils {
         String mac = entry.value;
         String deviceTypeText = getDeviceTypeForMacAddress(mac);
 
-        if (deviceType != null && deviceTypeText != deviceType) {
-          return;
-        }
+        DeviceEntity? deviceEntity;
 
         if (ip == "$subnet.1") {
-          if (deviceType == null || deviceType == "6") {
-            infoList.add(DeviceEntity(
-              ip: ip,
-              mac: mac,
-              deviceTypeText: "路由器",
-              deviceType: getDeviceTypeInt("路由器"),
-              deviceCode: "",
-            ));
-          }
-        } else if (deviceTypeText.isNotEmpty) {
-          DeviceEntity deviceEntity = DeviceEntity(
+          deviceEntity = DeviceEntity(
             ip: ip,
             mac: mac,
-            deviceTypeText: deviceTypeText,
-            deviceType: getDeviceTypeInt(deviceTypeText),
+            deviceTypeText: "路由器",
+            deviceType: getDeviceTypeInt("路由器"),
             deviceCode: "",
           );
-          if (deviceTypeText == "AI设备" || deviceTypeText == "NVR") {
-            String deviceCode = getDeviceCodeByMacAddress(macAddress: mac);
-            deviceEntity.deviceCode = deviceCode;
-            infoList.add(deviceEntity);
-          } else { //摄像头
+        } else {
+          if (deviceTypeText == "AI设备") {
+            deviceEntity = DeviceEntity(
+              ip: ip,
+              mac: mac,
+              deviceTypeText: deviceTypeText,
+              deviceType: getDeviceTypeInt(deviceTypeText),
+              deviceCode: getDeviceCodeByMacAddress(macAddress: mac),
+            );
+          } else {
+            //摄像头
             try {
               DeviceEntity? a = await hikvisionDeviceInfo(ipAddress: ip);
+              if (ip == "192.168.101.52") {
+                LogUtils.info(msg: "192.168.101.52 ---------${a.toString()}");
+              }
               if (a != null) {
-                deviceEntity.deviceCode = a.deviceCode;
-                infoList.add(deviceEntity);
+                deviceEntity = a;
               }
             } catch (e) {
               print("海康系统登录验证失败");
             }
           }
         }
+
+        if ((deviceEntity == null) ||
+            (deviceType != null && deviceEntity.deviceTypeText != deviceType)) {
+          return;
+        }
+        infoList.add(deviceEntity);
       }));
     }
 

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
+import 'package:omt/utils/device_utils.dart';
 import 'package:xml/xml.dart';
 
 import '../bean/home/home_page/device_entity.dart';
@@ -105,8 +106,8 @@ Future<DeviceEntity?> hikvisionDeviceInfo({
         .timeout(const Duration(seconds: 1));
 
     if (response.statusCode == 200) {
-      print('Response: ${response.body}');
-      return DeviceEntity.fromXml(response.body, ipAddress);
+      DeviceEntity a = DeviceEntity.fromXml(response.body, ipAddress);
+      return hikvisionFormatDeviceData(data: a);
     } else {
       print('Failed to load data: ${response.statusCode}');
       return null;
@@ -118,4 +119,21 @@ Future<DeviceEntity?> hikvisionDeviceInfo({
     print('Error in hikvisionDeviceInfo for IP $ipAddress: $e');
     return null;
   }
+}
+
+Future<DeviceEntity?> hikvisionFormatDeviceData({
+  required DeviceEntity data,
+}) async {
+  if (data.deviceTypeText?.contains("NVR") ?? false) {
+    data.deviceTypeText = "NVR";
+    data.deviceCode =
+        DeviceUtils.getDeviceCodeByMacAddress(macAddress: data.mac ?? "");
+  } else if ((data.deviceTypeText?.contains("Camera") ?? false) ||
+      (data.deviceTypeText?.contains("IPDome") ?? false)) {
+    data.deviceTypeText = "摄像头";
+  }
+
+  data.deviceType = DeviceUtils.getDeviceTypeInt(data.deviceTypeText ?? "");
+
+  return data;
 }
