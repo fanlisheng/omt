@@ -24,7 +24,9 @@ import '../../search_device/services/device_search_service.dart';
 class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
   final String pNodeCode;
 
-  final List<DeviceDetailAiData> aiDeviceList;
+  List<DeviceDetailAiData> aiDeviceList;
+  int gateId = 0;
+  String instanceId = "";
 
   AddCameraViewModel(this.pNodeCode, this.aiDeviceList);
 
@@ -136,19 +138,37 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
                 cameraDeviceEntity.videoIdController.text;
           }
 
-          HttpQuery.share.installService.aiDeviceCameraInstall(
-              pNodeCode: pNodeCode,
-              aiDevice: aiParams,
-              camera: cameraParams,
-              onSuccess: (data) {
-                cameraDeviceEntity.readOnly = true;
-                cameraDeviceEntity.isAddEnd = true;
-                Navigator.pop(context);
-                notifyListeners();
-              },
-              onError: (error) {
-                LoadingUtils.showToast(data: '安装失败: $error');
-              });
+          //如果是添加
+          if (pNodeCode.isNotEmpty) {
+            HttpQuery.share.installService.aiDeviceCameraInstall(
+                pNodeCode: pNodeCode,
+                aiDevice: aiParams,
+                camera: cameraParams,
+                onSuccess: (data) {
+                  cameraDeviceEntity.readOnly = true;
+                  cameraDeviceEntity.isAddEnd = true;
+                  Navigator.pop(context);
+                  notifyListeners();
+                },
+                onError: (error) {
+                  LoadingUtils.showToast(data: '安装失败: $error');
+                });
+          } else {
+            HttpQuery.share.installService.installStep1(
+                aiDevice: aiParams,
+                camera: cameraParams,
+                gateId: gateId,
+                instanceId: instanceId,
+                onSuccess: (data) {
+                  cameraDeviceEntity.readOnly = true;
+                  cameraDeviceEntity.isAddEnd = true;
+                  Navigator.pop(context);
+                  notifyListeners();
+                },
+                onError: (error) {
+                  LoadingUtils.showToast(data: '安装失败: $error');
+                });
+          }
         },
         onError: (e) {
           LoadingUtils.showError(data: "配置本地AI设备信息失败");

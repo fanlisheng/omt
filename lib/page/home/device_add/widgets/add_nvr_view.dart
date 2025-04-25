@@ -56,7 +56,7 @@ class AddNvrView extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              if (false) ...[
+              if (model.pNodeCode.isEmpty) ...[
                 const SizedBox(height: 16),
                 // 是否需要安装NVR
                 const Row(
@@ -84,14 +84,19 @@ class AddNvrView extends StatelessWidget {
                       onChanged: (value) {
                         model.isNvrNeeded = value as bool;
                         model.notifyListeners();
+                        if(model.nvrDeviceList.isEmpty){
+                          model.refreshNvrAction();
+                        }
                       },
                     ),
-                    Text("需要",
-                        style: TextStyle(
-                            fontSize: 12,
-                            color: model.isNvrNeeded
-                                ? ColorUtils.colorGreen
-                                : ColorUtils.colorWhite)),
+                    Text(
+                      "需要",
+                      style: TextStyle(
+                          fontSize: 12,
+                          color: (model.isNvrNeeded ?? false)
+                              ? ColorUtils.colorGreen
+                              : ColorUtils.colorWhite),
+                    ),
                     const SizedBox(width: 16),
                     Radio(
                       value: false,
@@ -102,18 +107,20 @@ class AddNvrView extends StatelessWidget {
                         model.notifyListeners();
                       },
                     ),
-                    Text("不需要",
-                        style: TextStyle(
-                            fontSize: 12,
-                            color: model.isNvrNeeded
-                                ? ColorUtils.colorWhite
-                                : ColorUtils.colorGreen)),
+                    Text(
+                      "不需要",
+                      style: TextStyle(
+                          fontSize: 12,
+                          color: (model.isNvrNeeded ?? true)
+                              ? ColorUtils.colorWhite
+                              : ColorUtils.colorGreen),
+                    ),
                   ],
                 ),
               ],
               const SizedBox(height: 10),
               // NVR IP 地址选择
-              if (model.isNvrNeeded) ...[
+              if (model.isNvrNeeded ?? false) ...[
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

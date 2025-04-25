@@ -95,6 +95,14 @@ DeviceDetailAiData $DeviceDetailAiDataFromJson(Map<String, dynamic> json) {
   if (isIdentityLatest != null) {
     deviceDetailAiData.isIdentityLatest = isIdentityLatest;
   }
+  final bool? enabled = jsonConvert.convert<bool>(json['enabled']);
+  if (enabled != null) {
+    deviceDetailAiData.enabled = enabled;
+  }
+  final bool? end = jsonConvert.convert<bool>(json['end']);
+  if (end != null) {
+    deviceDetailAiData.end = end;
+  }
   return deviceDetailAiData;
 }
 
@@ -115,6 +123,8 @@ Map<String, dynamic> $DeviceDetailAiDataToJson(DeviceDetailAiData entity) {
   data['mac'] = entity.mac;
   data['is_program_latest'] = entity.isProgramLatest;
   data['is_identity_latest'] = entity.isIdentityLatest;
+  data['enabled'] = entity.enabled;
+  data['end'] = entity.end;
   return data;
 }
 
@@ -135,6 +145,8 @@ extension DeviceDetailAiDataExtension on DeviceDetailAiData {
     String? mac,
     bool? isProgramLatest,
     bool? isIdentityLatest,
+    bool? enabled,
+    bool? end,
   }) {
     return DeviceDetailAiData()
       ..instanceName = instanceName ?? this.instanceName
@@ -151,6 +163,8 @@ extension DeviceDetailAiDataExtension on DeviceDetailAiData {
       ..nodeId = nodeId ?? this.nodeId
       ..mac = mac ?? this.mac
       ..isProgramLatest = isProgramLatest ?? this.isProgramLatest
-      ..isIdentityLatest = isIdentityLatest ?? this.isIdentityLatest;
+      ..isIdentityLatest = isIdentityLatest ?? this.isIdentityLatest
+      ..enabled = enabled ?? this.enabled
+      ..end = end ?? this.end;
   }
 }

@@ -3,6 +3,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:kayo_package/mvvm/base/provider_widget.dart';
+import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/page/home/device_add/view_models/add_ai_viewmodel.dart';
 import 'package:omt/page/home/device_add/view_models/device_add_viewmodel.dart';
 import 'package:omt/page/home/device_add/widgets/add_ai_view.dart';
@@ -13,6 +14,8 @@ import 'package:omt/page/home/device_add/widgets/add_power_box_view.dart';
 import 'package:omt/utils/color_utils.dart';
 import '../../../widget/combobox.dart';
 import '../../../widget/nav/dnavigation_view.dart';
+import '../../../widget/searchable_dropdown.dart';
+import '../../home/home/keep_alive_page.dart';
 import '../view_models/install_device_viewmodel.dart';
 
 class InstallDeviceScreen extends StatelessWidget {
@@ -93,7 +96,7 @@ class InstallDeviceScreen extends StatelessWidget {
     );
   }
 
-  Widget stepOneView(InstallDeviceViewModel model) {
+  Widget _stepOneView(InstallDeviceViewModel model) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -125,58 +128,30 @@ class InstallDeviceScreen extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               EquallyRow(
-                one: ComboBox<String>(
-                  isExpanded: true,
-                  value: model.selectedInstall,
-                  items: model.installList.map<ComboBoxItem<String>>((e) {
-                    return ComboBoxItem<String>(
-                      value: e,
-                      child: Text(
-                        e,
-                        textAlign: TextAlign.start,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: ColorUtils.colorGreenLiteLite,
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (a) {
-                    model.selectedInstall = a!;
+                one: SearchableDropdown<StrIdNameValue>(
+                  asgbKey: model.asgbKey,
+                  focusNode: model.focusNode,
+                  controller: model.controller,
+                  items: model.instanceList,
+                  placeholder: "请选择实例",
+                  labelSelector: (item) => item.name ?? "",
+                  clearButtonEnabled: true,
+                  onSelected: (a) {
+                    model.selectedInstance = a;
+                    model.selectedDoor = null;
                     model.notifyListeners();
                   },
-                  placeholder: const Text(
-                    "请选择实例",
-                    textAlign: TextAlign.start,
-                    style: TextStyle(
-                        fontSize: 12, color: ColorUtils.colorBlackLiteLite),
-                  ),
                 ),
-                two: ComboBox<String>(
-                  isExpanded: true,
-                  value: model.selectedGateNumber,
-                  items: model.gateNumberList.map<ComboBoxItem<String>>((e) {
-                    return ComboBoxItem<String>(
-                      value: e,
-                      child: Text(
-                        e,
-                        textAlign: TextAlign.start,
-                        style: const TextStyle(
-                            fontSize: 12, color: ColorUtils.colorGreenLiteLite),
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (a) {
-                    model.selectedGateNumber = a!;
-                    model.notifyListeners();
-                  },
-                  placeholder: const Text(
-                    "请选择大门编号",
-                    textAlign: TextAlign.start,
-                    style: TextStyle(
-                        fontSize: 12, color: ColorUtils.colorBlackLiteLite),
-                  ),
-                ),
+                two: FComboBox<IdNameValue>(
+                    selectedValue: model.selectedDoor,
+                    items: model.doorList,
+                    disabled:  model.selectedInstance == null,
+                    onChanged: (a) {
+                      model.selectedDoor = a;
+                      model.selectedInOut = null;
+                      model.notifyListeners();
+                    },
+                    placeholder: "请选择大门编号"),
               ),
               const SizedBox(height: 20),
               const RowTitle(name: "标签",isMust: false),
@@ -294,29 +269,21 @@ class InstallDeviceScreen extends StatelessWidget {
   }
 
   Widget bottomContentView(InstallDeviceViewModel model) {
-    // switch (model.currentStep) {
-    //   case 1:
-    //     return stepOneView(model);
-    //   case 2:
-    //     return const AddAiView(DeviceType.ai, StepNumber.second);
-    //   case 3:
-    //     return const AddCameraView(
-    //         deviceType: DeviceType.camera, stepNumber: StepNumber.third);
-    //   case 4:
-    //     return const AddNvrView(
-    //         deviceType: DeviceType.nvr,
-    //         stepNumber: StepNumber.third,
-    //         showInstall: true);
-    //   case 5:
-    //     return const AddPowerBoxView(DeviceType.powerBox, StepNumber.second,
-    //         isInstall: true);
-    //   case 6:
-    //     return const AddBatteryExchangeView(
-    //         DeviceType.battery, StepNumber.second,
-    //         isInstall: true);
-    //   default:
-    //     return Container();
-    // }
-    return Container();
+    return PageView(
+      controller: model.pageController,
+      physics: const NeverScrollableScrollPhysics(), // 禁用手动滑动
+      onPageChanged: (index) {
+        model.currentStep = index + 1;
+        model.notifyListeners();
+      },
+      children: [
+        KeepAlivePage(child: _stepOneView(model)),
+        KeepAlivePage(child: AddAiView(model: model.aiViewModel)),
+        KeepAlivePage(child: AddCameraView(model: model.cameraViewModel)),
+        KeepAlivePage(child: AddNvrView(model: model.nvrViewModel)),
+        KeepAlivePage(child: AddPowerBoxView(model: model.powerBoxViewModel)),
+        KeepAlivePage(child: AddBatteryExchangeView(model: model.batteryExchangeViewModel)),
+      ],
+    );
   }
 }

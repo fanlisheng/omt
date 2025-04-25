@@ -99,24 +99,24 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
       //   onTap: () => debugPrint('测试详情'),
       // ),
 
-      // PaneItem(
-      //   icon: PaneImage(
-      //     name: "home/ic_pane_add",
-      //     selectedName: 'home/ic_pane_add_s',
-      //     index: 1,
-      //     selectedIndex: topIndex,
-      //   ),
-      //   title: Text(
-      //     "安装",
-      //     style: TextStyle(
-      //         fontSize: 12,
-      //         color: 1 == topIndex ? "#F3FFFF".toColor() : "#678384".toColor()),
-      //   ),
-      //   body: const KeepAlivePage(
-      //     child: InstallDeviceScreen(),
-      //   ),
-      //   onTap: () => debugPrint('安装'),
-      // ),
+      PaneItem(
+        icon: PaneImage(
+          name: "home/ic_pane_add",
+          selectedName: 'home/ic_pane_add_s',
+          index: 1,
+          selectedIndex: topIndex,
+        ),
+        title: Text(
+          "安装",
+          style: TextStyle(
+              fontSize: 12,
+              color: 1 == topIndex ? "#F3FFFF".toColor() : "#678384".toColor()),
+        ),
+        body: const KeepAlivePage(
+          child: InstallDeviceScreen(),
+        ),
+        onTap: () => debugPrint('安装'),
+      ),
       PaneItem(
         icon: PaneImage(
           name: "home/ic_pane_delete",

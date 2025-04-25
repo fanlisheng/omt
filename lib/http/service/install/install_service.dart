@@ -37,6 +37,8 @@ class InstallService {
 
   get _getCameraType => '${API.share.host}api/device/camera/camera_type_map';
 
+  get _installStep1 => '${API.share.host}api/device/install/step1';
+
   /// AI设备和摄像头安装
   aiDeviceCameraInstall({
     String? pNodeCode,
@@ -318,6 +320,44 @@ class InstallService {
       method: 'POST',
       autoHideDialog: false,
       autoShowDialog: false,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  /// AI设备和摄像头安装
+  installStep1({
+    String? instanceId,
+    int? gateId,
+    int? passId,
+    required Map<String, dynamic> aiDevice,
+    required Map<String, dynamic> camera,
+    required ValueChanged<CodeMessageData?> onSuccess,
+    ValueChanged<CodeMessageData?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    Map<String, dynamic> params = {
+      "ai_device": aiDevice,
+      "camera": camera,
+    };
+
+    if (instanceId != null) {
+      params["instance_id"] = instanceId;
+    }
+    if (gateId != null) {
+      params["gate_id"] = gateId;
+    }
+    if (passId != null) {
+      params["pass_id"] = passId;
+    }
+
+    HttpManager.share.doHttpPost<CodeMessageData>(
+      await _installStep1,
+      params,
+      method: 'POST',
+      autoHideDialog: true,
+      autoShowDialog: true,
       onSuccess: onSuccess,
       onCache: onCache,
       onError: onError,

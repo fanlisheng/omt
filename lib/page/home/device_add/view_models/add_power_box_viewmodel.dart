@@ -18,7 +18,7 @@ class AddPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
   // ===== 电源箱相关属性 =====
   IdNameValue? selectedPowerBoxInOut;
   DeviceDetailPowerBoxData? selectedDeviceDetailPowerBox;
-  bool isPowerBoxNeeded = true;
+  bool? isPowerBoxNeeded;
   List<DeviceDetailPowerBoxData> powerBoxList = [];
   List<IdNameValue> inOutList = [];
 
@@ -68,14 +68,17 @@ class AddPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
   // 安装电源箱
   void installPowerBox() {
     // 检查是否已选择电源箱
-    if (selectedPowerBoxInOut?.id == null) {
-      LoadingUtils.showToast(data: '请选择进出口');
+    if (checkSelection() == false) {
       return;
     }
-    if (selectedDeviceDetailPowerBox?.deviceCode == null) {
-      LoadingUtils.showToast(data: '请先选择电源箱');
-      return;
-    }
+    // if (selectedPowerBoxInOut?.id == null) {
+    //   LoadingUtils.showToast(data: '请选择进出口');
+    //   return;
+    // }
+    // if (selectedDeviceDetailPowerBox?.deviceCode == null) {
+    //   LoadingUtils.showToast(data: '请先选择电源箱');
+    //   return;
+    // }
 
     HttpQuery.share.installService.powerBoxInstall(
         pNodeCode: pNodeCode,
@@ -123,5 +126,24 @@ class AddPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
           selectedDeviceDetailPowerBox?.dcInterfaces = data?.dcInterfaces ?? [];
           notifyListeners();
         });
+  }
+
+  //检查
+  bool checkSelection() {
+    if (isPowerBoxNeeded == null) {
+      LoadingUtils.showToast(data: '请选选择是否需要安装!');
+      return false;
+    }
+    if (isPowerBoxNeeded ?? false) {
+      if (selectedPowerBoxInOut?.id == null) {
+        LoadingUtils.showToast(data: '请选择进出口');
+        return false;
+      }
+      if (selectedDeviceDetailPowerBox?.deviceCode == null) {
+        LoadingUtils.showToast(data: '请先选择电源箱');
+        return false;
+      }
+    }
+    return true;
   }
 }
