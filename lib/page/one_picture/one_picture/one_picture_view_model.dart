@@ -203,40 +203,48 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
           }).toList();
 
           if (notJckList.isNotEmpty && gdsbList.isEmpty) {
-            data.children.add(OnePictureDataData()
-              ..type = OnePictureType.GDSB.index
-              ..unknown = true
-              ..children = [
-                OnePictureDataData()
-                  ..type = OnePictureType.SD.index
-                  ..name = '电源未知'
-              ]);
-            if (dyxList.isEmpty) {
+            if (data.addEmptyNode) {
               data.children.add(OnePictureDataData()
-                ..type = OnePictureType.DYX.index
+                ..type = OnePictureType.GDSB.index
                 ..unknown = true
-                ..name = '电源箱未知');
+                ..children = [
+                  OnePictureDataData()
+                    ..type = OnePictureType.SD.index
+                    ..name = '电源未知'
+                ]);
+            }
+            if (dyxList.isEmpty) {
+              if (data.addEmptyNode) {
+                data.children.add(OnePictureDataData()
+                  ..type = OnePictureType.DYX.index
+                  ..unknown = true
+                  ..name = '电源箱未知');
+              }
             }
           }
           if (notJckList.isNotEmpty && wlList.isEmpty) {
-            data.children.add(OnePictureDataData()
-              ..type = OnePictureType.YXWL.index
-              ..unknown = true
-              ..children = [
-                OnePictureDataData()
-                  ..type = OnePictureType.YXWL.index
-                  ..name = '未知网路'
-              ]);
+            if (data.addEmptyNode) {
+              data.children.add(OnePictureDataData()
+                ..type = OnePictureType.YXWL.index
+                ..unknown = true
+                ..children = [
+                  OnePictureDataData()
+                    ..type = OnePictureType.YXWL.index
+                    ..name = '未知网路'
+                ]);
+            }
           }
           if (notJckList.isNotEmpty && jhjList.isEmpty) {
-            data.children.add(OnePictureDataData()
-              ..type = OnePictureType.JHJ.index
-              ..unknown = true
-              ..children = [
-                OnePictureDataData()
-                  ..type = OnePictureType.JHJ.index
-                  ..name = '未知交换机'
-              ]);
+            if (data.addEmptyNode) {
+              data.children.add(OnePictureDataData()
+                ..type = OnePictureType.JHJ.index
+                ..unknown = true
+                ..children = [
+                  OnePictureDataData()
+                    ..type = OnePictureType.JHJ.index
+                    ..name = '未知交换机'
+                ]);
+            }
           }
         }
 
@@ -284,24 +292,28 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
 
         if (otherList.isNotEmpty) {
           if (wlList.isEmpty) {
-            data.children.add(OnePictureDataData()
-              ..type = OnePictureType.YXWL.index
-              ..unknown = true
-              ..children = [
-                OnePictureDataData()
-                  ..type = OnePictureType.YXWL.index
-                  ..name = '未知网路'
-              ]);
+            if (data.addEmptyNode || true) {
+              data.children.add(OnePictureDataData()
+                ..type = OnePictureType.YXWL.index
+                ..unknown = true
+                ..children = [
+                  OnePictureDataData()
+                    ..type = OnePictureType.YXWL.index
+                    ..name = '未知网路'
+                ]);
+            }
           }
           if (jhjList.isEmpty) {
-            data.children.add(OnePictureDataData()
-              ..type = OnePictureType.JHJ.index
-              ..unknown = true
-              ..children = [
-                OnePictureDataData()
-                  ..type = OnePictureType.JHJ.index
-                  ..name = '未知交换机'
-              ]);
+            if (data.addEmptyNode  || true) {
+              data.children.add(OnePictureDataData()
+                ..type = OnePictureType.JHJ.index
+                ..unknown = true
+                ..children = [
+                  OnePictureDataData()
+                    ..type = OnePictureType.JHJ.index
+                    ..name = '未知交换机'
+                ]);
+            }
           }
         }
 
