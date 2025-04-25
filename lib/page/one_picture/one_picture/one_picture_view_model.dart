@@ -34,7 +34,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
   int? passId;
 
   OnePictureViewModel(
-      this.instanceId, this.gateId, this.passId, this.instanceName);
+      this.instanceId, this.gateId, this.passId, this.instanceName,this.onePictureHttpData);
 
   final TransformationController transformationController =
       TransformationController();
@@ -58,6 +58,56 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
   void initState() async {
     super.initState();
     // requestData();
+
+    if(null!=onePictureHttpData){
+      dataMap.clear();
+      OnePictureDataData? opd;
+      if (null == data && null == gateId && null == passId) {
+        opd = OnePictureDataData()
+          ..name = instanceName ?? '未知'
+          ..type = OnePictureType.SL.index
+          ..id = '-99'
+          ..nextList = [
+            OnePictureDataData()
+              ..name = '未发现绑定设备'
+              ..type = OnePictureType.OTHER.index
+              ..id = '-99'
+          ];
+
+        _setDataMap(opd);
+
+        setArrowBorder(opd);
+      } else if (null == data) {
+        opd = OnePictureDataData()
+          ..name = '未发现绑定设备'
+          ..type = OnePictureType.OTHER.index
+          ..id = '-99';
+        _setDataMap(opd);
+      } else {
+        _setDataMap(data);
+        opd = _dealHttpData(data);
+      }
+
+      if (opd != null) {
+        // if(opd.nextList.isNotEmpty){
+        //   if(opd.type == OnePictureType.DM.index){
+        //     ///
+        //   }
+        // }
+      }
+
+      setDataToGraph(opd);
+
+      // data = opd;
+      theOnePictureDataData = opd;
+      notifyListeners();
+
+      Timer(Duration(milliseconds: 500), () {
+        notifyListeners();
+      });
+
+    }
+
 
     DeviceUtils.getNetworkMac(onData: (data) {
       if (SharedUtils.networkMac != data) {
