@@ -83,33 +83,28 @@ class AddPowerViewModel extends BaseViewModelRefresh<dynamic> {
     }
   }
 
-  void addExchangeAction(){
-    if((exchangeDevices.last.selectedPortNumber?.isNotEmpty ?? false) && (exchangeDevices.last.selectedSupplyMethod?.isNotEmpty ?? false)){
+  void addExchangeAction() {
+    if ((exchangeDevices.last.selectedPortNumber?.isNotEmpty ?? false) &&
+        (exchangeDevices.last.selectedSupplyMethod?.isNotEmpty ?? false)) {
       exchangeDevices.add(ExchangeDeviceModel());
       notifyListeners();
-    }else{
+    } else {
       LoadingUtils.showInfo(data: "请完善上一个交换机信息！");
     }
   }
 
-  void removeExchangeAction(){
-    if(exchangeDevices.length > 1){
+  void removeExchangeAction() {
+    if (exchangeDevices.length > 1) {
       exchangeDevices.removeLast();
       notifyListeners();
-    }else{
+    } else {
       LoadingUtils.showInfo(data: "至少要保留一个交换机！");
     }
   }
 
   // 安装电源信息
   installPower() {
-    // 电源需要检查参数
-    if (selectedPowerInOut?.id == null) {
-      LoadingUtils.showToast(data: '请选择进出口');
-      return;
-    }
-    if (batteryMains == false && battery == false) {
-      LoadingUtils.showToast(data: '请选择电源类型');
+    if (checkSelection() == false) {
       return;
     }
 
@@ -127,6 +122,47 @@ class AddPowerViewModel extends BaseViewModelRefresh<dynamic> {
         LoadingUtils.showToast(data: '电源信息安装失败: $error');
       },
     );
+  }
+
+  //检查
+  bool checkSelection() {
+    if (selectedPowerInOut?.id == null) {
+      LoadingUtils.showToast(data: '请选择进出口');
+      return false;
+    }
+    if (batteryMains == false && battery == false) {
+      LoadingUtils.showToast(data: '请选择接电方式');
+      return false;
+    }
+    return true;
+  }
+
+  //检查
+  bool checkNetworkSelection() {
+    // 检查参数
+    if (routerIpController.text.isEmpty) {
+      LoadingUtils.showToast(data: '没有识别到路由器');
+      return false;
+    }
+
+    // 路由器需要检查参数
+    if (selectedRouterType?.id == null || selectedRouterType?.id == null) {
+      LoadingUtils.showToast(data: '请选择进出口/有线无线类型');
+      return false;
+    }
+    return true;
+  }
+
+  //检查
+  bool checkExchangeSelection() {
+
+    for (ExchangeDeviceModel  exchange  in exchangeDevices ){
+      if((exchange.selectedSupplyMethod?.isEmpty ?? true ) || (exchange.selectedPortNumber?.isEmpty ?? true )){
+        LoadingUtils.showToast(data: '请完善各个交换机的信息');
+        return false;
+      }
+    }
+    return true;
   }
 }
 

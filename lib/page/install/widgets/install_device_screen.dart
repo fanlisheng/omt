@@ -66,7 +66,7 @@ class InstallDeviceScreen extends StatelessWidget {
                                 left: 12, right: 12, top: 4, bottom: 4),
                             color: ColorUtils.colorGreen,
                             child: Text(
-                              model.currentStep == 6 ? "添加完成" : "下一步",
+                              model.currentStep == 7 ? "添加完成" : (model.currentStep == 6 ? "生成拓扑图" : "下一步"),
                               style: const TextStyle(
                                   fontSize: 12, color: ColorUtils.colorWhite),
                             ),
@@ -89,8 +89,10 @@ class InstallDeviceScreen extends StatelessWidget {
   Widget contentView(InstallDeviceViewModel model) {
     return Column(
       children: [
-        topView(model),
-        const SizedBox(height: 10),
+        if(model.currentStep < 7)...[
+          topView(model),
+          const SizedBox(height: 10),
+        ],
         Expanded(
           child: bottomContentView(model),
         ),

@@ -6,6 +6,7 @@ import 'package:kayo_package/mvvm/base/provider_widget.dart';
 import 'package:omt/bean/one_picture/one_picture/one_picture_data_entity.dart';
 import 'package:omt/page/one_picture/one_picture/one_picture_page.dart';
 import 'package:provider/provider.dart';
+import '../../../utils/color_utils.dart';
 import '../../../widget/nav/dnavigation_view.dart';
 import '../view_models/install_device_viewmodel.dart';
 import '../view_models/preview_viewmodel.dart';
@@ -21,12 +22,34 @@ class PreviewPage extends StatelessWidget {
 
     return ProviderWidget<PreviewViewModel>(
         model: installDeviceViewModel.previewViewModel,
-        // 使用来自InstallDeviceViewModel的PreviewViewModel
         autoLoadData: true,
         builder: (context, model, child) {
           return model.onePictureDataData != null
-              ? OnePicturePage()
-              : const Center(child: fu.ProgressRing());
+              ? OnePicturePage(onePictureHttpData: model.onePictureDataData)
+              : Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const fu.ProgressRing(),
+                      const SizedBox(height: 20),
+                      Text(
+                        "正在生成预览数据，请稍候...",
+                        style: TextStyle(
+                          color: ColorUtils.colorGreenLiteLite,
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      // fu.FilledButton(
+                      //   child: const Text("重新生成预览"),
+                      //   onPressed: () {
+                      //     // 使用公开方法重新生成预览数据
+                      //     installDeviceViewModel.rebuildPreviewData();
+                      //   },
+                      // ),
+                    ],
+                  ),
+                );
         });
   }
 

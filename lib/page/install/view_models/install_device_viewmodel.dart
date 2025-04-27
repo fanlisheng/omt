@@ -113,14 +113,15 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
 
   // 下一步
   void nextStepEventAction() {
-    if (currentStep < 6) {
-      bool canProceed = _checkCondition(); // 假设这是一个异步方法
+    if (currentStep < 8) {
+      bool canProceed = _checkCondition();
+      // bool canProceed = true;
       if (canProceed) {
         currentStep = currentStep + 1;
         pageController.jumpToPage(currentStep - 1);
 
         // 如果是最后一步，构建预览数据
-        if (currentStep == 6) {
+        if (currentStep == 7) {
           _buildPreviewData();
         }
       } else {
@@ -135,16 +136,16 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
 
   // 构建预览数据方法
   void _buildPreviewData() {
-    // _previewViewModel.buildPreviewData(
-    //   selectedInstance: selectedInstance,
-    //   selectedDoor: selectedDoor,
-    //   selectedInOut: selectedInOut,
-    //   aiViewModel: _aiViewModel,
-    //   cameraViewModel: _cameraViewModel,
-    //   nvrViewModel: _nvrViewModel,
-    //   powerBoxViewModel: _powerBoxViewModel,
-    //   powerViewModel: _powerViewModel,
-    // );
+    _previewViewModel.buildPreviewData(
+      selectedInstance: selectedInstance,
+      selectedDoor: selectedDoor,
+      // selectedInOut: selectedInOut ?? selectedDoor,
+      aiViewModel: _aiViewModel,
+      cameraViewModel: _cameraViewModel,
+      nvrViewModel: _nvrViewModel,
+      powerBoxViewModel: _powerBoxViewModel,
+      powerViewModel: _powerViewModel,
+    );
   }
 
   ///私有方法
@@ -184,6 +185,7 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
         }
         return true;
       case 2: //添加AI设备
+        return true;
         //如果只有一个
         if (aiViewModel.aiDeviceList.length == 1 &&
             (aiViewModel.aiDeviceList.first.mac?.isEmpty ?? true)) {
@@ -202,6 +204,7 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
         cameraViewModel.gateId = selectedDoor?.id ?? 0;
         return true;
       case 3: //摄像头
+        return true;
         //如果只有一个
         if (cameraViewModel.cameraDeviceList.length == 1 &&
             (!cameraViewModel.cameraDeviceList.first.isAddEnd)) {
@@ -218,14 +221,46 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
         }
         return true;
       case 4:
+        return true;
         if (powerBoxViewModel.checkSelection()) {
           return true;
         }
         return false;
       case 5:
         return true;
+        if (powerViewModel.checkSelection()) {
+          if (powerViewModel.checkNetworkSelection()) {
+            if (powerViewModel.checkExchangeSelection()) {
+              return true;
+            }
+          }
+        }
+
+        return false;
+      case 6:
+        return true;
       default:
         return false;
     }
   }
+
+// // 添加一个可以从外部调用的重生成预览数据的方法
+// void rebuildPreviewData() {
+//   // 验证必要数据是否存在
+//   if (selectedInstance == null || selectedDoor == null) {
+//     LoadingUtils.showInfo(data: "缺少必要的实例或大门信息！");
+//     return;
+//   }
+//
+//   // 重新生成预览数据
+//   _buildPreviewData();
+//
+//   // 显示生成中提示
+//   LoadingUtils.show(data: "正在重新生成预览数据...");
+//
+//   // 3秒后关闭加载提示
+//   Future.delayed(const Duration(seconds: 3), () {
+//     LoadingUtils.dismiss();
+//   });
+// }
 }
