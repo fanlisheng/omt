@@ -90,7 +90,7 @@ class AddPowerBoxView extends StatelessWidget {
                     Text("需要",
                         style: TextStyle(
                             fontSize: 12,
-                            color: model.isPowerBoxNeeded
+                            color: (model.isPowerBoxNeeded ?? false)
                                 ? ColorUtils.colorGreen
                                 : ColorUtils.colorWhite)),
                     const SizedBox(width: 16),
@@ -106,7 +106,7 @@ class AddPowerBoxView extends StatelessWidget {
                     Text("不需要",
                         style: TextStyle(
                             fontSize: 12,
-                            color: model.isPowerBoxNeeded
+                            color: (model.isPowerBoxNeeded ?? true)
                                 ? ColorUtils.colorWhite
                                 : ColorUtils.colorGreen)),
                   ],
@@ -115,58 +115,59 @@ class AddPowerBoxView extends StatelessWidget {
               if (model.isPowerBoxNeeded == true) ...[
                 const SizedBox(height: 10),
                 EquallyRow(
-                    one: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const RowTitle(name: "进/出口"),
-                        const SizedBox(height: 8),
-                        ui.ComboBox<IdNameValue>(
-                          isExpanded: true,
-                          value: model.selectedPowerBoxInOut,
-                          items: model.inOutList
-                              .map<ui.ComboBoxItem<IdNameValue>>((e) {
-                            return ui.ComboBoxItem<IdNameValue>(
-                              value: e,
-                              child: SizedBox(
-                                child: Text(
-                                  e.name ?? "",
-                                  textAlign: TextAlign.start,
-                                ),
+                  one: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const RowTitle(name: "进/出口"),
+                      const SizedBox(height: 8),
+                      ui.ComboBox<IdNameValue>(
+                        isExpanded: true,
+                        value: model.selectedPowerBoxInOut,
+                        items: model.inOutList
+                            .map<ui.ComboBoxItem<IdNameValue>>((e) {
+                          return ui.ComboBoxItem<IdNameValue>(
+                            value: e,
+                            child: SizedBox(
+                              child: Text(
+                                e.name ?? "",
+                                textAlign: TextAlign.start,
                               ),
-                            );
-                          }).toList(),
-                          onChanged: (a) {
-                            model.selectedPowerBoxInOut = a!;
-                            model.notifyListeners();
-                          },
-                          placeholder: const Text(
-                            "请选择进/出口",
-                            textAlign: TextAlign.start,
-                            style: TextStyle(
-                                fontSize: 12,
-                                color: ColorUtils.colorBlackLiteLite),
-                          ),
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (a) {
+                          model.selectedPowerBoxInOut = a!;
+                          model.notifyListeners();
+                        },
+                        placeholder: const Text(
+                          "请选择进/出口",
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                              fontSize: 12,
+                              color: ColorUtils.colorBlackLiteLite),
                         ),
-                      ],
-                    ),
-                    two: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const RowTitle(name: "电源箱编码"),
-                        const SizedBox(height: 8),
-                        SearchableDropdown<DeviceDetailPowerBoxData>(
-                          asgbKey: model.asgbKey,
-                          focusNode: model.focusNode,
-                          controller: model.controller,
-                          items: model.powerBoxList,
-                          placeholder: "电源箱编码",
-                          labelSelector: (item) => item.deviceCode ?? "",
-                          onSelected: (a) {
-                            model.selectedPowerBoxCode(a);
-                          },
-                        ),
-                      ],
-                    )),
+                      ),
+                    ],
+                  ),
+                  two: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const RowTitle(name: "电源箱编码"),
+                      const SizedBox(height: 8),
+                      SearchableDropdown<DeviceDetailPowerBoxData>(
+                        asgbKey: model.asgbKey,
+                        focusNode: model.focusNode,
+                        controller: model.controller,
+                        items: model.powerBoxList,
+                        placeholder: "电源箱编码",
+                        labelSelector: (item) => item.deviceCode ?? "",
+                        onSelected: (a) {
+                          model.selectedPowerBoxCode(a);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
               ]
             ],
           ),
@@ -257,16 +258,27 @@ class AddPowerBoxView extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              RowItemInfoView(name: "供电状态", value: "${model.selectedDeviceDetailPowerBox?.powerStatus ?? 0}"),
-              RowItemInfoView(name: "工作时长", value: model.selectedDeviceDetailPowerBox?.workTime ?? ""),
+              RowItemInfoView(
+                  name: "供电状态",
+                  value:
+                      "${model.selectedDeviceDetailPowerBox?.powerStatus ?? 0}"),
+              RowItemInfoView(
+                  name: "工作时长",
+                  value: model.selectedDeviceDetailPowerBox?.workTime ?? ""),
             ],
           ),
           const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              RowItemInfoView(name: "进风口温度", value: "${model.selectedDeviceDetailPowerBox?.inletTemperature}℃"),
-              RowItemInfoView(name: "出风口温度", value: "${model.selectedDeviceDetailPowerBox?.outletTemperature}℃"),
+              RowItemInfoView(
+                  name: "进风口温度",
+                  value:
+                      "${model.selectedDeviceDetailPowerBox?.inletTemperature}℃"),
+              RowItemInfoView(
+                  name: "出风口温度",
+                  value:
+                      "${model.selectedDeviceDetailPowerBox?.outletTemperature}℃"),
             ],
           ),
           const SizedBox(height: 12),

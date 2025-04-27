@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:omt/generated/json/base/json_convert_content.dart';
 
+import '../bean/common/id_name_value.dart';
+
 class JsonUtils {
   static getMap(var data) {
     if (data is String) {
@@ -44,7 +46,14 @@ class JsonUtils {
       return data;
     } else if (queryDataType == 'List<String>') {
       return List<String>.from(data) as T;
-    } else if (queryDataType == 'dynamic') {
+    } else if (queryDataType == 'List<StrIdNameValue>') {
+      if(data is List){
+        return await Future.value(JsonConvert.fromJsonAsT<T>(data));
+      }else if(data is Map){
+        return await Future.value(JsonConvert.fromJsonAsT<T>(data["data"]));
+      }
+
+    }else if (queryDataType == 'dynamic') {
       return data;
     } else {
       return await Future.value(JsonConvert.fromJsonAsT<T>(map));

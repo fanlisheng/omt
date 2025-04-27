@@ -5,6 +5,7 @@ import 'package:omt/http/http_manager.dart';
 
 import '../../../bean/common/id_name_value.dart';
 import '../../../bean/home/home_page/device_detail_power_box_entity.dart';
+import '../../../bean/one_picture/one_picture/one_picture_data_entity.dart';
 
 ///
 ///  omt
@@ -36,6 +37,10 @@ class InstallService {
       '${API.share.host}api/device/camera/control_status_map';
 
   get _getCameraType => '${API.share.host}api/device/camera/camera_type_map';
+
+  get _installStep1 => '${API.share.host}api/device/install/step1';
+
+  get _installPreview => '${API.share.host}api/device/tree/preview';
 
   /// AI设备和摄像头安装
   aiDeviceCameraInstall({
@@ -318,6 +323,119 @@ class InstallService {
       method: 'POST',
       autoHideDialog: false,
       autoShowDialog: false,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  /// AI设备和摄像头安装
+  installStep1({
+    String? instanceId,
+    int? gateId,
+    int? passId,
+    required Map<String, dynamic> aiDevice,
+    required Map<String, dynamic> camera,
+    required ValueChanged<CodeMessageData?> onSuccess,
+    ValueChanged<CodeMessageData?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    Map<String, dynamic> params = {
+      "ai_device": aiDevice,
+      "camera": camera,
+    };
+
+    if (instanceId != null) {
+      params["instance_id"] = instanceId;
+    }
+    if (gateId != null) {
+      params["gate_id"] = gateId;
+    }
+    if (passId != null) {
+      params["pass_id"] = passId;
+    }
+
+    HttpManager.share.doHttpPost<CodeMessageData>(
+      await _installStep1,
+      params,
+      method: 'POST',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  /// 设备安装第二步预览
+  installPreview({
+    String? instanceId,
+    int? gateId,
+    // required List<Map<String, dynamic>> powers,
+    // required List<Map<String, dynamic>> powerBoxes,
+    // required List<Map<String, dynamic>> routers,
+    // required List<Map<String, dynamic>> wiredNetworks,
+    // required List<Map<String, dynamic>> nvrs,
+    // required List<Map<String, dynamic>> switches,
+    required ValueChanged<OnePictureDataData?> onSuccess,
+    ValueChanged<OnePictureDataData?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    // Map<String, dynamic> params = {
+    //   "powers": powers,
+    //   "power_boxes": powerBoxes,
+    //   "routers": routers,
+    //   "wired_networks": wiredNetworks,
+    //   "nvrs": nvrs,
+    //   "switches": switches,
+    // };
+    //
+    // if (instanceId != null) {
+    //   params["instance_id"] = instanceId;
+    // }
+    // if (gateId != null) {
+    //   params["gate_id"] = gateId;
+    // }
+
+    Map<String, dynamic> params = {
+      "instance_id": instanceId,
+      "gate_id": gateId,
+      // 电源信息
+      "powers": [
+        {
+          "PowerType": [1],
+          "battery_capacity": 100,
+          "pass_id": 2
+        }
+      ],
+      // 电源箱
+      "power_boxes": [
+        {"device_code": "", "pass_id": 1}
+      ],
+      // 无线路由器
+      "routers": [
+        {"ip": "192.168.101.1", "mac": "24:32:ae:74:aa:d8", "pass_id": 2}
+      ],
+      // 有线网络
+      "wired_networks": [
+        {"ip": "192.168.101.1", "mac": "24:32:ae:74:aa:d8", "pass_id": 1}
+      ],
+      // nvr
+      "nvrs": [
+        {"ip": "192.168.101.1", "mac": "24:32:ae:74:aa:d8", "pass_id": 1}
+      ],
+      // 交换机
+      "switches": [
+        {"interface_num": 3, "power_method": "POE", "pass_id": 1}
+      ]
+    };
+
+    HttpManager.share.doHttpPost<OnePictureDataData>(
+      await _installPreview,
+      params,
+      method: 'POST',
+      autoHideDialog: true,
+      autoShowDialog: true,
       onSuccess: onSuccess,
       onCache: onCache,
       onError: onError,

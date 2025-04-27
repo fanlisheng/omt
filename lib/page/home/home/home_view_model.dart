@@ -99,24 +99,24 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
       //   onTap: () => debugPrint('测试详情'),
       // ),
 
-      // PaneItem(
-      //   icon: PaneImage(
-      //     name: "home/ic_pane_add",
-      //     selectedName: 'home/ic_pane_add_s',
-      //     index: 1,
-      //     selectedIndex: topIndex,
-      //   ),
-      //   title: Text(
-      //     "安装",
-      //     style: TextStyle(
-      //         fontSize: 12,
-      //         color: 1 == topIndex ? "#F3FFFF".toColor() : "#678384".toColor()),
-      //   ),
-      //   body: const KeepAlivePage(
-      //     child: InstallDeviceScreen(),
-      //   ),
-      //   onTap: () => debugPrint('安装'),
-      // ),
+      PaneItem(
+        icon: PaneImage(
+          name: "home/ic_pane_add",
+          selectedName: 'home/ic_pane_add_s',
+          index: 1,
+          selectedIndex: topIndex,
+        ),
+        title: Text(
+          "安装",
+          style: TextStyle(
+              fontSize: 12,
+              color: 1 == topIndex ? "#F3FFFF".toColor() : "#678384".toColor()),
+        ),
+        body: const KeepAlivePage(
+          child: InstallDeviceScreen(),
+        ),
+        onTap: () => debugPrint('安装'),
+      ),
       PaneItem(
         icon: PaneImage(
           name: "home/ic_pane_delete",
@@ -135,51 +135,51 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
         ),
         onTap: () => debugPrint('拆除'),
       ),
-      // PaneItemExpander(
-      //   icon: PaneImage(
-      //     name: "home/ic_pane_set",
-      //     selectedName: 'home/ic_pane_set',
-      //     index: 3,
-      //     selectedIndex: topIndex,
-      //   ),
-      //   title: Text(
-      //     "设置",
-      //     style: TextStyle(
-      //         fontSize: 12,
-      //         color: 3 == topIndex ? "#F3FFFF".toColor() : "#678384".toColor()),
-      //   ),
-      //   body: Container(),
-      //   items: [
-      //     // PaneItem(
-      //     //   icon: Container(),
-      //     //   title: Text(
-      //     //     "个设备",
-      //     //     style: TextStyle(
-      //     //         fontSize: 12,
-      //     //         color: 4 == topIndex
-      //     //             ? "#F3FFFF".toColor()
-      //     //             : "#678384".toColor()),
-      //     //   ),
-      //     //   body: const KeepAlivePage(
-      //     //     child: LabelManagementScreen(),
-      //     //   ),
-      //     // ),
-      //     PaneItem(
-      //       icon: Container(),
-      //       title: Text(
-      //         "一张图",
-      //         style: TextStyle(
-      //             fontSize: 12,
-      //             color: 5 == topIndex
-      //                 ? "#F3FFFF".toColor()
-      //                 : "#678384".toColor()),
-      //       ),
-      //       body: KeepAlivePage(
-      //         child: OnePicturePage(),
-      //       ),
-      //     ),
-      //   ],
-      // ),
+      PaneItemExpander(
+        icon: PaneImage(
+          name: "home/ic_pane_set",
+          selectedName: 'home/ic_pane_set',
+          index: 3,
+          selectedIndex: topIndex,
+        ),
+        title: Text(
+          "设置",
+          style: TextStyle(
+              fontSize: 12,
+              color: 3 == topIndex ? "#F3FFFF".toColor() : "#678384".toColor()),
+        ),
+        body: Container(),
+        items: [
+          PaneItem(
+            icon: Container(),
+            title: Text(
+              "个设备",
+              style: TextStyle(
+                  fontSize: 12,
+                  color: 4 == topIndex
+                      ? "#F3FFFF".toColor()
+                      : "#678384".toColor()),
+            ),
+            body: const KeepAlivePage(
+              child: LabelManagementScreen(),
+            ),
+          ),
+          // PaneItem(
+          //   icon: Container(),
+          //   title: Text(
+          //     "一张图",
+          //     style: TextStyle(
+          //         fontSize: 12,
+          //         color: 5 == topIndex
+          //             ? "#F3FFFF".toColor()
+          //             : "#678384".toColor()),
+          //   ),
+          //   body: KeepAlivePage(
+          //     child: OnePicturePage(),
+          //   ),
+          // ),
+        ],
+      ),
     ];
   }
 

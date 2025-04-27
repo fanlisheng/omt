@@ -626,8 +626,13 @@ class AddCameraView extends StatelessWidget {
                 ),
               ),
               onTap: () {
-                model.cameraDeviceList.add(CameraDeviceEntity());
-                model.notifyListeners();
+                if(model.cameraDeviceList.last.isAddEnd == true){
+                  model.cameraDeviceList.add(CameraDeviceEntity());
+                  model.notifyListeners();
+                }else{
+                  LoadingUtils.showInfo(data: "请添加完上一个设备!");
+                }
+
               },
             ),
           ],

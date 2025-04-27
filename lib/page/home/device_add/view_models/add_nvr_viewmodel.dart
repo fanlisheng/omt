@@ -17,7 +17,7 @@ class AddNvrViewModel extends BaseViewModel {
 
   // ===== NVR 相关属性 =====
   List<DeviceEntity> nvrDeviceList = [];
-  bool isNvrNeeded = true;
+  bool? isNvrNeeded ;
   DeviceEntity? selectedNvr;
   DeviceDetailNvrData nvrData = DeviceDetailNvrData();
   bool isNvrSearching = false;
@@ -28,8 +28,8 @@ class AddNvrViewModel extends BaseViewModel {
   @override
   void initState() {
     super.initState();
-    // 初始化进/出口列表
 
+    // 初始化进/出口列表
     HttpQuery.share.homePageService.getInOutList(
       onSuccess: (List<IdNameValue>? data) {
         inOutList = data ?? [];
@@ -37,7 +37,6 @@ class AddNvrViewModel extends BaseViewModel {
       },
     );
 
-    refreshNvrAction();
   }
 
   @override
@@ -100,13 +99,17 @@ class AddNvrViewModel extends BaseViewModel {
 
   // 安装NVR设备
   void installNvrAction() {
-    // 检查是否已选择NVR
-    if (selectedNarInOut == null) {
-      LoadingUtils.showToast(data: '请先选择进出口');
-      return;
-    }
-    if (selectedNvr == null) {
-      LoadingUtils.showToast(data: '请先选择NVR设备');
+    // // 检查是否已选择NVR
+    // if (selectedNarInOut == null) {
+    //   LoadingUtils.showToast(data: '请先选择进出口');
+    //   return;
+    // }
+    // if (selectedNvr == null) {
+    //   LoadingUtils.showToast(data: '请先选择NVR设备');
+    //   return;
+    // }
+
+    if (checkNvrSelection() == false) {
       return;
     }
 
@@ -122,6 +125,24 @@ class AddNvrViewModel extends BaseViewModel {
         onError: (error) {
           LoadingUtils.showToast(data: 'NVR安装失败: $error');
         });
+  }
+
+  bool checkNvrSelection() {
+    if (isNvrNeeded == null) {
+      LoadingUtils.showToast(data: '请选选择是否需要安装!');
+      return false;
+    }
+    if (isNvrNeeded ?? false) {
+      if (selectedNarInOut == null) {
+        LoadingUtils.showToast(data: '请先选择进出口');
+        return false;
+      }
+      if (selectedNvr == null) {
+        LoadingUtils.showToast(data: '请先选择NVR设备');
+        return false;
+      }
+    }
+    return true;
   }
 
   bool _shouldStop() {

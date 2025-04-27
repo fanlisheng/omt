@@ -99,7 +99,7 @@ class SearchableDropdownState<T> extends State<SearchableDropdown<T>> {
       controller: widget.controller,
       placeholderStyle: widget.placeholderStyle,
       decoration: widget.decoration,
-      clearButtonEnabled: false,
+      clearButtonEnabled: widget.clearButtonEnabled,
       onChanged: (text, reason) {
         if (reason == TextChangedReason.cleared) {
           setState(() {
