@@ -33,8 +33,8 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
   int? gateId;
   int? passId;
 
-  OnePictureViewModel(
-      this.instanceId, this.gateId, this.passId, this.instanceName,this.onePictureHttpData);
+  OnePictureViewModel(this.instanceId, this.gateId, this.passId,
+      this.instanceName, this.onePictureHttpData);
 
   final TransformationController transformationController =
       TransformationController();
@@ -59,35 +59,14 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
     super.initState();
     // requestData();
 
-    if(null!=onePictureHttpData){
+    if (null != onePictureHttpData) {
+      OnePictureDataData data = onePictureHttpData!;
+      currentIndex = 0;
+      onePictureHttpData = data;
       dataMap.clear();
       OnePictureDataData? opd;
-      if (null == data && null == gateId && null == passId) {
-        opd = OnePictureDataData()
-          ..name = instanceName ?? '未知'
-          ..type = OnePictureType.SL.index
-          ..id = '-99'
-          ..nextList = [
-            OnePictureDataData()
-              ..name = '未发现绑定设备'
-              ..type = OnePictureType.OTHER.index
-              ..id = '-99'
-          ];
-
-        _setDataMap(opd);
-
-        setArrowBorder(opd);
-      } else if (null == data) {
-        opd = OnePictureDataData()
-          ..name = '未发现绑定设备'
-          ..type = OnePictureType.OTHER.index
-          ..id = '-99';
-        _setDataMap(opd);
-      } else {
-        _setDataMap(data);
-        opd = _dealHttpData(data);
-      }
-
+      _setDataMap(data);
+      opd = _dealHttpData(data);
       if (opd != null) {
         // if(opd.nextList.isNotEmpty){
         //   if(opd.type == OnePictureType.DM.index){
@@ -105,9 +84,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
       Timer(Duration(milliseconds: 500), () {
         notifyListeners();
       });
-
     }
-
 
     DeviceUtils.getNetworkMac(onData: (data) {
       if (SharedUtils.networkMac != data) {
@@ -354,7 +331,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
             }
           }
           if (jhjList.isEmpty) {
-            if (data.addEmptyNode  || true) {
+            if (data.addEmptyNode || true) {
               data.children.add(OnePictureDataData()
                 ..type = OnePictureType.JHJ.index
                 ..unknown = true
