@@ -371,64 +371,64 @@ class InstallService {
   installPreview({
     String? instanceId,
     int? gateId,
-    // required List<Map<String, dynamic>> powers,
-    // required List<Map<String, dynamic>> powerBoxes,
-    // required List<Map<String, dynamic>> routers,
-    // required List<Map<String, dynamic>> wiredNetworks,
-    // required List<Map<String, dynamic>> nvrs,
-    // required List<Map<String, dynamic>> switches,
+    required List<Map<String, dynamic>> powers,
+    required List<Map<String, dynamic>> powerBoxes,
+    required List<Map<String, dynamic>> routers,
+    required List<Map<String, dynamic>> wiredNetworks,
+    required List<Map<String, dynamic>> nvrs,
+    required List<Map<String, dynamic>> switches,
     required ValueChanged<OnePictureDataData?> onSuccess,
     ValueChanged<OnePictureDataData?>? onCache,
     ValueChanged<String>? onError,
   }) async {
-    // Map<String, dynamic> params = {
-    //   "powers": powers,
-    //   "power_boxes": powerBoxes,
-    //   "routers": routers,
-    //   "wired_networks": wiredNetworks,
-    //   "nvrs": nvrs,
-    //   "switches": switches,
-    // };
-    //
-    // if (instanceId != null) {
-    //   params["instance_id"] = instanceId;
-    // }
-    // if (gateId != null) {
-    //   params["gate_id"] = gateId;
-    // }
-
     Map<String, dynamic> params = {
-      "instance_id": instanceId,
-      "gate_id": gateId,
-      // 电源信息
-      "powers": [
-        {
-          "PowerType": [1],
-          "battery_capacity": 100,
-          "pass_id": 2
-        }
-      ],
-      // 电源箱
-      "power_boxes": [
-        {"device_code": "", "pass_id": 1}
-      ],
-      // 无线路由器
-      "routers": [
-        {"ip": "192.168.101.1", "mac": "24:32:ae:74:aa:d8", "pass_id": 2}
-      ],
-      // 有线网络
-      "wired_networks": [
-        {"ip": "192.168.101.1", "mac": "24:32:ae:74:aa:d8", "pass_id": 1}
-      ],
-      // nvr
-      "nvrs": [
-        {"ip": "192.168.101.1", "mac": "24:32:ae:74:aa:d8", "pass_id": 1}
-      ],
-      // 交换机
-      "switches": [
-        {"interface_num": 3, "power_method": "POE", "pass_id": 1}
-      ]
+      "powers": powers,
+      "power_boxes": powerBoxes,
+      "routers": routers,
+      "wired_networks": wiredNetworks,
+      "nvrs": nvrs,
+      "switches": switches,
     };
+
+    if (instanceId != null) {
+      params["instance_id"] = instanceId;
+    }
+    if (gateId != null) {
+      params["gate_id"] = gateId;
+    }
+
+    // Map<String, dynamic> params = {
+    //   "instance_id": instanceId,
+    //   "gate_id": gateId,
+    //   // 电源信息
+    //   "powers": [
+    //     {
+    //       "PowerType": [1],
+    //       "battery_capacity": 100,
+    //       "pass_id": 2
+    //     }
+    //   ],
+    //   // 电源箱
+    //   "power_boxes": [
+    //     {"device_code": "", "pass_id": 1}
+    //   ],
+    //   // 无线路由器
+    //   "routers": [
+    //     {"ip": "192.168.101.1", "mac": "24:32:ae:74:aa:d8", "pass_id": 2}
+    //   ],
+    //   // 有线网络
+    //   "wired_networks": [
+    //     {"ip": "192.168.101.1", "mac": "24:32:ae:74:aa:d8", "pass_id": 1}
+    //   ],
+    //   // nvr
+    //   "nvrs": [
+    //     {"ip": "192.168.101.1", "mac": "24:32:ae:74:aa:d8", "pass_id": 1}
+    //   ],
+    //   // 交换机
+    //   "switches": [
+    //     {"interface_num": 3, "power_method": "POE", "pass_id": 1}
+    //   ]
+    // };
 
     HttpManager.share.doHttpPost<OnePictureDataData>(
       await _installPreview,

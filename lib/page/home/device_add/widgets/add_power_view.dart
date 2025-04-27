@@ -31,6 +31,7 @@ class _AddPowerViewState extends State<AddPowerView> {
   }
 
   Widget contentView(AddPowerViewModel model) {
+    double vSpace = 20;
     return ListView(
       // crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -99,18 +100,18 @@ class _AddPowerViewState extends State<AddPowerView> {
                     "请选择进/出口",
                     textAlign: TextAlign.start,
                     style: TextStyle(
-                        fontSize: 12, color: ColorUtils.colorBlackLiteLite),
+                        fontSize: 12, color: ColorUtils.colorWhite),
                   ),
                 ),
                 two: Container(),
               ),
-              const SizedBox(height: 30),
+              SizedBox(height: vSpace),
               DashLine(
                 color: "#5D6666".toColor(),
                 height: 1,
                 width: double.infinity,
               ),
-              const SizedBox(height: 30),
+               SizedBox(height: vSpace),
               EquallyRow(
                 one: const Row(
                   children: [
@@ -153,7 +154,7 @@ class _AddPowerViewState extends State<AddPowerView> {
                       )
                     : Container(),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 6),
               EquallyRow(
                 one: Wrap(
                   spacing: 30.0,
@@ -200,13 +201,13 @@ class _AddPowerViewState extends State<AddPowerView> {
                       )
                     : Container(),
               ),
-              const SizedBox(height: 30),
+               SizedBox(height: vSpace),
               DashLine(
                 color: "#5D6666".toColor(),
                 height: 1,
                 width: double.infinity,
               ),
-              const SizedBox(height: 30),
+               SizedBox(height: vSpace),
               if (model.isInstall) ...[
                 const EquallyRow(
                   one: Row(
@@ -248,7 +249,7 @@ class _AddPowerViewState extends State<AddPowerView> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 5),
+                const SizedBox(height: 6),
                 EquallyRow(
                   one: FComboBox(
                     selectedValue: model.selectedRouterType,
@@ -268,7 +269,6 @@ class _AddPowerViewState extends State<AddPowerView> {
                 ),
                 buildExchangeList(model),
               ],
-              const SizedBox(height: 37),
             ],
           ),
         ),
@@ -350,17 +350,17 @@ class _AddPowerViewState extends State<AddPowerView> {
         (index) {
           final device = model.exchangeDevices[index];
           return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            padding: const EdgeInsets.symmetric(vertical: 0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 30),
+                const SizedBox(height: 20),
                 DashLine(
                   color: "#5D6666".toColor(),
                   height: 1,
                   width: double.infinity,
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 20),
                 const EquallyRow(
                   one: RowTitle(name: "交换机接口数量"),
                   two: RowTitle(name: "交换机接供电方式"),

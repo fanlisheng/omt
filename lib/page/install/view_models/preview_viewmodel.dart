@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:kayo_package/extension/_index_extension.dart';
 import 'package:kayo_package/mvvm/base/base_view_model.dart';
 import 'package:omt/http/http_query.dart';
 
@@ -35,32 +37,35 @@ class PreviewViewModel extends BaseViewModel {
     }
 
     try {
-      // Map<String, dynamic> powersMap = _getPowersMap(powerViewModel);
-      // Map<String, dynamic> powerBoxes = _getPowerBoxes(powerBoxViewModel);
-      // Map<String, dynamic> network = _getNetwork(powerViewModel);
-      // Map<String, dynamic> nvr = _getNvr(nvrViewModel);
-      // List<Map<String, dynamic>> routers = [];
-      // List<Map<String, dynamic>> wiredNetworks = [];
-      // if (network["type"] == 6) {
-      //   routers.add(network);
-      // } else {
-      //   wiredNetworks.add(network);
-      // }
+      Map<String, dynamic> powersMap = _getPowersMap(powerViewModel);
+      Map<String, dynamic> powerBoxes = _getPowerBoxes(powerBoxViewModel);
+      Map<String, dynamic> network = _getNetwork(powerViewModel);
+      Map<String, dynamic> nvr = _getNvr(nvrViewModel);
+      List<Map<String, dynamic>> routers = [];
+      List<Map<String, dynamic>> wiredNetworks = [];
+      if (network["type"] == 6) {
+        routers.add(network);
+      } else {
+        wiredNetworks.add(network);
+      }
 
       HttpQuery.share.installService.installPreview(
           instanceId: selectedInstance.id ?? "",
           gateId: selectedDoor.id ?? 0,
-          // powers: [powersMap],
-          // powerBoxes: [powerBoxes],
-          // routers: routers,
-          // wiredNetworks: wiredNetworks,
-          // nvrs: [nvr],
-          // switches: _getSwitches(powerViewModel),
+          powers: [powersMap],
+          powerBoxes: [powerBoxes],
+          routers: routers,
+          wiredNetworks: wiredNetworks,
+          nvrs: [nvr],
+          switches: _getSwitches(powerViewModel),
           onSuccess: (data) {
             onePictureDataData = data;
-            picturePageKey.currentState
-                ?.refreshWithData(data: onePictureDataData);
             notifyListeners();
+            Timer(Duration(milliseconds: 100), () {
+              picturePageKey.currentState
+                  ?.refreshWithData(data: onePictureDataData);
+              notifyListeners();
+            });
           });
     } catch (e) {
       print("Error building OnePictureDataData: $e");
@@ -133,9 +138,9 @@ class PreviewViewModel extends BaseViewModel {
     List<Map<String, dynamic>> paramsList = [];
     for (ExchangeDeviceModel exchange in powerViewModel.exchangeDevices) {
       Map<String, dynamic> params = {
-        "interface_num": exchange.selectedPortNumber,
+        "interface_num": exchange.selectedPortNumber.toInt(),
         "power_method": exchange.selectedSupplyMethod,
-        "pass_id": powerViewModel.selectedPowerInOut,
+        "pass_id": powerViewModel.selectedPowerInOut?.id,
       };
       paramsList.add(params);
     }
