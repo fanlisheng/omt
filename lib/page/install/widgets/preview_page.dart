@@ -26,62 +26,142 @@ class PreviewPage extends StatelessWidget {
         model: model,
         autoLoadData: true,
         builder: (context, model, child) {
-          return model.onePictureDataData != null
-              ? OnePicturePage(
-                  key: model.picturePageKey,
-                  onePictureHttpData: model.onePictureDataData)
-              : const Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      fu.ProgressRing(),
-                      SizedBox(height: 20),
-                      Text(
-                        "正在生成预览数据，请稍候...",
-                        style: TextStyle(
-                          color: ColorUtils.colorGreenLiteLite,
-                          fontSize: 16,
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      // fu.FilledButton(
-                      //   child: const Text("重新生成预览"),
-                      //   onPressed: () {
-                      //     // 使用公开方法重新生成预览数据
-                      //     installDeviceViewModel.rebuildPreviewData();
-                      //   },
-                      // ),
-                    ],
-                  ),
-                );
+          return contentView();
+              // : const Center(
+              //     child: Column(
+              //       mainAxisAlignment: MainAxisAlignment.center,
+              //       children: [
+              //         fu.ProgressRing(),
+              //         SizedBox(height: 20),
+              //         Text(
+              //           "正在生成预览数据，请稍候...",
+              //           style: TextStyle(
+              //             color: ColorUtils.colorGreenLiteLite,
+              //             fontSize: 16,
+              //           ),
+              //         ),
+              //         SizedBox(height: 20),
+              //         // fu.FilledButton(
+              //         //   child: const Text("重新生成预览"),
+              //         //   onPressed: () {
+              //         //     // 使用公开方法重新生成预览数据
+              //         //     installDeviceViewModel.rebuildPreviewData();
+              //         //   },
+              //         // ),
+              //       ],
+              //     ),
+              //   );
         });
   }
 
-  // 显示JSON数据的对话框
-  void _showJsonDialog(BuildContext context, PreviewViewModel model) {
-    // final jsonString = model.getJsonString();
-    // if (jsonString != null) {
-    //   showDialog(
-    //     context: context,
-    //     builder: (context) => fu.ContentDialog(
-    //       title: const Text("预览JSON数据"),
-    //       content: SizedBox(
-    //         width: double.maxFinite,
-    //         height: 400,
-    //         child: SingleChildScrollView(
-    //           child: SelectableText(jsonString),
-    //         ),
-    //       ),
-    //       actions: [
-    //         fu.Button(
-    //           child: const Text("关闭"),
-    //           onPressed: () {
-    //             Navigator.of(context).pop();
-    //           },
-    //         ),
-    //       ],
-    //     ),
-    //   );
-    // }
+  Widget contentView() {
+    return Column(
+      // crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Container(
+            margin: const EdgeInsets.only(left: 16, right: 16),
+            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+            decoration: BoxDecoration(
+              color: ColorUtils.colorBackgroundLine,
+              borderRadius: BorderRadius.circular(3),
+            ),
+            width: double.infinity,
+            child: OnePicturePage(
+                key: model.picturePageKey,
+                onePictureHttpData: model.onePictureDataData),
+          ),
+        ),
+        const fu.SizedBox(height: 10,),
+        Container(
+          height: 40,
+          margin: const EdgeInsets.only(left: 16, right: 16, bottom: 15),
+          decoration: BoxDecoration(
+            color: const Color(0xFF4E5353),
+            borderRadius: BorderRadius.circular(3),
+          ),
+          // 深灰色背景
+          child: Row(
+            children: [
+              const SizedBox(width: 16),
+              const Text(
+                '设备统计：',
+                style: TextStyle(color: fu.Colors.white),
+              ),
+              Expanded(
+                child: buildDeviceStatistics(
+                    statistics:
+                        "设备统计：  1个电池  /  1个电源箱  /  2个路由器  /  2个交换机  /  2个边缘设备（1个异常）  /  2个摄像头（1个异常）  /  1个NVR（1个异常）"),
+                // child: Text(
+                //   model.deviceStatistics,
+                //   style: const TextStyle(
+                //     color: ColorUtils.colorGreen,
+                //     fontSize: 12,
+                //   ),
+                //   maxLines: 2,
+                // ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  static Widget buildDeviceStatistics({
+    required String statistics,
+  }) {
+    // 解析 statistics 字符串，拆分为设备统计项
+    final stats = statistics.split(' / ').map((item) {
+      final parts = item.trim().split('（');
+      final nameCount = parts[0].trim();
+      final abnormal = parts.length > 1 ? parts[1].replaceAll('）', '') : '';
+      return {
+        'nameCount': nameCount,
+        'abnormal': abnormal,
+      };
+    }).toList();
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        ...stats.asMap().entries.map((entry) {
+          final stat = entry.value;
+          final isLast = entry.key == stats.length - 1;
+          return RichText(
+            maxLines: 2, // 最多 2 行
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: stat['nameCount'],
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: (stat['abnormal']?.isNotEmpty ?? false)
+                        ? ColorUtils.colorRed
+                        : ColorUtils.colorGreen,
+                  ),
+                ),
+                if (stat['abnormal']?.isNotEmpty ?? false)
+                  TextSpan(
+                    text: '（${stat['abnormal']}）',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: ColorUtils.colorRed,
+                    ),
+                  ),
+                if (!isLast)
+                  const TextSpan(
+                    text: ' / ',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: ColorUtils.colorGreen,
+                    ),
+                  ),
+              ],
+            ),
+          );
+        }),
+      ],
+    );
   }
 }

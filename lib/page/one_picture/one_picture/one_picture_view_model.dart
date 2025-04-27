@@ -59,7 +59,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
     super.initState();
     // requestData();
 
-    setupOnePictureHttpData();
+    // setupOnePictureHttpData();
 
     DeviceUtils.getNetworkMac(onData: (data) {
       if (SharedUtils.networkMac != data) {

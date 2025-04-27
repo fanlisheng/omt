@@ -48,7 +48,7 @@ class OnePicturePageState extends State<OnePicturePage> {
     return ProviderWidget<OnePictureViewModel>(
         model: OnePictureViewModel(widget.instanceId, widget.gateId,
             widget.passId, widget.instanceName, widget.onePictureHttpData),
-        autoLoadData: true,
+        autoLoadData: false,
         builder: (context, model, child) {
           viewModel = model;
           return model.theOnePictureDataData?.type ==
