@@ -12,26 +12,30 @@ import '../view_models/install_device_viewmodel.dart';
 import '../view_models/preview_viewmodel.dart';
 
 class PreviewPage extends StatelessWidget {
-  const PreviewPage({super.key});
+  final PreviewViewModel model;
+
+  PreviewPage({super.key, required this.model});
 
   @override
   Widget build(BuildContext context) {
     // 获取InstallDeviceViewModel的实例
-    final installDeviceViewModel =
-        Provider.of<InstallDeviceViewModel>(context, listen: false);
+    // final installDeviceViewModel =
+    //     Provider.of<InstallDeviceViewModel>(context, listen: false);
 
     return ProviderWidget<PreviewViewModel>(
-        model: installDeviceViewModel.previewViewModel,
+        model: model,
         autoLoadData: true,
         builder: (context, model, child) {
           return model.onePictureDataData != null
-              ? OnePicturePage(onePictureHttpData: model.onePictureDataData)
-              : Center(
+              ? OnePicturePage(
+                  key: model.picturePageKey,
+                  onePictureHttpData: model.onePictureDataData)
+              : const Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const fu.ProgressRing(),
-                      const SizedBox(height: 20),
+                      fu.ProgressRing(),
+                      SizedBox(height: 20),
                       Text(
                         "正在生成预览数据，请稍候...",
                         style: TextStyle(
@@ -39,7 +43,7 @@ class PreviewPage extends StatelessWidget {
                           fontSize: 16,
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
                       // fu.FilledButton(
                       //   child: const Text("重新生成预览"),
                       //   onPressed: () {
