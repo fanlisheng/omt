@@ -16,48 +16,23 @@ class PreviewPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // 获取InstallDeviceViewModel的实例
-    final installDeviceViewModel = Provider.of<InstallDeviceViewModel>(context, listen: false);
-    
+    final installDeviceViewModel =
+        Provider.of<InstallDeviceViewModel>(context, listen: false);
+
     return ProviderWidget<PreviewViewModel>(
-        model: installDeviceViewModel.previewViewModel, // 使用来自InstallDeviceViewModel的PreviewViewModel
+        model: installDeviceViewModel.previewViewModel,
+        // 使用来自InstallDeviceViewModel的PreviewViewModel
         autoLoadData: true,
         builder: (context, model, child) {
-          return Container(
-            color: "#3B3F3F".toColor(),
-            child: fu.ScaffoldPage(
-              header: fu.PageHeader(
-                title: DNavigationView(
-                  title: "安装预览",
-                  titlePass: "",
-                  hasReturn: false,
-                  rightWidget: Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        // 可以添加查看JSON按钮
-                        fu.Button(
-                          child: const Text("查看JSON"),
-                          onPressed: () {
-                            _showJsonDialog(context, model);
-                          },
-                        ),
-                        const SizedBox(width: 16),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              content: model.onePictureDataData != null
-                  ? OnePicturePage()
-                  : const Center(child: fu.ProgressRing()),
-            ),
-          );
+          return model.onePictureDataData != null
+              ? OnePicturePage()
+              : const Center(child: fu.ProgressRing());
         });
   }
-  
+
   // 显示JSON数据的对话框
   void _showJsonDialog(BuildContext context, PreviewViewModel model) {
-    final jsonString = model.getJsonString();
+    // final jsonString = model.getJsonString();
     // if (jsonString != null) {
     //   showDialog(
     //     context: context,

@@ -11,6 +11,7 @@ import '../../home/device_add/view_models/add_battery_exchange_viewmodel.dart';
 import '../../home/device_add/view_models/add_camera_viewmodel.dart';
 import '../../home/device_add/view_models/add_nvr_viewmodel.dart';
 import '../../home/device_add/view_models/add_power_box_viewmodel.dart';
+import '../../home/device_add/view_models/add_power_viewmodel.dart';
 import '../../home/search_device/services/device_search_service.dart';
 import '../view_models/preview_viewmodel.dart';
 
@@ -28,17 +29,8 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
   List<IdNameValue> inOutList = [];
   IdNameValue? selectedInOut;
 
-  List<String> availableTags = [
-    '标签1',
-    '标签2',
-    '标签3',
-    '标签4',
-    '标签5',
-    '标签6',
-    '标签7',
-    '标签9'
-  ];
-  List<String> selectedTags = [];
+  List<StrIdNameValue> availableTags = [];
+  List<StrIdNameValue> selectedTags = [];
 
   FocusNode focusNode = FocusNode();
   TextEditingController controller = TextEditingController();
@@ -50,8 +42,8 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
   late AddCameraViewModel _cameraViewModel;
   late AddNvrViewModel _nvrViewModel;
   late AddPowerBoxViewModel _powerBoxViewModel;
-  late AddBatteryExchangeViewModel _batteryExchangeViewModel;
-  
+  late AddPowerViewModel _powerViewModel;
+
   // 添加 PreviewViewModel 实例
   late PreviewViewModel _previewViewModel;
 
@@ -64,9 +56,8 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
 
   AddPowerBoxViewModel get powerBoxViewModel => _powerBoxViewModel;
 
-  AddBatteryExchangeViewModel get batteryExchangeViewModel =>
-      _batteryExchangeViewModel;
-      
+  AddPowerViewModel get powerViewModel => _powerViewModel;
+
   // 添加 PreviewViewModel 的 getter
   PreviewViewModel get previewViewModel => _previewViewModel;
 
@@ -81,8 +72,7 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
     _cameraViewModel = AddCameraViewModel("", []);
     _nvrViewModel = AddNvrViewModel("");
     _powerBoxViewModel = AddPowerBoxViewModel("", isInstall: true);
-    _batteryExchangeViewModel =
-        AddBatteryExchangeViewModel("", isInstall: true);
+    _powerViewModel = AddPowerViewModel("", isInstall: true);
     // 初始化 PreviewViewModel
     _previewViewModel = PreviewViewModel();
 
@@ -103,7 +93,7 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
     _cameraViewModel.dispose();
     _nvrViewModel.dispose();
     _powerBoxViewModel.dispose();
-    _batteryExchangeViewModel.dispose();
+    _powerViewModel.dispose();
     _previewViewModel.dispose();
     super.dispose();
   }
@@ -128,7 +118,7 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
       if (canProceed) {
         currentStep = currentStep + 1;
         pageController.jumpToPage(currentStep - 1);
-        
+
         // 如果是最后一步，构建预览数据
         if (currentStep == 6) {
           _buildPreviewData();
@@ -142,19 +132,19 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
     }
     notifyListeners();
   }
-  
+
   // 构建预览数据方法
   void _buildPreviewData() {
-    _previewViewModel.buildPreviewData(
-      selectedInstance: selectedInstance,
-      selectedDoor: selectedDoor,
-      selectedInOut: selectedInOut,
-      aiViewModel: _aiViewModel,
-      cameraViewModel: _cameraViewModel,
-      nvrViewModel: _nvrViewModel,
-      powerBoxViewModel: _powerBoxViewModel,
-      batteryExchangeViewModel: _batteryExchangeViewModel,
-    );
+    // _previewViewModel.buildPreviewData(
+    //   selectedInstance: selectedInstance,
+    //   selectedDoor: selectedDoor,
+    //   selectedInOut: selectedInOut,
+    //   aiViewModel: _aiViewModel,
+    //   cameraViewModel: _cameraViewModel,
+    //   nvrViewModel: _nvrViewModel,
+    //   powerBoxViewModel: _powerBoxViewModel,
+    //   powerViewModel: _powerViewModel,
+    // );
   }
 
   ///私有方法
@@ -177,53 +167,61 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
         await Future.delayed(const Duration(seconds: 1)); // 延迟后重试，避免过于频繁请求
       }
     }
+
+    HttpQuery.share.labelManagementService.getLabelList("", onSuccess: (data) {
+      availableTags = data ?? [];
+      notifyListeners();
+    }, onError: (String value) {});
   }
 
   //检查某些条件
   bool _checkCondition() {
     switch (currentStep) {
       case 1: //绑定实例
-        // if (selectedInstance == null || selectedDoor == null) {
-        //   LoadingUtils.showInfo(data: "请完善实例或大门选择！");
-        //   return false;
-        // }
+        if (selectedInstance == null || selectedDoor == null) {
+          LoadingUtils.showInfo(data: "请完善实例或大门选择！");
+          return false;
+        }
         return true;
       case 2: //添加AI设备
         //如果只有一个
-        // if (aiViewModel.aiDeviceList.length == 1 &&
-        //     (aiViewModel.aiDeviceList.first.mac?.isEmpty ?? true)) {
-        //   LoadingUtils.showInfo(data: "至少添加1个AI设备!");
-        //   return false;
-        // }
-        //
-        // //去除空的
-        // for (DeviceDetailAiData ai in aiViewModel.aiDeviceList.toList()) {
-        //   if ((ai.ip?.isEmpty ?? true) || (ai.mac?.isEmpty ?? true)) {
-        //     aiViewModel.aiDeviceList.remove(ai); // 修改原始列表是安全的
-        //   }
-        // }
-        // cameraViewModel.aiDeviceList = aiViewModel.aiDeviceList;
-        // cameraViewModel.instanceId = selectedInstance?.id ?? "";
-        // cameraViewModel.gateId = selectedDoor?.id ?? 0;
+        if (aiViewModel.aiDeviceList.length == 1 &&
+            (aiViewModel.aiDeviceList.first.mac?.isEmpty ?? true)) {
+          LoadingUtils.showInfo(data: "至少添加1个AI设备!");
+          return false;
+        }
+
+        //去除空的
+        for (DeviceDetailAiData ai in aiViewModel.aiDeviceList.toList()) {
+          if ((ai.ip?.isEmpty ?? true) || (ai.mac?.isEmpty ?? true)) {
+            aiViewModel.aiDeviceList.remove(ai); // 修改原始列表是安全的
+          }
+        }
+        cameraViewModel.aiDeviceList = aiViewModel.aiDeviceList;
+        cameraViewModel.instanceId = selectedInstance?.id ?? "";
+        cameraViewModel.gateId = selectedDoor?.id ?? 0;
         return true;
-      case 3://摄像头
+      case 3: //摄像头
         //如果只有一个
-        // if (cameraViewModel.cameraDeviceList.length == 1 &&
-        //     (!cameraViewModel.cameraDeviceList.first.isAddEnd)) {
-        //   LoadingUtils.showInfo(data: "至少添加1个AI设备!");
-        //   return false;
-        // }
-        //
-        // //去除空的
-        // for (CameraDeviceEntity camera in cameraViewModel.cameraDeviceList.toList()) {
-        //   if ((camera.ip?.isEmpty ?? true) || (camera.rtsp?.isEmpty ?? true)) {
-        //     cameraViewModel.cameraDeviceList.remove(camera); // 修改原始列表是安全的
-        //   }
-        // }
+        if (cameraViewModel.cameraDeviceList.length == 1 &&
+            (!cameraViewModel.cameraDeviceList.first.isAddEnd)) {
+          LoadingUtils.showInfo(data: "至少添加1个AI设备!");
+          return false;
+        }
+
+        //去除空的
+        for (CameraDeviceEntity camera
+            in cameraViewModel.cameraDeviceList.toList()) {
+          if ((camera.ip?.isEmpty ?? true) || (camera.rtsp?.isEmpty ?? true)) {
+            cameraViewModel.cameraDeviceList.remove(camera); // 修改原始列表是安全的
+          }
+        }
         return true;
       case 4:
-
-        return true;
+        if (powerBoxViewModel.checkSelection()) {
+          return true;
+        }
+        return false;
       case 5:
         return true;
       default:

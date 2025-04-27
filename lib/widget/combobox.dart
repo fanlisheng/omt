@@ -1,6 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart' as ui;
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
+import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/utils/color_utils.dart';
 
 class FComboBox<T> extends StatelessWidget {
@@ -66,10 +67,10 @@ class FComboBox<T> extends StatelessWidget {
 }
 
 class MultiSelectComboBox extends StatefulWidget {
-  final List<String> availableTags; // 可选标签列表
-  final List<String> initialSelectedTags; // 初始已选标签
+  final List<StrIdNameValue> availableTags; // 可选标签列表
+  final List<StrIdNameValue> initialSelectedTags; // 初始已选标签
   final String placeholder; // Placeholder 文本
-  final ValueChanged<List<String>>? onSelectionChanged; // 选中项变化时回调
+  final ValueChanged<List<StrIdNameValue>>? onSelectionChanged; // 选中项变化时回调
 
   const MultiSelectComboBox({
     super.key,
@@ -84,7 +85,7 @@ class MultiSelectComboBox extends StatefulWidget {
 }
 
 class _MultiSelectComboBoxState extends State<MultiSelectComboBox> {
-  late List<String> _selectedTags;
+  late List<StrIdNameValue> _selectedTags;
 
   @override
   void initState() {
@@ -92,7 +93,7 @@ class _MultiSelectComboBoxState extends State<MultiSelectComboBox> {
     _selectedTags = List.from(widget.initialSelectedTags);
   }
 
-  void _handleTagSelection(String? selectedTag) {
+  void _handleTagSelection(StrIdNameValue? selectedTag) {
     if (selectedTag != null && !_selectedTags.contains(selectedTag)) {
       setState(() {
         _selectedTags.add(selectedTag);
@@ -101,7 +102,7 @@ class _MultiSelectComboBoxState extends State<MultiSelectComboBox> {
     }
   }
 
-  void _handleTagDeletion(String tag) {
+  void _handleTagDeletion(StrIdNameValue tag) {
     setState(() {
       _selectedTags.remove(tag);
     });
@@ -113,7 +114,7 @@ class _MultiSelectComboBoxState extends State<MultiSelectComboBox> {
     return Stack(
       children: [
         // ComboBox
-        ui.ComboBox<String>(
+        ui.ComboBox<StrIdNameValue>(
           isExpanded: true,
           placeholder: (_selectedTags.isEmpty)
               ? Text(
@@ -124,9 +125,9 @@ class _MultiSelectComboBoxState extends State<MultiSelectComboBox> {
               : null,
           value: null,
           items: widget.availableTags.map((tag) {
-            return ui.ComboBoxItem<String>(
+            return ui.ComboBoxItem<StrIdNameValue>(
               value: tag,
-              child: Text(tag),
+              child: Text(tag.name ?? ""),
             );
           }).toList(),
           onChanged: _handleTagSelection,
@@ -163,7 +164,7 @@ class _MultiSelectComboBoxState extends State<MultiSelectComboBox> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          tag,
+                          tag.name ?? "",
                           style: const TextStyle(
                               fontSize: 12,
                               color: ColorUtils.colorGreenLiteLite),

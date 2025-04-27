@@ -11,6 +11,8 @@ import 'package:omt/page/home/device_add/widgets/add_battery_exchange_view.dart'
 import 'package:omt/page/home/device_add/widgets/add_camera_view.dart';
 import 'package:omt/page/home/device_add/widgets/add_nvr_view.dart';
 import 'package:omt/page/home/device_add/widgets/add_power_box_view.dart';
+import 'package:omt/page/home/device_add/widgets/add_power_view.dart';
+import 'package:omt/page/install/widgets/preview_page.dart';
 import 'package:omt/utils/color_utils.dart';
 import '../../../widget/combobox.dart';
 import '../../../widget/nav/dnavigation_view.dart';
@@ -282,7 +284,8 @@ class InstallDeviceScreen extends StatelessWidget {
         KeepAlivePage(child: AddCameraView(model: model.cameraViewModel)),
         KeepAlivePage(child: AddNvrView(model: model.nvrViewModel)),
         KeepAlivePage(child: AddPowerBoxView(model: model.powerBoxViewModel)),
-        KeepAlivePage(child: AddBatteryExchangeView(model: model.batteryExchangeViewModel)),
+        KeepAlivePage(child: AddPowerView(model: model.powerViewModel)),
+        KeepAlivePage(child: PreviewPage()),
       ],
     );
   }

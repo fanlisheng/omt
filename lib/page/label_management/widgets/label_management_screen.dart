@@ -51,14 +51,14 @@ class LabelManagementScreen extends StatelessWidget {
                       title: "添加标签",
                       placeholder: '请输入标签的名字');
                   if (result == null || result.isEmpty) {
-                    result;
+                    return;
                   }
                   String? result2 = await DialogUtils.showContentDialog(
                       context: model.context!,
                       title: "添加标签",
                       content: "将添加\"$result\"标签,添加后暂时只能修改不能删除,您要添加它吗？");
                   if (result2 == '确定') {
-                    model.addEventAction(result!);
+                    model.addEventAction(result);
                   }
                 },
                 child: Container(
@@ -139,7 +139,7 @@ class LabelManagementScreen extends StatelessWidget {
                                     Text("操作", style: TextStyle(fontSize: 12))),
                           ],
                           rows: model.dataList.asMap().keys.map((index) {
-                            IdNameValue info = model.dataList[index];
+                            StrIdNameValue info = model.dataList[index];
                             return DataRow(
                                 color: WidgetStateProperty.all(index % 2 == 0
                                     ? "#4E5353".toColor()
@@ -172,8 +172,7 @@ class LabelManagementScreen extends StatelessWidget {
                                                   content:
                                                       "将修改\"${info.name}\"修改为\"$result\",您要修改吗");
                                           if (result2 == '确定') {
-                                            model.editEventAction(
-                                                info.id!, result);
+                                            model.editEventAction(info, result);
                                           }
                                         }
                                       },

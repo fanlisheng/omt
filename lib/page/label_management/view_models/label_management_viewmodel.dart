@@ -14,7 +14,7 @@ class LabelManagementViewModel extends BaseViewModelRefresh<dynamic> {
 
   // NVR通道信息
   // List<Map<String, String>> nvrInfo = [];
-  List<IdNameValue> dataList = [];
+  List<StrIdNameValue> dataList = [];
 
   @override
   void initState() async {
@@ -46,10 +46,8 @@ class LabelManagementViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   addEventAction(String name) {
-    LogUtils.info(msg: name);
-    return;
-    HttpQuery.share.labelManagementService.create("", onSuccess: (a) {
-      notifyListeners();
+    HttpQuery.share.labelManagementService.create(name, onSuccess: (a) {
+      requestList();
     }, onError: (e) {});
   }
 
@@ -58,9 +56,10 @@ class LabelManagementViewModel extends BaseViewModelRefresh<dynamic> {
     requestList();
   }
 
-  editEventAction(int index, String name) {
-    HttpQuery.share.labelManagementService.edit(index, name, onSuccess: (a) {
-      dataList.removeAt(index);
+  editEventAction(StrIdNameValue data, String name) {
+    HttpQuery.share.labelManagementService.edit(data.id ?? "", name,
+        onSuccess: (a) {
+      requestList();
       notifyListeners();
     }, onError: (e) {});
   }

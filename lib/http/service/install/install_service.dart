@@ -5,6 +5,7 @@ import 'package:omt/http/http_manager.dart';
 
 import '../../../bean/common/id_name_value.dart';
 import '../../../bean/home/home_page/device_detail_power_box_entity.dart';
+import '../../../bean/one_picture/one_picture/one_picture_data_entity.dart';
 
 ///
 ///  omt
@@ -38,6 +39,8 @@ class InstallService {
   get _getCameraType => '${API.share.host}api/device/camera/camera_type_map';
 
   get _installStep1 => '${API.share.host}api/device/install/step1';
+
+  get _installPreview => '${API.share.host}api/device/tree/preview';
 
   /// AI设备和摄像头安装
   aiDeviceCameraInstall({
@@ -354,6 +357,49 @@ class InstallService {
 
     HttpManager.share.doHttpPost<CodeMessageData>(
       await _installStep1,
+      params,
+      method: 'POST',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+
+  /// 设备安装第二步预览
+  installPreview({
+    String? instanceId,
+    int? gateId,
+    required List<Map<String, dynamic>> powers,
+    required List<Map<String, dynamic>> powerBoxes,
+    required List<Map<String, dynamic>> routers,
+    required List<Map<String, dynamic>> wiredNetworks,
+    required List<Map<String, dynamic>> nvrs,
+    required List<Map<String, dynamic>> switches,
+    required ValueChanged<OnePictureDataData?> onSuccess,
+    ValueChanged<OnePictureDataData?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    Map<String, dynamic> params = {
+      "powers": powers,
+      "power_boxes": powerBoxes,
+      "routers": routers,
+      "wired_networks": wiredNetworks,
+      "nvrs": nvrs,
+      "switches": switches,
+    };
+
+    if (instanceId != null) {
+      params["instance_id"] = instanceId;
+    }
+    if (gateId != null) {
+      params["gate_id"] = gateId;
+    }
+
+    HttpManager.share.doHttpPost<OnePictureDataData>(
+      await _installPreview,
       params,
       method: 'POST',
       autoHideDialog: true,

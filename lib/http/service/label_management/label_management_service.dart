@@ -7,21 +7,21 @@ import '../../api.dart';
 import '../../http_manager.dart';
 
 class LabelManagementService {
-  get _labelList => '${API.share.host}/api/label/list';
+  get _labelList => '${API.share.host}api/label/list';
 
-  get _create => '${API.share.host}/api/label/create';
+  get _create => '${API.share.host}api/label/create';
 
-  get _delete => '${API.share.host}/api/label/delete';
+  get _delete => '${API.share.host}api/label/delete';
 
-  get _edit => '${API.share.host}/api/label/edit';
+  get _edit => '${API.share.host}api/label/edit';
 
   getLabelList(
     String name, {
-    required ValueChanged<List<IdNameValue>?>? onSuccess,
-    ValueChanged<List<IdNameValue>?>? onCache,
+    required ValueChanged<List<StrIdNameValue>?>? onSuccess,
+    ValueChanged<List<StrIdNameValue>?>? onCache,
     required ValueChanged<String>? onError,
   }) async {
-    HttpManager.share.doHttpPost<List<IdNameValue>>(
+    HttpManager.share.doHttpPost<List<StrIdNameValue>>(
       await _labelList,
       {"page": 0, "limit": 0, "name": name},
       method: 'GET',
@@ -40,7 +40,7 @@ class LabelManagementService {
     required ValueChanged<String>? onError,
   }) async {
     HttpManager.share.doHttpPost<CodeMessageData>(
-      await _delete,
+      await _create,
       {"name": name},
       method: 'POST',
       autoHideDialog: true,
@@ -70,7 +70,7 @@ class LabelManagementService {
   }
 
   edit(
-    int id,
+    String id,
     String name, {
     required ValueChanged<CodeMessageData?> onSuccess,
     ValueChanged<CodeMessageData?>? onCache,

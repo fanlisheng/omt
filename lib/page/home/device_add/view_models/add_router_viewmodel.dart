@@ -13,9 +13,9 @@ class AddRouterViewModel extends BaseViewModelRefresh<dynamic> {
   AddRouterViewModel(this.pNodeCode, {this.isInstall = false});
 
   // ===== 路由器相关属性 =====
-  IdNameValue? selectedRouterType;
   IdNameValue? selectedRouterInOut;
   List<IdNameValue> inOutList = [];
+  IdNameValue? selectedRouterType;
   List<IdNameValue> routerTypeList = [];
   TextEditingController routerIpController = TextEditingController();
   String? mac;
