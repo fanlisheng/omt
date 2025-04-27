@@ -510,6 +510,13 @@ class OnePicturePageState extends State<OnePicturePage> {
     viewModel?.passId = passId;
     viewModel?.reInitData();
   }
+
+  refreshWithData({
+    @required OnePictureDataData? data,
+  }) {
+    viewModel?.onePictureHttpData = data;
+    viewModel?.setupOnePictureHttpData();
+  }
 }
 
 extension on Widget {

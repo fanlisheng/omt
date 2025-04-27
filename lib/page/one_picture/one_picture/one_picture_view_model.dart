@@ -63,6 +63,26 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
     super.initState();
     // requestData();
 
+    setupOnePictureHttpData();
+
+    DeviceUtils.getNetworkMac(onData: (data) {
+      if (SharedUtils.networkMac != data) {
+        SharedUtils.networkMac = data ?? '';
+        reInitData();
+      }
+    });
+
+    reInitData();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // 在 Widget 构建完成后设置初始变换
+      transformationController.value = vmath.Matrix4.identity()
+        // ..translate(0, 0, 0.0) // 初始平移
+        ..scale(0.7, 0.7, 0.7); // 初始缩放
+    });
+  }
+
+  void setupOnePictureHttpData() {
     if (null != onePictureHttpData) {
       OnePictureDataData data = onePictureHttpData!;
       currentIndex = 0;
@@ -89,22 +109,6 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
         notifyListeners();
       });
     }
-
-    DeviceUtils.getNetworkMac(onData: (data) {
-      if (SharedUtils.networkMac != data) {
-        SharedUtils.networkMac = data ?? '';
-        reInitData();
-      }
-    });
-
-    reInitData();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // 在 Widget 构建完成后设置初始变换
-      transformationController.value = vmath.Matrix4.identity()
-        // ..translate(0, 0, 0.0) // 初始平移
-        ..scale(0.7, 0.7, 0.7); // 初始缩放
-    });
   }
 
   void reInitData() {

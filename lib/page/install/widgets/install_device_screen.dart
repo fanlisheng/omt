@@ -287,7 +287,7 @@ class InstallDeviceScreen extends StatelessWidget {
         KeepAlivePage(child: AddNvrView(model: model.nvrViewModel)),
         KeepAlivePage(child: AddPowerBoxView(model: model.powerBoxViewModel)),
         KeepAlivePage(child: AddPowerView(model: model.powerViewModel)),
-        KeepAlivePage(child: PreviewPage()),
+        KeepAlivePage(child: PreviewPage(model: model.previewViewModel,)),
       ],
     );
   }

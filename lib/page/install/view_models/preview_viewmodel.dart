@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:kayo_package/mvvm/base/base_view_model.dart';
 import 'package:omt/http/http_query.dart';
 
@@ -11,9 +12,12 @@ import '../../home/device_add/view_models/add_nvr_viewmodel.dart';
 import '../../home/device_add/view_models/add_power_box_viewmodel.dart';
 import '../../../bean/common/id_name_value.dart';
 import '../../home/device_add/view_models/add_power_viewmodel.dart';
+import '../../one_picture/one_picture/one_picture_page.dart';
 
 class PreviewViewModel extends BaseViewModel {
   OnePictureDataData? onePictureDataData;
+
+  final GlobalKey<OnePicturePageState> picturePageKey = GlobalKey();
 
   // 处理所有viewModel数据并构建 OnePictureDataData 对象
   void buildPreviewData({
@@ -54,6 +58,8 @@ class PreviewViewModel extends BaseViewModel {
           // switches: _getSwitches(powerViewModel),
           onSuccess: (data) {
             onePictureDataData = data;
+            picturePageKey.currentState
+                ?.refreshWithData(data: onePictureDataData);
             notifyListeners();
           });
     } catch (e) {
