@@ -54,6 +54,10 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
 
   int currentIndex = 0;
 
+  bool cannotTap() {
+    return passId == null && gateId == null && passId == null;
+  }
+
   @override
   void initState() async {
     super.initState();
@@ -732,6 +736,9 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
   }
 
   void onTapItem(OnePictureDataData? data) {
+    if (cannotTap()) {
+      return;
+    }
     if (data?.unknown == true) {
       if (data?.type == OnePictureType.DYX.index) {
         /// 电源箱未知
@@ -781,7 +788,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
   }
 
   void onTapItemNew(OnePictureDataData? data) {
-    if (data == null) {
+    if (data == null  || cannotTap()) {
       return;
     }
     IntentUtils.share.push(context,
