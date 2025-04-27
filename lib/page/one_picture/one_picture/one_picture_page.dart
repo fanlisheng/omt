@@ -22,13 +22,15 @@ class OnePicturePage extends StatefulWidget {
   String? instanceId;
   final int? gateId;
   final int? passId;
+  final OnePictureDataData? onePictureHttpData;
 
   OnePicturePage(
       {super.key,
       this.instanceId,
       this.gateId,
       this.passId,
-      this.instanceName});
+      this.instanceName,
+      this.onePictureHttpData});
 
   @override
   State<OnePicturePage> createState() => OnePicturePageState();
@@ -45,7 +47,7 @@ class OnePicturePageState extends State<OnePicturePage> {
   Widget build(BuildContext context) {
     return ProviderWidget<OnePictureViewModel>(
         model: OnePictureViewModel(widget.instanceId, widget.gateId,
-            widget.passId, widget.instanceName),
+            widget.passId, widget.instanceName, widget.onePictureHttpData),
         autoLoadData: true,
         builder: (context, model, child) {
           viewModel = model;
