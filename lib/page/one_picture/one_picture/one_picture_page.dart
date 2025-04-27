@@ -164,7 +164,7 @@ class OnePicturePageState extends State<OnePicturePage> {
           ],
         ),
       ).addRightIcon(
-          onTap: onePictureDataData?.showAddBtn != true
+          onTap: onePictureDataData?.showAddBtn != true || model.cannotTap()
               ? null
               : () {
                   model.onTapItemNew(onePictureDataData);
@@ -186,7 +186,7 @@ class OnePicturePageState extends State<OnePicturePage> {
                     : const EdgeInsetsDirectional.only(top: 50),
                 child: _item(onePictureDataData))
             .addRightIcon(
-                onTap: onePictureDataData?.showAddBtnDM != true
+                onTap: onePictureDataData?.showAddBtnDM != true || model.cannotTap()
                     ? null
                     : () {
                         model.onTapItemNew(onePictureDataData);
@@ -319,7 +319,7 @@ class OnePicturePageState extends State<OnePicturePage> {
                         : TextView(data?.showDesc),
                   ]))
               .addRightIcon(
-                  onTap: data?.showAddBtn != true
+                  onTap: data?.showAddBtn != true || model.cannotTap()
                       ? null
                       : () {
                           model.onTapItemNew(data);
