@@ -79,6 +79,10 @@ class OnePictureDataData {
     return fault ?? [];
   }
 
+  bool addNetwork(OnePictureDataData data) {
+    return true;
+  }
+
   String? get theNodeId => '${type}_${id}';
 
   bool? get isCurrentNet {
@@ -253,7 +257,6 @@ class OnePictureDataData {
   }
 
   bool get addEmptyNode {
-
     var index = children.indexWhere((e) {
       return e.showBorder == true;
     });
@@ -334,10 +337,13 @@ class OnePictureDataData {
         }
 
         if (childList.isNotEmpty) {
-          var id2 = '${id}_${BaseTimeUtils.nowTimestamp()}';
+          var nodeCode2 = '${nodeCode}_${BaseTimeUtils.nowTimestamp()}';
           var copyWith2 = copyWith(
-              children: childList, showBorder: false, ignore: true, id: id2);
-          callback('${type}_${id2}', copyWith2);
+              children: childList,
+              showBorder: false,
+              ignore: true,
+              nodeCode: nodeCode2);
+          callback('${type}_${nodeCode2}', copyWith2);
 
           theList.add(copyWith2);
         }

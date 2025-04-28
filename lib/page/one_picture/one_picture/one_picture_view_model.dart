@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:graphview/GraphView.dart';
@@ -10,6 +11,7 @@ import 'package:omt/utils/color_utils.dart';
 import 'package:omt/utils/device_utils.dart';
 import 'package:omt/utils/json_utils.dart';
 import 'package:omt/utils/shared_utils.dart';
+import 'package:omt/utils/sys_utils.dart';
 
 import '../../../router_utils.dart';
 import '../../../utils/intent_utils.dart';
@@ -83,6 +85,8 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
   }
 
   void setupOnePictureHttpData() {
+
+
     if (null != onePictureHttpData) {
       OnePictureDataData data = onePictureHttpData!;
       currentIndex = 0;
@@ -147,6 +151,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
         onSuccess: (data) {
           currentIndex = 0;
           onePictureHttpData = data;
+
           dataMap.clear();
           OnePictureDataData? opd;
           if (null == data && null == gateId && null == passId) {
@@ -211,8 +216,8 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
   }
 
   void _setDataMap(OnePictureDataData? data) {
-    if (null != data?.type || null != data?.id) {
-      dataMap['${data!.type}_${data.id}'] = data;
+    if (null != data?.type || null != data?.nodeCode) {
+      dataMap[_getNodeId(data)] = data!;
     }
     if (null != data?.children && data!.children.isNotEmpty) {
       if (data.type == OnePictureType.DM.index) {
@@ -327,7 +332,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
 
         if (otherList.isNotEmpty) {
           if (wlList.isEmpty) {
-            if (data.addEmptyNode || true) {
+            if (data.addEmptyNode) {
               data.children.add(OnePictureDataData()
                 ..type = OnePictureType.YXWL.index
                 ..unknown = true
@@ -339,7 +344,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
             }
           }
           if (jhjList.isEmpty) {
-            if (data.addEmptyNode || true) {
+            if (data.addEmptyNode) {
               data.children.add(OnePictureDataData()
                 ..type = OnePictureType.JHJ.index
                 ..unknown = true
@@ -375,6 +380,8 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
       }
     }
   }
+
+  String _getNodeId(OnePictureDataData? data) => '${data?.type}_${data?.nodeCode??''}';
 
   OnePictureDataData? _dealHttpData(OnePictureDataData? data) {
     if (data == null) {
@@ -580,7 +587,9 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
           }
         } else if (dyx.isNotEmpty) {
           opd.children = dyx;
-        } else if (jck.isNotEmpty) {
+          _powerSub(opd.children[0],
+              jck: jck, lyq: lyq, nvr: nvr, jhj: jhj, yxwl: yxwl, aisb: aisb);
+         } else if (jck.isNotEmpty) {
           opd.children = jck;
           for (var child in jck) {
             setNextList(child);
@@ -658,7 +667,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
       {Node? parentNode}) {
     bool haNode = false;
     if (null != opd) {
-      var nodeRoot = parentNode ?? Node.Id('${opd.type}_${opd.id}');
+      var nodeRoot = parentNode ?? Node.Id(_getNodeId(opd));
       // var childList = opd.getChildList();
       if (opd.nextList.isNotEmpty) {
         OnePictureDataData? jhj;
@@ -673,7 +682,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
               opd.nextList.length > 1) {
             jhj = next;
           } else {
-            var nodeNext = Node.Id('${next.type}_${next.id}');
+            var nodeNext = Node.Id(_getNodeId(next));
             graph.addEdge(nodeRoot, nodeNext,
                 paint: Paint()
                   ..strokeWidth = 2
@@ -700,9 +709,9 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
           haNode = true;
         }
         if (jhj != null && jhjTargetList.isNotEmpty) {
-          var nodeRoot = Node.Id('${jhj.type}_${jhj.id}');
+          var nodeRoot = Node.Id(_getNodeId(jhj));
           for (var next in jhjTargetList) {
-            var nodeNext = Node.Id('${next.type}_${next.id}');
+            var nodeNext = Node.Id(_getNodeId(next));
             graph.addEdge(nodeNext, nodeRoot,
                 paint: Paint()
                   ..strokeWidth = 2
@@ -717,9 +726,9 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
         }
 
         if (lyqList.isNotEmpty && jhj != null) {
-          var nodeNext = Node.Id('${jhj.type}_${jhj.id}');
+          var nodeNext = Node.Id(_getNodeId(jhj));
           for (var root in lyqList) {
-            var nodeRoot = Node.Id('${root.type}_${root.id}');
+            var nodeRoot = Node.Id(_getNodeId(root));
             graph.addEdge(nodeRoot, nodeNext,
                 paint: Paint()
                   ..strokeWidth = 2
@@ -788,7 +797,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
   }
 
   void onTapItemNew(OnePictureDataData? data) {
-    if (data == null  || cannotTap()) {
+    if (data == null || cannotTap()) {
       return;
     }
     IntentUtils.share.push(context,
@@ -809,6 +818,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
       List<OnePictureDataData>? aisb,
       List<OnePictureDataData>? sxt}) {
     if (jck?.isNotEmpty == true) {
+      //todo
       // opd.nextList.addAll(jck!);
       opd.nextList.insert(0, jck![0]);
     }
@@ -827,7 +837,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
         var father =
             jhj[0].copyWith(children: jhj, sameTypeData: true, name: '');
         opd.nextList.add(father);
-        dataMap['${father!.type}_${father.id}'] = father;
+        dataMap[_getNodeId(father)] = father;
         for (var child in jhj) {
           opd.nextList.remove(child);
         }

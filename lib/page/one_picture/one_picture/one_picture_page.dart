@@ -334,7 +334,8 @@ class OnePicturePageState extends State<OnePicturePage> {
                       EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 16),
                   padding:
                       EdgeInsets.only(left: 0, right: 0, top: 0, bottom: 0),
-                  borderRadius: 4.0);
+                  borderRadius: 4.0)
+          ;
         } else {
           if (data.showBorder == true) {}
           if (data.ignore == true) {}
@@ -410,7 +411,7 @@ class OnePicturePageState extends State<OnePicturePage> {
                                   : '#347979')
                               .toColor(),
                           width: 1,
-                          dash: data.getChildList().length > 0,
+                          dash: data.getChildList().length > 0 && (data.type == OnePictureType.DM.index || data.type == OnePictureType.JCK.index) ,
                           margin: EdgeInsets.only(
                               left: 16,
                               right: 16,
