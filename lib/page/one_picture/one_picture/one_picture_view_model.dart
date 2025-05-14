@@ -57,7 +57,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
   int currentIndex = 0;
 
   bool cannotTap() {
-    return passId == null && gateId == null && passId == null;
+    return instanceId == null && gateId == null && passId == null;
   }
 
   @override
