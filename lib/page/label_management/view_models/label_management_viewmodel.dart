@@ -1,4 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:kayo_package/extension/_index_extension.dart';
 import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
 import 'package:kayo_package/views/widget/alert/datetime_picker/date_format.dart';
 import 'package:omt/bean/common/id_name_value.dart';
@@ -57,7 +58,7 @@ class LabelManagementViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   editEventAction(StrIdNameValue data, String name) {
-    HttpQuery.share.labelManagementService.edit(data.id ?? "", name,
+    HttpQuery.share.labelManagementService.edit((data.id ?? "0").toInt() , name,
         onSuccess: (a) {
       requestList();
       notifyListeners();

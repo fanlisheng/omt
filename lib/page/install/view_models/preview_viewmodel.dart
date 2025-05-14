@@ -37,10 +37,10 @@ class PreviewViewModel extends BaseViewModel {
     }
 
     try {
-      Map<String, dynamic> powersMap = _getPowersMap(powerViewModel);
-      Map<String, dynamic> powerBoxes = _getPowerBoxes(powerBoxViewModel);
-      Map<String, dynamic> network = _getNetwork(powerViewModel);
-      Map<String, dynamic> nvr = _getNvr(nvrViewModel);
+      Map<String, dynamic> powersMap = AddPowerViewModel.getPowersMap(powerViewModel);
+      Map<String, dynamic> powerBoxes = AddPowerBoxViewModel.getPowerBoxes(powerBoxViewModel);
+      Map<String, dynamic> network = AddPowerViewModel.getNetwork(powerViewModel);
+      Map<String, dynamic> nvr = AddNvrViewModel.getNvr(nvrViewModel);
       List<Map<String, dynamic>> routers = [];
       List<Map<String, dynamic>> wiredNetworks = [];
       if (network["type"] == 6) {
@@ -57,11 +57,11 @@ class PreviewViewModel extends BaseViewModel {
           routers: routers,
           wiredNetworks: wiredNetworks,
           nvrs: [nvr],
-          switches: _getSwitches(powerViewModel),
+          switches: AddPowerViewModel.getSwitches(powerViewModel),
           onSuccess: (data) {
             onePictureDataData = data;
             notifyListeners();
-            Timer(Duration(milliseconds: 100), () {
+            Timer(Duration(milliseconds: 200), () {
               picturePageKey.currentState
                   ?.refreshWithData(data: onePictureDataData);
               notifyListeners();

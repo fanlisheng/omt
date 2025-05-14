@@ -151,7 +151,11 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
                   notifyListeners();
                 },
                 onError: (error) {
-                  LoadingUtils.showToast(data: '安装失败: $error');
+                  //如果安装失败需要删除Ai上的配置
+                  HttpQuery.share.homePageService.removeConfigAi(
+                      deviceCode: cameraDeviceEntity.code,
+                      onSuccess: (data) {});
+                  LoadingUtils.showToast(data: '添加失败: $error');
                 });
           } else {
             HttpQuery.share.installService.installStep1(
@@ -166,6 +170,10 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
                   notifyListeners();
                 },
                 onError: (error) {
+                  //如果安装失败需要删除Ai上的配置
+                  HttpQuery.share.homePageService.removeConfigAi(
+                      deviceCode: cameraDeviceEntity.code,
+                      onSuccess: (data) {});
                   LoadingUtils.showToast(data: '安装失败: $error');
                 });
           }

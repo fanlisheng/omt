@@ -148,4 +148,17 @@ class AddNvrViewModel extends BaseViewModel {
   bool _shouldStop() {
     return stopScanning; // 当 stopAiScanning 为 true 时停止
   }
+
+  static   Map<String, dynamic> getNvr(AddNvrViewModel nvrViewModel) {
+    int passId = nvrViewModel.selectedNarInOut!.id!;
+    String mac = nvrViewModel.selectedNvr!.mac ?? "";
+    String ip = nvrViewModel.selectedNvr?.ip ?? "";
+
+    Map<String, dynamic> params = {
+      "ip": ip,
+      "mac": mac,
+      "pass_id": passId,
+    };
+    return params;
+  }
 }

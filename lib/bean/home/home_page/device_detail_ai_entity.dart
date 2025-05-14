@@ -37,8 +37,8 @@ class DeviceDetailAiData {
   String? programVersion;
   @JSONField(name: "identity_version")
   String? identityVersion;
-  @JSONField(name: "camera_device_code")
-  String? cameraDeviceCode;
+  @JSONField(name: "camera_device_codes")
+  List<String>? cameraDeviceCodes;
   @JSONField(name: "iot_connect_status")
   String? iotConnectStatus;
   @JSONField(name: "server_host")

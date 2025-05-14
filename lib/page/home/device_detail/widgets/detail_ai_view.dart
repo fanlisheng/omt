@@ -119,7 +119,7 @@ class DetailAiView extends StatelessWidget {
                   children: [
                     RowItemInfoView(
                         name: "摄像头编码",
-                        value: model.deviceInfo.cameraDeviceCode),
+                        value: (model.deviceInfo.cameraDeviceCodes ?? []).join(";")),
                     RowItemInfoView(
                       name: "IOT连接状态",
                       value: model.deviceInfo.iotConnectStatus,

@@ -113,7 +113,7 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
 
   // 下一步
   void nextStepEventAction() {
-    if (currentStep < 8) {
+    if (currentStep < 7) {
       bool canProceed = _checkCondition();
       // bool canProceed = true;
       if (canProceed) {
@@ -124,12 +124,9 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
         if (currentStep == 7) {
           _buildPreviewData();
         }
-      } else {
-        // 可选：处理 checkCondition 返回 false 的情况，例如显示提示
-        return; // 或执行其他逻辑
       }
     } else {
-      // 完成
+      _addingFinished();
     }
     notifyListeners();
   }
@@ -185,7 +182,7 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
         }
         return true;
       case 2: //添加AI设备
-        return true;
+        // return true;
         //如果只有一个
         if (aiViewModel.aiDeviceList.length == 1 &&
             (aiViewModel.aiDeviceList.first.mac?.isEmpty ?? true)) {
@@ -204,7 +201,7 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
         cameraViewModel.gateId = selectedDoor?.id ?? 0;
         return true;
       case 3: //摄像头
-        return true;
+        // return true;
         //如果只有一个
         if (cameraViewModel.cameraDeviceList.length == 1 &&
             (!cameraViewModel.cameraDeviceList.first.isAddEnd)) {
@@ -221,13 +218,13 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
         }
         return true;
       case 4:
-        return true;
+        // return true;
         if (powerBoxViewModel.checkSelection()) {
           return true;
         }
         return false;
       case 5:
-        return true;
+        // return true;
         if (powerViewModel.checkSelection()) {
           if (powerViewModel.checkNetworkSelection()) {
             if (powerViewModel.checkExchangeSelection()) {
@@ -235,12 +232,57 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
             }
           }
         }
-
         return false;
       case 6:
-        return true;
+        if (previewViewModel.onePictureDataData != null) {
+          return true;
+        } else {
+          LoadingUtils.showInfo(data: "生成预览数据有误！");
+          return false;
+        }
       default:
         return false;
+    }
+  }
+
+  //添加完成
+  void _addingFinished() {
+    // 完成
+    //请求接口  跳转页面
+    if (selectedInstance == null || selectedDoor == null) {
+      return;
+    }
+
+    try {
+      Map<String, dynamic> powersMap =
+          AddPowerViewModel.getPowersMap(powerViewModel);
+      Map<String, dynamic> powerBoxes =
+          AddPowerBoxViewModel.getPowerBoxes(powerBoxViewModel);
+      Map<String, dynamic> network =
+          AddPowerViewModel.getNetwork(powerViewModel);
+      Map<String, dynamic> nvr = AddNvrViewModel.getNvr(nvrViewModel);
+      List<Map<String, dynamic>> routers = [];
+      List<Map<String, dynamic>> wiredNetworks = [];
+      if (network["type"] == 6) {
+        routers.add(network);
+      } else {
+        wiredNetworks.add(network);
+      }
+
+      HttpQuery.share.installService.installStep2(
+          instanceId: selectedInstance?.id ?? "",
+          gateId: selectedDoor?.id ?? 0,
+          powers: [powersMap],
+          powerBoxes: [powerBoxes],
+          routers: routers,
+          wiredNetworks: wiredNetworks,
+          nvrs: [nvr],
+          switches: AddPowerViewModel.getSwitches(powerViewModel),
+          onSuccess: (data) {
+
+          });
+    } catch (e) {
+      print("Error building OnePictureDataData: $e");
     }
   }
 

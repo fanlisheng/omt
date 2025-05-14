@@ -118,6 +118,9 @@ class HomePageService {
   get _configAi async =>
       '${await API.share.hostVideoConfiguration}/webcam/save';
 
+  get _removeConfigAi async =>
+      '${await API.share.hostVideoConfiguration}/webcam/remove';
+
   getInstanceList(
     String areaCode, {
     required ValueChanged<List<StrIdNameValue>?>? onSuccess,
@@ -917,6 +920,24 @@ class HomePageService {
     HttpManager.share.doHttpPost<dynamic>(
       await _configAi,
       JsonUtils.getMap(data.toJson2()),
+      method: 'post',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  removeConfigAi({
+    required String? deviceCode,
+    ValueChanged<dynamic>? onSuccess,
+    ValueChanged<dynamic>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<dynamic>(
+      '${await _removeConfigAi}/$deviceCode',
+      {},
       method: 'post',
       autoHideDialog: true,
       autoShowDialog: true,

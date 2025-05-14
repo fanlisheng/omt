@@ -70,7 +70,7 @@ class LabelManagementService {
   }
 
   edit(
-    String id,
+    int id,
     String name, {
     required ValueChanged<CodeMessageData?> onSuccess,
     ValueChanged<CodeMessageData?>? onCache,

@@ -63,10 +63,11 @@ DeviceDetailAiData $DeviceDetailAiDataFromJson(Map<String, dynamic> json) {
   if (identityVersion != null) {
     deviceDetailAiData.identityVersion = identityVersion;
   }
-  final String? cameraDeviceCode = jsonConvert.convert<String>(
-      json['camera_device_code']);
-  if (cameraDeviceCode != null) {
-    deviceDetailAiData.cameraDeviceCode = cameraDeviceCode;
+  final List<String>? cameraDeviceCodes = (json['camera_device_codes'] as List<
+      dynamic>?)?.map(
+          (e) => jsonConvert.convert<String>(e) as String).toList();
+  if (cameraDeviceCodes != null) {
+    deviceDetailAiData.cameraDeviceCodes = cameraDeviceCodes;
   }
   final String? iotConnectStatus = jsonConvert.convert<String>(
       json['iot_connect_status']);
@@ -116,7 +117,7 @@ Map<String, dynamic> $DeviceDetailAiDataToJson(DeviceDetailAiData entity) {
   data['ip'] = entity.ip;
   data['program_version'] = entity.programVersion;
   data['identity_version'] = entity.identityVersion;
-  data['camera_device_code'] = entity.cameraDeviceCode;
+  data['camera_device_codes'] = entity.cameraDeviceCodes;
   data['iot_connect_status'] = entity.iotConnectStatus;
   data['server_host'] = entity.serverHost;
   data['node_id'] = entity.nodeId;
@@ -138,7 +139,7 @@ extension DeviceDetailAiDataExtension on DeviceDetailAiData {
     String? ip,
     String? programVersion,
     String? identityVersion,
-    String? cameraDeviceCode,
+    List<String>? cameraDeviceCodes,
     String? iotConnectStatus,
     String? serverHost,
     String? nodeId,
@@ -157,7 +158,7 @@ extension DeviceDetailAiDataExtension on DeviceDetailAiData {
       ..ip = ip ?? this.ip
       ..programVersion = programVersion ?? this.programVersion
       ..identityVersion = identityVersion ?? this.identityVersion
-      ..cameraDeviceCode = cameraDeviceCode ?? this.cameraDeviceCode
+      ..cameraDeviceCodes = cameraDeviceCodes ?? this.cameraDeviceCodes
       ..iotConnectStatus = iotConnectStatus ?? this.iotConnectStatus
       ..serverHost = serverHost ?? this.serverHost
       ..nodeId = nodeId ?? this.nodeId

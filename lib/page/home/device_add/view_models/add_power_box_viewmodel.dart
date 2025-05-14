@@ -146,4 +146,17 @@ class AddPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
     }
     return true;
   }
+
+
+  static  Map<String, dynamic> getPowerBoxes(AddPowerBoxViewModel powerBoxViewModel) {
+    String deviceCode =
+    powerBoxViewModel.selectedDeviceDetailPowerBox!.deviceCode!;
+    int passId = powerBoxViewModel.selectedPowerBoxInOut!.id!;
+
+    Map<String, dynamic> params = {
+      "device_code": deviceCode,
+      "pass_id": passId,
+    };
+    return params;
+  }
 }

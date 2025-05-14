@@ -155,16 +155,69 @@ class AddPowerViewModel extends BaseViewModelRefresh<dynamic> {
 
   //检查
   bool checkExchangeSelection() {
-
-    for (ExchangeDeviceModel  exchange  in exchangeDevices ){
-      if((exchange.selectedSupplyMethod?.isEmpty ?? true ) || (exchange.selectedPortNumber?.isEmpty ?? true )){
+    for (ExchangeDeviceModel exchange in exchangeDevices) {
+      if ((exchange.selectedSupplyMethod?.isEmpty ?? true) ||
+          (exchange.selectedPortNumber?.isEmpty ?? true)) {
         LoadingUtils.showToast(data: '请完善各个交换机的信息');
         return false;
       }
     }
     return true;
   }
+
+  static Map<String, dynamic> getPowersMap(AddPowerViewModel powerViewModel) {
+    List<int> items = [];
+    int? batteryCap = (powerViewModel.battery == false)
+        ? null
+        : (powerViewModel.isCapacity80 ? 80 : 160);
+
+    if (powerViewModel.batteryMains) {
+      items.add(1);
+    }
+    if (batteryCap != null) {
+      items.add(2);
+    }
+    Map<String, dynamic> params = {
+      "PowerType": items,
+      "pass_id": powerViewModel.selectedPowerInOut!.id!,
+    };
+    if (batteryCap != null) {
+      params["battery_capacity"] = batteryCap;
+    }
+    return params;
+  }
+
+  static Map<String, dynamic> getNetwork(AddPowerViewModel powerViewModel) {
+    int passId = powerViewModel.selectedPowerInOut!.id!;
+    int type = powerViewModel.selectedRouterType!.id!;
+    String mac = powerViewModel.mac!;
+    String ip = powerViewModel.routerIpController.text;
+
+    Map<String, dynamic> params = {
+      "ip": ip,
+      "type": type,
+      "mac": mac,
+      "pass_id": passId,
+    };
+    return params;
+  }
+
+  static List<Map<String, dynamic>> getSwitches(AddPowerViewModel powerViewModel) {
+    List<Map<String, dynamic>> paramsList = [];
+    for (ExchangeDeviceModel exchange in powerViewModel.exchangeDevices) {
+      Map<String, dynamic> params = {
+        "interface_num": exchange.selectedPortNumber.toInt(),
+        "power_method": exchange.selectedSupplyMethod,
+        "pass_id": powerViewModel.selectedPowerInOut?.id,
+      };
+      paramsList.add(params);
+    }
+
+    return paramsList;
+  }
 }
+
+
 
 class ExchangeDeviceModel extends ChangeNotifier {
   String? selectedPortNumber;
