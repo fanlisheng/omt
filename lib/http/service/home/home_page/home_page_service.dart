@@ -82,7 +82,7 @@ class HomePageService {
   get _restartPowerBox => '${API.share.host}api/device/power_box/restart';
 
   get _dcInterfaceControl =>
-      '${API.share.host}api/device/power_box/dc_interface_control';
+      '${API.share.host}api/device/power_box/dc_interface/control';
 
   get _deleteNvrChannel => '${API.share.host}api/device/nvr/delete_channel';
 

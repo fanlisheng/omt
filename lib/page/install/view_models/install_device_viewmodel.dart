@@ -279,11 +279,43 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
           nvrs: [nvr],
           switches: AddPowerViewModel.getSwitches(powerViewModel),
           onSuccess: (data) {
-
+            _reset();
+            LoadingUtils.showInfo(data: "安装成功！");
           });
     } catch (e) {
       print("Error building OnePictureDataData: $e");
     }
+  }
+
+  // 重置方法
+  void _reset() {
+    // 重置步骤
+    currentStep = 1;
+    pageController.jumpToPage(0);
+
+    // 清空选择数据
+    selectedInstance = null;
+    selectedDoor = null;
+    selectedInOut = null;
+    selectedTags.clear();
+
+    // 清空输入
+    controller.clear();
+    isClear = false;
+
+    // 重置子 ViewModel
+    _aiViewModel = AddAiViewModel("");
+    _cameraViewModel = AddCameraViewModel("", []);
+    _nvrViewModel = AddNvrViewModel("");
+    _powerBoxViewModel = AddPowerBoxViewModel("", isInstall: true);
+    _powerViewModel = AddPowerViewModel("", isInstall: true);
+    _previewViewModel = PreviewViewModel();
+
+    // 重新加载初始数据（模拟 initState 的行为）
+    _loadInitialData();
+
+    // 通知 UI 更新
+    notifyListeners();
   }
 
 // // 添加一个可以从外部调用的重生成预览数据的方法
