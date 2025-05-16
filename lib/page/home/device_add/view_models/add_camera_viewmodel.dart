@@ -93,16 +93,30 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   // 完成摄像头设置
+  bool checkCameraInfo(CameraDeviceEntity cameraDeviceEntity) {
+    if ((cameraDeviceEntity.deviceNameController.text.isEmpty) ||
+        ((cameraDeviceEntity.selectedCameraType?.value ?? -1) == -1) ||
+        ((cameraDeviceEntity.selectedRegulation?.value ?? -1) == -1) ||
+        ((cameraDeviceEntity.selectedEntryExit?.id ?? -1) == -1)) {
+      LoadingUtils.showToast(data: '"设备名称、摄像头类型、进出口、是否纳入监管"不能为空！');
+      return false;
+    }
+    return true;
+  }
+
   Future<void> completeCameraAction(
       BuildContext context, CameraDeviceEntity cameraDeviceEntity) async {
-    CameraDeviceEntity cameraDevice = cameraDeviceList.first;
-    if ((cameraDevice.deviceNameController.text.isEmpty) ||
-        ((cameraDevice.selectedCameraType?.value ?? -1) == -1) ||
-        ((cameraDevice.selectedRegulation?.value ?? -1) == -1) ||
-        ((cameraDevice.selectedEntryExit?.id ?? -1) == -1)) {
-      LoadingUtils.showToast(data: '"设备名称、摄像头类型、进出口、是否纳入监管"不能为空！');
-      return;
-    }
+    CameraDeviceEntity cameraDevice = cameraDeviceEntity;
+    // if (checkCameraInfo(cameraDevice) == false) {
+    //   return;
+    // }
+    // if ((cameraDevice.deviceNameController.text.isEmpty) ||
+    //     ((cameraDevice.selectedCameraType?.value ?? -1) == -1) ||
+    //     ((cameraDevice.selectedRegulation?.value ?? -1) == -1) ||
+    //     ((cameraDevice.selectedEntryExit?.id ?? -1) == -1)) {
+    //   LoadingUtils.showToast(data: '"设备名称、摄像头类型、进出口、是否纳入监管"不能为空！');
+    //   return;
+    // }
 
     var webcam = VideoInfoCamEntity()
       ..name = cameraDeviceEntity.deviceNameController.text

@@ -219,12 +219,17 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
         return true;
       case 4:
         // return true;
-        if (powerBoxViewModel.checkSelection()) {
+        if (nvrViewModel.checkNvrSelection()) {
           return true;
         }
         return false;
       case 5:
         // return true;
+        if (powerBoxViewModel.checkSelection()) {
+          return true;
+        }
+        return false;
+      case 6:
         if (powerViewModel.checkSelection()) {
           if (powerViewModel.checkNetworkSelection()) {
             if (powerViewModel.checkExchangeSelection()) {
@@ -232,14 +237,7 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
             }
           }
         }
-        return false;
-      case 6:
-        if (previewViewModel.onePictureDataData != null) {
-          return true;
-        } else {
-          LoadingUtils.showInfo(data: "生成预览数据有误！");
-          return false;
-        }
+        return  false;
       default:
         return false;
     }
