@@ -32,6 +32,9 @@ class AddPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
   @override
   void initState() async {
     super.initState();
+    if(isInstall == false){
+      isPowerBoxNeeded = true;
+    }
     // 初始化进/出口列表
     HttpQuery.share.homePageService.getInOutList(
       onSuccess: (List<IdNameValue>? data) {

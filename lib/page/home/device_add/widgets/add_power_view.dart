@@ -47,9 +47,9 @@ class _AddPowerViewState extends State<AddPowerView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              const Text(
-                "添加电源信息",
-                style: TextStyle(
+              Text(
+                model.isInstall ? "添加电源及其它信息" : "添加电源信息",
+                style: const TextStyle(
                     fontSize: 16,
                     color: ColorUtils.colorWhite,
                     fontWeight: FontWeight.w500),

@@ -28,7 +28,10 @@ class AddNvrViewModel extends BaseViewModel {
   @override
   void initState() {
     super.initState();
-
+    if(pNodeCode.isNotEmpty){
+      isNvrNeeded = true;
+      refreshNvrAction();
+    }
     // 初始化进/出口列表
     HttpQuery.share.homePageService.getInOutList(
       onSuccess: (List<IdNameValue>? data) {

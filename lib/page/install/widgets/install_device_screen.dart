@@ -66,7 +66,7 @@ class InstallDeviceScreen extends StatelessWidget {
                                 left: 12, right: 12, top: 4, bottom: 4),
                             color: ColorUtils.colorGreen,
                             child: Text(
-                              model.currentStep == 7 ? "添加完成" : (model.currentStep == 6 ? "生成拓扑图" : "下一步"),
+                              model.currentStep == 7 ? "安装完成" : (model.currentStep == 6 ? "生成拓扑图" : "下一步"),
                               style: const TextStyle(
                                   fontSize: 12, color: ColorUtils.colorWhite),
                             ),
