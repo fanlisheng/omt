@@ -126,7 +126,6 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
 
   Future<void> completeCameraAction(
       BuildContext context, CameraDeviceEntity cameraDeviceEntity) async {
-    return;
     CameraDeviceEntity cameraDevice = cameraDeviceEntity;
     // if (checkCameraInfo(cameraDevice) == false) {
     //   return;
