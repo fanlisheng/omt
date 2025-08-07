@@ -14,18 +14,52 @@ import 'package:omt/page/home/device_add/widgets/add_power_box_view.dart';
 import 'package:omt/page/home/device_add/widgets/add_power_view.dart';
 import 'package:omt/page/install/widgets/preview_page.dart';
 import 'package:omt/utils/color_utils.dart';
+import 'package:omt/utils/reset_manager.dart';
 import '../../../widget/combobox.dart';
 import '../../../widget/nav/dnavigation_view.dart';
 import '../../../widget/searchable_dropdown.dart';
 import '../../home/home/keep_alive_page.dart';
 import '../view_models/install_device_viewmodel.dart';
 
-class InstallDeviceScreen extends StatelessWidget {
+// 定义重置键
+const String installDeviceResetKey = 'install_device_reset';
+
+class InstallDeviceScreen extends StatefulWidget {
   const InstallDeviceScreen({super.key});
 
   @override
+  State<InstallDeviceScreen> createState() => _InstallDeviceScreenState();
+}
+
+class _InstallDeviceScreenState extends State<InstallDeviceScreen> {
+  // 用于强制重建整个组件
+  Key _contentKey = UniqueKey();
+  
+  @override
+  void initState() {
+    super.initState();
+    
+    // 监听重置事件
+    resetManager.getResetStream(installDeviceResetKey).listen((_) {
+      setState(() {
+        // 更新Key以强制重建
+        _contentKey = UniqueKey();
+      });
+    });
+  }
+  
+  @override
+  void dispose() {
+    // 清理资源
+    resetManager.closeStream(installDeviceResetKey);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return ProviderWidget<InstallDeviceViewModel>(
+    return KeyedSubtree(
+      key: _contentKey,
+      child: ProviderWidget<InstallDeviceViewModel>(
         model: InstallDeviceViewModel()..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
@@ -83,7 +117,9 @@ class InstallDeviceScreen extends StatelessWidget {
               content: contentView(model),
             ),
           );
-        });
+        }
+      ),
+    );
   }
 
   Widget contentView(InstallDeviceViewModel model) {

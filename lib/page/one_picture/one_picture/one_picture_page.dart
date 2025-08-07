@@ -518,6 +518,15 @@ class OnePicturePageState extends State<OnePicturePage> {
     viewModel?.onePictureHttpData = data;
     viewModel?.setupOnePictureHttpData();
   }
+  
+  // 清除页面数据的方法
+  clearData() {
+    viewModel?.onePictureHttpData = null;
+    viewModel?.theOnePictureDataData = null;
+    viewModel?.dataMap.clear();
+    viewModel?.graph = Graph();
+    viewModel?.notifyListeners();
+  }
 }
 
 extension on Widget {

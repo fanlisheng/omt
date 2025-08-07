@@ -154,4 +154,7 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
     throw UnimplementedError();
   }
 
+  void disposea() {
+    dispose();
+  }
 }

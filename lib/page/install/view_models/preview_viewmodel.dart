@@ -72,6 +72,26 @@ class PreviewViewModel extends BaseViewModel {
     }
   }
 
+  // 清除预览数据，用于重置页面
+  void clearPreviewData() {
+    // 清空数据
+    onePictureDataData = null;
+    
+    // 通知UI更新
+    notifyListeners();
+    
+    // 延迟一点时间确保UI能够更新
+    Timer(Duration(milliseconds: 100), () {
+      // 确保OnePicturePage的状态存在
+      if (picturePageKey.currentState != null) {
+        picturePageKey.currentState?.clearData();
+      }
+      
+      // 再次通知UI更新
+      notifyListeners();
+    });
+  }
+
   Map<String, dynamic> _getPowersMap(AddPowerViewModel powerViewModel) {
     List<int> items = [];
     int? batteryCap = (powerViewModel.battery == false)

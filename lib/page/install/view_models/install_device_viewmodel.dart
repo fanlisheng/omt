@@ -1,7 +1,17 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
+import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/http/http_query.dart';
+import 'package:omt/page/home/device_add/view_models/add_ai_viewmodel.dart';
+import 'package:omt/page/home/device_add/view_models/add_battery_exchange_viewmodel.dart';
+import 'package:omt/page/home/device_add/view_models/add_camera_viewmodel.dart';
+import 'package:omt/page/home/device_add/view_models/add_nvr_viewmodel.dart';
+import 'package:omt/page/home/device_add/view_models/add_power_box_viewmodel.dart';
+import 'package:omt/page/home/device_add/view_models/add_power_viewmodel.dart';
+import 'package:omt/page/install/view_models/preview_viewmodel.dart';
+import 'package:omt/utils/reset_utils.dart';
 
 import '../../../bean/common/id_name_value.dart';
 import '../../../bean/home/home_page/camera_device_entity.dart';
@@ -16,6 +26,7 @@ import '../../home/search_device/services/device_search_service.dart';
 import '../view_models/preview_viewmodel.dart';
 
 class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
+  Key contentKey = UniqueKey();
   int currentStep = 1;
   PageController pageController = PageController(initialPage: 0);
 
@@ -38,14 +49,15 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
   final asgbKey = GlobalKey<AutoSuggestBoxState>();
 
   // 创建 ViewModels，立即初始化以确保状态持久
-  late AddAiViewModel _aiViewModel;
-  late AddCameraViewModel _cameraViewModel;
-  late AddNvrViewModel _nvrViewModel;
-  late AddPowerBoxViewModel _powerBoxViewModel;
-  late AddPowerViewModel _powerViewModel;
+  AddAiViewModel _aiViewModel = AddAiViewModel("");
+  AddCameraViewModel _cameraViewModel = AddCameraViewModel("", []);
+  AddNvrViewModel _nvrViewModel = AddNvrViewModel("");
+  AddPowerBoxViewModel _powerBoxViewModel =
+      AddPowerBoxViewModel("", isInstall: true);
+  AddPowerViewModel _powerViewModel = AddPowerViewModel("", isInstall: true);
 
   // 添加 PreviewViewModel 实例
-  late PreviewViewModel _previewViewModel;
+  PreviewViewModel _previewViewModel = PreviewViewModel();
 
   // 使用 getter 直接返回已初始化的ViewModel
   AddAiViewModel get aiViewModel => _aiViewModel;
@@ -66,15 +78,6 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
     super.initState();
 
     _loadInitialData();
-
-    // 初始化所有子ViewModel，确保状态持久
-    _aiViewModel = AddAiViewModel("");
-    _cameraViewModel = AddCameraViewModel("", []);
-    _nvrViewModel = AddNvrViewModel("");
-    _powerBoxViewModel = AddPowerBoxViewModel("", isInstall: true);
-    _powerViewModel = AddPowerViewModel("", isInstall: true);
-    // 初始化 PreviewViewModel
-    _previewViewModel = PreviewViewModel();
 
     stepTitles = [
       "绑定实例",
@@ -237,7 +240,7 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
             }
           }
         }
-        return  false;
+        return false;
       default:
         return false;
     }
@@ -277,44 +280,18 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
           nvrs: [nvr],
           switches: AddPowerViewModel.getSwitches(powerViewModel),
           onSuccess: (data) {
-            _reset();
+            // 显示成功信息
             LoadingUtils.showInfo(data: "安装成功！");
+            
+            // 重置所有数据 (内部会调用_previewViewModel.clearPreviewData())
+            ResetUtils.resetInstallDeviceScreen();
+
           });
     } catch (e) {
       print("Error building OnePictureDataData: $e");
     }
   }
 
-  // 重置方法
-  void _reset() {
-    // 重置步骤
-    currentStep = 1;
-    pageController.jumpToPage(0);
-
-    // 清空选择数据
-    selectedInstance = null;
-    selectedDoor = null;
-    selectedInOut = null;
-    selectedTags.clear();
-
-    // 清空输入
-    controller.clear();
-    isClear = false;
-
-    // 重置子 ViewModel
-    _aiViewModel = AddAiViewModel("");
-    _cameraViewModel = AddCameraViewModel("", []);
-    _nvrViewModel = AddNvrViewModel("");
-    _powerBoxViewModel = AddPowerBoxViewModel("", isInstall: true);
-    _powerViewModel = AddPowerViewModel("", isInstall: true);
-    _previewViewModel = PreviewViewModel();
-
-    // 重新加载初始数据（模拟 initState 的行为）
-    _loadInitialData();
-
-    // 通知 UI 更新
-    notifyListeners();
-  }
 
 // // 添加一个可以从外部调用的重生成预览数据的方法
 // void rebuildPreviewData() {
