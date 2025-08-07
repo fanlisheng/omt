@@ -35,8 +35,7 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
   List<IdNameValue> inOutList = [];
   List<IdNameValue> cameraTypeList = [];
   List<IdNameValue> regulationList = [];
-  late final player = Player();
-  late var videoController = VideoController(player);
+
   List<CameraDeviceEntity> cameraDeviceList = [CameraDeviceEntity()];
 
   @override
@@ -61,18 +60,38 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
   @override
   void dispose() {
     // 销毁所有控制器
-    player.dispose();
+    _disposeAllResources();
     super.dispose();
+  }
+
+  // 释放所有资源的方法
+  void _disposeAllResources() {
+    for (var camera in cameraDeviceList) {
+      // 释放视频播放器
+      if (camera.player.state.playing) {
+        camera.player.pause();
+      }
+      camera.player.dispose();
+
+      // 释放文本控制器
+      camera.rtspController.dispose();
+      camera.deviceNameController.dispose();
+      camera.videoIdController.dispose();
+    }
   }
 
   // 连接摄像头
   connectCameraAction(int index) async {
     LoadingUtils.show(data: "连接中...");
     CameraDeviceEntity e = cameraDeviceList[index];
-    if (e.rtspController.text.isEmpty) return;
+    if (e.rtspController.text.isEmpty) {
+      LoadingUtils.dismiss();
+      LoadingUtils.showInfo(data: "RTSP地址不能为空!");
+      return;
+    }
     e.rtsp = e.rtspController.text;
-    player.open(Media(e.rtsp!));
-    videoController = VideoController(player);
+    e.player.open(Media(e.rtsp!));
+    e.videoController = VideoController(e.player);
     e.ip = DeviceUtils.getIpFromRtsp(e.rtsp!);
     try {
       DeviceEntity? deviceEntity =
@@ -81,6 +100,7 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
         e.code = deviceEntity.deviceCode ?? "";
         e.mac = deviceEntity.mac;
         e.isOpen = true;
+        cameraDeviceList[index] = e;
       } else {
         LoadingUtils.showError(data: "连接失败!");
       }
@@ -106,6 +126,7 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
 
   Future<void> completeCameraAction(
       BuildContext context, CameraDeviceEntity cameraDeviceEntity) async {
+    return;
     CameraDeviceEntity cameraDevice = cameraDeviceEntity;
     // if (checkCameraInfo(cameraDevice) == false) {
     //   return;

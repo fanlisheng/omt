@@ -359,7 +359,7 @@ class AddCameraView extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      _videoView(model),
+                      _videoView(e.videoController),
                       const SizedBox(height: 16),
                       DashLine(
                           height: 1,
@@ -551,7 +551,7 @@ class AddCameraView extends StatelessWidget {
                                 onTap: () {
                                   // e.readOnly = true;
                                   // model.notifyListeners();
-                                  if(model.checkCameraInfo(e)){
+                                  if (model.checkCameraInfo(e)) {
                                     showConfirmDialog(context, e);
                                   }
                                   // model.completeCameraAction(e);
@@ -628,13 +628,12 @@ class AddCameraView extends StatelessWidget {
                 ),
               ),
               onTap: () {
-                if(model.cameraDeviceList.last.isAddEnd == true){
+                if (model.cameraDeviceList.last.isAddEnd == true) {
                   model.cameraDeviceList.add(CameraDeviceEntity());
                   model.notifyListeners();
-                }else{
+                } else {
                   LoadingUtils.showInfo(data: "请添加完上一个设备!");
                 }
-
               },
             ),
           ],
@@ -644,14 +643,14 @@ class AddCameraView extends StatelessWidget {
     );
   }
 
-  Widget _videoView(AddCameraViewModel model) {
+  Widget _videoView(VideoController controller) {
     return Center(
         child: SizedBox(
       width: 640,
       height: 360,
       child: Stack(
         children: [
-          Video(controller: model.videoController),
+          Video(controller: controller),
         ],
       ),
     ));
@@ -684,7 +683,7 @@ class AddCameraView extends StatelessWidget {
                   style: TextStyle(fontSize: 16, color: ColorUtils.colorWhite),
                 ),
                 const SizedBox(height: 28),
-                _videoView(model),
+                _videoView(cameraDeviceEntity.videoController),
                 const SizedBox(height: 40),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,

@@ -1,4 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:media_kit/media_kit.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/generated/json/base/json_field.dart';
 import 'dart:convert';
@@ -19,6 +21,8 @@ class CameraDeviceEntity {
   bool readOnly = false;
   bool isAddEnd = false; //添加完成的标识
   DeviceDetailAiData? selectedAi; //对应的ai设备
+  late final player = Player();
+  late var videoController = VideoController(player);
   TextEditingController rtspController = TextEditingController();
   //设备名称
   TextEditingController deviceNameController = TextEditingController();
@@ -44,8 +48,10 @@ class CameraDeviceEntity {
     this.isOpen,
   });
 
+
   @override
   String toString() {
     return jsonEncode(this);
   }
+
 }
