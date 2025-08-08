@@ -17,7 +17,8 @@ class AddNvrViewModel extends BaseViewModel {
 
   // ===== NVR 相关属性 =====
   List<DeviceEntity> nvrDeviceList = [];
-  bool? isNvrNeeded ;
+  bool? isNvrNeeded;
+
   DeviceEntity? selectedNvr;
   DeviceDetailNvrData nvrData = DeviceDetailNvrData();
   bool isNvrSearching = false;
@@ -28,7 +29,7 @@ class AddNvrViewModel extends BaseViewModel {
   @override
   void initState() {
     super.initState();
-    if(pNodeCode.isNotEmpty){
+    if (pNodeCode.isNotEmpty) {
       isNvrNeeded = true;
       refreshNvrAction();
     }
@@ -39,7 +40,6 @@ class AddNvrViewModel extends BaseViewModel {
         notifyListeners();
       },
     );
-
   }
 
   @override
@@ -152,7 +152,10 @@ class AddNvrViewModel extends BaseViewModel {
     return stopScanning; // 当 stopAiScanning 为 true 时停止
   }
 
-  static   Map<String, dynamic> getNvr(AddNvrViewModel nvrViewModel) {
+  static   Map<String, dynamic>? getNvr(AddNvrViewModel nvrViewModel) {
+    if (nvrViewModel.isNvrNeeded == false) {
+      return null;
+    }
     int passId = nvrViewModel.selectedNarInOut!.id!;
     String mac = nvrViewModel.selectedNvr!.mac ?? "";
     String ip = nvrViewModel.selectedNvr?.ip ?? "";

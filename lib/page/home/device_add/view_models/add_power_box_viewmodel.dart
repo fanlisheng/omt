@@ -32,7 +32,7 @@ class AddPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
   @override
   void initState() async {
     super.initState();
-    if(isInstall == false){
+    if (isInstall == false) {
       isPowerBoxNeeded = true;
     }
     // 初始化进/出口列表
@@ -150,8 +150,11 @@ class AddPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
     return true;
   }
 
-
-  static  Map<String, dynamic> getPowerBoxes(AddPowerBoxViewModel powerBoxViewModel) {
+  static Map<String, dynamic>? getPowerBoxes(
+      AddPowerBoxViewModel powerBoxViewModel) {
+    if (powerBoxViewModel.isPowerBoxNeeded == false) {
+      return null;
+    }
     String deviceCode =
     powerBoxViewModel.selectedDeviceDetailPowerBox!.deviceCode!;
     int passId = powerBoxViewModel.selectedPowerBoxInOut!.id!;

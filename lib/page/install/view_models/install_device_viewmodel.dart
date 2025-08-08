@@ -257,11 +257,11 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
     try {
       Map<String, dynamic> powersMap =
           AddPowerViewModel.getPowersMap(powerViewModel);
-      Map<String, dynamic> powerBoxes =
+      Map<String, dynamic>? powerBoxes =
           AddPowerBoxViewModel.getPowerBoxes(powerBoxViewModel);
       Map<String, dynamic> network =
           AddPowerViewModel.getNetwork(powerViewModel);
-      Map<String, dynamic> nvr = AddNvrViewModel.getNvr(nvrViewModel);
+      Map<String, dynamic>? nvr = AddNvrViewModel.getNvr(nvrViewModel);
       List<Map<String, dynamic>> routers = [];
       List<Map<String, dynamic>> wiredNetworks = [];
       if (network["type"] == 6) {
@@ -274,24 +274,21 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
           instanceId: selectedInstance?.id ?? "",
           gateId: selectedDoor?.id ?? 0,
           powers: [powersMap],
-          powerBoxes: [powerBoxes],
+          powerBoxes: powerBoxes != null ? [powerBoxes] : [],
           routers: routers,
           wiredNetworks: wiredNetworks,
-          nvrs: [nvr],
+          nvrs: nvr != null ? [nvr] : [],
           switches: AddPowerViewModel.getSwitches(powerViewModel),
           onSuccess: (data) {
             // 显示成功信息
             LoadingUtils.showInfo(data: "安装成功！");
-            
-            // 重置所有数据 (内部会调用_previewViewModel.clearPreviewData())
-            ResetUtils.resetInstallDeviceScreen();
 
+            ResetUtils.resetInstallDeviceScreen();
           });
     } catch (e) {
       print("Error building OnePictureDataData: $e");
     }
   }
-
 
 // // 添加一个可以从外部调用的重生成预览数据的方法
 // void rebuildPreviewData() {

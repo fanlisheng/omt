@@ -37,10 +37,13 @@ class PreviewViewModel extends BaseViewModel {
     }
 
     try {
-      Map<String, dynamic> powersMap = AddPowerViewModel.getPowersMap(powerViewModel);
-      Map<String, dynamic> powerBoxes = AddPowerBoxViewModel.getPowerBoxes(powerBoxViewModel);
-      Map<String, dynamic> network = AddPowerViewModel.getNetwork(powerViewModel);
-      Map<String, dynamic> nvr = AddNvrViewModel.getNvr(nvrViewModel);
+      Map<String, dynamic> powersMap =
+          AddPowerViewModel.getPowersMap(powerViewModel);
+      Map<String, dynamic>? powerBoxes =
+          AddPowerBoxViewModel.getPowerBoxes(powerBoxViewModel);
+      Map<String, dynamic> network =
+          AddPowerViewModel.getNetwork(powerViewModel);
+      Map<String, dynamic>? nvr = AddNvrViewModel.getNvr(nvrViewModel);
       List<Map<String, dynamic>> routers = [];
       List<Map<String, dynamic>> wiredNetworks = [];
       if (network["type"] == 6) {
@@ -53,10 +56,10 @@ class PreviewViewModel extends BaseViewModel {
           instanceId: selectedInstance.id ?? "",
           gateId: selectedDoor.id ?? 0,
           powers: [powersMap],
-          powerBoxes: [powerBoxes],
+          powerBoxes: powerBoxes != null ? [powerBoxes] : [],
           routers: routers,
           wiredNetworks: wiredNetworks,
-          nvrs: [nvr],
+          nvrs: nvr != null ? [nvr] : [],
           switches: AddPowerViewModel.getSwitches(powerViewModel),
           onSuccess: (data) {
             onePictureDataData = data;
@@ -76,17 +79,17 @@ class PreviewViewModel extends BaseViewModel {
   void clearPreviewData() {
     // 清空数据
     onePictureDataData = null;
-    
+
     // 通知UI更新
     notifyListeners();
-    
+
     // 延迟一点时间确保UI能够更新
     Timer(Duration(milliseconds: 100), () {
       // 确保OnePicturePage的状态存在
       if (picturePageKey.currentState != null) {
         picturePageKey.currentState?.clearData();
       }
-      
+
       // 再次通知UI更新
       notifyListeners();
     });
