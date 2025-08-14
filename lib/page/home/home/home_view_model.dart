@@ -153,7 +153,7 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
           PaneItem(
             icon: Container(),
             title: Text(
-              "个设备",
+              "标签管理",
               style: TextStyle(
                   fontSize: 12,
                   color: 4 == topIndex

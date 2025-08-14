@@ -79,7 +79,7 @@ class DetailPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
         ids: ids,
         status: isCloseAllDc ? 1 : 2,
         onSuccess: (data) {
-          isCloseAllDc = false;
+          isCloseAllDc = !isCloseAllDc;
           LoadingUtils.showToast(data: "${isCloseAllDc ? "关闭" : "打开"}成功!");
           requestData();
         });

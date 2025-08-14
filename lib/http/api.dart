@@ -96,6 +96,14 @@ class API extends BaseAPI {
     return 'http://10.10.1.93:8001';
   }
 
+  String hostDeviceConfiguration(String ip) {
+    if (BaseSysUtils.empty(ip)) {
+      return '';
+    } else {
+      return 'http://$ip:8000';
+    }
+  }
+
   @override
   String get host => _host ?? '';
 

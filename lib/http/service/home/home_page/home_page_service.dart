@@ -69,7 +69,7 @@ class HomePageService {
 
   get _getUnboundDevices => '${API.share.host}api/device/devices';
 
-  get _restartAiDevice => '${API.share.host}api/device/ai_device/restart';
+  get _restartAiDevice => '/contrl/golang/restart';
 
   get _upgradeAiDeviceProgram =>
       '${API.share.host}api/device/ai_device/upgrade_program';
@@ -472,16 +472,14 @@ class HomePageService {
 
   /// 重启AI设备
   restartAiDevice({
-    required String deviceCode,
-    required ValueChanged<CodeMessageData?> onSuccess,
-    ValueChanged<CodeMessageData?>? onCache,
+    required String ip,
+    required ValueChanged<dynamic?> onSuccess,
+    ValueChanged<dynamic?>? onCache,
     ValueChanged<String>? onError,
   }) async {
-    HttpManager.share.doHttpPost<CodeMessageData>(
-      await _restartAiDevice,
-      {
-        'device_code': deviceCode,
-      },
+    String url = '${API.share.hostDeviceConfiguration(ip)}$_restartAiDevice';
+    HttpManager.share.doHttpPost<dynamic>(
+      url, {},
       method: 'POST',
       autoHideDialog: true,
       autoShowDialog: true,

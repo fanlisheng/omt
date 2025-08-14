@@ -130,9 +130,10 @@ class DetailPowerBoxView extends StatelessWidget {
                   color: ColorUtils.colorGreen,
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: const Text(
-                  "打开所有DC",
-                  style: TextStyle(fontSize: 12, color: ColorUtils.colorWhite),
+                child: Text(
+                  model.isCloseAllDc == true ? "关闭所有DC" : "打开所有DC",
+                  style: const TextStyle(
+                      fontSize: 12, color: ColorUtils.colorWhite),
                 ),
               ),
             ),

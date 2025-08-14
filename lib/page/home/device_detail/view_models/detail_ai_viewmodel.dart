@@ -59,7 +59,7 @@ class DetailAiViewModel extends BaseViewModelRefresh<dynamic> {
         deleteText: "确定");
     if (result == '取消') return;
     HttpQuery.share.homePageService.restartAiDevice(
-        deviceCode: deviceInfo.deviceCode ?? "",
+        ip: deviceInfo.ip ?? "",
         onSuccess: (a) {
           LoadingUtils.showToast(data: "重启成功!");
         });
