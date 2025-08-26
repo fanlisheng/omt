@@ -24,10 +24,51 @@ class UpdateService {
   double _downloadProgress = 0.0;
   String? _downloadPath;
   String? _extractedPath;
+  String? _logFilePath;
 
   // 获取当前版本信息
   Future<PackageInfo> getCurrentVersion() async {
     return await PackageInfo.fromPlatform();
+  }
+
+  Future<void> _ensureLogFile() async {
+    if (_logFilePath != null) return;
+    try {
+      Directory baseDir;
+      if (Platform.isWindows) {
+        final downloads = await getDownloadsDirectory();
+        baseDir = downloads ?? await getApplicationDocumentsDirectory();
+      } else {
+        baseDir = await getApplicationDocumentsDirectory();
+      }
+      if (!await baseDir.exists()) {
+        await baseDir.create(recursive: true);
+      }
+      final logsDir = Directory('${baseDir.path}/omt_logs');
+      if (!await logsDir.exists()) {
+        await logsDir.create(recursive: true);
+      }
+      final date = DateTime.now();
+      final y = date.year.toString().padLeft(4, '0');
+      final m = date.month.toString().padLeft(2, '0');
+      final d = date.day.toString().padLeft(2, '0');
+      _logFilePath = '${logsDir.path}/update_${y}${m}${d}.log';
+    } catch (_) {
+      // 忽略日志初始化失败
+    }
+  }
+
+  Future<void> _log(String message) async {
+    try {
+      await _ensureLogFile();
+      if (_logFilePath == null) return;
+      final now = DateTime.now().toIso8601String();
+      final line = '[$now] $message\n';
+      final file = File(_logFilePath!);
+      await file.writeAsString(line, mode: FileMode.append, flush: true);
+    } catch (_) {
+      // 忽略日志写入失败
+    }
   }
 
   // 检查更新
@@ -93,27 +134,86 @@ class UpdateService {
     _downloadProgress = 0.0;
 
     try {
-      final appDir = await getApplicationDocumentsDirectory();
-      final fileName = 'update_${updateInfo.version}.zip';
-      _downloadPath = '${appDir.path}/$fileName';
+      await _ensureLogFile();
 
+      Directory baseDir;
+      if (Platform.isWindows) {
+        final downloads = await getDownloadsDirectory();
+        baseDir = downloads ?? await getApplicationDocumentsDirectory();
+      } else {
+        baseDir = await getApplicationDocumentsDirectory();
+      }
+      if (!await baseDir.exists()) {
+        await baseDir.create(recursive: true);
+      }
+
+      final fileName = 'update_${updateInfo.version}.zip';
+      _downloadPath = '${baseDir.path}/$fileName';
+
+      final targetFile = File(_downloadPath!);
+      if (await targetFile.exists()) {
+        try {
+          await targetFile.delete();
+          await _log('已删除旧文件: ${targetFile.absolute.path}');
+        } catch (e) {
+          await _log('删除旧文件失败: $e');
+        }
+      }
+
+      await _log('开始下载更新包');
+      await _log('URL: ${updateInfo.downloadUrl}');
+      await _log('保存到: ${File(_downloadPath!).absolute.path}');
+
+      int lastPercent = -1;
       await _dio.download(
         updateInfo.downloadUrl,
         _downloadPath!,
-        onReceiveProgress: (received, total) {
+        onReceiveProgress: (received, total) async {
           if (total != -1) {
             _downloadProgress = received / total;
             onProgress(_downloadProgress);
+            final percent = (_downloadProgress * 100).floor();
+            if (percent != lastPercent && percent % 10 == 0) {
+              lastPercent = percent;
+              await _log('下载进度: $percent%');
+            }
           }
         },
       );
 
       _isDownloading = false;
-      return true;
+
+      final savedFile = File(_downloadPath!);
+      final exists = await savedFile.exists();
+      final size = exists ? await savedFile.length() : 0;
+      await _log('下载完成: ${savedFile.absolute.path}');
+      await _log('存在: $exists, 大小: $size 字节');
+      return exists;
     } catch (e) {
       _isDownloading = false;
-      print('下载失败: $e');
+      await _log('下载失败: $e');
       return false;
+    }
+  }
+
+  // 打开下载文件所在目录（Windows/桌面便捷操作）
+  Future<void> openDownloadedFileLocation() async {
+    try {
+      if (_downloadPath == null) return;
+      final fullPath = File(_downloadPath!).absolute.path;
+      if (Platform.isWindows) {
+        // 在资源管理器中选中文件
+        await Process.start('explorer', ['/select,', fullPath]);
+      } else if (Platform.isMacOS) {
+        // 打开所在目录并高亮
+        await Process.run('open', ['-R', fullPath]);
+      } else if (Platform.isLinux) {
+        // 打开所在目录
+        final dir = Directory(_downloadPath!).parent.path;
+        await Process.run('xdg-open', [dir]);
+      }
+    } catch (e) {
+      print('打开下载目录失败: $e');
     }
   }
 
@@ -128,29 +228,57 @@ class UpdateService {
       // 创建解压目录
       final extractDir = Directory(_extractedPath!);
       if (await extractDir.exists()) {
-        await extractDir.delete(recursive: true);
+        try {
+          await extractDir.delete(recursive: true);
+          await _log('已清理旧解压目录: ${extractDir.path}');
+        } catch (e) {
+          await _log('清理旧解压目录失败: $e');
+        }
       }
       await extractDir.create(recursive: true);
 
+      await _log('开始解压更新包');
+      await _log('ZIP: ${File(_downloadPath!).absolute.path}');
+      await _log('目标目录: ${extractDir.path}');
+
       // 读取ZIP文件
       final bytes = await File(_downloadPath!).readAsBytes();
-      final archive = ZipDecoder().decodeBytes(bytes);
+      final archive = ZipDecoder().decodeBytes(bytes, verify: true);
+      final total = archive.length;
+      await _log('ZIP 条目总数: $total');
 
       // 解压文件
-      for (final file in archive) {
-        final filename = file.name;
-        if (file.isFile) {
-          final outFile = File('$_extractedPath/$filename');
-          await outFile.create(recursive: true);
-          await outFile.writeAsBytes(file.content);
-        } else {
-          await Directory('$_extractedPath/$filename').create(recursive: true);
+      int done = 0;
+      int lastPercent = -1;
+      for (final entry in archive) {
+        try {
+          final name = entry.name.replaceAll('\\', '/');
+          final outPath = '$_extractedPath/$name';
+          if (entry.isFile) {
+            final outFile = File(outPath);
+            await outFile.parent.create(recursive: true);
+            await outFile.writeAsBytes(entry.content);
+          } else {
+            await Directory(outPath).create(recursive: true);
+          }
+        } catch (e) {
+          await _log('解压条目失败: ${entry.name} -> $e');
+        } finally {
+          done++;
+          if (total > 0) {
+            final percent = ((done / total) * 100).floor();
+            if (percent != lastPercent && percent % 10 == 0) {
+              lastPercent = percent;
+              await _log('解压进度: $percent%');
+            }
+          }
         }
       }
 
+      await _log('解压完成: $done/$total 条目');
       return true;
     } catch (e) {
-      print('解压失败: $e');
+      await _log('解压失败: $e');
       return false;
     }
   }

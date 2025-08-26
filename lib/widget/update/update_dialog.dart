@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import '../../bean/update/update_info.dart';
 import '../../http/service/update/update_service.dart';
@@ -23,6 +24,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
   bool _isDownloading = false;
   double _downloadProgress = 0.0;
   bool _downloadCompleted = false;
+  bool _isInstalling = false;
 
   @override
   Widget build(BuildContext context) {
@@ -188,7 +190,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
 
         // 下载/安装按钮
         ElevatedButton(
-          onPressed: _isDownloading ? null : _handleAction,
+          onPressed: (_isDownloading || _isInstalling) ? null : _handleAction,
           child: Text(_getActionButtonText()),
         ),
       ],
@@ -198,6 +200,8 @@ class _UpdateDialogState extends State<UpdateDialog> {
   String _getActionButtonText() {
     if (_isDownloading) {
       return '下载中...';
+    } else if (_isInstalling) {
+      return '安装中...';
     } else if (_downloadCompleted) {
       return '立即安装';
     } else {
@@ -207,8 +211,8 @@ class _UpdateDialogState extends State<UpdateDialog> {
 
   void _handleAction() async {
     if (_downloadCompleted) {
-      // 安装更新
-      await _updateService.installUpdate();
+      // 安装更新（带详细错误提示）
+      await _installWithFeedback();
     } else {
       // 开始下载
       _startDownload();
@@ -269,14 +273,22 @@ class _UpdateDialogState extends State<UpdateDialog> {
       final extractSuccess = await _updateService.extractUpdatePackage();
 
       if (extractSuccess) {
-        // 检查是否有.exe文件
-        final hasExe = await _updateService.existsByExtension('.exe');
+        // 检查是否有.exe文件（Windows）或其他平台安装介质
+        bool found = false;
+        if (Platform.isWindows) {
+          found = await _updateService.existsByExtension('.exe');
+        } else if (Platform.isMacOS) {
+          // mac 可以只做提示：解压成功，点击安装后尝试 open
+          found = true;
+        } else {
+          found = true;
+        }
 
-        if (hasExe) {
+        if (found) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('解压完成，找到安装程序！'),
+                content: Text('解压完成，安装介质已就绪'),
                 backgroundColor: Colors.green,
               ),
             );
@@ -309,6 +321,50 @@ class _UpdateDialogState extends State<UpdateDialog> {
             backgroundColor: Colors.red,
           ),
         );
+      }
+    }
+  }
+
+  Future<void> _installWithFeedback() async {
+    setState(() {
+      _isInstalling = true;
+    });
+    try {
+      // Windows: 先确保存在 .exe
+      if (Platform.isWindows) {
+        final hasExe = await _updateService.existsByExtension('.exe');
+        if (!hasExe) {
+          throw Exception('未找到安装程序(.exe)。请检查ZIP内容是否包含安装包。');
+        }
+      }
+
+      final ok = await _updateService.installUpdate();
+      if (!ok) {
+        throw Exception('安装程序未能启动。可能被系统或安全软件拦截。');
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('已启动安装程序，应用将退出以继续安装'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('安装失败：$e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isInstalling = false;
+        });
       }
     }
   }
