@@ -82,12 +82,20 @@ class DetailCameraViewModel extends BaseViewModelRefresh<dynamic> {
         deleteText: "确定");
     if (result == '取消') return;
     notifyListeners();
-    HttpQuery.share.homePageService.manualSnapCamera(
-        deviceCode: deviceInfo.deviceCode ?? "",
-        aiDeviceCode: deviceInfo.aiDeviceCode ?? "",
-        onSuccess: (a) {
-          LoadingUtils.showToast(data: "重启识别成功!");
-        });
+    // HttpQuery.share.homePageService.manualSnapCamera(
+    //     deviceCode: deviceInfo.deviceCode ?? "",
+    //     aiDeviceCode: deviceInfo.aiDeviceCode ?? "",
+    //     onSuccess: (a) {
+    //       LoadingUtils.showToast(data: "重启识别成功!");
+    //     });
+    HttpQuery.share.homePageService.restartAiDevicePython(
+      // deviceCode: cameraDeviceEntity.code ?? "",
+      // aiDeviceCode: cameraDeviceEntity.selectedAi?.deviceCode ?? "",
+      ip:  "192.168.101.82",
+      onSuccess: (a) {
+        LoadingUtils.showToast(data: "重启识别成功!");
+      },
+    );
   }
 
   //图片

@@ -220,12 +220,14 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
   // 重启识别
   restartRecognitionAction(CameraDeviceEntity cameraDeviceEntity) {
     notifyListeners();
-    HttpQuery.share.homePageService.manualSnapCamera(
-        deviceCode: cameraDeviceEntity.code ?? "",
-        aiDeviceCode: cameraDeviceEntity.selectedAi?.deviceCode ?? "",
-        onSuccess: (a) {
-          LoadingUtils.showToast(data: "重启识别成功!");
-        });
+    HttpQuery.share.homePageService.restartAiDevicePython(
+      // deviceCode: cameraDeviceEntity.code ?? "",
+      // aiDeviceCode: cameraDeviceEntity.selectedAi?.deviceCode ?? "",
+      ip: cameraDeviceEntity.ip ?? "",
+      onSuccess: (a) {
+        LoadingUtils.showToast(data: "重启识别成功!");
+      },
+    );
   }
 
   // 图片预览

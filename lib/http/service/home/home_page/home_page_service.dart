@@ -70,6 +70,7 @@ class HomePageService {
   get _getUnboundDevices => '${API.share.host}api/device/devices';
 
   get _restartAiDevice => '/contrl/golang/restart';
+  get _restartAiDevicePython => '/contrl/python/restart';
 
   get _upgradeAiDeviceProgram =>
       '${API.share.host}api/device/ai_device/upgrade_program';
@@ -480,6 +481,27 @@ class HomePageService {
     String url = '${API.share.hostDeviceConfiguration(ip)}$_restartAiDevice';
     HttpManager.share.doHttpPost<dynamic>(
       url, {},
+      method: 'POST',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  /// 重启AI识别
+  restartAiDevicePython({
+    required String ip,
+    required ValueChanged<dynamic> onSuccess,
+    ValueChanged<dynamic>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    String url =
+        '${API.share.hostDeviceConfiguration(ip)}$_restartAiDevicePython';
+    HttpManager.share.doHttpPost<dynamic>(
+      url,
+      {},
       method: 'POST',
       autoHideDialog: true,
       autoShowDialog: true,

@@ -52,6 +52,10 @@ dependencies:
       url: https://github.com/kayoxu/graphview.git
 #    path: /Volumes/U/app/demo/graphview
 
+  # 更新系统相关依赖
+  path_provider: ^2.1.1
+  archive: ^3.4.9
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

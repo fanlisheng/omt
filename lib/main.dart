@@ -13,6 +13,7 @@ import 'package:omt/test/test.dart';
 import 'package:omt/theme.dart';
 import 'package:omt/utils/color_utils.dart';
 import 'package:omt/utils/intent_utils.dart';
+import 'package:omt/widget/update/update_manager.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:system_theme/system_theme.dart';
@@ -31,7 +32,6 @@ bool get isDesktop {
 }
 
 void main() async {
-
   KeyboardNumber.register();
   KeyboardCarNum.register();
   KeyboardPhone.register();
@@ -92,7 +92,6 @@ void main() async {
 
   API.share.init();
 
-
   // Widget appPage = const MyApp();
   // runApp(appPage);
   // return;
@@ -118,6 +117,8 @@ class _MyHomePageState extends State<MyHomePage>
   StreamSubscription? stream;
   StreamSubscription? streamBaseViewModelBusEvent;
 
+  final UpdateManager _updateManager = UpdateManager();
+
   @override
   void initState() {
     windowManager.addListener(this);
@@ -137,6 +138,7 @@ class _MyHomePageState extends State<MyHomePage>
         // VersionUtils.canShowDialogUpdate = true;
       }
     });
+    _updateManager.checkUpdateOnStartup(context);
   }
 
   @override
