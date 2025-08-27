@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:kayo_package/kayo_package.dart';
 import '../../bean/update/update_info.dart';
 import '../../http/service/update/update_service.dart';
 import '../../theme.dart';
@@ -25,6 +26,33 @@ class _UpdateDialogState extends State<UpdateDialog> {
   double _downloadProgress = 0.0;
   bool _downloadCompleted = false;
   bool _isInstalling = false;
+
+  BuildContext _snackContext() {
+    final overlayCtx = KayoPackage.share.navigatorKey.currentState?.overlay?.context;
+    return overlayCtx ?? context;
+  }
+
+  void _showSnack(String msg, Color color, {int seconds = 3}) {
+    LoadingUtils.showInfo(data: msg);
+    // final ctx = _snackContext();
+    // final messenger = ScaffoldMessenger.maybeOf(ctx);
+    // if (messenger != null) {
+    //   messenger.showSnackBar(
+    //     SnackBar(content: Text(msg), backgroundColor: color, duration: Duration(seconds: seconds)),
+    //   );
+    // } else {
+    //   showDialog(
+    //     context: ctx,
+    //     barrierDismissible: true,
+    //     builder: (c) => AlertDialog(
+    //       content: Text(msg),
+    //       actions: [
+    //         TextButton(onPressed: () => Navigator.of(c).pop(), child: const Text('确定')),
+    //       ],
+    //     ),
+    //   );
+    // }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -201,8 +229,8 @@ class _UpdateDialogState extends State<UpdateDialog> {
     if (_isDownloading) {
       return '下载中...';
     } else if (_isInstalling) {
-      return '安装中...'; // Show "Installing..." when installing
-    } else if (_downloadCompleted) { // If download is complete, but not yet installing
+      return '安装中...';
+    } else if (_downloadCompleted) {
       return '立即安装 (将关闭应用)';
     } else {
       return '立即更新';
@@ -244,30 +272,14 @@ class _UpdateDialogState extends State<UpdateDialog> {
     });
 
     if (!success) {
-      // 显示下载失败提示
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('下载失败，请检查网络连接后重试'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      _showSnack('下载失败，请检查网络连接后重试', Colors.red);
     }
   }
 
   // 解压并检查.exe文件
   void _extractAndCheck() async {
     try {
-      // 显示解压提示
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('正在解压更新包...'),
-            backgroundColor: Colors.blue,
-          ),
-        );
-      }
+      _showSnack('正在解压更新包...', Colors.blue, seconds: 2);
 
       // 解压ZIP包
       final extractSuccess = await _updateService.extractUpdatePackage();
@@ -277,51 +289,20 @@ class _UpdateDialogState extends State<UpdateDialog> {
         bool found = false;
         if (Platform.isWindows) {
           found = await _updateService.existsByExtension('.exe');
-        } else if (Platform.isMacOS) {
-          // mac 可以只做提示：解压成功，点击安装后尝试 open
-          found = true;
         } else {
           found = true;
         }
 
         if (found) {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('解压完成，安装介质已就绪'),
-                backgroundColor: Colors.green,
-              ),
-            );
-          }
+          _showSnack('解压完成，安装介质已就绪', Colors.green, seconds: 2);
         } else {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('解压完成，但未找到安装程序(.exe文件)'),
-                backgroundColor: Colors.orange,
-              ),
-            );
-          }
+          _showSnack('解压完成，但未找到安装程序(.exe文件)', Colors.orange);
         }
       } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('解压失败，请检查文件完整性'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
+        _showSnack('解压失败，请检查文件完整性', Colors.red);
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('解压过程出错: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      _showSnack('解压过程出错: $e', Colors.red);
     }
   }
 
@@ -332,76 +313,30 @@ class _UpdateDialogState extends State<UpdateDialog> {
     try {
       // 检查平台支持
       if (!Platform.isWindows) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('当前平台不支持自动安装: ${Platform.operatingSystem}'),
-              backgroundColor: Colors.orange,
-            ),
-          );
-        }
+        _showSnack('当前平台不支持自动安装，请在Windows系统上使用此功能', Colors.red);
+        setState(() { _isInstalling = false; });
         return;
       }
 
       // Windows: 先确保存在 .exe
       final hasExe = await _updateService.existsByExtension('.exe');
       if (!hasExe) {
-        throw Exception('未找到安装程序(.exe)。请检查ZIP内容是否包含安装包。');
-      }
-
-      // 显示确认对话框
-      final confirmed = await showDialog<bool>(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => AlertDialog(
-          title: const Text('确认安装'),
-          content: const Text(
-            '即将开始安装更新，安装过程中应用将自动关闭。\n\n'
-            '安装完成后，请重新启动应用以使用新版本。\n\n'
-            '是否继续？'
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('取消'),
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('确认安装'),
-            ),
-          ],
-        ),
-      );
-
-      if (confirmed != true) {
-        setState(() {
-          _isInstalling = false;
-        });
+        _showSnack('未找到安装程序(.exe)。请检查ZIP内容是否包含安装包。', Colors.red);
+        setState(() { _isInstalling = false; });
         return;
       }
 
+      // 直接开始安装
       final ok = await _updateService.installUpdate();
       if (!ok) {
-        throw Exception('安装程序未能启动。可能被系统或安全软件拦截。');
+        _showSnack('安装程序未能启动。可能被系统或安全软件拦截，或者安装脚本创建失败。', Colors.red);
+        setState(() { _isInstalling = false; });
+        return;
       }
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('正在启动安装程序，应用将自动关闭...'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
+      _showSnack('正在启动安装程序，应用将自动关闭...', Colors.green, seconds: 2);
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('安装失败：$e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      _showSnack('安装失败：$e', Colors.red);
     } finally {
       if (mounted) {
         setState(() {
@@ -409,14 +344,5 @@ class _UpdateDialogState extends State<UpdateDialog> {
         });
       }
     }
-  }
-
-  @override
-  void dispose() {
-    // 如果下载未完成，清理下载文件
-    if (!_downloadCompleted) {
-      _updateService.cleanupDownload();
-    }
-    super.dispose();
   }
 }

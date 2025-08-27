@@ -8,7 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:archive/archive.dart';
 import '../../../bean/update/update_info.dart';
-import '../../api.dart';
+import '../../../utils/file_log_utils.dart';
 import 'mock_update_api.dart';
 import 'windows_install_script.dart';
 
@@ -26,51 +26,17 @@ class UpdateService {
   double _downloadProgress = 0.0;
   String? _downloadPath;
   String? _extractedPath;
-  String? _logFilePath;
+  final FileLogUtils _fileLogger = FileLogUtils();
+  final String _logType = 'update';
 
   // 获取当前版本信息
   Future<PackageInfo> getCurrentVersion() async {
     return await PackageInfo.fromPlatform();
   }
 
-  Future<void> _ensureLogFile() async {
-    if (_logFilePath != null) return;
-    try {
-      Directory baseDir;
-      if (Platform.isWindows) {
-        final downloads = await getDownloadsDirectory();
-        baseDir = downloads ?? await getApplicationDocumentsDirectory();
-      } else {
-        baseDir = await getApplicationDocumentsDirectory();
-      }
-      if (!await baseDir.exists()) {
-        await baseDir.create(recursive: true);
-      }
-      final logsDir = Directory('${baseDir.path}/omt_logs');
-      if (!await logsDir.exists()) {
-        await logsDir.create(recursive: true);
-      }
-      final date = DateTime.now();
-      final y = date.year.toString().padLeft(4, '0');
-      final m = date.month.toString().padLeft(2, '0');
-      final d = date.day.toString().padLeft(2, '0');
-      _logFilePath = '${logsDir.path}/update_${y}${m}${d}.log';
-    } catch (_) {
-      // 忽略日志初始化失败
-    }
-  }
-
-  Future<void> _log(String message) async {
-    try {
-      await _ensureLogFile();
-      if (_logFilePath == null) return;
-      final now = DateTime.now().toIso8601String();
-      final line = '[$now] $message\n';
-      final file = File(_logFilePath!);
-      await file.writeAsString(line, mode: FileMode.append, flush: true);
-    } catch (_) {
-      // 忽略日志写入失败
-    }
+  /// 记录日志到文件
+  Future<void> logMessage(String message) async {
+    await _fileLogger.log(_logType, message);
   }
 
   // 检查更新
@@ -136,8 +102,6 @@ class UpdateService {
     _downloadProgress = 0.0;
 
     try {
-      await _ensureLogFile();
-
       Directory baseDir;
       if (Platform.isWindows) {
         final downloads = await getDownloadsDirectory();
@@ -156,15 +120,15 @@ class UpdateService {
       if (await targetFile.exists()) {
         try {
           await targetFile.delete();
-          await _log('已删除旧文件: ${targetFile.absolute.path}');
+          await logMessage('已删除旧文件: ${targetFile.absolute.path}');
         } catch (e) {
-          await _log('删除旧文件失败: $e');
+          await logMessage('删除旧文件失败: $e');
         }
       }
 
-      await _log('开始下载更新包');
-      await _log('URL: ${updateInfo.downloadUrl}');
-      await _log('保存到: ${File(_downloadPath!).absolute.path}');
+      await logMessage('开始下载更新包');
+      await logMessage('URL: ${updateInfo.downloadUrl}');
+      await logMessage('保存到: ${File(_downloadPath!).absolute.path}');
 
       int lastPercent = -1;
       await _dio.download(
@@ -177,7 +141,7 @@ class UpdateService {
             final percent = (_downloadProgress * 100).floor();
             if (percent != lastPercent && percent % 10 == 0) {
               lastPercent = percent;
-              await _log('下载进度: $percent%');
+              await logMessage('下载进度: $percent%');
             }
           }
         },
@@ -188,12 +152,12 @@ class UpdateService {
       final savedFile = File(_downloadPath!);
       final exists = await savedFile.exists();
       final size = exists ? await savedFile.length() : 0;
-      await _log('下载完成: ${savedFile.absolute.path}');
-      await _log('存在: $exists, 大小: $size 字节');
+      await logMessage('下载完成: ${savedFile.absolute.path}');
+      await logMessage('存在: $exists, 大小: $size 字节');
       return exists;
     } catch (e) {
       _isDownloading = false;
-      await _log('下载失败: $e');
+      await logMessage('下载失败: $e');
       return false;
     }
   }
@@ -238,17 +202,27 @@ class UpdateService {
         );
       } else {
         // 非Windows平台不支持
-        await _log('当前平台不支持自动安装: ${Platform.operatingSystem}');
+        await logMessage('当前平台不支持自动安装: ${Platform.operatingSystem}');
         return null;
       }
 
       final scriptFile = File(scriptPath);
       await scriptFile.writeAsString(scriptContent);
-      await _log('创建安装脚本: $scriptPath');
+      await logMessage('创建安装脚本: $scriptPath');
+      
+      // 确保脚本文件存在
+      if (!await scriptFile.exists()) {
+        await logMessage('错误：安装脚本文件未能创建');
+        return null;
+      }
+      
+      // 检查脚本文件大小
+      final fileSize = await scriptFile.length();
+      await logMessage('安装脚本大小: $fileSize 字节');
       
       return scriptPath;
     } catch (e) {
-      await _log('创建安装脚本失败: $e');
+      await logMessage('创建安装脚本失败: $e');
       return null;
     }
   }
@@ -258,41 +232,46 @@ class UpdateService {
     try {
       // 检查平台支持
       if (!Platform.isWindows) {
-        await _log('当前平台不支持自动安装: ${Platform.operatingSystem}');
+        await logMessage('当前平台不支持自动安装: ${Platform.operatingSystem}');
         return false;
       }
 
-      await _log('开始安装更新流程');
+      await logMessage('开始安装更新流程');
       
       // 创建安装脚本
       final scriptPath = await _createInstallScript();
       if (scriptPath == null) {
-        await _log('创建安装脚本失败');
+        await logMessage('创建安装脚本失败');
         return false;
       }
 
-      await _log('安装脚本路径: $scriptPath');
-      await _log('解压路径: $_extractedPath');
-      await _log('下载路径: $_downloadPath');
+      await logMessage('安装脚本路径: $scriptPath');
+      await logMessage('解压路径: $_extractedPath');
+      await logMessage('下载路径: $_downloadPath');
 
       // 启动安装脚本
-      final process = await Process.start('cmd', ['/c', scriptPath], 
-        mode: ProcessStartMode.detached);
-      await _log('Windows安装脚本已启动，PID: ${process.pid}');
+      try {
+        final process = await Process.start('cmd', ['/c', scriptPath], 
+          mode: ProcessStartMode.detached);
+        await logMessage('Windows安装脚本已启动，PID: ${process.pid}');
+      } catch (e) {
+        await logMessage('启动安装脚本失败，详细错误: $e');
+        return false;
+      }
 
-      await _log('安装脚本启动成功，应用将在3秒后退出...');
+      await logMessage('安装脚本启动成功，应用将在3秒后退出...');
       
       // 等待3秒让脚本启动，然后退出应用
       await Future.delayed(const Duration(seconds: 3));
       
-      await _log('正在退出应用...');
+      await logMessage('正在退出应用...');
       
       // 退出应用
       exit(0);
       
       return true;
     } catch (e) {
-      await _log('启动安装脚本失败: $e');
+      await logMessage('启动安装脚本失败: $e');
       return false;
     }
   }
@@ -310,22 +289,22 @@ class UpdateService {
       if (await extractDir.exists()) {
         try {
           await extractDir.delete(recursive: true);
-          await _log('已清理旧解压目录: ${extractDir.path}');
+          await logMessage('已清理旧解压目录: ${extractDir.path}');
         } catch (e) {
-          await _log('清理旧解压目录失败: $e');
+          await logMessage('清理旧解压目录失败: $e');
         }
       }
       await extractDir.create(recursive: true);
 
-      await _log('开始解压更新包');
-      await _log('ZIP: ${File(_downloadPath!).absolute.path}');
-      await _log('目标目录: ${extractDir.path}');
+      await logMessage('开始解压更新包');
+      await logMessage('ZIP: ${File(_downloadPath!).absolute.path}');
+      await logMessage('目标目录: ${extractDir.path}');
 
       // 读取ZIP文件
       final bytes = await File(_downloadPath!).readAsBytes();
       final archive = ZipDecoder().decodeBytes(bytes, verify: true);
       final total = archive.length;
-      await _log('ZIP 条目总数: $total');
+      await logMessage('ZIP 条目总数: $total');
 
       // 解压文件
       int done = 0;
@@ -342,23 +321,23 @@ class UpdateService {
             await Directory(outPath).create(recursive: true);
           }
         } catch (e) {
-          await _log('解压条目失败: ${entry.name} -> $e');
+          await logMessage('解压条目失败: ${entry.name} -> $e');
         } finally {
           done++;
           if (total > 0) {
             final percent = ((done / total) * 100).floor();
             if (percent != lastPercent && percent % 10 == 0) {
               lastPercent = percent;
-              await _log('解压进度: $percent%');
+              await logMessage('解压进度: $percent%');
             }
           }
         }
       }
 
-      await _log('解压完成: $done/$total 条目');
+      await logMessage('解压完成: $done/$total 条目');
       return true;
     } catch (e) {
-      await _log('解压失败: $e');
+      await logMessage('解压失败: $e');
       return false;
     }
   }

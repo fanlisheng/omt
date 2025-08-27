@@ -184,23 +184,33 @@ set "APP_NAME=$appName"
 set "SOURCE_DIR=$extractedPathWin"
 set "TARGET_DIR=$targetDirWin"
 set "APP_PATH=%TARGET_DIR%\\%APP_NAME%"
+set "LOG_FILE=%TEMP%\\omt_update_log.txt"
 REM ==================
+
+echo %date% %time% - 开始安装更新 > "%LOG_FILE%"
 
 echo [INFO] Configuration:
 echo   APP_NAME: %APP_NAME%
 echo   SOURCE_DIR: %SOURCE_DIR%
 echo   TARGET_DIR: %TARGET_DIR%
 echo   APP_PATH: %APP_PATH%
+echo   LOG_FILE: %LOG_FILE%
 echo.
 
+echo %date% %time% - 配置信息已记录 >> "%LOG_FILE%"
+
 echo [1/6] Checking source directory...
+echo %date% %time% - 检查源目录: %SOURCE_DIR% >> "%LOG_FILE%"
+
 dir "%SOURCE_DIR%" /B
 if not exist "%SOURCE_DIR%" (
     echo [ERROR] Source dir not found: %SOURCE_DIR%
+    echo %date% %time% - 错误：源目录未找到: %SOURCE_DIR% >> "%LOG_FILE%"
     pause
     exit /b 1
 )
 echo [OK] Source directory exists
+echo %date% %time% - 源目录存在 >> "%LOG_FILE%"
 
 echo.
 echo [2/6] Checking target directory...
@@ -221,16 +231,21 @@ if not exist "%TARGET_DIR%" (
 
 echo.
 echo [3/6] Copying files...
+echo %date% %time% - 开始复制文件: 从 %SOURCE_DIR% 到 %TARGET_DIR% >> "%LOG_FILE%"
 echo Copying from %SOURCE_DIR% to %TARGET_DIR%
+
 xcopy "%SOURCE_DIR%\\*" "%TARGET_DIR%\\" /E /Y /I /R
 set "XCOPY_ERR=%ERRORLEVEL%"
+echo %date% %time% - 复制文件完成，返回代码: %XCOPY_ERR% >> "%LOG_FILE%"
 
 if %XCOPY_ERR% GEQ 4 (
     echo [ERROR] Copy failed, code: %XCOPY_ERR%
+    echo %date% %time% - 错误：复制文件失败，代码: %XCOPY_ERR% >> "%LOG_FILE%"
     pause
     exit /b 1
 ) else (
     echo [OK] Files copied, code: %XCOPY_ERR%
+    echo %date% %time% - 文件复制成功 >> "%LOG_FILE%"
 )
 
 echo.
@@ -245,14 +260,44 @@ REM if exist "$downloadPathWin" del "$downloadPathWin"
 
 echo.
 echo [6/6] Launching new version...
+echo %date% %time% - 尝试启动新版本: %APP_PATH% >> "%LOG_FILE%"
+
 if exist "%APP_PATH%" (
     echo [INFO] Starting application: %APP_PATH%
+    echo %date% %time% - 找到应用程序，正在启动: %APP_PATH% >> "%LOG_FILE%"
     start "" "%APP_PATH%"
-    echo [OK] Started: %APP_PATH%
+    set "START_ERR=%ERRORLEVEL%"
+    echo %date% %time% - 启动应用程序，返回代码: %START_ERR% >> "%LOG_FILE%"
+    
+    if %START_ERR% EQU 0 (
+        echo [OK] Started: %APP_PATH%
+        echo %date% %time% - 应用程序启动成功 >> "%LOG_FILE%"
+    ) else (
+        echo [WARN] Application may not have started properly, code: %START_ERR%
+        echo %date% %time% - 警告：应用程序可能未正确启动，代码: %START_ERR% >> "%LOG_FILE%"
+    )
 ) else (
     echo [WARN] App not found: %APP_PATH%
+    echo %date% %time% - 警告：未找到应用程序: %APP_PATH% >> "%LOG_FILE%"
     echo Available executables:
-    dir "%TARGET_DIR%\\*.exe" /B 2>nul
+    echo %date% %time% - 查找可用的可执行文件: >> "%LOG_FILE%"
+    for /f "tokens=*" %%a in ('dir "%TARGET_DIR%\\*.exe" /B 2^>nul') do (
+        echo %%a
+        echo %%a >> "%LOG_FILE%"
+    )
+    
+    REM 尝试查找并启动任何可用的EXE文件
+    for /f "tokens=*" %%a in ('dir "%TARGET_DIR%\\*.exe" /B 2^>nul') do (
+        echo %date% %time% - 尝试启动替代应用程序: %TARGET_DIR%\\%%a >> "%LOG_FILE%"
+        start "" "%TARGET_DIR%\\%%a"
+        echo %date% %time% - 已尝试启动替代应用程序 >> "%LOG_FILE%"
+        goto :found_exe
+    )
+    
+    echo [ERROR] No executable files found in target directory
+    echo %date% %time% - 错误：目标目录中未找到可执行文件 >> "%LOG_FILE%"
+    
+    :found_exe
 )
 
 echo.
@@ -264,4 +309,4 @@ echo Press any key to exit...
 pause >nul
 ''';
   }
-} 
+}
