@@ -272,6 +272,8 @@ if exist "%APP_PATH%" (
     if %START_ERR% EQU 0 (
         echo [OK] Started: %APP_PATH%
         echo %date% %time% - 应用程序启动成功 >> "%LOG_FILE%"
+        echo Waiting for application to initialize...
+        timeout /t 2 >nul
     ) else (
         echo [WARN] Application may not have started properly, code: %START_ERR%
         echo %date% %time% - 警告：应用程序可能未正确启动，代码: %START_ERR% >> "%LOG_FILE%"
@@ -291,6 +293,8 @@ if exist "%APP_PATH%" (
         echo %date% %time% - 尝试启动替代应用程序: %TARGET_DIR%\\%%a >> "%LOG_FILE%"
         start "" "%TARGET_DIR%\\%%a"
         echo %date% %time% - 已尝试启动替代应用程序 >> "%LOG_FILE%"
+        echo Waiting for alternative application to initialize...
+        timeout /t 2 >nul
         goto :found_exe
     )
     
@@ -305,8 +309,9 @@ echo ========================================
 echo           Test Update Finished!
 echo ========================================
 echo.
-echo Press any key to exit...
-pause >nul
+echo Script will exit in 3 seconds...
+timeout /t 3 >nul
+echo Exiting script...
 ''';
   }
 }
