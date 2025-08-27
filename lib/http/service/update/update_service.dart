@@ -280,11 +280,9 @@ class UpdateService {
         return false;
       }
 
-      await logMessage('安装脚本启动成功，应用将在3秒后退出...');
+      await logMessage('安装脚本启动成功，应用将立即退出...');
       
-      // 等待3秒让脚本启动，然后退出应用
-      await Future.delayed(const Duration(seconds: 3));
-      
+      // 立即退出应用，让脚本接管更新过程
       await logMessage('正在退出应用...');
       
       // 退出应用
