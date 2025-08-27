@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 import 'dart:math';
 import 'dart:convert';
 import 'package:dio/dio.dart';
@@ -9,6 +10,7 @@ import 'package:archive/archive.dart';
 import '../../../bean/update/update_info.dart';
 import '../../api.dart';
 import 'mock_update_api.dart';
+import 'windows_install_script.dart';
 
 get _clientVersion => 'http://106.75.154.221:8082/api/client_version/last';
 
@@ -202,18 +204,96 @@ class UpdateService {
       if (_downloadPath == null) return;
       final fullPath = File(_downloadPath!).absolute.path;
       if (Platform.isWindows) {
-        // 在资源管理器中选中文件
         await Process.start('explorer', ['/select,', fullPath]);
       } else if (Platform.isMacOS) {
-        // 打开所在目录并高亮
         await Process.run('open', ['-R', fullPath]);
       } else if (Platform.isLinux) {
-        // 打开所在目录
         final dir = Directory(_downloadPath!).parent.path;
         await Process.run('xdg-open', [dir]);
       }
     } catch (e) {
       print('打开下载目录失败: $e');
+    }
+  }
+
+  // 创建安装脚本
+  Future<String?> _createInstallScript() async {
+    if (_extractedPath == null) return null;
+    
+    try {
+      final appDir = await getApplicationDocumentsDirectory();
+      final scriptDir = Directory('${appDir.path}/install_scripts');
+      if (!await scriptDir.exists()) {
+        await scriptDir.create(recursive: true);
+      }
+
+      String scriptPath;
+      String scriptContent;
+      
+      if (Platform.isWindows) {
+        scriptPath = '${scriptDir.path}/install_update.bat';
+        scriptContent = WindowsInstallScript.generateScript(
+          extractedPath: _extractedPath!,
+          downloadPath: _downloadPath ?? '',
+        );
+      } else {
+        // 非Windows平台不支持
+        await _log('当前平台不支持自动安装: ${Platform.operatingSystem}');
+        return null;
+      }
+
+      final scriptFile = File(scriptPath);
+      await scriptFile.writeAsString(scriptContent);
+      await _log('创建安装脚本: $scriptPath');
+      
+      return scriptPath;
+    } catch (e) {
+      await _log('创建安装脚本失败: $e');
+      return null;
+    }
+  }
+
+  // 安装更新（启动安装脚本并退出应用）
+  Future<bool> installUpdate() async {
+    try {
+      // 检查平台支持
+      if (!Platform.isWindows) {
+        await _log('当前平台不支持自动安装: ${Platform.operatingSystem}');
+        return false;
+      }
+
+      await _log('开始安装更新流程');
+      
+      // 创建安装脚本
+      final scriptPath = await _createInstallScript();
+      if (scriptPath == null) {
+        await _log('创建安装脚本失败');
+        return false;
+      }
+
+      await _log('安装脚本路径: $scriptPath');
+      await _log('解压路径: $_extractedPath');
+      await _log('下载路径: $_downloadPath');
+
+      // 启动安装脚本
+      final process = await Process.start('cmd', ['/c', scriptPath], 
+        mode: ProcessStartMode.detached);
+      await _log('Windows安装脚本已启动，PID: ${process.pid}');
+
+      await _log('安装脚本启动成功，应用将在3秒后退出...');
+      
+      // 等待3秒让脚本启动，然后退出应用
+      await Future.delayed(const Duration(seconds: 3));
+      
+      await _log('正在退出应用...');
+      
+      // 退出应用
+      exit(0);
+      
+      return true;
+    } catch (e) {
+      await _log('启动安装脚本失败: $e');
+      return false;
     }
   }
 
@@ -300,45 +380,6 @@ class UpdateService {
       return false;
     } catch (e) {
       print('检测安装文件失败: $e');
-      return false;
-    }
-  }
-
-  // 安装更新（按平台处理）
-  Future<bool> installUpdate() async {
-    if (_extractedPath == null) return false;
-    try {
-      if (Platform.isWindows) {
-        final exe = await _findFirstByExtension('.exe');
-        if (exe != null) {
-          await Process.start(exe, []);
-          exit(0);
-        }
-        throw Exception('未找到 .exe 安装程序');
-      } else if (Platform.isMacOS) {
-        // 优先 .app，其次 .dmg
-        final app = await _findFirstAppBundle();
-        if (app != null) {
-          await Process.run('open', [app]);
-          exit(0);
-        }
-        final dmg = await _findFirstByExtension('.dmg');
-        if (dmg != null) {
-          await Process.run('open', [dmg]);
-          exit(0);
-        }
-        throw Exception('未找到 .app 或 .dmg 安装包');
-      } else if (Platform.isLinux) {
-        final deb = await _findFirstByExtension('.deb');
-        if (deb != null) {
-          await Process.run('dpkg', ['-i', deb]);
-          exit(0);
-        }
-        throw Exception('未找到 .deb 安装包');
-      }
-      return false;
-    } catch (e) {
-      print('安装失败: $e');
       return false;
     }
   }

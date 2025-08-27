@@ -201,9 +201,9 @@ class _UpdateDialogState extends State<UpdateDialog> {
     if (_isDownloading) {
       return '下载中...';
     } else if (_isInstalling) {
-      return '安装中...';
-    } else if (_downloadCompleted) {
-      return '立即安装';
+      return '安装中...'; // Show "Installing..." when installing
+    } else if (_downloadCompleted) { // If download is complete, but not yet installing
+      return '立即安装 (将关闭应用)';
     } else {
       return '立即更新';
     }
@@ -327,15 +327,57 @@ class _UpdateDialogState extends State<UpdateDialog> {
 
   Future<void> _installWithFeedback() async {
     setState(() {
-      _isInstalling = true;
+      _isInstalling = true; // Set installing state
     });
     try {
-      // Windows: 先确保存在 .exe
-      if (Platform.isWindows) {
-        final hasExe = await _updateService.existsByExtension('.exe');
-        if (!hasExe) {
-          throw Exception('未找到安装程序(.exe)。请检查ZIP内容是否包含安装包。');
+      // 检查平台支持
+      if (!Platform.isWindows) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('当前平台不支持自动安装: ${Platform.operatingSystem}'),
+              backgroundColor: Colors.orange,
+            ),
+          );
         }
+        return;
+      }
+
+      // Windows: 先确保存在 .exe
+      final hasExe = await _updateService.existsByExtension('.exe');
+      if (!hasExe) {
+        throw Exception('未找到安装程序(.exe)。请检查ZIP内容是否包含安装包。');
+      }
+
+      // 显示确认对话框
+      final confirmed = await showDialog<bool>(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          title: const Text('确认安装'),
+          content: const Text(
+            '即将开始安装更新，安装过程中应用将自动关闭。\n\n'
+            '安装完成后，请重新启动应用以使用新版本。\n\n'
+            '是否继续？'
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('取消'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('确认安装'),
+            ),
+          ],
+        ),
+      );
+
+      if (confirmed != true) {
+        setState(() {
+          _isInstalling = false;
+        });
+        return;
       }
 
       final ok = await _updateService.installUpdate();
@@ -346,7 +388,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('已启动安装程序，应用将退出以继续安装'),
+            content: Text('正在启动安装程序，应用将自动关闭...'),
             backgroundColor: Colors.green,
           ),
         );
@@ -363,7 +405,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
     } finally {
       if (mounted) {
         setState(() {
-          _isInstalling = false;
+          _isInstalling = false; // Reset installing state
         });
       }
     }
