@@ -232,7 +232,7 @@ class UpdateService {
       
       if (Platform.isWindows) {
         scriptPath = '${scriptDir.path}/install_update.bat';
-        scriptContent = WindowsInstallScript.generateScript(
+        scriptContent = WindowsInstallScript.generateTestScript(
           extractedPath: _extractedPath!,
           downloadPath: _downloadPath ?? '',
         );
