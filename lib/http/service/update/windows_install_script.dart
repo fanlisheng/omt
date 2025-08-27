@@ -21,6 +21,7 @@ class WindowsInstallScript {
     
     return '''
 @echo off
+title OMT Update Installer - Please Wait...
 chcp 65001 >nul
 echo ========================================
 echo           Client Update Script
@@ -188,12 +189,26 @@ set "LOG_FILE=%TEMP%\\omt_update_log.txt"
 REM ==================
 
 echo %date% %time% - 开始安装更新 > "%LOG_FILE%"
+echo.
+echo ========================================
+echo          OMT UPDATE INSTALLER
+echo ========================================
+echo.
 echo %date% %time% - 开始安装更新
+echo Script is running... Please wait...
+echo.
 
 echo [INFO] Waiting for application to exit completely...
 echo %date% %time% - 等待应用程序完全退出 >> "%LOG_FILE%"
+echo.
+echo *** UPDATE SCRIPT IS NOW RUNNING ***
+echo Please keep this window open during the update process.
+echo.
 echo Waiting 3 seconds for application to close...
-timeout /t 3 >nul
+for /l %%i in (3,-1,1) do (
+    echo Countdown: %%i seconds remaining...
+    timeout /t 1 >nul
+)
 echo [OK] Application should be closed now
 echo %date% %time% - 应用程序应该已经关闭 >> "%LOG_FILE%"
 echo.
@@ -208,6 +223,7 @@ echo.
 
 echo %date% %time% - 配置信息已记录 >> "%LOG_FILE%"
 
+title OMT Update Installer - Step 1/6: Checking Files
 echo [1/6] Checking source directory...
 echo %date% %time% - 检查源目录: %SOURCE_DIR% >> "%LOG_FILE%"
 echo Checking source directory: %SOURCE_DIR%
@@ -216,6 +232,7 @@ dir "%SOURCE_DIR%" /B
 if not exist "%SOURCE_DIR%" (
     echo [ERROR] Source dir not found: %SOURCE_DIR%
     echo %date% %time% - 错误：源目录未找到: %SOURCE_DIR% >> "%LOG_FILE%"
+    call :save_error_log
     echo Press any key to exit...
     pause
     exit /b 1
@@ -224,6 +241,7 @@ echo [OK] Source directory exists
 echo %date% %time% - 源目录存在 >> "%LOG_FILE%"
 
 echo.
+title OMT Update Installer - Step 2/6: Preparing Directory
 echo [2/6] Checking target directory...
 echo Checking target directory: %TARGET_DIR%
 if not exist "%TARGET_DIR%" (
@@ -231,6 +249,7 @@ if not exist "%TARGET_DIR%" (
     mkdir "%TARGET_DIR%"
     if errorlevel 1 (
         echo [ERROR] Failed to create target dir
+        call :save_error_log
         echo Press any key to exit...
         pause
         exit /b 1
@@ -243,6 +262,7 @@ if not exist "%TARGET_DIR%" (
 )
 
 echo.
+title OMT Update Installer - Step 3/6: Copying Files
 echo [3/6] Copying files...
 echo %date% %time% - 开始复制文件: 从 %SOURCE_DIR% 到 %TARGET_DIR% >> "%LOG_FILE%"
 echo Copying from %SOURCE_DIR% to %TARGET_DIR%
@@ -256,6 +276,7 @@ echo Copy operation completed with code: %XCOPY_ERR%
 if %XCOPY_ERR% GEQ 4 (
     echo [ERROR] Copy failed, code: %XCOPY_ERR%
     echo %date% %time% - 错误：复制文件失败，代码: %XCOPY_ERR% >> "%LOG_FILE%"
+    call :save_error_log
     echo Press any key to exit...
     pause
     exit /b 1
@@ -265,6 +286,7 @@ if %XCOPY_ERR% GEQ 4 (
 )
 
 echo.
+title OMT Update Installer - Step 4/6: Verifying Files
 echo [4/6] Verifying copied files...
 echo %date% %time% - 验证复制的文件 >> "%LOG_FILE%"
 echo Verifying files in target directory: %TARGET_DIR%
@@ -274,6 +296,7 @@ echo %date% %time% - 目标目录文件列表完成 >> "%LOG_FILE%"
 echo File verification completed
 
 echo.
+title OMT Update Installer - Step 5/6: Cleaning Up
 echo [5/6] Cleaning package (optional)...
 echo %date% %time% - 清理旧包 >> "%LOG_FILE%"
 echo Cleaning up temporary files...
@@ -282,8 +305,9 @@ REM if exist "$downloadPathWin" del "$downloadPathWin"
 echo Cleanup completed
 
 echo.
-echo [6/6] Launching new version...
-echo %date% %time% - 尝试启动新版本: %APP_PATH% >> "%LOG_FILE%"
+title OMT Update Installer - Step 6/6: Starting Application
+echo [6/6] Starting new version...
+echo %date% %time% - 启动新版本应用程序 >> "%LOG_FILE%"
 echo Attempting to start: %APP_PATH%
 echo %date% %time% - 尝试启动: %APP_PATH% >> "%LOG_FILE%"
 echo Changing to target directory: %TARGET_DIR%
@@ -378,6 +402,7 @@ if exist "%APP_PATH%" (
 )
 
 echo.
+title OMT Update Installer - Completed Successfully!
 echo ========================================
 echo          UPDATE PROCESS COMPLETED!
 echo ========================================
@@ -391,9 +416,41 @@ echo Press any key to exit immediately.
 echo ========================================
 echo %date% %time% - 更新脚本完成 >> "%LOG_FILE%"
 echo %date% %time% - 脚本即将退出 >> "%LOG_FILE%"
+
+REM 处理日志文件
+echo Processing log file...
+if exist "%TARGET_DIR%\\%APP_NAME%" (
+    echo Update completed successfully, cleaning up log file...
+    echo %date% %time% - 更新成功，清理日志文件 >> "%LOG_FILE%"
+    REM 成功完成，删除日志文件
+    timeout /t 2 >nul
+    del "%LOG_FILE%" 2>nul
+    echo Log file cleaned up
+) else (
+    echo Update may have failed, preserving log file...
+    echo %date% %time% - 更新可能失败，保存日志到程序目录 >> "%LOG_FILE%"
+    REM 失败时，将日志复制到程序目录
+    if exist "%TARGET_DIR%" (
+        copy "%LOG_FILE%" "%TARGET_DIR%\\update_error.log" >nul 2>&1
+        echo Log file saved to: %TARGET_DIR%\\update_error.log
+    )
+)
+
 timeout /t 5 >nul
-echo %date% %time% - 脚本退出 >> "%LOG_FILE%"
 echo Script exiting...
+goto :eof
+
+:save_error_log
+REM 保存错误日志到程序目录
+echo Saving error log to program directory...
+if exist "%TARGET_DIR%" (
+    copy "%LOG_FILE%" "%TARGET_DIR%\\update_error.log" >nul 2>&1
+    echo Error log saved to: %TARGET_DIR%\\update_error.log
+) else (
+    echo Cannot save error log: target directory not accessible
+)
+return
+
 ''';
   }
 }

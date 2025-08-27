@@ -275,14 +275,19 @@ class UpdateService {
         final process = await Process.start('cmd', ['/c', scriptPath], 
           mode: ProcessStartMode.detached);
         await logMessage('Windows安装脚本已启动，PID: ${process.pid}');
+        
+        // 等待脚本完全启动
+        await Future.delayed(Duration(milliseconds: 500));
+        await logMessage('脚本启动延迟完成');
+        
       } catch (e) {
         await logMessage('启动安装脚本失败，详细错误: $e');
         return false;
       }
 
-      await logMessage('安装脚本启动成功，应用将立即退出...');
+      await logMessage('安装脚本启动成功，应用将退出...');
       
-      // 立即退出应用，让脚本接管更新过程
+      // 退出应用，让脚本接管更新过程
       await logMessage('正在退出应用...');
       
       // 退出应用
