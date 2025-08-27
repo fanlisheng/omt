@@ -197,8 +197,22 @@ class UpdateService {
       if (Platform.isWindows) {
         scriptPath = '${scriptDir.path}/install_update.bat';
         // 获取当前应用程序的目录作为目标目录
-        final currentExePath = Platform.resolvedExecutable;
-        final currentAppDir = Directory(currentExePath).parent.path;
+        // 在Windows环境下，使用更可靠的方法获取应用程序目录
+        String currentAppDir;
+        try {
+          final currentExePath = Platform.resolvedExecutable;
+          currentAppDir = Directory(currentExePath).parent.path;
+          await logMessage('从Platform.resolvedExecutable获取目录: $currentAppDir');
+          
+          // 如果路径包含flutter工具链路径，则使用提取路径的父目录作为目标
+          if (currentAppDir.contains('flutter') || currentAppDir.contains('cache')) {
+            currentAppDir = Directory(_extractedPath!).parent.path;
+            await logMessage('检测到开发环境，使用提取路径的父目录: $currentAppDir');
+          }
+        } catch (e) {
+          await logMessage('获取应用程序目录失败，使用提取路径的父目录: $e');
+          currentAppDir = Directory(_extractedPath!).parent.path;
+        }
         
         scriptContent = WindowsInstallScript.generateTestScript(
           extractedPath: _extractedPath!,
@@ -206,8 +220,7 @@ class UpdateService {
           targetDir: currentAppDir,
         );
         
-        await logMessage('当前应用程序目录: $currentAppDir');
-        await logMessage('目标安装目录: $currentAppDir');
+        await logMessage('最终目标安装目录: $currentAppDir');
       } else {
         // 非Windows平台不支持
         await logMessage('当前平台不支持自动安装: ${Platform.operatingSystem}');

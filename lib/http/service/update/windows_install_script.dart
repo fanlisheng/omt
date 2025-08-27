@@ -262,10 +262,16 @@ echo.
 echo [6/6] Launching new version...
 echo %date% %time% - 尝试启动新版本: %APP_PATH% >> "%LOG_FILE%"
 
+echo [DEBUG] Checking if app exists: %APP_PATH%
 if exist "%APP_PATH%" (
     echo [INFO] Starting application: %APP_PATH%
     echo %date% %time% - 找到应用程序，正在启动: %APP_PATH% >> "%LOG_FILE%"
-    start "" "%APP_PATH%"
+    
+    REM 使用更可靠的启动方式
+    cd /d "%TARGET_DIR%"
+    echo %date% %time% - 切换到目标目录: %TARGET_DIR% >> "%LOG_FILE%"
+    
+    start "" "%APP_NAME%"
     set "START_ERR=%ERRORLEVEL%"
     echo %date% %time% - 启动应用程序，返回代码: %START_ERR% >> "%LOG_FILE%"
     
@@ -273,7 +279,17 @@ if exist "%APP_PATH%" (
         echo [OK] Started: %APP_PATH%
         echo %date% %time% - 应用程序启动成功 >> "%LOG_FILE%"
         echo Waiting for application to initialize...
-        timeout /t 2 >nul
+        timeout /t 3 >nul
+        
+        REM 检查进程是否真的在运行
+        tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
+        if %ERRORLEVEL% EQU 0 (
+            echo [OK] Application is running
+            echo %date% %time% - 确认应用程序正在运行 >> "%LOG_FILE%"
+        ) else (
+            echo [WARN] Application process not found
+            echo %date% %time% - 警告：未找到应用程序进程 >> "%LOG_FILE%"
+        )
     ) else (
         echo [WARN] Application may not have started properly, code: %START_ERR%
         echo %date% %time% - 警告：应用程序可能未正确启动，代码: %START_ERR% >> "%LOG_FILE%"
@@ -291,10 +307,25 @@ if exist "%APP_PATH%" (
     REM 尝试查找并启动任何可用的EXE文件
     for /f "tokens=*" %%a in ('dir "%TARGET_DIR%\\*.exe" /B 2^>nul') do (
         echo %date% %time% - 尝试启动替代应用程序: %TARGET_DIR%\\%%a >> "%LOG_FILE%"
-        start "" "%TARGET_DIR%\\%%a"
-        echo %date% %time% - 已尝试启动替代应用程序 >> "%LOG_FILE%"
-        echo Waiting for alternative application to initialize...
-        timeout /t 2 >nul
+        cd /d "%TARGET_DIR%"
+        start "" "%%a"
+        set "ALT_START_ERR=%ERRORLEVEL%"
+        echo %date% %time% - 启动替代应用程序，返回代码: %ALT_START_ERR% >> "%LOG_FILE%"
+        
+        if %ALT_START_ERR% EQU 0 (
+            echo Waiting for alternative application to initialize...
+            timeout /t 3 >nul
+            
+            REM 检查替代应用程序是否在运行
+            tasklist /FI "IMAGENAME eq %%a" 2>nul | find /I "%%a" >nul
+            if %ERRORLEVEL% EQU 0 (
+                echo [OK] Alternative application is running: %%a
+                echo %date% %time% - 确认替代应用程序正在运行: %%a >> "%LOG_FILE%"
+            ) else (
+                echo [WARN] Alternative application process not found: %%a
+                echo %date% %time% - 警告：未找到替代应用程序进程: %%a >> "%LOG_FILE%"
+            )
+        )
         goto :found_exe
     )
     
@@ -309,8 +340,13 @@ echo ========================================
 echo           Test Update Finished!
 echo ========================================
 echo.
-echo Script will exit in 3 seconds...
-timeout /t 3 >nul
+echo %date% %time% - 更新脚本执行完成 >> "%LOG_FILE%"
+echo Log file location: %LOG_FILE%
+echo.
+echo Script will exit in 5 seconds...
+echo You can check the log file for detailed information.
+timeout /t 5 >nul
+echo %date% %time% - 脚本正常退出 >> "%LOG_FILE%"
 echo Exiting script...
 ''';
   }
