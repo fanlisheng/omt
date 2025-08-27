@@ -49,7 +49,7 @@ dependencies:
   ping_discover_network_forked: ^0.0.1
   graphview:
     git:
-      url: https://gitee.com/KayoXu/graphview
+      url: https://gitee.com/KayoXu/graphview.git
 #    path: /Volumes/U/app/demo/graphview
 
   # 更新系统相关依赖
