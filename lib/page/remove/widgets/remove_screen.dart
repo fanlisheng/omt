@@ -55,7 +55,7 @@ class RemoveScreen extends StatelessWidget {
                   style: TextStyle(color: ColorUtils.colorGreenLiteLite),
                 ),
                 Text(
-                  model.dismantleDeviceList.length.toString(),
+                  model.remainingDeviceList.length.toString(),
                   style: const TextStyle(
                     color: ColorUtils.colorGreen,
                   ),
@@ -98,8 +98,12 @@ class RemoveScreen extends StatelessWidget {
   }
 
   Widget deviceList(RemoveViewModel model) {
-    if (model.noDismantleDeviceList.isEmpty &&
-        model.dismantleDeviceList.isEmpty) {
+    // 检查是否有任何设备数据
+    bool hasAnyDevices = model.approvedFailedDeviceList.isNotEmpty ||
+        model.pendingApprovalDeviceList.isNotEmpty ||
+        model.remainingDeviceList.isNotEmpty;
+
+    if (!hasAnyDevices) {
       if (model.isSearchResult) {
         return const Expanded(
             child: Center(
@@ -127,29 +131,35 @@ class RemoveScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 8),
-            const Row(
-              children: [
-                SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    "已选择拆除设备",
-                    style: TextStyle(
-                        fontSize: 16,
-                        color: ColorUtils.colorWhite,
-                        fontWeight: FontWeight.bold),
+            // 已选择拆除设备
+            if (model.remainingDeviceList.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              const Row(
+                children: [
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      "已选择拆除设备",
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: ColorUtils.colorWhite,
+                          fontWeight: FontWeight.bold),
+                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(width: 2),
-            Expanded(
-              child:
-                  _deviceShowList1(model.dismantleDeviceList, onTap: (index) {
-                model.selectedItemEventAction(false, index);
-              }),
-            ),
-            if (model.noDismantleDeviceList.isNotEmpty) ...[
+                ],
+              ),
+              const SizedBox(height: 8),
+              Container(
+                height: 120,
+                child: _deviceShowList1(model.remainingDeviceList, onTap: (index) {
+                  model.selectedItemEventAction(false, index);
+                }),
+              ),
+              const SizedBox(height: 16),
+            ],
+            
+            // 已申请拆除，审核通过，删除失败
+            if (model.approvedFailedDeviceList.isNotEmpty) ...[
               DashLine(
                 height: 1,
                 width: double.infinity,
@@ -163,19 +173,83 @@ class RemoveScreen extends StatelessWidget {
                   SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      "不拆除设备",
+                      "已申请拆除，审核通过，删除失败",
                       style: TextStyle(
                           fontSize: 16,
-                          color: ColorUtils.colorWhite,
+                          color: ColorUtils.colorRed,
                           fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],
               ),
+              const SizedBox(height: 8),
+              Container(
+                height: 120,
+                child: _deviceShowList1(model.approvedFailedDeviceList, readOnly: true),
+              ),
+              const SizedBox(height: 16),
+            ],
+            
+            // 已申请拆除，待审核
+            if (model.pendingApprovalDeviceList.isNotEmpty) ...[
+              DashLine(
+                height: 1,
+                width: double.infinity,
+                color: "#678384".toColor(),
+                gap: 3,
+                margin: const EdgeInsets.symmetric(horizontal: 10),
+              ),
+              const SizedBox(height: 8),
+              const Row(
+                children: [
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      "已申请拆除，待审核",
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: ColorUtils.colorYellow,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Container(
+                height: 120,
+                child: _deviceShowList1(model.pendingApprovalDeviceList, readOnly: true),
+              ),
+              const SizedBox(height: 16),
+            ],
+            
+            // 剩余待绑定设备
+            if (model.remainingDeviceList.isNotEmpty) ...[
+              DashLine(
+                height: 1,
+                width: double.infinity,
+                color: "#678384".toColor(),
+                gap: 3,
+                margin: const EdgeInsets.symmetric(horizontal: 10),
+              ),
+              const SizedBox(height: 8),
+              const Row(
+                children: [
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      "剩余待绑定设备",
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: ColorUtils.colorGreen,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
               Expanded(
-                child: _deviceShowList1(model.noDismantleDeviceList,
-                    onTap: (index) {
-                  model.selectedItemEventAction(true, index);
+                child: _deviceShowList1(model.remainingDeviceList, onTap: (index) {
+                  model.selectedItemEventAction(true, index, listType: 'remaining');
                 }),
               ),
             ],
@@ -327,6 +401,7 @@ class RemoveScreen extends StatelessWidget {
   Widget _deviceShowList1(
     List<DeviceListData> deviceData, {
     Function(int)? onTap,
+    bool readOnly = false,
   }) {
     return SingleChildScrollView(
       padding: const EdgeInsets.only(left: 12, right: 12, top: 10, bottom: 10),
@@ -341,11 +416,11 @@ class RemoveScreen extends StatelessWidget {
             color = "#FF4D4F".toColor();
           }
           return Clickable(
-            onTap: onTap != null
-                ? () {
-                    onTap(index);
-                  }
-                : null,
+              onTap: readOnly ? null : (onTap != null
+                  ? () {
+                      onTap(index);
+                    }
+                  : null),
             child: Container(
               width: 90, // 固定宽度
               height: 76, // 固定高度

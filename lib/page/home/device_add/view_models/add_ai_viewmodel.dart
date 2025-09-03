@@ -37,9 +37,16 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
   void dispose() {
     // 销毁所有控制器
     for (var controller in aiControllers) {
-      controller.dispose();
+      try {
+        controller.dispose();
+      } catch (e) {
+        // 忽略已经被释放的控制器
+      }
     }
-    super.dispose();
+    try {
+      super.dispose();
+    } catch (e) {
+    }
   }
 
   // 连接AI设备
@@ -140,6 +147,8 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
   removeAiDataForIndex(int index){
     if( index < aiDeviceList.length && index < aiControllers.length){
       aiDeviceList.removeAt(index);
+      // 先释放控制器再移除
+      aiControllers[index].dispose();
       aiControllers.removeAt(index);
       notifyListeners();
     }

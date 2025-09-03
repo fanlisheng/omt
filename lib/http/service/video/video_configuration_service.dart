@@ -18,19 +18,27 @@ import '../../../bean/video/video_configuration/Video_Connect_entity.dart';
 ///
 
 class VideoConfigurationService {
+  // Webcam API路径常量
+  static const String webcamDeviceCodeInfo = 'device_code/info';
+  static const String webcamSave = 'save';
+  static const String webcamRemove = 'remove';
+  static const String webcamList = 'list';
+  static const String webcamInfo = 'info';
+  static const String webcamInfoSave = 'info/save';
+
   get _connect async => '/central_control/get';
 
-  get _add_device async =>
-      '${await API.share.hostVideoConfiguration}/webcam/save';
+  get _add_device async => await API.share
+      .buildControlWebcamUrl(VideoConfigurationService.webcamSave);
 
-  get _device_list async =>
-      '${await API.share.hostVideoConfiguration}/webcam/list';
+  get _device_list async => await API.share
+      .buildControlWebcamUrl(VideoConfigurationService.webcamList);
 
-  get _device_info async =>
-      '${await API.share.hostVideoConfiguration}/webcam/info';
+  get _device_info async => await API.share
+      .buildControlWebcamUrl(VideoConfigurationService.webcamInfo);
 
-  get _update_device async =>
-      '${await API.share.hostVideoConfiguration}/webcam/info/save';
+  get _update_device async => await API.share
+      .buildControlWebcamUrl(VideoConfigurationService.webcamInfoSave);
 
   get _stop_recognition async =>
       '${await API.share.hostVideoConfiguration}/contrl/python/stop';
@@ -44,8 +52,11 @@ class VideoConfigurationService {
   get _restart_device async =>
       '${await API.share.hostVideoConfiguration}/contrl/system/restart';
 
-  get _delete_device async =>
-      '${await API.share.hostVideoConfiguration}/webcam/remove';
+  get _delete_device async => await API.share
+      .buildControlWebcamUrl(VideoConfigurationService.webcamRemove);
+
+  get _device_info_uuid async => await API.share
+      .buildControlWebcamUrl(VideoConfigurationService.webcamDeviceCodeInfo);
 
   connect({
     required String host,
@@ -224,6 +235,23 @@ class VideoConfigurationService {
       // '${await _delete_device}',
       {},
       method: 'post',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  deviceInfoUuids({
+    ValueChanged<List<dynamic>?>? onSuccess,
+    ValueChanged<List<dynamic>?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<List<dynamic>?>(
+      await _device_info_uuid,
+      {},
+      method: 'get',
       autoHideDialog: true,
       autoShowDialog: true,
       onSuccess: onSuccess,

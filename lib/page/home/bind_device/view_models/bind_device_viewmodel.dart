@@ -1,12 +1,15 @@
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
 import 'package:omt/routing/routes.dart';
 import 'package:omt/utils/device_utils.dart';
+import 'package:omt/utils/dialog_utils.dart';
 
 import '../../../../bean/common/id_name_value.dart';
 import '../../../../bean/home/home_page/device_entity.dart';
 import '../../../../http/http_query.dart';
+import '../../../../router_utils.dart';
 import '../../../../utils/intent_utils.dart';
 
 enum BindDevicePageState {
@@ -100,7 +103,73 @@ class BindDeviceViewModel extends BaseViewModelRefresh<dynamic> {
       return;
     }
 
-    request();
+    // 检测设备配置状态
+    checkDeviceConfiguration();
+  }
+
+  // 检测设备配置状态
+  void checkDeviceConfiguration() {
+    // 检查当前大门下是否有电源信息、网络信息、交换机信息
+    HttpQuery.share.removeService.getDeviceList(
+      instanceId: instance.id ?? "",
+      gateId: selectedDoor?.id,
+      onSuccess: (deviceList) {
+        List<String> missingDevices = [];
+
+        // 检查是否有电源设备 (设备类型 5: 电源箱, 或其他电源相关设备)
+        bool hasPowerDevice =
+            deviceList?.any((device) => device.type == 5 || device.type == 4) ??
+                false;
+
+        // 检查是否有网络设备 (设备类型 6: 路由器)
+        bool hasNetworkDevice =
+            deviceList?.any((device) => device.type == 6) ?? false;
+
+        // 检查是否有交换机设备 (设备类型 9: 交换机)
+        bool hasSwitchDevice =
+            deviceList?.any((device) => device.type == 9) ?? false;
+
+        if (!hasPowerDevice) {
+          missingDevices.add("电源信息");
+        }
+        if (!hasNetworkDevice) {
+          missingDevices.add("网络信息");
+        }
+        if (!hasSwitchDevice) {
+          missingDevices.add("交换机信息");
+        }
+
+        if (missingDevices.isNotEmpty) {
+          // 显示设备缺失弹窗
+          showMissingDeviceDialog(missingDevices);
+        } else {
+          // 所有设备都已配置，继续绑定流程
+          request();
+        }
+      },
+      onError: (error) {
+        LoadingUtils.showToast(data: "检测设备配置失败: $error");
+      },
+    );
+  }
+
+  // 显示设备缺失弹窗
+  void showMissingDeviceDialog(List<String> missingDevices) {
+    String deviceText = missingDevices.join("、");
+    String message = "经系统检测，当前大门下存在${deviceText}未配置的设备，请完成设备添加后方可提交绑定";
+
+    DialogUtils.showContentDialog(
+      context: context!,
+      title: "设备检测",
+      content: message,
+      deleteText: "去添加",
+      cancelText: "取消",
+    ).then((result) {
+      if (result == "确定") {
+        // 跳转到设备添加界面
+        navigateToDeviceAddScreen(missingDevices);
+      }
+    });
   }
 
   //成功返回
@@ -124,6 +193,23 @@ class BindDeviceViewModel extends BaseViewModelRefresh<dynamic> {
     } else {
       handlePop(success: addSuccess);
     }
+  }
+
+  // 跳转到设备添加界面
+  void navigateToDeviceAddScreen(List<String> missingDevices) {
+    String pNodeCode = "${instance.id}-2#${selectedDoor?.id}";
+    IntentUtils.share
+        .push(context, routeName: RouterPage.MissingDeviceAddScreen, data: {
+      'missingDevices': missingDevices,
+      'instance': instance.id,
+      'gateId': selectedDoor?.id,
+      "pNodeCode": pNodeCode
+    })?.then((result) {
+      // 如果设备添加成功，重新检查设备配置
+      if (IntentUtils.share.isResultOk(result)) {
+        checkDeviceConfiguration();
+      }
+    });
   }
 
   //手动绑定

@@ -13,6 +13,8 @@ class FComboBox<T> extends StatelessWidget {
   final TextStyle? placeholderStyle;
   final Color? bgColor;
   final bool disabled;
+  final double? height;
+  final Widget? icon; // ✅ 新增：自定义下拉图标
 
   const FComboBox({
     super.key,
@@ -24,45 +26,48 @@ class FComboBox<T> extends StatelessWidget {
     this.placeholderStyle,
     this.bgColor,
     this.disabled = false,
+    this.height,
+    this.icon, // 接收外部传入图标
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-        decoration: BoxDecoration(
-          color: bgColor ?? ColorUtils.transparent, // 动态设置背景颜色
-          borderRadius: BorderRadius.circular(4.0),
-        ),
-        child: ui.ComboBox<T>(
-          isExpanded: true,
-          value: selectedValue,
-          items: items
-              .map<ui.ComboBoxItem<T>>(
-                (item) => ui.ComboBoxItem<T>(
-                  value: item,
-                  child: Text(
-                    item.toString(),
-                    textAlign: TextAlign.start,
-                    style: itemStyle ??
-                        const TextStyle(
-                          fontSize: 12,
-                          // color: ColorUtils.colorGreenLiteLite,
-                        ),
+      height: height ?? 35,
+      decoration: BoxDecoration(
+        color: bgColor ?? ColorUtils.transparent,
+        borderRadius: BorderRadius.circular(4.0),
+      ),
+      child: ui.ComboBox<T>(
+        isExpanded: true,
+        value: selectedValue,
+        icon: icon ?? const Icon(ui.FluentIcons.chevron_down), // 默认图标
+        items: items
+            .map<ui.ComboBoxItem<T>>(
+              (item) => ui.ComboBoxItem<T>(
+            value: item,
+            child: Text(
+              item.toString(),
+              textAlign: TextAlign.start,
+              style: itemStyle ??
+                  const TextStyle(
+                    fontSize: 12,
                   ),
-                ),
-              )
-              .toList(),
-          onChanged: disabled ? null : onChanged,
-          placeholder: Text(
-            placeholder,
-            textAlign: TextAlign.start,
-            style: placeholderStyle ??
-                const TextStyle(
-                  fontSize: 12,
-                  // color: ColorUtils.colorBlackLiteLite,
-                ),
+            ),
           ),
-        ));
+        )
+            .toList(),
+        onChanged: disabled ? null : onChanged,
+        placeholder: Text(
+          placeholder,
+          textAlign: TextAlign.start,
+          style: placeholderStyle ??
+              const TextStyle(
+                fontSize: 12,
+              ),
+        ),
+      ),
+    );
   }
 }
 

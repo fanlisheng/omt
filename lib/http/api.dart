@@ -104,6 +104,21 @@ class API extends BaseAPI {
     }
   }
 
+  /// 获取webcam相关API的基础路径
+  String getWebcamApiPath(String endpoint) {
+    return '/webcam/$endpoint';
+  }
+
+  /// 构建指定设备的webcam API URL
+  String buildDeviceWebcamUrl(String ip, String endpoint) {
+    return '${hostDeviceConfiguration(ip)}${getWebcamApiPath(endpoint)}';
+  }
+
+  /// 构建当前控制设备的webcam API URL
+  Future<String> buildControlWebcamUrl(String endpoint) async {
+    return '${await hostVideoConfiguration}${getWebcamApiPath(endpoint)}';
+  }
+
   @override
   String get host => _host ?? '';
 

@@ -42,7 +42,7 @@ class StateView extends StatelessWidget {
       textColor = ColorUtils.colorRed;
       // text2Color = ColorUtils.colorRed;
       src = source("home/ic_failure");
-      btnText = "手动更新";
+      btnText = "重新更新";
       action = () {
         viewModel.handBindingEventAction();
       };

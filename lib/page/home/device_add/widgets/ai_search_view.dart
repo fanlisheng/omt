@@ -3,7 +3,6 @@ import 'package:flutter/material.dart' as ui;
 import 'package:kayo_package/mvvm/base/provider_widget.dart';
 import 'package:omt/utils/color_utils.dart'; // 假设 ColorUtils 在这里定义
 import '../view_models/ai_search_viewmodel.dart';
-import "package:provider/provider.dart" show Consumer, Provider;
 
 Future<String?> showAiSearchDialog(BuildContext context) {
 
@@ -22,8 +21,25 @@ class AiSearchDialog extends StatelessWidget {
   const AiSearchDialog({super.key});
   @override
   Widget build(BuildContext context) {
+    final viewModel = AiSearchViewModel()..themeNotifier = true;
+    viewModel.onSearchCompleted = () {
+       // 如果搜索完成且没有结果，延迟3秒后自动关闭弹窗
+       if (viewModel.aiSearchResults.isEmpty) {
+         Future.delayed(const Duration(seconds: 3), () {
+           // 检查context是否仍然有效
+           try {
+             if (Navigator.canPop(context)) {
+               Navigator.pop(context);
+             }
+           } catch (e) {
+             // 忽略context无效的错误
+           }
+         });
+       }
+     };
+    
     return ProviderWidget<AiSearchViewModel>(
-        model: AiSearchViewModel()..themeNotifier = true,
+        model: viewModel,
         autoLoadData: true,
         builder: (context, model, child) {
           return Center(
@@ -76,7 +92,8 @@ class AiSearchDialog extends StatelessWidget {
                     FilledButton(
                       onPressed: () {
                         model.stopAiSearch();
-                        Navigator.pop(context);
+                        // 确保弹窗关闭
+                        Future.microtask(() => Navigator.pop(context));
                       },
                       style: ButtonStyle(
                         backgroundColor: WidgetStateProperty.all(Colors.red),

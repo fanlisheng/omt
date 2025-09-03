@@ -67,8 +67,15 @@ class DeviceSearchService {
   // 扫描设备并获取信息
   Future<List<DeviceEntity>> scanDevices(
       {required bool Function() shouldStop, String? deviceType}) async {
-    return await DeviceUtils.scanAndFetchDevicesInfo(
+    // 首先扫描基础设备信息
+    List<DeviceEntity> devices = await DeviceUtils.scanAndFetchDevicesInfo(
         shouldStop: shouldStop, deviceType: deviceType);
+    
+    // 为设备添加UDID信息（从AI设备获取摄像头UDID）
+    devices = await DeviceUtils.enrichDevicesWithUdids(
+        devices, shouldStop: shouldStop);
+    
+    return devices;
   }
 
   // 上传设备扫描数据

@@ -61,22 +61,42 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
   void dispose() {
     // 销毁所有控制器
     _disposeAllResources();
-    super.dispose();
+    try {
+      super.dispose();
+    } catch (e) {
+      // 忽略父类dispose错误
+    }
   }
 
   // 释放所有资源的方法
   void _disposeAllResources() {
     for (var camera in cameraDeviceList) {
       // 释放视频播放器
-      if (camera.player.state.playing) {
-        camera.player.pause();
+      try {
+        if (camera.player.state.playing) {
+          camera.player.pause();
+        }
+        camera.player.dispose();
+      } catch (e) {
+        // 忽略已经被释放的播放器
       }
-      camera.player.dispose();
 
       // 释放文本控制器
-      camera.rtspController.dispose();
-      camera.deviceNameController.dispose();
-      camera.videoIdController.dispose();
+      try {
+        camera.rtspController.dispose();
+      } catch (e) {
+        // 忽略已经被释放的控制器
+      }
+      try {
+        camera.deviceNameController.dispose();
+      } catch (e) {
+        // 忽略已经被释放的控制器
+      }
+      try {
+        camera.videoIdController.dispose();
+      } catch (e) {
+        // 忽略已经被释放的控制器
+      }
     }
   }
 
@@ -89,6 +109,13 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
       LoadingUtils.showInfo(data: "RTSP地址不能为空!");
       return;
     }
+    
+    // 重置播放结果状态
+    e.playResult = null;
+    // 设置连接中状态
+    e.connectionStatus = 1;
+    notifyListeners();
+    
     e.rtsp = e.rtspController.text;
     e.player.open(Media(e.rtsp!));
     e.videoController = VideoController(e.player);
@@ -100,11 +127,14 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
         e.code = deviceEntity.deviceCode ?? "";
         e.mac = deviceEntity.mac;
         e.isOpen = true;
+        e.connectionStatus = 2; // 连接成功
         cameraDeviceList[index] = e;
       } else {
+        e.connectionStatus = 3; // 连接失败
         LoadingUtils.showError(data: "连接失败!");
       }
     } catch (e) {
+      cameraDeviceList[index].connectionStatus = 3; // 连接失败
       LoadingUtils.showError(data: "连接失败, 请检查rtsp!");
     }
 
@@ -310,6 +340,17 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
       return;
     } else {
       LoadingUtils.showToast(data: "请先提交所有设备的数据");
+    }
+  }
+
+  // 更新播放结果状态的方法
+  void updatePlayResult(int index, bool? playResult) {
+    if (index >= 0 && index < cameraDeviceList.length) {
+      // 只有当状态真正改变时才更新和通知
+      if (cameraDeviceList[index].playResult != playResult) {
+        cameraDeviceList[index].playResult = playResult;
+        notifyListeners();
+      }
     }
   }
 

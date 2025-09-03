@@ -32,8 +32,8 @@ class _AddPowerViewState extends State<AddPowerView> {
 
   Widget contentView(AddPowerViewModel model) {
     double vSpace = 20;
-    return ListView(
-      // crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
           margin: const EdgeInsets.only(left: 16, right: 16),
@@ -46,11 +46,11 @@ class _AddPowerViewState extends State<AddPowerView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 20),
+              const SizedBox(height: 15),
               Text(
                 model.isInstall ? "添加电源及其它信息" : "添加电源信息",
                 style: const TextStyle(
-                    fontSize: 16,
+                    fontSize: 14,
                     color: ColorUtils.colorWhite,
                     fontWeight: FontWeight.w500),
               ),

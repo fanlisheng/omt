@@ -92,22 +92,24 @@ class DetailAiView extends StatelessWidget {
                     RowItemInfoView(
                       name: "主程版本",
                       value: model.deviceInfo.programVersion,
-                      buttonName: (model.deviceInfo.isProgramLatest == false)
-                          ? "升级"
-                          : "",
+                      downloadButtonName: "下载",
+                      downloadButtonAction: () {
+                        model.downloadProgramAction();
+                      },
+                      buttonName: "升级",
                       buttonAction: () {
-                        // LogUtils.info(msg: "点击--主程版本-升级");
                         model.upgradeProgramAction();
                       },
                     ),
                     RowItemInfoView(
                       name: "识别版本",
                       value: model.deviceInfo.identityVersion,
-                      buttonName: (model.deviceInfo.isIdentityLatest == false)
-                          ? "升级"
-                          : "",
+                      downloadButtonName: "下载",
+                      downloadButtonAction: () {
+                        model.downloadIdentityAction();
+                      },
+                      buttonName: "升级",
                       buttonAction: () {
-                        // LogUtils.info(msg: "点击--识别版本-升级");
                         model.upgradeIdentityAction();
                       },
                     ),
@@ -204,6 +206,8 @@ class RowItemInfoView extends StatelessWidget {
     this.stateColor,
     this.buttonName,
     this.buttonAction,
+    this.downloadButtonName,
+    this.downloadButtonAction,
   });
 
   final String name;
@@ -212,6 +216,8 @@ class RowItemInfoView extends StatelessWidget {
   final Color? stateColor;
   final String? buttonName;
   final Function()? buttonAction;
+  final String? downloadButtonName;
+  final Function()? downloadButtonAction;
 
   @override
   Widget build(BuildContext context) {
@@ -254,8 +260,27 @@ class RowItemInfoView extends StatelessWidget {
               maxLines: 2, // 限制单行
             ),
           ),
+          if ((downloadButtonName ?? "").isNotEmpty) ...[
+            const SizedBox(width: 8),
+            Clickable(
+              onTap: downloadButtonAction,
+              child: Container(
+                padding: const EdgeInsets.only(
+                    left: 12, right: 12, top: 2, bottom: 2),
+                decoration: BoxDecoration(
+                  color: ColorUtils.colorGreen,
+                  borderRadius: BorderRadius.circular(3),
+                ),
+                child: Text(
+                  downloadButtonName ?? "",
+                  style: const TextStyle(
+                      fontSize: 12, color: ColorUtils.colorWhite),
+                ),
+              ),
+            ),
+          ],
           if ((buttonName ?? "").isNotEmpty) ...[
-            const SizedBox(width: 12),
+            const SizedBox(width: 8),
             Clickable(
               onTap: buttonAction,
               child: Container(

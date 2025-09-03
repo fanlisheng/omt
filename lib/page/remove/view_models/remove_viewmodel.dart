@@ -9,6 +9,7 @@ import 'package:omt/utils/dialog_utils.dart';
 import '../../../bean/common/id_name_value.dart';
 import '../../../bean/home/home_page/device_entity.dart';
 import '../../../bean/remove/device_list_entity.dart';
+import '../../../bean/remove/device_status_list_entity.dart';
 import '../../../utils/device_utils.dart';
 
 class RemoveViewModel extends BaseViewModelRefresh<dynamic> {
@@ -23,9 +24,13 @@ class RemoveViewModel extends BaseViewModelRefresh<dynamic> {
 
   DeviceListEntity deviceListEntity = DeviceListEntity();
 
-  //设备数据
-  List<DeviceListData> dismantleDeviceList = [];
-  List<DeviceListData> noDismantleDeviceList = [];
+  //设备数据 - 三种状态的设备列表
+  List<DeviceListData> noDismantleDeviceList = []; // 保留原有的未选中设备列表
+  
+  // 新增三种状态的设备列表
+  List<DeviceListData> approvedFailedDeviceList = []; // 已申请拆除，审核通过，删除失败
+  List<DeviceListData> pendingApprovalDeviceList = []; // 已申请拆除，待审核
+  List<DeviceListData> remainingDeviceList = []; // 剩余待绑定，替代原有的选中设备列表
 
   // 创建 FocusNode 来监听焦点事件
   FocusNode focusNode = FocusNode();
@@ -72,12 +77,20 @@ class RemoveViewModel extends BaseViewModelRefresh<dynamic> {
       return;
     }
     noDismantleDeviceList = [];
-    HttpQuery.share.removeService.getDeviceList(
+    // 使用新的接口获取三种状态的设备列表
+    HttpQuery.share.removeService.getDeviceListWithStatus(
         instanceId: selectedInstance!.id!,
         passId: selectedInOut?.id,
         gateId: selectedDoor?.id,
         onSuccess: (data) {
-          dismantleDeviceList = data ?? [];
+          // 解析新的数据结构
+          approvedFailedDeviceList = data?.approvedFailedDevices ?? [];
+          pendingApprovalDeviceList = data?.pendingApprovalDevices ?? [];
+          remainingDeviceList = data?.remainingDevices ?? [];
+          
+          // 清空原有的选中列表
+          noDismantleDeviceList = [];
+          
           isSearchResult = true;
           notifyListeners();
         },
@@ -90,7 +103,7 @@ class RemoveViewModel extends BaseViewModelRefresh<dynamic> {
   //拆除设备
   dismantleEventAction() async {
     List<int> nodeIds = [];
-    for (DeviceListData d in dismantleDeviceList) {
+    for (DeviceListData d in remainingDeviceList) {
       nodeIds.add(d.id.toInt());
     }
     RemoveDialogPage.showAndSubmit(
@@ -150,21 +163,39 @@ class RemoveViewModel extends BaseViewModelRefresh<dynamic> {
     // }
   }
 
-  //选中
-  selectedItemEventAction(bool selected, int index) {
+  //选中设备 - 支持从三种状态列表中选择
+  selectedItemEventAction(bool selected, int index, {String? listType}) {
     //selected == false 是点击选中的设备
 
     if (selected == false) {
-      DeviceListData a = dismantleDeviceList[index];
+      // 从选中列表移除
+      DeviceListData a = remainingDeviceList[index];
       a.selected = false;
-      dismantleDeviceList.remove(a);
+      remainingDeviceList.remove(a);
       noDismantleDeviceList.add(a);
     } else {
-      DeviceListData a = noDismantleDeviceList[index];
+      // 添加到选中列表
+      DeviceListData? a;
+      
+      if (listType == 'remaining') {
+        a = remainingDeviceList[index];
+        remainingDeviceList.remove(a);
+      } else {
+        a = noDismantleDeviceList[index];
+        noDismantleDeviceList.remove(a);
+      }
+      
       a.selected = true;
-      noDismantleDeviceList.remove(a);
-      dismantleDeviceList.add(a);
+      remainingDeviceList.add(a);
     }
+    notifyListeners();
+  }
+  
+  // 新增：从剩余设备列表选择设备
+  selectFromRemainingDevices(int index) {
+    DeviceListData device = remainingDeviceList[index];
+    device.selected = true;
+    // 注意：这里的逻辑需要重新考虑，因为现在remainingDeviceList就是主要的设备列表
     notifyListeners();
   }
 

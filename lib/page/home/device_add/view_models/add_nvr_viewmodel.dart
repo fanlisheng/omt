@@ -45,7 +45,11 @@ class AddNvrViewModel extends BaseViewModel {
   @override
   void dispose() {
     stopScanning = true;
-    super.dispose();
+    try {
+      super.dispose();
+    } catch (e) {
+      // 忽略父类dispose错误
+    }
   }
 
   @override

@@ -53,8 +53,21 @@ class AddPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
 
   @override
   void dispose() {
-    controller.dispose();
-    super.dispose();
+    try {
+      controller.dispose();
+    } catch (e) {
+      // 忽略重复释放错误
+    }
+    try {
+      focusNode.dispose();
+    } catch (e) {
+      // 忽略重复释放错误
+    }
+    try {
+      super.dispose();
+    } catch (e) {
+      // 忽略父类dispose错误
+    }
   }
 
   @override

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:kayo_package/views/common/404.dart';
 import 'package:omt/page/home/bind_device/widgets/bind_device_screen.dart';
+import 'package:omt/page/home/bind_device/widgets/missing_device_add_screen.dart';
 import 'package:omt/page/home/device_add/widgets/device_add_screen.dart';
 import 'package:omt/page/home/device_detail/widgets/device_detail_screen.dart';
 import 'package:omt/page/home/device_edit/widgets/edit_ai_view.dart';
@@ -78,6 +79,9 @@ class RouterPage {
 
   ///设备绑定
   static const String DeviceBindPage = 'DeviceBindPage';
+
+  //设备绑定中添加 路由 网络 交互机
+  static const String MissingDeviceAddScreen = 'MissingDeviceAddScreen';
 
   ///设备添加
   static const String DeviceAddPage = 'DeviceAddPage';
@@ -201,6 +205,17 @@ Route<dynamic> generateRoute(RouteSettings settings, {uniqueId}) {
               deviceData: arguments["deviceData"],
               doorList: arguments["doorList"],
               instance: arguments["instance"],
+            );
+          });
+    case RouterPage.MissingDeviceAddScreen:
+      return CupertinoPageRoute(
+          settings: settings,
+          builder: (context) {
+            return MissingDeviceAddScreen(
+              missingDevices: arguments["missingDevices"],
+              pNodeCode: arguments["pNodeCode"],
+              gateId: arguments["gateId"],
+              instanceId: arguments["instance"],
             );
           });
 

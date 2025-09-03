@@ -36,7 +36,11 @@ class AddBatteryExchangeViewModel extends BaseViewModelRefresh<dynamic> {
 
   @override
   void dispose() {
-    super.dispose();
+    try {
+      super.dispose();
+    } catch (e) {
+      // 忽略父类dispose错误
+    }
   }
 
   @override

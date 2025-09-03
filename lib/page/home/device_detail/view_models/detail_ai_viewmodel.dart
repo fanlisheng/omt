@@ -11,11 +11,13 @@ import '../../../../router_utils.dart';
 import '../../../../utils/dialog_utils.dart';
 import '../../../../utils/intent_utils.dart';
 import '../../device_add/view_models/device_add_viewmodel.dart';
+import '../upgrade/upgrade_viewmodel.dart';
 
 class DetailAiViewModel extends BaseViewModelRefresh<dynamic> {
   final String nodeId;
   final Function(bool) onChange;
   bool isChange = false;
+  final UpgradeViewModel _upgradeViewModel = UpgradeViewModel();
 
   DetailAiViewModel(this.nodeId, {required this.onChange});
 
@@ -78,33 +80,43 @@ class DetailAiViewModel extends BaseViewModelRefresh<dynamic> {
     });
   }
 
+  //下载主程版本
+  downloadProgramAction() async {
+    if (deviceInfo.deviceCode != null && deviceInfo.ip != null) {
+      _upgradeViewModel.setDeviceInfo(deviceInfo.deviceCode!, deviceInfo.ip!);
+      _upgradeViewModel.startDownload(context!, 'program');
+    } else {
+      LoadingUtils.showToast(data: "设备信息不完整");
+    }
+  }
+
+  //下载识别版本
+  downloadIdentityAction() async {
+    if (deviceInfo.deviceCode != null && deviceInfo.ip != null) {
+      _upgradeViewModel.setDeviceInfo(deviceInfo.deviceCode!, deviceInfo.ip!);
+      _upgradeViewModel.startDownload(context!, 'identity');
+    } else {
+      LoadingUtils.showToast(data: "设备信息不完整");
+    }
+  }
+
   //升级主程版本
   upgradeProgramAction() async {
-    final result = await DialogUtils.showContentDialog(
-        context: context!,
-        title: "升级主程版本",
-        content: "您确定升级主程版本?",
-        deleteText: "确定");
-    if (result == '取消') return;
-    HttpQuery.share.homePageService.upgradeAiDeviceProgram(
-        deviceCode: deviceInfo.deviceCode ?? "",
-        onSuccess: (a) {
-          _requestData();
-        });
+    if (deviceInfo.deviceCode != null && deviceInfo.ip != null) {
+      _upgradeViewModel.setDeviceInfo(deviceInfo.deviceCode!, deviceInfo.ip!);
+      _upgradeViewModel.startUpgrade(context!, 'program');
+    } else {
+      LoadingUtils.showToast(data: "设备信息不完整");
+    }
   }
 
   //升级识别版本
   upgradeIdentityAction() async {
-    final result = await DialogUtils.showContentDialog(
-        context: context!,
-        title: "升级识别版本",
-        content: "您确定升级识别版本?",
-        deleteText: "确定");
-    if (result == '取消') return;
-    HttpQuery.share.homePageService.upgradeAiDeviceIdentity(
-        deviceCode: deviceInfo.deviceCode ?? "",
-        onSuccess: (a) {
-          _requestData();
-        });
+    if (deviceInfo.deviceCode != null && deviceInfo.ip != null) {
+      _upgradeViewModel.setDeviceInfo(deviceInfo.deviceCode!, deviceInfo.ip!);
+      _upgradeViewModel.startUpgrade(context!, 'identity');
+    } else {
+      LoadingUtils.showToast(data: "设备信息不完整");
+    }
   }
 }

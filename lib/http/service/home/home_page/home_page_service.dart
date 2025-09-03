@@ -21,6 +21,7 @@ import '../../../../bean/home/home_page/device_detail_power_entity.dart';
 import '../../../../bean/home/home_page/device_unbound_entity.dart';
 import '../../../../bean/video/video_configuration/Video_Connect_entity.dart';
 import '../../../../utils/json_utils.dart';
+import '../../video/video_configuration_service.dart';
 
 // import 'package:omt/utils/shared_utils.dart';
 
@@ -32,8 +33,10 @@ import '../../../../utils/json_utils.dart';
 ///  Created by kayoxu on 2024-03-05 at 15:06:35
 ///  Copyright © 2024 .. All rights reserved.
 ///
+///
 
 class HomePageService {
+  
   get _list async => '${API.share.host}xxx/xxx';
 
   get _detail async => '${API.share.host}xxx/xxx';
@@ -117,10 +120,10 @@ class HomePageService {
 
   //_configAi
   get _configAi async =>
-      '${await API.share.hostVideoConfiguration}/webcam/save';
+      await API.share.buildControlWebcamUrl(VideoConfigurationService.webcamSave);
 
   get _removeConfigAi async =>
-      '${await API.share.hostVideoConfiguration}/webcam/remove';
+      await API.share.buildControlWebcamUrl(VideoConfigurationService.webcamRemove);  
 
   getInstanceList(
     String areaCode, {

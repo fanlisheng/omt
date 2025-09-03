@@ -95,15 +95,19 @@ class DeviceAddViewModel extends BaseViewModelRefresh<dynamic> {
   @override
   void dispose() {
     // 销毁所有控制器
-    // aiViewModel?.dispose();
-    // cameraViewModel?.dispose();
-    // nvrViewModel?.dispose();
-    // powerBoxViewModel?.dispose();
-    // batteryExchangeViewModel?.dispose();
-    // powerViewModel?.dispose();
-    // routerViewModel?.dispose();
+    aiViewModel?.dispose();
+    cameraViewModel?.dispose();
+    nvrViewModel?.dispose();
+    powerBoxViewModel?.dispose();
+    batteryExchangeViewModel?.dispose();
+    powerViewModel?.dispose();
+    routerViewModel?.dispose();
     LoadingUtils.dismiss();
-    super.dispose();
+    try {
+      super.dispose();
+    } catch (e) {
+      // 忽略父类dispose错误
+    }
   }
 
   @override

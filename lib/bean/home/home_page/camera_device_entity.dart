@@ -16,6 +16,16 @@ class CameraDeviceEntity {
 
   String? mac;
   String? ip;
+  
+  // 连接状态：0-未连接，1-连接中，2-连接成功，3-连接失败
+  int connectionStatus = 0;
+  
+  // 播放状态
+  bool isPlaying = false;
+  Duration position = Duration.zero;
+  
+  // 播放结果状态：true-播放成功，false-播放失败/超时，null-未尝试播放
+  bool? playResult;
 
   //不允许编辑
   bool readOnly = false;

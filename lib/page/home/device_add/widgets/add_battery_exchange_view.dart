@@ -9,8 +9,9 @@ import '../view_models/add_battery_exchange_viewmodel.dart';
 
 class AddBatteryExchangeView extends StatelessWidget {
   final AddBatteryExchangeViewModel model;
+  final String? title; // 可选的自定义标题
 
-  const AddBatteryExchangeView({super.key, required this.model});
+  const AddBatteryExchangeView({super.key, required this.model, this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +40,7 @@ class AddBatteryExchangeView extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "第${model.isInstall ? "六" : "二"}步：添加${model.isBattery ? "电池" : "交换机"}",
+                title ?? "第${model.isInstall ? "六" : "二"}步：添加${model.isBattery ? "电池" : "交换机"}",
                 style: const TextStyle(
                   fontSize: 14,
                   color: ColorUtils.colorGreenLiteLite,

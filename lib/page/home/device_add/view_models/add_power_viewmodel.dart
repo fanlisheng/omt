@@ -68,7 +68,16 @@ class AddPowerViewModel extends BaseViewModelRefresh<dynamic> {
 
   @override
   void dispose() {
-    super.dispose();
+    try {
+      routerIpController.dispose();
+    } catch (e) {
+      // 忽略已经被释放的控制器
+    }
+    try {
+      super.dispose();
+    } catch (e) {
+      // 忽略父类dispose错误
+    }
   }
 
   @override

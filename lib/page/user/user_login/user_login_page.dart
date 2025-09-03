@@ -40,87 +40,76 @@ class UserLoginPage extends StatelessWidget {
           var column = _buildColumn2(model);
 
           return ui.FluentTheme(
-            data: FluentThemeData(
-              brightness: Brightness.light, // 强制此页面为亮色模式
-              accentColor: AppTheme().color,
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 490,
-                  child: FractionallySizedBox(
-                    widthFactor: 1,
-                    heightFactor: 1,
+              data: FluentThemeData(
+                brightness: Brightness.light, // 强制此页面为亮色模式
+                accentColor: AppTheme().color,
+              ),
+              child: Stack(
+                children: [
+                  Positioned.fill(
                     child: ImageView(
                       src: source('login/ic_bg'),
                       fit: BoxFit.cover,
-                      bgColor: ColorUtils.colorRed,
                     ),
                   ),
-                ),
-                Expanded(
-                  flex: 590,
-                  child: Center(
-                    child: Container(
-                      alignment: Alignment.center,
-                      color: ColorUtils.colorWhite,
-                      child: rightView(model),
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 560,
+                        child: Container(),
+                      ),
+                      Expanded(
+                        flex: 720,
+                        child: Center(
+                          child: Container(
+                            alignment: Alignment.center,
+                            child: rightView(model),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-          );
-
+                ],
+              ));
           return _buildStack(context, windowWidth, column);
         });
   }
 
   Widget rightView(UserLoginViewModel model) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 25),
-      height: double.infinity,
+      // padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 25),
       child: Column(
+        crossAxisAlignment: ui.CrossAxisAlignment.center,
         children: [
-          Row(
-            children: [
-              const Spacer(),
-              ImageView(
-                src: source("ic_logo"),
-                width: 22,
-                height: 22,
-              ),
-              const SizedBox(width: 6),
-              const Text.rich(
-                TextSpan(
-                  text: '福立盟运维配置客户端',
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    color: ColorUtils.colorBlack,
-                    fontWeight: FontWeight.w900,
-                    height: 1.5,
-                  ),
-                ),
-                textAlign: TextAlign.left,
-              ),
-            ],
-          ),
           // SizedBox(height: 100,),
           Expanded(flex: 100, child: Container()),
+          ImageView(
+            src: source("ic_logo"),
+            width: 66,
+            height: 66,
+          ),
+          const ui.SizedBox(
+            height: 16,
+          ),
+          const Text.rich(
+            TextSpan(
+              text: '福立盟运维配置客户端',
+              style: TextStyle(
+                fontSize: 28.0,
+                color: ColorUtils.colorBlack,
+                fontWeight: FontWeight.w900,
+                height: 1.5,
+              ),
+            ),
+          ),
+          Expanded(flex: 46, child: Container()),
           ConstrainedBox(
             constraints: const BoxConstraints(
-                maxWidth: 220.0, minWidth: 220.0, maxHeight: 299.0),
+                maxWidth: 280.0, minWidth: 280.0, maxHeight: 342.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "欢迎登录，\n福立盟运维配置客户端",
-                  style: TextStyle(
-                      fontSize: 16,
-                      color: ColorUtils.colorBlack,
-                      fontWeight: FontWeight.w500),
-                ),
                 _titleView("项目"),
                 FComboBox(
                   selectedValue: model.selectedProject,
@@ -128,31 +117,42 @@ class UserLoginPage extends StatelessWidget {
                   onChanged: (v) {},
                   placeholder: "",
                   bgColor: "#EEF6F5".toColor(),
+                  icon: Image.asset(
+                    'assets/login/ic_dropdown_arrow.png',
+                    width: 16,
+                    height: 16,
+                  ),
+                  height: 40,
                 ),
                 _titleView("账号"),
-                ui.TextBox(
-                  placeholder: '请输入账号',
-                  controller: model.phoneController,
-                  style: const TextStyle(
-                    fontSize: 12.0,
+                SizedBox(
+                  height: 40, // 👈 控制高度
+                  child: ui.TextBox(
+                    placeholder: '请输入账号',
+                    controller: model.phoneController,
+                    style: const TextStyle(fontSize: 12.0),
+                    cursorColor: ui.Colors.teal,
+                    decoration: ui.WidgetStatePropertyAll(
+                      BoxDecoration(color: "#EEF6F5".toColor()),
+                    ),
                   ),
-                  cursorColor: ui.Colors.teal,
-                  decoration: ui.WidgetStatePropertyAll(
-                      BoxDecoration(color: "#EEF6F5".toColor())),
                 ),
                 _titleView("密码"),
-                ui.TextBox(
-                  placeholder: '请输入密码',
-                  controller: model.pwdController,
-                  obscureText: true,
-                  style: const TextStyle(
-                    fontSize: 12.0,
+                SizedBox(
+                  height: 40, // 👈 控制高度
+                  child: ui.TextBox(
+                    placeholder: '请输入密码',
+                    controller: model.pwdController,
+                    obscureText: true,
+                    style: const TextStyle(
+                      fontSize: 12.0,
+                    ),
+                    cursorColor: ui.Colors.teal,
+                    decoration: ui.WidgetStatePropertyAll(
+                        BoxDecoration(color: "#EEF6F5".toColor())),
                   ),
-                  cursorColor: ui.Colors.teal,
-                  decoration: ui.WidgetStatePropertyAll(
-                      BoxDecoration(color: "#EEF6F5".toColor())),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 30),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -166,8 +166,8 @@ class UserLoginPage extends StatelessWidget {
                           model.login();
                         },
                         child: TextView(
-                          padding: const EdgeInsets.symmetric(vertical: 3),
-                          '确定',
+                          padding: const EdgeInsets.symmetric(vertical: 7),
+                          '登录',
                           size: 12,
                           fontWeight: FontWeight.w500,
                           textDarkOnlyOpacity: true,
@@ -180,12 +180,7 @@ class UserLoginPage extends StatelessWidget {
               ],
             ),
           ),
-          // FractionallySizedBox(
-          //   heightFactor: 0.25,
-          //   child: Container(
-          //   ),
-          // ),
-          Expanded(flex: 140, child: Container()),
+          Expanded(flex: 200, child: Container()),
         ],
       ),
     );
@@ -193,11 +188,11 @@ class UserLoginPage extends StatelessWidget {
 
   ui.Container _titleView(String name) {
     return Container(
-      margin: const EdgeInsets.only(top: 12, bottom: 6),
+      margin: const EdgeInsets.only(top: 24, bottom: 6),
       child: Text(
         name,
         style: const TextStyle(
-            fontSize: 12,
+            fontSize: 14,
             color: ColorUtils.colorBlackLiteLite,
             fontWeight: FontWeight.w400),
       ),
