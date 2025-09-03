@@ -51,6 +51,15 @@ class AddPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
     );
   }
 
+  /// 同步控制器与数据
+  void syncControllersWithData() {
+    // 如果有选中的电源箱数据，同步到控制器
+    if (selectedDeviceDetailPowerBox != null && controller.text.isEmpty) {
+      controller.text = selectedDeviceDetailPowerBox?.deviceCode ?? "";
+      notifyListeners();
+    }
+  }
+
   @override
   void dispose() {
     try {

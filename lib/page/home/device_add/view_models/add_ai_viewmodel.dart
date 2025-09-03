@@ -48,6 +48,27 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
     } catch (e) {
     }
   }
+  
+  /// 同步aiControllers和aiDeviceList
+  /// 确保控制器数量与设备列表匹配，并填充IP地址
+  void syncControllersWithDeviceList() {
+    // 调整控制器数量以匹配设备列表
+    while (aiControllers.length < aiDeviceList.length) {
+      aiControllers.add(TextEditingController());
+    }
+    while (aiControllers.length > aiDeviceList.length) {
+      if (aiControllers.isNotEmpty) {
+        aiControllers.removeLast().dispose();
+      }
+    }
+    
+    // 同步IP地址到控制器
+    for (int i = 0; i < aiDeviceList.length && i < aiControllers.length; i++) {
+      aiControllers[i].text = aiDeviceList[i].ip ?? '';
+    }
+    
+    notifyListeners();
+  }
 
   // 连接AI设备
   connectAiDeviceAction(int index) async {

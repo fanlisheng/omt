@@ -98,6 +98,15 @@ class _MultiSelectComboBoxState extends State<MultiSelectComboBox> {
     _selectedTags = List.from(widget.initialSelectedTags);
   }
 
+  @override
+  void didUpdateWidget(MultiSelectComboBox oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // 当外部传入的initialSelectedTags发生变化时，更新内部状态
+    if (widget.initialSelectedTags != oldWidget.initialSelectedTags) {
+      _selectedTags = List.from(widget.initialSelectedTags);
+    }
+  }
+
   void _handleTagSelection(StrIdNameValue? selectedTag) {
     if (selectedTag != null && !_selectedTags.contains(selectedTag)) {
       setState(() {

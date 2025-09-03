@@ -1,5 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide showDialog;
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/page/camera/camera_bound/camera_bound_page.dart';
 import 'package:omt/page/camera/camera_bound_delete/camera_bound_delete_page.dart';
@@ -18,6 +18,8 @@ import 'package:omt/utils/auth_utils.dart';
 import 'package:omt/utils/shared_utils.dart';
 import 'package:omt/utils/sys_utils.dart';
 import 'package:omt/widget/combobox.dart';
+import 'package:omt/services/install_cache_service.dart';
+import 'package:omt/router_utils.dart';
 
 import '../../../test/select_detail_page.dart';
 import '../search_device/widgets/search_device_screen.dart';
@@ -31,8 +33,8 @@ import 'keep_alive_page.dart';
 ///  Created by kayoxu on 2024-03-05 at 15:27:39
 ///  Copyright © 2024 .. All rights reserved.
 ///
-final rootNavigatorKey = GlobalKey<NavigatorState>();
-final _shellNavigatorKey = GlobalKey<NavigatorState>();
+// final rootNavigatorKey = GlobalKey<NavigatorState>();
+// final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
 class NavigationBodyItem extends StatelessWidget {
   const NavigationBodyItem({
@@ -258,6 +260,9 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
   void initState() async {
     super.initState();
 
+    // 检查安装缓存
+    _checkInstallCache();
+
     if (SysUtils.useNavi()) {
       SharedUtils.getTheUserPermission().then((value) {
         if (value?.id == AuthEnum.menuVideoConfiguration) {
@@ -293,6 +298,75 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
   void setDisplayMode(PaneDisplayMode mode) {
     displayMode = mode;
     notifyListeners();
+  }
+
+  /// 检查安装缓存
+  void _checkInstallCache() async {
+    final hasCache = await InstallCacheService.instance.hasCacheData();
+    if (hasCache) {
+      // 延迟一下确保UI已经构建完成
+      await Future.delayed(const Duration(milliseconds: 500));
+      _showCacheDialog();
+    }
+  }
+
+  /// 显示缓存恢复对话框
+  void _showCacheDialog() {
+    var context = KayoPackage.share.navigatorKey.currentState?.overlay?.context;
+    if (context == null) return;
+
+    showDialog<void>(
+      context: context,
+      builder: (context) => ContentDialog(
+        title: const Text('发现未完成的安装'),
+        content: const Text('检测到有未完成的设备安装，是否继续之前的安装？'),
+        actions: [
+          Button(
+            child: const Text('清除重新开始'),
+            onPressed: () {
+              Navigator.of(context).pop();
+              _clearCache();
+            },
+          ),
+          Button(
+            child: const Text('继续安装'),
+            onPressed: () {
+              Navigator.of(context).pop();
+              _continueInstall();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 清除缓存
+  void _clearCache() {
+    InstallCacheService.instance.clearCacheData();
+  }
+
+  /// 继续安装
+  void _continueInstall() {
+    final context =
+        KayoPackage.share.navigatorKey.currentState?.overlay?.context;
+    if (context == null) return;
+
+    _triggerCacheRestore();
+    // 切换到安装设备的tab
+    topIndex = 1; // 安装设备是第二个tab (index=1)
+    notifyListeners();
+
+    // 延迟一下确保页面切换完成后触发缓存恢复
+    // Future.delayed(const Duration(milliseconds: 300), () {
+    //   // 通过全局标志触发缓存恢复
+    //   _triggerCacheRestore();
+    // });
+  }
+
+  /// 触发缓存恢复
+  void _triggerCacheRestore() {
+    // 设置全局标志，让InstallDeviceScreen知道需要恢复缓存
+    InstallCacheService.instance.setShouldRestoreFromHome(true);
   }
 }
 

@@ -15,6 +15,7 @@ class SearchableDropdown<T> extends StatefulWidget {
   final String Function(T) labelSelector; // 新增：自定义 label 生成
   final bool enabled;
   final bool clearButtonEnabled;
+  final T? selectedValue; // 新增：当前选中的值
 
   const SearchableDropdown({
     super.key,
@@ -36,6 +37,7 @@ class SearchableDropdown<T> extends StatefulWidget {
     required this.labelSelector, // 要求提供 labelSelector
     this.enabled = true,
     this.clearButtonEnabled = false,
+    this.selectedValue, // 新增：当前选中的值
   });
 
   @override
@@ -50,8 +52,29 @@ class SearchableDropdownState<T> extends State<SearchableDropdown<T>> {
   void initState() {
     super.initState();
     _filteredItems = widget.items; // 初始显示所有选项
+    
+    // 如果有初始选中值，设置_selectedInstance和controller文本
+    if (widget.selectedValue != null) {
+      _selectedInstance = widget.selectedValue;
+      widget.controller.text = widget.labelSelector(widget.selectedValue!);
+    }
+    
     _setupFocusListener();
     widget.controller.addListener(_onTextChanged);
+  }
+
+  @override
+  void didUpdateWidget(SearchableDropdown<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // 当外部传入的selectedValue发生变化时，更新内部状态
+    if (widget.selectedValue != oldWidget.selectedValue) {
+      _selectedInstance = widget.selectedValue;
+      if (widget.selectedValue != null) {
+        widget.controller.text = widget.labelSelector(widget.selectedValue!);
+      } else {
+        widget.controller.clear();
+      }
+    }
   }
 
   void _setupFocusListener() {

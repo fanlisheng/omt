@@ -68,6 +68,24 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
     }
   }
 
+  // 同步摄像头控制器与设备列表
+  void syncControllersWithDeviceList() {
+    for (int i = 0; i < cameraDeviceList.length; i++) {
+      var camera = cameraDeviceList[i];
+      // 确保控制器已初始化并填充数据
+      if (camera.rtsp != null && camera.rtsp!.isNotEmpty) {
+        camera.rtspController.text = camera.rtsp!;
+      }
+      if (camera.deviceNameController.text.isEmpty) {
+        // 如果设备名称为空，可以设置默认名称或保持为空
+      }
+      if (camera.videoIdController.text.isEmpty) {
+        // 如果视频ID为空，可以设置默认值或保持为空
+      }
+    }
+    notifyListeners();
+  }
+
   // 释放所有资源的方法
   void _disposeAllResources() {
     for (var camera in cameraDeviceList) {

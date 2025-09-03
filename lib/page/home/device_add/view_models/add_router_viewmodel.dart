@@ -53,6 +53,15 @@ class AddRouterViewModel extends BaseViewModelRefresh<dynamic> {
 
   }
 
+  /// 同步控制器与数据
+  void syncControllersWithData() {
+    // 如果有路由器IP和MAC数据，同步到控制器
+    if (mac != null && routerIpController.text.isEmpty) {
+      // 这里可以根据需要填充路由器IP
+      notifyListeners();
+    }
+  }
+
   @override
   void dispose() {
     try {
