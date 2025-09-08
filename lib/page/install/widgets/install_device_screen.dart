@@ -42,12 +42,17 @@ class _InstallDeviceScreenState extends State<InstallDeviceScreen> {
   @override
   void initState() {
     super.initState();
-    
+  
     // 监听重置事件
     resetManager.getResetStream(installDeviceResetKey).listen((_) {
-      setState(() {
-        // 更新Key以强制重建
-        _contentKey = UniqueKey();
+      // 先清除缓存数据
+      _clearCache().then((_) {
+        setState(() {
+          // 更新Key以强制重建
+          _contentKey = UniqueKey();
+          // 确保不会从缓存恢复
+          _shouldRestoreFromCache = false;
+        });
       });
     });
   }
@@ -73,7 +78,7 @@ class _InstallDeviceScreenState extends State<InstallDeviceScreen> {
   }
 
   /// 清除缓存
-  void _clearCache() async {
+  Future<void> _clearCache() async {
     final cacheService = InstallCacheService.instance;
     await cacheService.clearCacheData();
   }

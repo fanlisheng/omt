@@ -24,13 +24,16 @@ class UpgradeViewModel extends ChangeNotifier {
   
   /// 开始下载流程
   void startDownload(BuildContext context, String upgradeType) {
-    if (_deviceCode == null || _deviceIp == null) {
-      LoadingUtils.showToast(data: '设备信息不完整');
-      return;
-    }
+    // _showUpgradeSuccessDialog(context, upgradeType);
+    // _showUpgradeFailureDialog(context, upgradeType, "测试一下");
+    _startWaitingUpgrade(context, upgradeType);
+    // if (_deviceCode == null || _deviceIp == null) {
+    //   LoadingUtils.showToast(data: '设备信息不完整');
+    //   return;
+    // }
     
     // 直接进入本地上传升级流程
-    _showFileUploadDialog(context, upgradeType);
+    // _showFileUploadDialog(context, upgradeType);
   }
   
   /// 开始升级流程
@@ -132,13 +135,35 @@ class UpgradeViewModel extends ChangeNotifier {
     
     // TODO: 实现在线升级逻辑
     LoadingUtils.showToast(data: '在线升级功能开发中...');
-    
+
     _isUpgrading = false;
     notifyListeners();
   }
   
   /// 开始等待升级
   void _startWaitingUpgrade(BuildContext context, String upgradeType) {
+    _isUpgrading = true;
+    notifyListeners();
+    
+    String title = upgradeType == 'program' ? '主程版本升级' : '识别版本升级';
+    
+    // 显示正在升级的对话框
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => UpgradeProgressDialog(
+        title: title,
+      ),
+    );
+    
+    // 设置15秒总超时（确保比ping超时时间长）
+    Timer(const Duration(seconds: 13), () {
+      if (_isUpgrading && context.mounted) {
+        _statusCheckTimer?.cancel();
+        _onUpgradeFailure(context, upgradeType, '升级总超时，请检查设备状态');
+      }
+    });
+    
     // 1秒后开始ping设备
     Future.delayed(const Duration(seconds: 1), () {
       _startPingDevice(context, upgradeType);
@@ -147,7 +172,20 @@ class UpgradeViewModel extends ChangeNotifier {
   
   /// 开始ping设备
   void _startPingDevice(BuildContext context, String upgradeType) {
-    Timer.periodic(const Duration(seconds: 2), (timer) async {
+    Timer? pingTimer;
+    int pingCount = 0;
+    const maxPingAttempts = 5; // 最多ping 6次（12秒）
+    
+    pingTimer = Timer.periodic(const Duration(seconds: 2), (timer) async {
+      pingCount++;
+      
+      if (pingCount > maxPingAttempts) {
+        timer.cancel();
+        // ping超时时不立即调用失败，让总超时Timer处理
+        // 这样可以确保进度对话框能被正确关闭
+        return;
+      }
+      
       bool isReachable = await _upgradeService.pingDevice(_deviceIp!);
       
       if (isReachable) {
@@ -193,9 +231,23 @@ class UpgradeViewModel extends ChangeNotifier {
     notifyListeners();
     
     Navigator.of(context).pop(); // 关闭等待弹窗
+    _showUpgradeSuccessDialog(context, upgradeType);
+  }
+  
+  /// 显示升级成功弹窗
+  void _showUpgradeSuccessDialog(BuildContext context, String upgradeType) {
+    String title = upgradeType == 'program' ? '主程版本升级' : '识别版本升级';
     
-    String message = upgradeType == 'program' ? '主程版本升级成功' : '识别版本升级成功';
-    LoadingUtils.showToast(data: message);
+    showDialog(
+      context: context,
+      builder: (context) => UpgradeResultDialog(
+        title: title,
+        isSuccess: true,
+        onConfirm: () {
+          // 升级成功后的处理逻辑
+        },
+      ),
+    );
   }
   
   /// 升级失败
@@ -213,10 +265,17 @@ class UpgradeViewModel extends ChangeNotifier {
     
     showDialog(
       context: context,
-      builder: (context) => UpgradeFailureDialog(
+      builder: (context) => UpgradeResultDialog(
         title: title,
-        reason: reason,
-        onRetry: () => startUpgrade(context, upgradeType),
+        isSuccess: false,
+        errorDetails: reason,
+        onRetry: () {
+          Navigator.of(context).pop();
+          startUpgrade(context, upgradeType);
+        },
+        onConfirm: () {
+          Navigator.of(context).pop();
+        },
       ),
     );
   }

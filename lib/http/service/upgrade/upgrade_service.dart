@@ -86,7 +86,7 @@ class UpgradeService {
         'http://$ip:8000/ping',
         {},
         method: 'GET',
-        autoHideDialog: true,
+        autoHideDialog: false,
         autoShowDialog: false,
         onSuccess: (data) {
           isReachable = true;

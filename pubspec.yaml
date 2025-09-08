@@ -78,6 +78,7 @@ flutter:
     - assets/
     - assets/login/
     - assets/home/
+    - assets/device_detail/
     - json/
 
   #     fvm flutter build web --web-browser-flag "--disable-web-security"

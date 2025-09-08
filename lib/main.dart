@@ -337,6 +337,11 @@ class _MyHomePageState extends State<MyHomePage>
         break;
 
       default:
+        // 过滤code 404且message包含ping的错误提示
+        if (code == 404 && message != null && message.toString().toLowerCase().contains('ping')) {
+          // 不显示ping相关的404错误提示
+          break;
+        }
         LoadingUtils.showToast(data: message);
         break;
     }
