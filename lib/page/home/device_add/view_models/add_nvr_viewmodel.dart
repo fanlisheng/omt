@@ -33,13 +33,16 @@ class AddNvrViewModel extends BaseViewModel {
       isNvrNeeded = true;
       refreshNvrAction();
     }
-    // 初始化进/出口列表
-    HttpQuery.share.homePageService.getInOutList(
-      onSuccess: (List<IdNameValue>? data) {
-        inOutList = data ?? [];
-        notifyListeners();
-      },
-    );
+
+    if(inOutList.isEmpty){
+      // 初始化进/出口列表
+      HttpQuery.share.homePageService.getInOutList(
+        onSuccess: (List<IdNameValue>? data) {
+          inOutList = data ?? [];
+          notifyListeners();
+        },
+      );
+    }
   }
 
   @override
@@ -156,7 +159,90 @@ class AddNvrViewModel extends BaseViewModel {
     return stopScanning; // 当 stopAiScanning 为 true 时停止
   }
 
-  static   Map<String, dynamic>? getNvr(AddNvrViewModel nvrViewModel) {
+  /// 智能恢复缓存选择项（公共方法）
+  void smartRestoreCacheSelections() {
+    _smartRestoreCacheSelections();
+  }
+
+  /// 智能恢复缓存选择项
+  void _smartRestoreCacheSelections() {
+    // 智能恢复进出口选择
+    if (selectedNarInOut != null && inOutList.isNotEmpty) {
+      IdNameValue? matchedInOut;
+      bool inOutExists = inOutList.any((inOut) {
+        if (inOut.id == selectedNarInOut?.id) {
+          matchedInOut = inOut;
+          return true;
+        }
+        return false;
+      });
+      if (inOutExists && matchedInOut != null) {
+        // 只有当对象引用不同时才重新赋值，避免不必要的UI更新
+        if (selectedNarInOut != matchedInOut) {
+          selectedNarInOut = matchedInOut;
+        }
+      } else {
+        // 如果缓存的进出口不在新列表中，清空选择
+        selectedNarInOut = null;
+      }
+    }
+    // 恢复缓存的NVR选择
+    if (selectedNvr != null) {
+      this.selectedNvr = selectedNvr;
+
+      // 将选中的nvr设备组成一个元素的数组
+      nvrDeviceList.clear();
+      nvrDeviceList.add(selectedNvr!);
+
+      // 调用selectNvrIpAction方法获取通道信息
+      selectNvrIpAction(selectedNvr!);
+    }
+    // 通知UI更新
+    notifyListeners();
+  }
+
+  /// 从缓存恢复NVR数据
+  void restoreFromCache({
+    bool? isNvrNeeded,
+    List<IdNameValue>? inOutList,
+    IdNameValue? selectedNarInOut,
+    DeviceEntity? selectedNvr,
+    DeviceDetailNvrData? nvrData,
+  }) {
+    // 恢复NVR相关数据
+    if (isNvrNeeded != null) {
+      this.isNvrNeeded = isNvrNeeded;
+    }
+    // 恢复进出口列表
+    if (inOutList != null) {
+      this.inOutList = inOutList;
+    }
+    // 恢复选中的进出口
+    if (selectedNarInOut != null) {
+      this.selectedNarInOut = selectedNarInOut;
+    }
+
+    // 恢复缓存的NVR选择
+    if (selectedNvr != null) {
+      this.selectedNvr = selectedNvr;
+
+      // 将选中的nvr设备组成一个元素的数组
+      nvrDeviceList.clear();
+      nvrDeviceList.add(selectedNvr);
+
+      // 调用selectNvrIpAction方法获取通道信息
+      selectNvrIpAction(selectedNvr);
+    }
+
+    if (nvrData != null) {
+      this.nvrData = nvrData;
+    }
+
+    print('NVR缓存数据已恢复');
+    notifyListeners();
+  }
+
+  static Map<String, dynamic>? getNvr(AddNvrViewModel nvrViewModel) {
     if (nvrViewModel.isNvrNeeded == false) {
       return null;
     }

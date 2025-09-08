@@ -64,8 +64,8 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
       PaneItem(
         key: const ValueKey('/'),
         icon: PaneImage(
-          name: "home/ic_pane_home",
-          selectedName: 'home/ic_pane_home_s',
+          name: "home/ic_home",
+          selectedName: 'home/ic_home_s',
           index: 0,
           selectedIndex: topIndex,
         ),
@@ -103,8 +103,8 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
 
       PaneItem(
         icon: PaneImage(
-          name: "home/ic_pane_add",
-          selectedName: 'home/ic_pane_add_s',
+          name: "home/ic_install",
+          selectedName: 'home/ic_install_s',
           index: 1,
           selectedIndex: topIndex,
         ),
@@ -121,8 +121,8 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
       ),
       PaneItem(
         icon: PaneImage(
-          name: "home/ic_pane_delete",
-          selectedName: 'home/ic_pane_delete',
+          name: "home/ic_dismantle",
+          selectedName: 'home/ic_dismantle_s',
           index: 2,
           selectedIndex: topIndex,
         ),
@@ -139,8 +139,8 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
       ),
       PaneItemExpander(
         icon: PaneImage(
-          name: "home/ic_pane_set",
-          selectedName: 'home/ic_pane_set',
+          name: "home/ic_set",
+          selectedName: 'home/ic_set',
           index: 3,
           selectedIndex: topIndex,
         ),

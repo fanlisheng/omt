@@ -18,6 +18,9 @@ import 'package:omt/bean/install/install_cache_data.dart';
 import '../../../bean/common/id_name_value.dart';
 import '../../../bean/home/home_page/camera_device_entity.dart';
 import '../../../bean/home/home_page/device_detail_ai_entity.dart';
+import '../../../bean/home/home_page/device_detail_nvr_entity.dart';
+import '../../../bean/home/home_page/device_detail_power_box_entity.dart';
+import '../../../bean/home/home_page/device_entity.dart';
 import '../../home/device_add/view_models/add_ai_viewmodel.dart';
 import '../../home/device_add/view_models/add_battery_exchange_viewmodel.dart';
 import '../../home/device_add/view_models/add_camera_viewmodel.dart';
@@ -77,7 +80,7 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
 
   // 缓存服务
   final InstallCacheService _cacheService = InstallCacheService.instance;
-  
+
   // 是否正在从缓存恢复数据
   bool _isRestoringFromCache = false;
 
@@ -120,7 +123,7 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
     currentStep = currentStep - 1;
     pageController.jumpToPage(currentStep - 1);
     notifyListeners();
-    _saveCacheData(); // 保存缓存
+    // _saveCacheData(); // 保存缓存
   }
 
   // 下一步
@@ -160,6 +163,11 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
 
   ///私有方法
   void _loadInitialData() async {
+    // 先尝试恢复缓存数据
+    final cacheData = await _cacheService.getCacheData();
+    IdNameValue? cachedSelectedDoor = cacheData?.selectedDoor;
+    StrIdNameValue? cachedSelectedInstance = cacheData?.selectedInstance;
+
     bool success = false;
     while (!success) {
       try {
@@ -171,19 +179,57 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
         inOutList = data.inOutList;
 
         success = true; // 获取成功，退出循环
+
+        // 智能恢复缓存的选择项
+        _smartRestoreSelections(cachedSelectedInstance, cachedSelectedDoor);
+
         notifyListeners();
+
+        // 在基础数据加载完成后恢复其他缓存数据
+        _restoreCacheAfterDataLoaded();
       } catch (e) {
         // 可选：记录错误日志
         print('请求错误 $e');
         await Future.delayed(const Duration(seconds: 1)); // 延迟后重试，避免过于频繁请求
       }
     }
+  }
 
+  /// 智能恢复选择项，优先保持缓存的选择
+  void _smartRestoreSelections(
+      StrIdNameValue? cachedInstance, IdNameValue? cachedDoor) {
+    // 恢复实例选择
+    if (cachedInstance != null) {
+      try {
+        selectedInstance = instanceList.firstWhere(
+          (instance) => instance.id == cachedInstance.id,
+        );
+      } catch (e) {
+        // 如果在新列表中找不到，保持缓存的实例数据
+        selectedInstance = cachedInstance;
+      }
+    }
+
+    // 恢复大门选择
+    if (cachedDoor != null) {
+      try {
+        selectedDoor = doorList.firstWhere(
+          (door) => door.id == cachedDoor.id,
+        );
+      } catch (e) {
+        // 如果在新列表中找不到，保持缓存的大门数据
+        selectedDoor = cachedDoor;
+      }
+    }
+  }
+
+  /// 在基础数据加载完成后恢复缓存
+  void _restoreCacheAfterDataLoaded() {
     HttpQuery.share.labelManagementService.getLabelList("", onSuccess: (data) {
       availableTags = data ?? [];
       notifyListeners();
-      
-      // 在基础数据加载完成后恢复缓存
+
+      // 在所有基础数据加载完成后恢复缓存
       restoreFromCache();
     }, onError: (String value) {
       // 即使标签加载失败，也要尝试恢复缓存
@@ -321,7 +367,7 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
           onSuccess: (data) {
             // 显示成功信息
             LoadingUtils.showInfo(data: "安装成功！");
-            
+
             // 清除缓存数据
             _clearCacheData();
 
@@ -331,13 +377,11 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
       print("Error building OnePictureDataData: $e");
     }
   }
-  
 
-  
   /// 保存缓存数据
   void _saveCacheData() {
     if (_isRestoringFromCache) return; // 避免在恢复数据时保存
-    
+
     try {
       final cacheData = InstallCacheData(
         currentStep: currentStep,
@@ -346,72 +390,203 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
         selectedInOut: selectedInOut,
         selectedTags: selectedTags,
         aiDeviceList: _aiViewModel.aiDeviceList,
-        cameraDeviceList: InstallCacheService.cameraDeviceListToMapList(_cameraViewModel.cameraDeviceList),
-        nvrData: _getNvrCacheData(),
-        powerBoxData: _getPowerBoxCacheData(),
-        powerData: _getPowerCacheData(),
+        cameraDeviceList: InstallCacheService.cameraDeviceListToMapList(
+            _cameraViewModel.cameraDeviceList),
+        // 从各个ViewModel获取最新的缓存数据
+        gateId: _aiViewModel.gateId,
+        instanceId: _aiViewModel.instanceId,
+        cameraInOutList: _cameraViewModel.inOutList,
+        cameraTypeList: _cameraViewModel.cameraTypeList,
+        regulationList: _cameraViewModel.regulationList,
+        isNvrNeeded: _nvrViewModel.isNvrNeeded,
+        selectedNarInOut: _nvrViewModel.selectedNarInOut,
+        nvrInOutList: _nvrViewModel.inOutList,
+        selectedNvr: _nvrViewModel.selectedNvr?.toJson(),
+        nvrDeviceData: _nvrViewModel.nvrData?.toJson(),
+        isPowerBoxNeeded: _powerBoxViewModel.isPowerBoxNeeded,
+        selectedPowerBoxInOut: _powerBoxViewModel.selectedPowerBoxInOut,
+        powerBoxInOutList: _powerBoxViewModel.inOutList,
+        selectedDeviceDetailPowerBox:
+            _powerBoxViewModel.selectedDeviceDetailPowerBox?.toJson(),
+        powerBoxList:
+            _powerBoxViewModel.powerBoxList.map((e) => e.toJson()).toList(),
+        portType: _powerViewModel.portType,
+        batteryMains: _powerViewModel.batteryMains,
+        battery: _powerViewModel.battery,
+        isCapacity80: _powerViewModel.isCapacity80,
+        selectedPowerInOut: _powerViewModel.selectedPowerInOut,
+        powerInOutList: _powerViewModel.inOutList,
+        selectedRouterType: _powerViewModel.selectedRouterType,
+        routerTypeList: _powerViewModel.routerTypeList,
+        routerIp: _powerViewModel.routerIpController.text,
+        mac: _powerViewModel.mac,
+        exchangeDevices: _powerViewModel.exchangeDevices
+            .map((e) => {
+                  'selectedPortNumber': e.selectedPortNumber,
+                  'selectedSupplyMethod': e.selectedSupplyMethod,
+                })
+            .toList(),
+        selectedExchangeInOut: _powerViewModel.selectedInOut,
       );
-      
+
       _cacheService.saveCacheData(cacheData);
     } catch (e) {
       print('保存缓存数据失败: $e');
     }
   }
-  
+
   /// 从缓存恢复数据
   Future<void> restoreFromCache() async {
     try {
       _isRestoringFromCache = true;
       final cacheData = await _cacheService.getCacheData();
-      
+
       if (cacheData != null) {
         currentStep = cacheData.currentStep;
-        selectedInstance = cacheData.selectedInstance;
-        
-        // 恢复大门选择，确保选中的门在当前门列表中存在
-        if (cacheData.selectedDoor != null) {
-          final cachedDoor = cacheData.selectedDoor!;
-          try {
-            selectedDoor = doorList.firstWhere(
-              (door) => door.id == cachedDoor.id,
-            );
-          } catch (e) {
-            // 如果在doorList中找不到匹配的门，使用缓存的门数据
-            selectedDoor = cachedDoor;
-          }
-        } else {
-          selectedDoor = null;
-        }
-        
+
+        // selectedInstance 和 selectedDoor 已在 _smartRestoreSelections 中处理
+        // 这里只恢复其他数据
         selectedInOut = cacheData.selectedInOut;
         selectedTags = cacheData.selectedTags;
-        
+
         // 恢复AI设备数据
         _aiViewModel.aiDeviceList.clear();
         _aiViewModel.aiDeviceList.addAll(cacheData.aiDeviceList);
         // 同步AI控制器与设备列表
         _aiViewModel.syncControllersWithDeviceList();
-        
+
         // 恢复摄像头设备数据
+        _cameraViewModel.aiDeviceList.clear();
+        _cameraViewModel..aiDeviceList.addAll(cacheData.aiDeviceList);
         _cameraViewModel.cameraDeviceList.clear();
         _cameraViewModel.cameraDeviceList.addAll(
-          InstallCacheService.cameraDeviceListFromMapList(cacheData.cameraDeviceList)
-        );
+            InstallCacheService.cameraDeviceListFromMapList(
+                cacheData.cameraDeviceList));
         // 同步摄像头控制器与设备列表
         _cameraViewModel.syncControllersWithDeviceList();
-        
-        // 恢复其他设备数据
-        _restoreNvrCacheData(cacheData.nvrData);
-        _restorePowerBoxCacheData(cacheData.powerBoxData);
-        _restorePowerCacheData(cacheData.powerData);
-        
+
+        // 恢复AI ViewModel的缓存数据
+        if (cacheData.gateId != null) {
+          _aiViewModel.gateId = cacheData.gateId!;
+        }
+        if (cacheData.instanceId != null) {
+          _aiViewModel.instanceId = cacheData.instanceId!;
+        }
+
+        // 恢复Camera ViewModel的缓存数据
+        if (cacheData.cameraInOutList != null) {
+          _cameraViewModel.inOutList = cacheData.cameraInOutList!;
+        }
+        if (cacheData.cameraTypeList != null) {
+          _cameraViewModel.cameraTypeList = cacheData.cameraTypeList!;
+        }
+        if (cacheData.regulationList != null) {
+          _cameraViewModel.regulationList = cacheData.regulationList!;
+        }
+
+        // 调用智能缓存恢复，确保选中项在列表中存在
+        _cameraViewModel.smartRestoreCacheSelections();
+
+        // 恢复NVR ViewModel的缓存数据
+        if (cacheData.isNvrNeeded != null) {
+          _nvrViewModel.isNvrNeeded = cacheData.isNvrNeeded;
+        }
+        if (cacheData.selectedNarInOut != null) {
+          _nvrViewModel.selectedNarInOut = cacheData.selectedNarInOut;
+        }
+        if (cacheData.nvrInOutList != null) {
+          _nvrViewModel.inOutList = cacheData.nvrInOutList!;
+        }
+        // 注意：这里需要根据实际的类型进行转换，暂时注释掉
+        if (cacheData.selectedNvr != null) {
+          _nvrViewModel.selectedNvr =
+              DeviceEntity.fromJson(cacheData.selectedNvr!);
+        }
+        if (cacheData.nvrDeviceData != null) {
+          _nvrViewModel.nvrData =
+              DeviceDetailNvrData.fromJson(cacheData.nvrDeviceData!);
+        }
+        _nvrViewModel.smartRestoreCacheSelections();
+
+        // 恢复PowerBox ViewModel的缓存数据
+        if (cacheData.isPowerBoxNeeded != null) {
+          _powerBoxViewModel.isPowerBoxNeeded = cacheData.isPowerBoxNeeded;
+        }
+        if (cacheData.selectedPowerBoxInOut != null) {
+          _powerBoxViewModel.selectedPowerBoxInOut =
+              cacheData.selectedPowerBoxInOut;
+        }
+        if (cacheData.powerBoxInOutList != null) {
+          _powerBoxViewModel.inOutList = cacheData.powerBoxInOutList!;
+        }
+        // 注意：这里需要根据实际的类型进行转换，暂时注释掉
+        if (cacheData.selectedDeviceDetailPowerBox != null) {
+          _powerBoxViewModel.selectedDeviceDetailPowerBox =
+              DeviceDetailPowerBoxData.fromJson(
+                  cacheData.selectedDeviceDetailPowerBox!);
+        }
+        if (cacheData.powerBoxList != null) {
+          _powerBoxViewModel.powerBoxList = cacheData.powerBoxList!
+              .map((e) => DeviceDetailPowerBoxData.fromJson(e))
+              .toList();
+        }
+
+        _powerBoxViewModel.smartRestoreCacheSelections();
+
+        // 恢复Power ViewModel的缓存数据
+        if (cacheData.portType != null) {
+          _powerViewModel.portType = cacheData.portType!;
+        }
+        if (cacheData.batteryMains != null) {
+          _powerViewModel.batteryMains = cacheData.batteryMains!;
+        }
+        if (cacheData.battery != null) {
+          _powerViewModel.battery = cacheData.battery!;
+        }
+        if (cacheData.isCapacity80 != null) {
+          _powerViewModel.isCapacity80 = cacheData.isCapacity80!;
+        }
+        if (cacheData.selectedPowerInOut != null) {
+          _powerViewModel.selectedPowerInOut = cacheData.selectedPowerInOut;
+        }
+        if (cacheData.powerInOutList != null) {
+          _powerViewModel.inOutList = cacheData.powerInOutList!;
+        }
+        if (cacheData.selectedRouterType != null) {
+          _powerViewModel.selectedRouterType = cacheData.selectedRouterType;
+        }
+        if (cacheData.routerTypeList != null) {
+          _powerViewModel.routerTypeList = cacheData.routerTypeList!;
+        }
+        if (cacheData.routerIp != null) {
+          _powerViewModel.routerIpController.text = cacheData.routerIp!;
+        }
+        if (cacheData.mac != null) {
+          _powerViewModel.mac = cacheData.mac;
+        }
+        if (cacheData.exchangeDevices != null) {
+          _powerViewModel.exchangeDevices.clear();
+          for (var deviceData in cacheData.exchangeDevices!) {
+            final device = ExchangeDeviceModel();
+            device.selectedPortNumber = deviceData['selectedPortNumber'];
+            device.selectedSupplyMethod = deviceData['selectedSupplyMethod'];
+            _powerViewModel.exchangeDevices.add(device);
+          }
+        }
+        if (cacheData.selectedExchangeInOut != null) {
+          _powerViewModel.selectedInOut = cacheData.selectedExchangeInOut;
+        }
+
         // 同步其他设备的控制器
-        _powerBoxViewModel.syncControllersWithData();
-        _powerViewModel.syncControllersWithData();
-        
+        _powerViewModel.smartRestoreCacheSelections();
+        // _powerViewModel.syncControllersWithData();
+
         // 跳转到对应步骤
+        if(currentStep > 7){
+          currentStep = 6;
+        }
         pageController.jumpToPage(currentStep - 1);
-        
+
         notifyListeners();
       }
     } catch (e) {
@@ -420,49 +595,10 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
       _isRestoringFromCache = false;
     }
   }
-  
+
   /// 清除缓存数据
   void _clearCacheData() {
     _cacheService.clearCacheData();
-  }
-  
-  /// 获取NVR缓存数据
-  Map<String, dynamic>? _getNvrCacheData() {
-    // 这里需要根据NVR ViewModel的具体实现来获取数据
-    // 暂时返回null，后续可以扩展
-    return null;
-  }
-  
-  /// 获取电源箱缓存数据
-  Map<String, dynamic>? _getPowerBoxCacheData() {
-    // 这里需要根据PowerBox ViewModel的具体实现来获取数据
-    // 暂时返回null，后续可以扩展
-    return null;
-  }
-  
-  /// 获取电源缓存数据
-  Map<String, dynamic>? _getPowerCacheData() {
-    // 这里需要根据Power ViewModel的具体实现来获取数据
-    // 暂时返回null，后续可以扩展
-    return null;
-  }
-  
-  /// 恢复NVR缓存数据
-  void _restoreNvrCacheData(Map<String, dynamic>? data) {
-    // 这里需要根据NVR ViewModel的具体实现来恢复数据
-    // 暂时为空，后续可以扩展
-  }
-  
-  /// 恢复电源箱缓存数据
-  void _restorePowerBoxCacheData(Map<String, dynamic>? data) {
-    // 这里需要根据PowerBox ViewModel的具体实现来恢复数据
-    // 暂时为空，后续可以扩展
-  }
-  
-  /// 恢复电源缓存数据
-  void _restorePowerCacheData(Map<String, dynamic>? data) {
-    // 这里需要根据Power ViewModel的具体实现来恢复数据
-    // 暂时为空，后续可以扩展
   }
 
 // // 添加一个可以从外部调用的重生成预览数据的方法

@@ -94,7 +94,7 @@ class _InstallDeviceScreenState extends State<InstallDeviceScreen> {
             model.restoreFromCache();
           });
           Future.delayed(const Duration(milliseconds: 200), () {
-            _clearCache();
+            // _clearCache();
           });
         }
       },

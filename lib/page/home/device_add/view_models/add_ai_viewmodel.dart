@@ -10,6 +10,8 @@ import 'package:omt/utils/sys_utils.dart';
 import '../../../../utils/dialog_utils.dart';
 import '../../search_device/services/device_search_service.dart';
 import '../widgets/ai_search_view.dart';
+import '../../../../services/install_cache_service.dart';
+import '../../../../bean/install/install_cache_data.dart';
 
 class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
   final String pNodeCode;
@@ -17,6 +19,11 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
   AddAiViewModel(this.pNodeCode);
 
   bool isInstall = false; //是否是安装 默认否
+  
+  // ===== 大门编号相关属性 =====
+  int? gateId;
+  String? instanceId;
+  
   // ===== AI设备相关属性 =====
   List<DeviceDetailAiData> aiDeviceList = [DeviceDetailAiData()];
   List<TextEditingController> aiControllers = [TextEditingController()];
@@ -25,6 +32,9 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
 
   // List<DeviceEntity> aiSearchResults = [];
   bool stopAiScanning = false;
+  
+  // 缓存服务
+  final InstallCacheService _cacheService = InstallCacheService.instance;
 
   @override
   void initState() {
@@ -111,6 +121,7 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
                 aiDeviceList[index] = data;
               }
             }
+            _saveAiCache(); // 保存缓存
             notifyListeners();
             LoadingUtils.dismiss;
           });
@@ -139,6 +150,7 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
       aiData.enabled = false;
     }
     aiDeviceList.last.enabled = true;
+    _saveAiCache(); // 保存缓存
     notifyListeners();
   }
 
@@ -171,7 +183,83 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
       // 先释放控制器再移除
       aiControllers[index].dispose();
       aiControllers.removeAt(index);
+      _saveAiCache(); // 保存缓存
       notifyListeners();
+    }
+  }
+  
+  /// 保存AI设备缓存数据
+  void _saveAiCache() async {
+    try {
+      final cacheData = await _cacheService.getCacheData();
+      if (cacheData != null) {
+        final updatedCacheData = InstallCacheData(
+          currentStep: cacheData.currentStep,
+          selectedInstance: cacheData.selectedInstance,
+          selectedDoor: cacheData.selectedDoor,
+          selectedInOut: cacheData.selectedInOut,
+          selectedTags: cacheData.selectedTags,
+          aiDeviceList: aiDeviceList,
+          cameraDeviceList: cacheData.cameraDeviceList,
+          nvrData: cacheData.nvrData,
+          powerBoxData: cacheData.powerBoxData,
+          powerData: cacheData.powerData,
+          gateId: gateId,
+          instanceId: instanceId,
+          cameraInOutList: cacheData.cameraInOutList,
+          cameraTypeList: cacheData.cameraTypeList,
+          regulationList: cacheData.regulationList,
+          isNvrNeeded: cacheData.isNvrNeeded,
+          selectedNarInOut: cacheData.selectedNarInOut,
+          nvrInOutList: cacheData.nvrInOutList,
+          selectedNvr: cacheData.selectedNvr,
+          nvrDeviceData: cacheData.nvrDeviceData,
+          isPowerBoxNeeded: cacheData.isPowerBoxNeeded,
+          selectedPowerBoxInOut: cacheData.selectedPowerBoxInOut,
+          powerBoxInOutList: cacheData.powerBoxInOutList,
+          selectedDeviceDetailPowerBox: cacheData.selectedDeviceDetailPowerBox,
+          powerBoxList: cacheData.powerBoxList,
+          portType: cacheData.portType,
+          batteryMains: cacheData.batteryMains,
+          battery: cacheData.battery,
+          isCapacity80: cacheData.isCapacity80,
+          selectedPowerInOut: cacheData.selectedPowerInOut,
+          powerInOutList: cacheData.powerInOutList,
+          selectedRouterType: cacheData.selectedRouterType,
+          routerTypeList: cacheData.routerTypeList,
+          routerIp: cacheData.routerIp,
+          mac: cacheData.mac,
+          exchangeDevices: cacheData.exchangeDevices,
+          selectedExchangeInOut: cacheData.selectedExchangeInOut,
+          createdAt: cacheData.createdAt,
+        );
+        
+        _cacheService.saveCacheData(updatedCacheData);
+      }
+    } catch (e) {
+      print('保存AI设备缓存数据失败: $e');
+    }
+  }
+  
+  /// 从缓存恢复AI设备数据
+  void restoreFromCache() async {
+    try {
+      final cacheData = await _cacheService.getCacheData();
+      if (cacheData != null) {
+        gateId = cacheData.gateId;
+        instanceId = cacheData.instanceId;
+        
+        // 恢复AI设备列表
+        if (cacheData.aiDeviceList.isNotEmpty) {
+          aiDeviceList.clear();
+          aiDeviceList.addAll(cacheData.aiDeviceList);
+          syncControllersWithDeviceList();
+        }
+        
+        notifyListeners();
+      }
+    } catch (e) {
+      print('从缓存恢复AI设备数据失败: $e');
     }
   }
 
@@ -180,8 +268,11 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
       {ValueChanged? onSuccess,
       ValueChanged? onCache,
       ValueChanged<String>? onError}) {
-    // TODO: implement loadData
-    throw UnimplementedError();
+    // AI设备的数据加载通过initState中的restoreFromCache完成
+    // 这里可以触发成功回调
+    if (onSuccess != null) {
+      onSuccess(aiDeviceList);
+    }
   }
 
 }

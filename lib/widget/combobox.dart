@@ -2,6 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart' as ui;
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/common/id_name_value.dart';
+import 'package:omt/theme.dart';
 import 'package:omt/utils/color_utils.dart';
 
 class FComboBox<T> extends StatelessWidget {
@@ -45,17 +46,17 @@ class FComboBox<T> extends StatelessWidget {
         items: items
             .map<ui.ComboBoxItem<T>>(
               (item) => ui.ComboBoxItem<T>(
-            value: item,
-            child: Text(
-              item.toString(),
-              textAlign: TextAlign.start,
-              style: itemStyle ??
-                  const TextStyle(
-                    fontSize: 12,
-                  ),
-            ),
-          ),
-        )
+                value: item,
+                child: Text(
+                  item.toString(),
+                  textAlign: TextAlign.start,
+                  style: itemStyle ??
+                      const TextStyle(
+                        fontSize: 12,
+                      ),
+                ),
+              ),
+            )
             .toList(),
         onChanged: disabled ? null : onChanged,
         placeholder: Text(
@@ -64,6 +65,7 @@ class FComboBox<T> extends StatelessWidget {
           style: placeholderStyle ??
               const TextStyle(
                 fontSize: 12,
+                color: ColorUtils.colorBlackLiteLite,
               ),
         ),
       ),

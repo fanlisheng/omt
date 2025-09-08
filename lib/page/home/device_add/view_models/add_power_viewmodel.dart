@@ -40,11 +40,13 @@ class AddPowerViewModel extends BaseViewModelRefresh<dynamic> {
     HttpQuery.share.homePageService.getInOutList(
       onSuccess: (List<IdNameValue>? data) {
         inOutList = data ?? [];
+        // 缓存恢复统一由 InstallDeviceViewModel 管理，避免重复恢复
+        // restoreFromCache();
         notifyListeners();
       },
     );
 
-    if (isInstall) {
+    if (isInstall && routerIpController.text.isEmpty) {
       // 获取当前子网的默认网关
       LoadingUtils.show(data: "获取路由中...");
       String? subnet = await DeviceUtils.getSubnet();
@@ -66,14 +68,6 @@ class AddPowerViewModel extends BaseViewModelRefresh<dynamic> {
     }
   }
 
-  /// 同步控制器与数据
-  void syncControllersWithData() {
-    // 如果有路由器IP数据，同步到控制器
-    if (mac != null && routerIpController.text.isEmpty) {
-      // 这里可以根据需要填充路由器IP
-      notifyListeners();
-    }
-  }
 
   @override
   void dispose() {
@@ -220,7 +214,8 @@ class AddPowerViewModel extends BaseViewModelRefresh<dynamic> {
     return params;
   }
 
-  static List<Map<String, dynamic>> getSwitches(AddPowerViewModel powerViewModel) {
+  static List<Map<String, dynamic>> getSwitches(
+      AddPowerViewModel powerViewModel) {
     List<Map<String, dynamic>> paramsList = [];
     for (ExchangeDeviceModel exchange in powerViewModel.exchangeDevices) {
       Map<String, dynamic> params = {
@@ -233,9 +228,138 @@ class AddPowerViewModel extends BaseViewModelRefresh<dynamic> {
 
     return paramsList;
   }
+
+  /// 智能恢复缓存选择项（公共方法）
+  void smartRestoreCacheSelections() {
+    _smartRestoreCacheSelections();
+  }
+
+  /// 智能恢复缓存选择项（私有实现）
+  void _smartRestoreCacheSelections() {
+    bool hasChanges = false;
+
+    // 智能恢复 selectedPowerInOut
+    if (selectedPowerInOut != null) {
+      final matchedInOut = inOutList.firstWhere(
+        (item) => item.id == selectedPowerInOut!.id,
+        orElse: () => IdNameValue(),
+      );
+      if (matchedInOut.id != null) {
+        if (selectedPowerInOut != matchedInOut) {
+          selectedPowerInOut = matchedInOut;
+          hasChanges = true;
+        }
+      } else {
+        // 缓存项在新列表中不存在，清空选择
+        selectedPowerInOut = null;
+        hasChanges = true;
+      }
+    }
+
+    // 智能恢复 selectedRouterType
+    if (selectedRouterType != null) {
+      final matchedRouterType = routerTypeList.firstWhere(
+        (item) => item.id == selectedRouterType!.id,
+        orElse: () => IdNameValue(),
+      );
+      if (matchedRouterType.id != null) {
+        if (selectedRouterType != matchedRouterType) {
+          selectedRouterType = matchedRouterType;
+          hasChanges = true;
+        }
+      } else {
+        // 缓存项在新列表中不存在，清空选择
+        selectedRouterType = null;
+        hasChanges = true;
+      }
+    }
+
+    // 智能恢复 selectedInOut（交换机相关）
+    if (selectedInOut != null) {
+      final matchedInOut = inOutList.firstWhere(
+        (item) => item.id == selectedInOut!.id,
+        orElse: () => IdNameValue(),
+      );
+      if (matchedInOut.id != null) {
+        if (selectedInOut != matchedInOut) {
+          selectedInOut = matchedInOut;
+          hasChanges = true;
+        }
+      } else {
+        // 缓存项在新列表中不存在，清空选择
+        selectedInOut = null;
+        hasChanges = true;
+      }
+    }
+
+    if (hasChanges) {
+      notifyListeners();
+    }
+  }
+
+  /// 从缓存恢复电源数据
+  void restoreFromCache({
+    String? portType,
+    bool? batteryMains,
+    bool? battery,
+    bool? isCapacity80,
+    IdNameValue? selectedPowerInOut,
+    List<IdNameValue>? powerInOutList,
+    IdNameValue? selectedRouterType,
+    List<IdNameValue>? routerTypeList,
+    String? routerIp,
+    String? mac,
+    List<Map<String, dynamic>>? exchangeDevices,
+    IdNameValue? selectedExchangeInOut,
+  }) {
+    // 恢复电源相关数据
+    if (portType != null) {
+      this.portType = portType;
+    }
+    if (batteryMains != null) {
+      this.batteryMains = batteryMains;
+    }
+    if (battery != null) {
+      this.battery = battery;
+    }
+    if (isCapacity80 != null) {
+      this.isCapacity80 = isCapacity80;
+    }
+    if (selectedPowerInOut != null) {
+      this.selectedPowerInOut = selectedPowerInOut;
+    }
+    if (powerInOutList != null && powerInOutList.isNotEmpty) {
+      inOutList = powerInOutList;
+    }
+    if (selectedRouterType != null) {
+      this.selectedRouterType = selectedRouterType;
+    }
+    if (routerTypeList != null && routerTypeList.isNotEmpty) {
+      this.routerTypeList = routerTypeList;
+    }
+    if (routerIp != null) {
+      routerIpController.text = routerIp;
+    }
+    if (mac != null) {
+      this.mac = mac;
+    }
+    if (exchangeDevices != null && exchangeDevices.isNotEmpty) {
+      this.exchangeDevices.clear();
+      for (var deviceData in exchangeDevices) {
+        final device = ExchangeDeviceModel();
+        device.selectedPortNumber = deviceData['selectedPortNumber'];
+        device.selectedSupplyMethod = deviceData['selectedSupplyMethod'];
+        this.exchangeDevices.add(device);
+      }
+    }
+    if (selectedExchangeInOut != null) {
+      selectedInOut = selectedExchangeInOut;
+    }
+
+    print('电源缓存数据已恢复');
+    notifyListeners();
+  }
 }
-
-
 
 class ExchangeDeviceModel extends ChangeNotifier {
   String? selectedPortNumber;

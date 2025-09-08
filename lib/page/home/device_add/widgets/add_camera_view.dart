@@ -6,6 +6,7 @@ import 'package:kayo_package/mvvm/base/provider_widget.dart';
 import 'package:kayo_package/utils/base_sys_utils.dart';
 import 'package:kayo_package/views/widget/base/clickable.dart';
 import 'package:kayo_package/views/widget/base/dash_line.dart';
+import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/bean/home/home_page/camera_device_entity.dart';
@@ -14,6 +15,7 @@ import 'package:omt/utils/color_utils.dart';
 
 import '../../../../bean/home/home_page/device_detail_ai_entity.dart';
 import '../../../../theme.dart';
+import '../../../../widget/combobox.dart';
 
 class AddCameraView extends StatelessWidget {
   final AddCameraViewModel model;
@@ -75,7 +77,7 @@ class AddCameraView extends StatelessWidget {
               // 播放成功 - 连接成功
               statusText = '';
               statusColor = AppTheme().color;
-            }else if (e.playResult == true) {
+            } else if (e.playResult == true) {
               // 播放成功 - 连接成功
               statusText = '连接成功';
               statusColor = AppTheme().color;
@@ -428,37 +430,14 @@ class AddCameraView extends StatelessWidget {
                           ),
                           enabled: !e.readOnly,
                         ),
-                        two: ComboBox<IdNameValue>(
-                          isExpanded: true,
-                          value: e.selectedCameraType,
-                          items: model.cameraTypeList
-                              .map<ComboBoxItem<IdNameValue>>((e) {
-                            return ComboBoxItem<IdNameValue>(
-                              value: e,
-                              child: Text(
-                                e.name ?? "",
-                                textAlign: TextAlign.start,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: ColorUtils.colorGreenLiteLite,
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: e.readOnly
-                              ? null
-                              : (a) {
-                                  e.selectedCameraType = a!;
-                                  model.notifyListeners();
-                                },
-                          placeholder: const Text(
-                            "请选择摄像头类型",
-                            textAlign: TextAlign.start,
-                            style: TextStyle(
-                                fontSize: 12,
-                                color: ColorUtils.colorBlackLiteLite),
-                          ),
-                        ),
+                        two: FComboBox<IdNameValue>(
+                            selectedValue: e.selectedCameraType,
+                            items: model.cameraTypeList,
+                            onChanged: (a) {
+                              e.selectedCameraType = a!;
+                              model.notifyListeners();
+                            },
+                            placeholder: "请选择大门编号"),
                       ),
                       const SizedBox(height: 10),
                       const EquallyRow(
@@ -673,103 +652,120 @@ class AddCameraView extends StatelessWidget {
   }
 
   Widget _videoView(
-      VideoController controller, AddCameraViewModel model, int index) {
+      VideoController? controller, AddCameraViewModel model, int index) {
+    // 获取当前摄像头设备
+    final cameraDevice = model.cameraDeviceList[index];
+
+    // 使用设备自己的videoController
+    final videoController = cameraDevice.videoController;
+
+    // 如果有RTSP地址，则播放视频
+    final rtspUrl = cameraDevice.rtsp;
+    if (rtspUrl != null && rtspUrl.isNotEmpty) {
+      videoController.player.open(Media(rtspUrl));
+    }
+
     return Center(
         child: SizedBox(
       width: 640,
       height: 360,
-      child: StreamBuilder<bool>(
-        stream: controller.player.stream.playing,
-        builder: (context, playingSnapshot) {
-          return StreamBuilder<Duration>(
-            stream: controller.player.stream.position,
-            builder: (context, positionSnapshot) {
-              // 检查是否正在播放且有画面
-              bool isPlaying = playingSnapshot.data ?? false;
-              Duration position = positionSnapshot.data ?? Duration.zero;
+      child: StatefulBuilder(
+        builder: (context, setState) {
+          return StreamBuilder<bool>(
+            stream: videoController.player.stream.playing,
+            builder: (context, playingSnapshot) {
+              return StreamBuilder<Duration>(
+                stream: videoController.player.stream.position,
+                builder: (context, positionSnapshot) {
+                  // 检查是否正在播放且有画面
+                  bool isPlaying = playingSnapshot.data ?? false;
+                  Duration position = positionSnapshot.data ?? Duration.zero;
 
-              // 更新CameraDeviceEntity中的播放状态
-              model.cameraDeviceList[index].isPlaying = isPlaying;
-              model.cameraDeviceList[index].position = position;
+                  // 更新CameraDeviceEntity中的播放状态
+                  model.cameraDeviceList[index].isPlaying = isPlaying;
+                  model.cameraDeviceList[index].position = position;
 
-              // 如果正在播放且有画面，直接显示视频
-              if (isPlaying && position > Duration.zero) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  model.updatePlayResult(index, true); // 播放成功
-                });
-                return Video(controller: controller);
-              }
-
-              // 添加延迟判断逻辑，避免立即显示无画面
-              return FutureBuilder(
-                future: Future.delayed(const Duration(seconds: 3)),
-                builder: (context, delaySnapshot) {
-                  // 如果延迟还没结束且没有播放，显示加载状态
-                  if (delaySnapshot.connectionState != ConnectionState.done) {
-                    return Container(
-                      width: double.infinity,
-                      height: double.infinity,
-                      color: Colors.black,
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const material.CircularProgressIndicator(
-                              color: Colors.white,
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              '正在连接...',
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.7),
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
+                  // 如果正在播放且有画面，直接显示视频
+                  if (isPlaying && position > Duration.zero) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      model.updatePlayResult(index, true); // 播放成功
+                    });
+                    return Video(controller: videoController);
                   }
 
-                  // 延迟结束后，设置播放失败状态并显示无画面提示
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    model.updatePlayResult(index, false); // 播放失败/超时
-                  });
+                  // 添加延迟判断逻辑，避免立即显示无画面
+                  return FutureBuilder(
+                    future: Future.delayed(const Duration(seconds: 3)),
+                    builder: (context, delaySnapshot) {
+                      // 如果延迟还没结束且没有播放，显示加载状态
+                      if (delaySnapshot.connectionState !=
+                          ConnectionState.done) {
+                        return Container(
+                          width: double.infinity,
+                          height: double.infinity,
+                          color: Colors.black,
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const material.CircularProgressIndicator(
+                                  color: Colors.white,
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  '正在连接...',
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.7),
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }
 
-                  return Container(
-                    width: double.infinity,
-                    height: double.infinity,
-                    color: Colors.black,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          material.Icon(
-                            material.Icons.videocam_off,
-                            size: 48,
-                            color: Colors.white.withOpacity(0.7),
+                      // 延迟结束后，设置播放失败状态并显示无画面提示
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        model.updatePlayResult(index, false); // 播放失败/超时
+                      });
+
+                      return Container(
+                        width: double.infinity,
+                        height: double.infinity,
+                        color: Colors.black,
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              material.Icon(
+                                material.Icons.videocam_off,
+                                size: 48,
+                                color: Colors.white.withOpacity(0.7),
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                '无画面',
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.7),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                '请检查RTSP地址是否正确',
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.54),
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 16),
-                          Text(
-                            '无画面',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.7),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            '请检查RTSP地址是否正确',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.54),
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                        ),
+                      );
+                    },
                   );
                 },
               );

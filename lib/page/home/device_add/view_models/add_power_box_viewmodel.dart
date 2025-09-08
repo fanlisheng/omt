@@ -25,6 +25,8 @@ class AddPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
   final asgbKey = GlobalKey<AutoSuggestBoxState>();
   final focusNode = FocusNode();
   final controller = TextEditingController();
+  
+
 
   // String powerBoxMemo = "";
   // final TextEditingController powerBoxMemoController = TextEditingController();
@@ -35,20 +37,105 @@ class AddPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
     if (isInstall == false) {
       isPowerBoxNeeded = true;
     }
+    
+    // 加载基础数据
+    _loadInitialData();
+  }
+  
+  /// 加载初始数据
+  void _loadInitialData() {
+    int completedRequests = 0;
+    const int totalRequests = 2;
+    
+    void checkAllRequestsCompleted() {
+      completedRequests++;
+      if (completedRequests == totalRequests) {
+        // 所有网络请求完成后通知UI更新
+        _smartRestoreCacheSelections();
+        notifyListeners();
+      }
+    }
+    
     // 初始化进/出口列表
     HttpQuery.share.homePageService.getInOutList(
       onSuccess: (List<IdNameValue>? data) {
         inOutList = data ?? [];
-        notifyListeners();
+        checkAllRequestsCompleted();
       },
     );
+    
     // 初始化电源箱列表
     HttpQuery.share.installService.getUnboundPowerBox(
       onSuccess: (List<DeviceDetailPowerBoxData>? data) {
         powerBoxList = data ?? [];
-        notifyListeners();
+        checkAllRequestsCompleted();
       },
     );
+  }
+  
+  /// 智能恢复缓存选择项（公共方法）
+  void smartRestoreCacheSelections() {
+    _smartRestoreCacheSelections();
+  }
+  
+  /// 智能恢复缓存选择项
+  void _smartRestoreCacheSelections() {
+    bool needRequestInterface = false;
+    DeviceDetailPowerBoxData? finalSelectedPowerBox;
+    
+    // 智能恢复进出口选择
+    if (selectedPowerBoxInOut != null && inOutList.isNotEmpty) {
+      IdNameValue? matchedInOut;
+      bool inOutExists = inOutList.any((inOut) {
+        if (inOut.id == selectedPowerBoxInOut?.id) {
+          matchedInOut = inOut;
+          return true;
+        }
+        return false;
+      });
+      if (inOutExists && matchedInOut != null) {
+        // 只有当对象引用不同时才重新赋值，避免不必要的UI更新
+        if (selectedPowerBoxInOut != matchedInOut) {
+          selectedPowerBoxInOut = matchedInOut;
+        }
+      } else {
+        // 如果缓存的进出口不在新列表中，清空选择
+        selectedPowerBoxInOut = null;
+      }
+    }
+    
+    // 智能恢复电源箱选择
+    if (selectedDeviceDetailPowerBox != null && powerBoxList.isNotEmpty) {
+      DeviceDetailPowerBoxData? matchedPowerBox;
+      bool powerBoxExists = powerBoxList.any((powerBox) {
+        if (powerBox.deviceCode == selectedDeviceDetailPowerBox?.deviceCode) {
+          matchedPowerBox = powerBox;
+          return true;
+        }
+        return false;
+      });
+      if (powerBoxExists && matchedPowerBox != null) {
+        // 只有当对象引用不同时才重新赋值，避免不必要的UI更新
+        if (selectedDeviceDetailPowerBox != matchedPowerBox) {
+          selectedDeviceDetailPowerBox = matchedPowerBox;
+          controller.text = matchedPowerBox?.deviceCode ?? "";
+          needRequestInterface = true;
+          finalSelectedPowerBox = matchedPowerBox;
+        }
+      } else {
+        // 如果缓存的电源箱不在新列表中，清空选择
+        selectedDeviceDetailPowerBox = null;
+        controller.clear();
+      }
+    }
+    
+    // 通知UI更新
+    notifyListeners();
+    
+    // 在所有数据处理完成后，统一调用一次selectedPowerBoxCode
+    if (needRequestInterface && finalSelectedPowerBox != null) {
+      selectedPowerBoxCode(finalSelectedPowerBox, requestInterface: true);
+    }
   }
 
   /// 同步控制器与数据
@@ -85,9 +172,12 @@ class AddPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   //选择电源箱code
-  selectedPowerBoxCode(DeviceDetailPowerBoxData? a) {
+  selectedPowerBoxCode(DeviceDetailPowerBoxData? a, {bool requestInterface = true}) {
     if (a == null) return;
-    requestDcInterfaceData(a);
+    selectedDeviceDetailPowerBox = a;
+    if (requestInterface) {
+      requestDcInterfaceData(a);
+    }
   }
 
   // 安装电源箱
@@ -96,14 +186,6 @@ class AddPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
     if (checkSelection() == false) {
       return;
     }
-    // if (selectedPowerBoxInOut?.id == null) {
-    //   LoadingUtils.showToast(data: '请选择进出口');
-    //   return;
-    // }
-    // if (selectedDeviceDetailPowerBox?.deviceCode == null) {
-    //   LoadingUtils.showToast(data: '请先选择电源箱');
-    //   return;
-    // }
 
     HttpQuery.share.installService.powerBoxInstall(
         pNodeCode: pNodeCode,
@@ -170,6 +252,40 @@ class AddPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
       }
     }
     return true;
+  }
+
+
+
+  /// 从缓存恢复电源箱数据
+  void restoreFromCache({
+    bool? isPowerBoxNeeded,
+    List<IdNameValue>? inOutList,
+    IdNameValue? selectedPowerBoxInOut,
+    DeviceDetailPowerBoxData? selectedDeviceDetailPowerBox,
+  }) {
+    // 恢复电源箱相关数据
+    if (isPowerBoxNeeded != null) {
+      this.isPowerBoxNeeded = isPowerBoxNeeded;
+    }
+    // 恢复进出口列表
+    if (inOutList != null) {
+      this.inOutList = inOutList;
+    }
+    // 恢复选中的进出口
+    if (selectedPowerBoxInOut != null) {
+      this.selectedPowerBoxInOut = selectedPowerBoxInOut;
+    }
+    // 恢复选中的电源箱
+    if (selectedDeviceDetailPowerBox != null) {
+      this.selectedDeviceDetailPowerBox = selectedDeviceDetailPowerBox;
+      // 同步控制器
+      controller.text = selectedDeviceDetailPowerBox.deviceCode ?? "";
+      // 缓存恢复时调用selectedPowerBoxCode方法（只在外部缓存恢复时执行）
+      selectedPowerBoxCode(selectedDeviceDetailPowerBox, requestInterface: true);
+    }
+    
+    print('电源箱缓存数据已恢复');
+    notifyListeners();
   }
 
   static Map<String, dynamic>? getPowerBoxes(
