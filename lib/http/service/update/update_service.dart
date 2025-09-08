@@ -27,6 +27,7 @@ class UpdateService {
   String? _downloadPath;
   String? _extractedPath;
   final FileLogUtils _fileLogger = FileLogUtils();
+  CancelToken? _cancelToken;
   final String _logType = 'update';
 
   // 获取当前版本信息
@@ -66,7 +67,7 @@ class UpdateService {
         final currentVersion = await getCurrentVersion();
 
         // 比较版本号
-        if (_compareVersions(updateInfo.version, currentVersion.version) > 0) {
+        if (_compareVersions(updateInfo.version, currentVersion.version) >= 0) {
           return updateInfo;
         }
       }
@@ -100,6 +101,7 @@ class UpdateService {
 
     _isDownloading = true;
     _downloadProgress = 0.0;
+    _cancelToken = CancelToken();
 
     try {
       Directory baseDir;
@@ -134,6 +136,7 @@ class UpdateService {
       await _dio.download(
         updateInfo.downloadUrl,
         _downloadPath!,
+        cancelToken: _cancelToken,
         onReceiveProgress: (received, total) async {
           if (total != -1) {
             _downloadProgress = received / total;
@@ -431,6 +434,19 @@ class UpdateService {
     return null;
   }
 
+  // 取消下载
+  Future<void> cancelDownload() async {
+    if (_isDownloading && _cancelToken != null && !_cancelToken!.isCancelled) {
+      _cancelToken!.cancel('用户取消下载');
+      _isDownloading = false;
+      _downloadProgress = 0.0;
+      await logMessage('下载已取消');
+    }
+  }
+
+  // 获取取消令牌
+  CancelToken? get cancelToken => _cancelToken;
+
   // 获取下载进度
   double get downloadProgress => _downloadProgress;
 
@@ -483,5 +499,11 @@ class UpdateService {
       }
     }
     return null;
+  }
+
+  // 清除本地保存的更新信息
+  Future<void> clearLocalUpdateInfo() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('lastUpdateInfo');
   }
 }

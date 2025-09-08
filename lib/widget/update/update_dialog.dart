@@ -28,200 +28,330 @@ class _UpdateDialogState extends State<UpdateDialog> {
   bool _isInstalling = false;
 
   BuildContext _snackContext() {
-    final overlayCtx = KayoPackage.share.navigatorKey.currentState?.overlay?.context;
+    final overlayCtx =
+        KayoPackage.share.navigatorKey.currentState?.overlay?.context;
     return overlayCtx ?? context;
   }
 
   void _showSnack(String msg, Color color, {int seconds = 3}) {
     LoadingUtils.showInfo(data: msg);
-    // final ctx = _snackContext();
-    // final messenger = ScaffoldMessenger.maybeOf(ctx);
-    // if (messenger != null) {
-    //   messenger.showSnackBar(
-    //     SnackBar(content: Text(msg), backgroundColor: color, duration: Duration(seconds: seconds)),
-    //   );
-    // } else {
-    //   showDialog(
-    //     context: ctx,
-    //     barrierDismissible: true,
-    //     builder: (c) => AlertDialog(
-    //       content: Text(msg),
-    //       actions: [
-    //         TextButton(onPressed: () => Navigator.of(c).pop(), child: const Text('确定')),
-    //       ],
-    //     ),
-    //   );
-    // }
   }
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Row(
-        children: [
-          Icon(
-            Icons.system_update,
-            color: AppTheme().color,
-            size: 24,
-          ),
-          const SizedBox(width: 8),
-          const Text(
-            '发现新版本',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
+    final screenSize = MediaQuery.of(context).size;
+    final dialogWidth = screenSize.width > 600 ? 500.0 : screenSize.width * 0.9;
+    final dialogHeight = screenSize.height > 700
+        ? (_isDownloading ? 400.0 : 358.0)
+        : screenSize.height * 0.7;
+
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      child: Container(
+        width: dialogWidth,
+        height: dialogHeight,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
             ),
-          ),
-        ],
-      ),
-      content: SizedBox(
-        width: 400,
+          ],
+        ),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 版本信息
-            Row(
-              children: [
-                const Text(
-                  '当前版本：',
-                  style: TextStyle(fontSize: 14),
-                ),
-                FutureBuilder(
-                  future: _updateService.getCurrentVersion(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return Text(
-                        snapshot.data!.version,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      );
-                    }
-                    return const Text('获取中...', style: TextStyle(fontSize: 14));
-                  },
-                ),
-                const SizedBox(width: 20),
-                const Text(
-                  '最新版本：',
-                  style: TextStyle(fontSize: 14),
-                ),
-                Text(
-                  widget.updateInfo.version,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: AppTheme().color,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // 更新日志
-            const Text(
-              '更新内容：',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 8),
+            // 顶部蓝色渐变区域
             Container(
+              height: 136,
               width: double.infinity,
-              height: 120,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: ColorUtils.colorBackgroundLine,
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: ColorUtils.colorGrayLight),
-              ),
-              child: SingleChildScrollView(
-                child: Text(
-                  widget.updateInfo.changelog.isEmpty
-                      ? '暂无更新说明'
-                      : widget.updateInfo.changelog,
-                  style: const TextStyle(fontSize: 12, height: 1.4),
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  topRight: Radius.circular(12),
+                ),
+                image: DecorationImage(
+                  image: AssetImage('assets/home/ic_update_bg.png'),
+                  fit: BoxFit.cover,
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
-
-            // 下载进度
-            if (_isDownloading) ...[
-              Row(
+              child: Stack(
                 children: [
-                  const Text('下载进度：', style: TextStyle(fontSize: 14)),
-                  const SizedBox(width: 8),
-                  Text(
-                    '${(_downloadProgress * 100).toStringAsFixed(1)}%',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: AppTheme().color,
-                      fontWeight: FontWeight.w500,
+                  // 标题和关闭按钮
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 20, 16, 20),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text(
+                                '新版本，抢先体验',
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF333333),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'v${widget.updateInfo.version}版本上线啦',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Color(0xFF202020),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              LinearProgressIndicator(
-                value: _downloadProgress,
-                backgroundColor: ColorUtils.colorGrayLight,
-                valueColor: AlwaysStoppedAnimation<Color>(AppTheme().color),
-              ),
-              const SizedBox(height: 16),
-            ],
-
-            // 下载完成提示
-            if (_downloadCompleted) ...[
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: ColorUtils.colorGreen.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: ColorUtils.colorGreen),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.check_circle,
-                      color: ColorUtils.colorGreen,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      '下载完成！点击安装按钮重启应用并安装更新',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: ColorUtils.colorGreen,
+                  // 关闭按钮
+                  Positioned(
+                    top: 0,
+                    right: 6,
+                    child: GestureDetector(
+                      onTap: () {
+                        widget.onCancel?.call();
+                        Navigator.of(context).pop();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        child: const Icon(
+                          Icons.close,
+                          color: Color(0xFF999999),
+                          size: 24,
+                        ),
                       ),
                     ),
+                  )
+                ],
+              ),
+            ),
+
+            // 白色内容区域
+            Expanded(
+              flex: 256,
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      '本次更新：',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF333333),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+
+                    // 更新内容列表
+                    Container(
+                      height: 80,
+                      child: SingleChildScrollView(
+                        child: Text(
+                          '• 新增一键绑定功能',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF666666),
+                            height: 1.4,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const Spacer(),
+
+                    // 下载进度区域
+                    if (_isDownloading) ...[
+                      const SizedBox(height: 20),
+                      LinearProgressIndicator(
+                        value: _downloadProgress,
+                        backgroundColor: const Color(0xFFE5E5E5),
+                        valueColor: const AlwaysStoppedAnimation<Color>(
+                            Color(0xFF4ABCD0)),
+                        minHeight: 6,
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(4)),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          const Text(
+                            '下载进度：',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF666666),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '${(_downloadProgress * 100).toStringAsFixed(0)}%',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF4ABCD0),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+
+                    // 底部按钮区域
+                    _isDownloading
+                        ? _buildDownloadingButtons()
+                        : _buildNormalButtons(),
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
-            ],
+            ),
           ],
         ),
       ),
-      actions: [
-        // 取消按钮（非强制更新时显示）
-        if (!widget.updateInfo.forceUpdate && !_isDownloading)
-          TextButton(
-            onPressed: () {
-              widget.onCancel?.call();
-              Navigator.of(context).pop();
-            },
-            child: const Text('稍后再说'),
-          ),
+    );
+  }
 
-        // 下载/安装按钮
-        ElevatedButton(
-          onPressed: (_isDownloading || _isInstalling) ? null : _handleAction,
-          child: Text(_getActionButtonText()),
+  Widget _buildUpdateItem(String text) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: const EdgeInsets.only(top: 6),
+          width: 6,
+          height: 6,
+          decoration: const BoxDecoration(
+            color: Color(0xFF44C5C4),
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontSize: 14,
+              color: Color(0xFF666666),
+              height: 1.4,
+            ),
+          ),
         ),
       ],
+    );
+  }
+
+  Widget _buildNormalButtons() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // 版本记录按钮
+        Container(
+          width: 110,
+          height: 32,
+          child: OutlinedButton(
+            onPressed: () {
+              // 版本记录功能
+            },
+            style: OutlinedButton.styleFrom(
+              side: const BorderSide(color: Color(0xFFE5E5E5), width: 1),
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            child: const Text(
+              '版本记录',
+              style: TextStyle(
+                fontSize: 12,
+                color: Color(0xFF44C5C4),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        // 立即安装按钮
+        Container(
+          width: 110,
+          height: 32,
+          child: ElevatedButton(
+            onPressed: _startDownload,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF44C5C4),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+              elevation: 0,
+            ),
+            child: const Text(
+              '立即安装',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDownloadingButtons() {
+    return Container(
+      height: 32,
+      decoration: BoxDecoration(
+        border: Border.all(color: const Color(0xFF4ABCD0), width: 1),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: TextButton(
+        onPressed: () async {
+          // 取消下载
+          await _updateService.cancelDownload();
+          setState(() {
+            _isDownloading = false;
+            _downloadProgress = 0.0;
+          });
+        },
+        style: TextButton.styleFrom(
+          foregroundColor: const Color(0xFF4ABCD0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(6),
+          ),
+        ),
+        child: const Text(
+          '取消下载',
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showVersionHistory() {
+    // 显示版本历史记录对话框
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('版本记录'),
+        content: const Text('这里显示版本历史记录...'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('关闭'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -231,15 +361,15 @@ class _UpdateDialogState extends State<UpdateDialog> {
     } else if (_isInstalling) {
       return '安装中...';
     } else if (_downloadCompleted) {
-      return '立即安装 (将关闭应用)';
+      return '立即安装';
     } else {
-      return '立即更新';
+      return '立即安装';
     }
   }
 
   void _handleAction() async {
     if (_downloadCompleted) {
-      // 安装更新（带详细错误提示）
+      // 安装更新
       await _installWithFeedback();
     } else {
       // 开始下载
@@ -266,26 +396,23 @@ class _UpdateDialogState extends State<UpdateDialog> {
       _isDownloading = false;
       if (success) {
         _downloadCompleted = true;
-        // 下载完成后自动解压
         _extractAndCheck();
       }
     });
 
-    if (!success) {
+    // 只有在非用户取消的情况下才显示失败提示
+    if (!success && _updateService.cancelToken?.isCancelled != true) {
       _showSnack('下载失败，请检查网络连接后重试', Colors.red);
     }
   }
 
-  // 解压并检查.exe文件
   void _extractAndCheck() async {
     try {
       _showSnack('正在解压更新包...', Colors.blue, seconds: 2);
 
-      // 解压ZIP包
       final extractSuccess = await _updateService.extractUpdatePackage();
 
       if (extractSuccess) {
-        // 检查是否有.exe文件（Windows）或其他平台安装介质
         bool found = false;
         if (Platform.isWindows) {
           found = await _updateService.existsByExtension('.exe');
@@ -308,29 +435,32 @@ class _UpdateDialogState extends State<UpdateDialog> {
 
   Future<void> _installWithFeedback() async {
     setState(() {
-      _isInstalling = true; // Set installing state
+      _isInstalling = true;
     });
     try {
-      // 检查平台支持
       if (!Platform.isWindows) {
         _showSnack('当前平台不支持自动安装，请在Windows系统上使用此功能', Colors.red);
-        setState(() { _isInstalling = false; });
+        setState(() {
+          _isInstalling = false;
+        });
         return;
       }
 
-      // Windows: 先确保存在 .exe
       final hasExe = await _updateService.existsByExtension('.exe');
       if (!hasExe) {
         _showSnack('未找到安装程序(.exe)。请检查ZIP内容是否包含安装包。', Colors.red);
-        setState(() { _isInstalling = false; });
+        setState(() {
+          _isInstalling = false;
+        });
         return;
       }
 
-      // 直接开始安装
       final ok = await _updateService.installUpdate();
       if (!ok) {
         _showSnack('安装程序未能启动。可能被系统或安全软件拦截，或者安装脚本创建失败。', Colors.red);
-        setState(() { _isInstalling = false; });
+        setState(() {
+          _isInstalling = false;
+        });
         return;
       }
 
@@ -340,7 +470,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
     } finally {
       if (mounted) {
         setState(() {
-          _isInstalling = false; // Reset installing state
+          _isInstalling = false;
         });
       }
     }

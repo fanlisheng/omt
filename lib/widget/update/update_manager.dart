@@ -21,6 +21,7 @@ class UpdateManager {
       await Future.delayed(const Duration(seconds: 2));
       
       final updateInfo = await _updateService.checkForUpdate();
+      // if (updateInfo != null && context.mounted) {
       if (updateInfo != null && context.mounted) {
         _showUpdateDialog(context, updateInfo);
       }
@@ -79,6 +80,11 @@ class UpdateManager {
     }
   }
 
+  // 显示更新弹窗（公共方法）
+  void showUpdateDialog(BuildContext context, UpdateInfo updateInfo) {
+    _showUpdateDialog(context, updateInfo);
+  }
+
   // 显示更新弹窗
   void _showUpdateDialog(BuildContext context, UpdateInfo updateInfo) {
     var context1 =
@@ -90,7 +96,7 @@ class UpdateManager {
         updateInfo: updateInfo,
         onCancel: () {
           // 保存更新信息到本地，下次启动时提醒
-          // _updateService.saveUpdateInfo(updateInfo);
+          _updateService.saveUpdateInfo(updateInfo);
         },
       ),
     );
@@ -140,4 +146,4 @@ class UpdateManager {
   void resetUpdateCheck() {
     _hasCheckedUpdate = false;
   }
-} 
+}

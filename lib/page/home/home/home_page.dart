@@ -42,11 +42,58 @@ class HomePage extends StatelessWidget {
                         color: "#E9F4F5".toColor(),
                       ),
                     ),
+                    // 版本号显示
+                    if (model.currentVersion.isNotEmpty) ...<Widget>[
+                      const SizedBox(width: 8),
+                      Text(
+                        "v${model.currentVersion}",
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: "#B8E6EA".toColor(),
+                        ),
+                      ),
+                    ],
+                    // 新版本提示标识
+                    if (model.hasNewVersion) ...<Widget>[
+                        const SizedBox(width: 8),
+                        GestureDetector(
+                          onTap: () => model.onNewVersionTap(),
+                          child: Container(
+                            width: 46,
+                            height: 22,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFFF940E),
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(6),
+                                topRight: Radius.circular(6),
+                                bottomLeft: Radius.circular(6),
+                                bottomRight: Radius.circular(0),
+                              ),
+                            ),
+                            child: const Center(
+                              child: Text(
+                                '新版本',
+                                style: TextStyle(
+                                  color: Color(0xFFFFFFFF),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                   ],
                 ),
                 automaticallyImplyLeading: false,
                 actions: SysUtils.appBarAction(context),
-                leading: null),
+                leading: null,
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/home/ic_nav_bg.png'),
+                    fit: BoxFit.cover,
+                  ),
+                )),
             onDisplayModeChanged: (mode) {
               debugPrint('Changed to $mode');
             },
@@ -100,7 +147,7 @@ class HomePage extends StatelessWidget {
                     ],
             ),
             transitionBuilder: null,
-          );
+            );
         });
   }
 }

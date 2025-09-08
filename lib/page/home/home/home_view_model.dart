@@ -20,6 +20,9 @@ import 'package:omt/utils/sys_utils.dart';
 import 'package:omt/widget/combobox.dart';
 import 'package:omt/services/install_cache_service.dart';
 import 'package:omt/router_utils.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:omt/widget/update/update_manager.dart';
+import 'package:omt/http/service/update/update_service.dart';
 
 import '../../../test/select_detail_page.dart';
 import '../search_device/widgets/search_device_screen.dart';
@@ -58,6 +61,67 @@ class NavigationBodyItem extends StatelessWidget {
 class HomeViewModel extends BaseViewModelRefresh<dynamic> {
   int topIndex = 0;
   PaneDisplayMode displayMode = PaneDisplayMode.open;
+  
+  // 版本信息相关
+  String currentVersion = '';
+  bool hasNewVersion = false;
+  final UpdateService _updateService = UpdateService();
+  
+  // 加载当前版本信息
+  Future<void> _loadVersionInfo() async {
+    try {
+      final packageInfo = await PackageInfo.fromPlatform();
+      currentVersion = packageInfo.version;
+      notifyListeners();
+    } catch (e) {
+      print('获取版本信息失败: $e');
+    }
+  }
+  
+  // 检查更新状态
+  Future<void> _checkUpdateStatus() async {
+    try {
+      // 检查是否有本地保存的更新信息（用户点击了"稍后再说"）
+      final localUpdateInfo = await _updateService.getLocalUpdateInfo();
+      if (localUpdateInfo != null) {
+        hasNewVersion = true;
+        notifyListeners();
+        return;
+      }
+      
+      // 检查远程更新
+      final updateInfo = await _updateService.checkForUpdate();
+      if (updateInfo != null) {
+        hasNewVersion = true;
+        // 保存更新信息到本地
+        await _updateService.saveUpdateInfo(updateInfo);
+        notifyListeners();
+      }
+    } catch (e) {
+      print('检查更新状态失败: $e');
+    }
+  }
+
+  // 处理新版本标识点击事件
+  Future<void> onNewVersionTap() async {
+    try {
+      final localUpdateInfo = await _updateService.getLocalUpdateInfo();
+      if (localUpdateInfo != null) {
+        // 清除本地更新信息
+        await _updateService.clearLocalUpdateInfo();
+        hasNewVersion = false;
+        notifyListeners();
+        
+        // 显示更新对话框
+        final context = KayoPackage.share.navigatorKey.currentState?.overlay?.context;
+        if (context != null) {
+          UpdateManager().showUpdateDialog(context, localUpdateInfo);
+        }
+      }
+    } catch (e) {
+      print('处理新版本点击失败: $e');
+    }
+  }
 
   List<NavigationPaneItem> get homeItems {
     return [
@@ -259,6 +323,10 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
   @override
   void initState() async {
     super.initState();
+
+    // 加载版本信息和检查更新状态
+    await _loadVersionInfo();
+    // await _checkUpdateStatus();
 
     // 检查安装缓存
     _checkInstallCache();
