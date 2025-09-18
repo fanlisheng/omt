@@ -24,9 +24,9 @@ class UpgradeViewModel extends ChangeNotifier {
   
   /// 开始下载流程
   void startDownload(BuildContext context, String upgradeType) {
-    // _showUpgradeSuccessDialog(context, upgradeType);
+    _showUpgradeSuccessDialog(context, upgradeType);
     // _showUpgradeFailureDialog(context, upgradeType, "测试一下");
-    _startWaitingUpgrade(context, upgradeType);
+    // _startWaitingUpgrade(context, upgradeType);
     // if (_deviceCode == null || _deviceIp == null) {
     //   LoadingUtils.showToast(data: '设备信息不完整');
     //   return;

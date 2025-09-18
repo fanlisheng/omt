@@ -310,9 +310,7 @@ class _UpgradeProgressDialogState extends State<UpgradeProgressDialog> {
             width: 70,
             height: 70,
             child: ProgressRing(
-              strokeWidth: 8,
-                backgroundColor:ColorUtils.colorBlackLiteLite
-            ),
+                strokeWidth: 8, backgroundColor: ColorUtils.colorBlackLiteLite),
           ),
           SizedBox(height: 20),
           // 正在升级按钮
@@ -358,13 +356,20 @@ class UpgradeResultDialog extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // 结果图标
-          SizedBox(height: 30),
-          Icon(
-            isSuccess ? FluentIcons.check_mark : FluentIcons.error_badge,
-            size: 48,
-            color: isSuccess ? Colors.green : Colors.red,
+          const SizedBox(height: 30),
+          // Icon(
+          //   isSuccess ? FluentIcons.check_mark : FluentIcons.error_badge,
+          //   size: 48,
+          //   color: isSuccess ? Colors.green : Colors.red,
+          // ),
+          Image.asset(
+            isSuccess
+                ? 'assets/device_detail/ic_upgrade_success.gif'
+                : 'assets/device_detail/ic_upgrade_failure.gif',
+            width: 80,
+            height: 80,
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           // 结果文字
           Text(
             isSuccess ? '升级完成' : '升级失败',

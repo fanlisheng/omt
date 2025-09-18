@@ -121,7 +121,8 @@ class DetailAiView extends StatelessWidget {
                   children: [
                     RowItemInfoView(
                         name: "摄像头编码",
-                        value: (model.deviceInfo.cameraDeviceCodes ?? []).join("\n")),
+                        value: (model.deviceInfo.cameraDeviceCodes ?? [])
+                            .join("\n")),
                     RowItemInfoView(
                       name: "IOT连接状态",
                       value: model.deviceInfo.iotConnectStatus,
@@ -267,9 +268,12 @@ class RowItemInfoView extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.only(
                     left: 12, right: 12, top: 2, bottom: 2),
-                decoration: BoxDecoration(
-                  color: ColorUtils.colorGreen,
-                  borderRadius: BorderRadius.circular(3),
+                decoration: const BoxDecoration(
+                  color: Color(0xFF14CC7E),
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(4),
+                      topRight: Radius.circular(4),
+                      bottomRight: Radius.circular(4)),
                 ),
                 child: Text(
                   downloadButtonName ?? "",
@@ -286,9 +290,12 @@ class RowItemInfoView extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.only(
                     left: 12, right: 12, top: 2, bottom: 2),
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: ColorUtils.colorGreen,
-                  borderRadius: BorderRadius.circular(3),
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(4),
+                      topRight: Radius.circular(4),
+                      bottomRight: Radius.circular(4)),
                 ),
                 child: Text(
                   buttonName ?? "",
