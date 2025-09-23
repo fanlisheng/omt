@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package_utils.dart';
 import '../../bean/update/update_info.dart';
 import '../../http/service/update/update_service.dart';
+import '../../utils/context_utils.dart';
 import 'update_dialog.dart';
 
 class UpdateManager {
@@ -87,10 +88,9 @@ class UpdateManager {
 
   // 显示更新弹窗
   void _showUpdateDialog(BuildContext context, UpdateInfo updateInfo) {
-    var context1 =
-        KayoPackage.share.navigatorKey.currentState?.overlay?.context;
+    var context1 = ContextUtils.instance.getGlobalContextOrThrow();
     showDialog(
-      context: context1!,
+      context: context1,
       barrierDismissible: !updateInfo.forceUpdate,
       builder: (context) => UpdateDialog(
         updateInfo: updateInfo,

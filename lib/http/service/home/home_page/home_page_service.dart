@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:kayo_package/extension/_index_extension.dart';
+import 'package:kayo_package/utils/loading_utils.dart';
 import 'package:omt/bean/common/code_data.dart';
 import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/bean/home/home_page/device_detail_ai_entity.dart';
@@ -36,7 +37,6 @@ import '../../video/video_configuration_service.dart';
 ///
 
 class HomePageService {
-  
   get _list async => '${API.share.host}xxx/xxx';
 
   get _detail async => '${API.share.host}xxx/xxx';
@@ -73,6 +73,7 @@ class HomePageService {
   get _getUnboundDevices => '${API.share.host}api/device/devices';
 
   get _restartAiDevice => '/contrl/golang/restart';
+
   get _restartAiDevicePython => '/contrl/python/restart';
 
   get _upgradeAiDeviceProgram =>
@@ -119,11 +120,16 @@ class HomePageService {
   get _replacePowerBox => '${API.share.host}api/device/power_box/replace';
 
   //_configAi
-  get _configAi async =>
-      await API.share.buildControlWebcamUrl(VideoConfigurationService.webcamSave);
+  get _configAi async => await API.share
+      .buildControlWebcamUrl(VideoConfigurationService.webcamSave);
 
-  get _removeConfigAi async =>
-      await API.share.buildControlWebcamUrl(VideoConfigurationService.webcamRemove);  
+  // get _removeConfigAllAi async => await API.share
+  //     .buildControlWebcamUrl(VideoConfigurationService.webcamRemoveAll);
+
+  get _removeConfigAi async => await API.share
+      .buildControlWebcamUrl(VideoConfigurationService.webcamRemove);
+
+  get _eventStatusAi => '/event/status';
 
   getInstanceList(
     String areaCode, {
@@ -483,7 +489,8 @@ class HomePageService {
   }) async {
     String url = '${API.share.hostDeviceConfiguration(ip)}$_restartAiDevice';
     HttpManager.share.doHttpPost<dynamic>(
-      url, {},
+      url,
+      {},
       method: 'POST',
       autoHideDialog: true,
       autoShowDialog: true,
@@ -520,16 +527,49 @@ class HomePageService {
     required ValueChanged<CodeMessageData?> onSuccess,
     ValueChanged<CodeMessageData?>? onCache,
     ValueChanged<String>? onError,
+    bool Function()? cancelCheck,
   }) async {
+    // 获取URL
+    String url = await _upgradeAiDeviceProgram;
+
+    // 发起请求
     HttpManager.share.doHttpPost<CodeMessageData>(
-      await _upgradeAiDeviceProgram,
+      url,
       {
         'device_code': deviceCode,
       },
       method: 'POST',
-      autoHideDialog: true,
-      autoShowDialog: true,
-      onSuccess: onSuccess,
+      autoHideDialog: false,
+      autoShowDialog: false,
+      onSuccess: (data) {
+        // 获取设备的udid和event_id进行验证
+        String? eventId = data?.id;
+        String? udid = deviceCode;
+        String? deviceIp = "";
+
+        if (eventId != null && udid != null) {
+          // 调用通用验证方法验证设备端请求是否成功
+          checkEventStatusAi(
+            eventId: eventId,
+            deviceIp: deviceIp,
+            udid: udid,
+            cancelCheck: cancelCheck,
+            onSuccess: (success) {
+              if (success) {
+                // 验证成功，调用原始成功回调
+                onSuccess(data);
+              } else {
+                // 验证失败，可以选择调用错误回调
+                onError?.call("设备端验证失败");
+              }
+            },
+            onError: onError,
+          );
+        } else {
+          // 如果没有获取到必要的验证参数，直接调用成功回调
+          onSuccess(data);
+        }
+      },
       onCache: onCache,
       onError: onError,
     );
@@ -541,16 +581,46 @@ class HomePageService {
     required ValueChanged<CodeMessageData?> onSuccess,
     ValueChanged<CodeMessageData?>? onCache,
     ValueChanged<String>? onError,
+    bool Function()? cancelCheck,
   }) async {
+    String url = await _upgradeAiDeviceIdentity;
     HttpManager.share.doHttpPost<CodeMessageData>(
-      await _upgradeAiDeviceIdentity,
+      url,
       {
         'device_code': deviceCode,
       },
       method: 'POST',
       autoHideDialog: true,
       autoShowDialog: true,
-      onSuccess: onSuccess,
+      onSuccess: (data) {
+        // 获取设备的udid和event_id进行验证
+        String? eventId = data?.id;
+        String? udid = deviceCode;
+        String? deviceIp = "";
+
+        if (eventId != null && udid != null) {
+          // 调用通用验证方法验证设备端请求是否成功
+          checkEventStatusAi(
+            eventId: eventId,
+            deviceIp: deviceIp,
+            udid: udid,
+            cancelCheck: cancelCheck,
+            onSuccess: (success) {
+              if (success) {
+                // 验证成功，调用原始成功回调
+                onSuccess(data);
+              } else {
+                // 验证失败，可以选择调用错误回调
+                onError?.call("设备端验证失败");
+              }
+            },
+            onError: onError,
+          );
+        } else {
+          // 如果没有获取到必要的验证参数，直接调用成功回调
+          onSuccess(data);
+        }
+      },
       onCache: onCache,
       onError: onError,
     );
@@ -871,9 +941,15 @@ class HomePageService {
     required ValueChanged<CodeMessageData?> onSuccess,
     ValueChanged<CodeMessageData?>? onCache,
     ValueChanged<String>? onError,
+    VoidCallback? retryCallback,
+    bool Function()? cancelCheck,
   }) async {
+    // 获取URL
+    String url = await _replaceAi;
+
+    // 发起请求
     HttpManager.share.doHttpPost<CodeMessageData>(
-      await _replaceAi,
+      url,
       {
         "node_id": nodeId,
         "ip": ip,
@@ -882,7 +958,36 @@ class HomePageService {
       method: 'POST',
       autoHideDialog: true,
       autoShowDialog: true,
-      onSuccess: onSuccess,
+      onSuccess: (data) {
+        // 获取设备的udid和event_id进行验证
+        String? eventId = data?.id;
+        String? udid = nodeId.toString(); // 使用nodeId作为udid
+        String? deviceIp = "";
+
+        if (eventId != null && udid != null) {
+          // 调用通用验证方法验证设备端请求是否成功
+          checkEventStatusAi(
+            eventId: eventId,
+            deviceIp: deviceIp,
+            udid: udid,
+            cancelCheck: cancelCheck,
+            onSuccess: (success) {
+              if (success) {
+                // 验证成功，调用原始成功回调
+                onSuccess(data);
+              } else {
+                // 验证失败，可以选择调用错误回调
+                onError?.call("设备端验证失败");
+              }
+            },
+            onError: onError,
+            retryCallback: retryCallback,
+          );
+        } else {
+          // 如果没有获取到必要的验证参数，直接调用成功回调
+          onSuccess(data);
+        }
+      },
       onCache: onCache,
       onError: onError,
     );
@@ -895,6 +1000,7 @@ class HomePageService {
     required ValueChanged<CodeMessageData?> onSuccess,
     ValueChanged<CodeMessageData?>? onCache,
     ValueChanged<String>? onError,
+    VoidCallback? retryCallback,
   }) async {
     HttpManager.share.doHttpPost<CodeMessageData>(
       await _replaceNvr,
@@ -967,6 +1073,141 @@ class HomePageService {
       onSuccess: onSuccess,
       onCache: onCache,
       onError: onError,
+    );
+  }
+
+  removeConfigAllAi({
+    required String deviceIp,
+    ValueChanged<dynamic>? onSuccess,
+    ValueChanged<dynamic>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    String url =
+        '${API.share.hostDeviceConfiguration(deviceIp)}${VideoConfigurationService.webcamRemoveAll}';
+    HttpManager.share.doHttpPost<dynamic>(
+      url,
+      {},
+      method: 'post',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  /// 通用的事件状态验证方法
+  /// 用于验证设备端请求是否成功
+  /// @param eventId 事件ID
+  /// @param udid 设备唯一标识
+  /// @param onSuccess 成功回调
+  /// @param onError 错误回调
+  /// @param retryCallback 重试回调，当状态为失败时调用
+  /// @param cancelCheck 取消检查回调，返回true表示已取消
+  checkEventStatusAi({
+    String? eventId,
+    required String udid,
+    required String deviceIp,
+    required ValueChanged<bool> onSuccess,
+    ValueChanged<String>? onError,
+    VoidCallback? retryCallback,
+    bool Function()? cancelCheck,
+  }) async {
+    // 获取URL
+    String url =
+        '${API.share.hostDeviceConfiguration(deviceIp)}$_eventStatusAi';
+
+    // 准备请求参数
+    Map<String, dynamic> params = {
+      "udid": udid,
+    };
+
+    // 如果提供了eventId，则添加到参数中
+    if (eventId != null) {
+      params["event_id"] = eventId;
+    }
+
+    print(
+        'checkEventStatusAi请求: url=$url, params=$params, eventId=${eventId ?? "未提供"}, udid=$udid');
+
+    // 检查是否已取消
+    if (cancelCheck != null && cancelCheck()) {
+      print('checkEventStatusAi: 操作已被取消，不发起网络请求');
+      return;
+    }
+
+    // 发起请求
+    HttpManager.share.doHttpPost<Map<String, dynamic>>(
+      url,
+      params,
+      method: 'POST',
+      autoHideDialog: false,
+      autoShowDialog: false,
+      onSuccess: (data) {
+        print(
+            'checkEventStatusAi响应: data=$data, eventId=${eventId ?? "未提供"}, udid=$udid');
+
+        // 在处理响应前检查是否已取消
+        if (cancelCheck != null && cancelCheck()) {
+          print('checkEventStatusAi: 响应处理时发现操作已被取消，忽略响应');
+          return;
+        }
+
+        // 解析返回的状态
+        int status = data?["status"] ?? 0;
+        if (status == 1) {
+          // 成功
+          print(
+              'checkEventStatusAi状态: 成功, eventId=${eventId ?? "未提供"}, udid=$udid');
+          onSuccess(true);
+        } else if (status == 2) {
+          // 失败，提示用户重试
+          onSuccess(false);
+          // print(
+          //     'checkEventStatusAi状态: 失败，需要重试, eventId=${eventId ?? "未提供"}, udid=$udid');
+          // LoadingUtils.showToast(data: "操作失败，请重试");
+
+          // // 确保只触发一个回调，避免重复显示失败对话框
+          // if (retryCallback != null) {
+          //   print('调用重试回调, eventId=${eventId ?? "未提供"}, udid=$udid');
+          //   retryCallback();
+          // } else {
+          //   print('没有提供重试回调, eventId=${eventId ?? "未提供"}, udid=$udid');
+          //   // 如果没有重试回调，调用onSuccess(false)或onError
+          //   if (onError != null) {
+          //     print('没有重试回调，调用错误回调');
+          //     onError("操作失败，请重试");
+          //   } else {
+          //     // 只有在没有retryCallback和onError时才调用onSuccess(false)
+          //     print('没有重试回调和错误回调，调用onSuccess(false)');
+          //     onSuccess(false);
+          //   }
+          // }
+        } else {
+          // 未知状态
+          print(
+              'checkEventStatusAi状态: 未知状态 $status, eventId=${eventId ?? "未提供"}, udid=$udid');
+          onSuccess(false);
+          if (onError != null) {
+            onError("未知状态: $status");
+          } else {
+            print('没有提供错误回调，无法处理未知状态');
+          }
+        }
+      },
+      onError: (error) {
+        print('checkEventStatusAi错误: $error');
+
+        // 在处理错误前检查是否已取消
+        if (cancelCheck != null && cancelCheck()) {
+          print('checkEventStatusAi: 错误处理时发现操作已被取消，忽略错误');
+          return;
+        }
+
+        if (onError != null) {
+          onError(error);
+        }
+      },
     );
   }
 

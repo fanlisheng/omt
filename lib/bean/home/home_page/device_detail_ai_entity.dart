@@ -50,7 +50,10 @@ class DeviceDetailAiData {
   bool? isProgramLatest;
   @JSONField(name: "is_identity_latest")
   bool? isIdentityLatest;
-
+  @JSONField(name: "program_url")
+  String? programUrl;
+  @JSONField(name: "identity_url")
+  String? identityUrl;
   ///自己加的属性
   //是否可以操作
   bool? enabled;

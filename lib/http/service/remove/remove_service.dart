@@ -3,10 +3,9 @@ import 'package:omt/bean/common/code_data.dart';
 import 'package:omt/http/api.dart';
 import 'package:omt/http/http_manager.dart';
 
-import '../../../bean/common/id_name_value.dart';
-import '../../../bean/home/home_page/device_detail_power_box_entity.dart';
+
+
 import '../../../bean/remove/device_list_entity.dart';
-import '../../../bean/remove/device_status_list_entity.dart';
 
 ///
 ///  omt
@@ -22,7 +21,7 @@ class RemoveService {
 
   get _getDeviceList => '${API.share.host}api/device/list';
   
-  get _getDeviceListWithStatus => '${API.share.host}api/device/list/status';
+  get _getDeviceListWithStatus => '${API.share.host}api/device/devices_group_remove_status';
 
   /// 拆除设备
   removeDevice({
@@ -99,8 +98,8 @@ class RemoveService {
     required String instanceId,
     int? gateId,
     int? passId,
-    required ValueChanged<DeviceStatusListEntity?>? onSuccess,
-    ValueChanged<DeviceStatusListEntity?>? onCache,
+    required ValueChanged<DevicesRemoveStatusEntity?>? onSuccess,
+    ValueChanged<DevicesRemoveStatusEntity?>? onCache,
     ValueChanged<String>? onError,
   }) async {
     Map<String, dynamic> params = {
@@ -112,7 +111,7 @@ class RemoveService {
     if (passId != null) {
       params["pass_id"] = passId;
     }
-    HttpManager.share.doHttpPost<DeviceStatusListEntity>(
+    HttpManager.share.doHttpPost<DevicesRemoveStatusEntity>(
       await _getDeviceListWithStatus,
       params,
       method: 'POST',

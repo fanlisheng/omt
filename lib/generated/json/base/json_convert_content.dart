@@ -327,6 +327,14 @@ class JsonConvert {
       return data.map<DeviceListData>((Map<String, dynamic> e) =>
           DeviceListData.fromJson(e)).toList() as M;
     }
+    if (<DevicesRemoveStatusEntity>[] is M) {
+      return data.map<DevicesRemoveStatusEntity>((Map<String, dynamic> e) =>
+          DevicesRemoveStatusEntity.fromJson(e)).toList() as M;
+    }
+    if (<DevicesRemoveStatusData>[] is M) {
+      return data.map<DevicesRemoveStatusData>((Map<String, dynamic> e) =>
+          DevicesRemoveStatusData.fromJson(e)).toList() as M;
+    }
     if (<UserInfoData>[] is M) {
       return data.map<UserInfoData>((Map<String, dynamic> e) =>
           UserInfoData.fromJson(e)).toList() as M;
@@ -444,6 +452,8 @@ class JsonConvertClassCollection {
     (OnePictureDataData).toString(): OnePictureDataData.fromJson,
     (DeviceListEntity).toString(): DeviceListEntity.fromJson,
     (DeviceListData).toString(): DeviceListData.fromJson,
+    (DevicesRemoveStatusEntity).toString(): DevicesRemoveStatusEntity.fromJson,
+    (DevicesRemoveStatusData).toString(): DevicesRemoveStatusData.fromJson,
     (UserInfoData).toString(): UserInfoData.fromJson,
     (UserPermission).toString(): UserPermission.fromJson,
     (VerInfo).toString(): VerInfo.fromJson,

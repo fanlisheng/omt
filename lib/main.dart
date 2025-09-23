@@ -12,6 +12,7 @@ import 'package:omt/router_utils.dart';
 import 'package:omt/test/test.dart';
 import 'package:omt/theme.dart';
 import 'package:omt/utils/color_utils.dart';
+import 'package:omt/utils/context_utils.dart';
 import 'package:omt/utils/intent_utils.dart';
 import 'package:omt/widget/update/update_manager.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -350,11 +351,11 @@ class _MyHomePageState extends State<MyHomePage>
   bool _dialogLoginShow = false;
 
   void showDialogLogin() async {
-    var context = KayoPackage.share.navigatorKey.currentState?.overlay?.context;
-    if (_dialogLoginShow == false) {
+    var context = ContextUtils.instance.getGlobalContext();
+    if (_dialogLoginShow == false && context != null) {
       _dialogLoginShow = true;
       showDialog<int>(
-        context: context!,
+        context: context,
         barrierDismissible: false,
         builder: (c) {
           var dialog = CupertinoAlertDialog(

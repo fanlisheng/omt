@@ -25,6 +25,7 @@ class VideoConfigurationService {
   static const String webcamList = 'list';
   static const String webcamInfo = 'info';
   static const String webcamInfoSave = 'info/save';
+  static const String webcamRemoveAll = '/webcam/remove/all';
 
   get _connect async => '/central_control/get';
 

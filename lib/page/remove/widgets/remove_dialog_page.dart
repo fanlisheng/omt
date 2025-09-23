@@ -8,8 +8,15 @@ import '../../../utils/color_utils.dart';
 import '../../../utils/dialog_utils.dart';
 import '../../../widget/combobox.dart';
 import '../../home/device_add/widgets/add_camera_view.dart';
+import '../../../widget/common_option_dialog.dart';
+import 'result_dialog.dart';
 
 class RemoveDialogPage {
+  /// 测试弹窗功能 - 可以在外面直接调用
+  static void testDialogs(BuildContext context) {
+    ResultDialog.testDialogs(context);
+  }
+
   static Future<void> showAndSubmit({
     required BuildContext context,
     required List<int> removeIds,
@@ -59,8 +66,25 @@ class RemoveDialogPage {
                 reason: dismantleCause,
                 remark: description,
                 onSuccess: (data) {
-                  // 重新请求数据
-                  onSuccess();
+                  // 显示成功弹窗
+                  ResultDialog.showSuccess(
+                     context: context,
+                     title: "删除申请提交成功！",
+                     message: '您的拆除申请已成功提交，需等待后台审核，审核通过后，设备将正式完成拆除，请耐心等待。\n如有紧急情况，可联系负责该区域的运营人员协助处理。',
+                     buttonText: '知道了',
+                     onDismiss: () {
+                       onSuccess();
+                     },
+                   );
+                },
+                onError: (error) {
+                  // 显示失败弹窗
+                  ResultDialog.showError(
+                    context: context,
+                    title: "删除申请提交失败！",
+                    message: '失败了你说为啥呢',
+                    buttonText: '重新提交',
+                  );
                 },
               );
             }

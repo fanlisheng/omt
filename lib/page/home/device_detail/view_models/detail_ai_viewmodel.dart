@@ -53,7 +53,7 @@ class DetailAiViewModel extends BaseViewModelRefresh<dynamic> {
   connectEventAction(int index) async {}
 
   //重起
-  restartAction() async{
+  restartAction() async {
     final result = await DialogUtils.showContentDialog(
         context: context!,
         title: "重启主程",
@@ -84,7 +84,7 @@ class DetailAiViewModel extends BaseViewModelRefresh<dynamic> {
   downloadProgramAction() async {
     if (deviceInfo.deviceCode != null && deviceInfo.ip != null) {
       _upgradeViewModel.setDeviceInfo(deviceInfo.deviceCode!, deviceInfo.ip!);
-      _upgradeViewModel.startDownload(context!, 'program');
+      _upgradeViewModel.startDownload('program', deviceInfo.programUrl ?? '');
     } else {
       LoadingUtils.showToast(data: "设备信息不完整");
     }
@@ -94,7 +94,7 @@ class DetailAiViewModel extends BaseViewModelRefresh<dynamic> {
   downloadIdentityAction() async {
     if (deviceInfo.deviceCode != null && deviceInfo.ip != null) {
       _upgradeViewModel.setDeviceInfo(deviceInfo.deviceCode!, deviceInfo.ip!);
-      _upgradeViewModel.startDownload(context!, 'identity');
+      _upgradeViewModel.startDownload('identity', deviceInfo.identityUrl ?? '');
     } else {
       LoadingUtils.showToast(data: "设备信息不完整");
     }
@@ -104,7 +104,7 @@ class DetailAiViewModel extends BaseViewModelRefresh<dynamic> {
   upgradeProgramAction() async {
     if (deviceInfo.deviceCode != null && deviceInfo.ip != null) {
       _upgradeViewModel.setDeviceInfo(deviceInfo.deviceCode!, deviceInfo.ip!);
-      _upgradeViewModel.startUpgrade(context!, 'program');
+      _upgradeViewModel.startUpgrade('program');
     } else {
       LoadingUtils.showToast(data: "设备信息不完整");
     }
@@ -114,7 +114,7 @@ class DetailAiViewModel extends BaseViewModelRefresh<dynamic> {
   upgradeIdentityAction() async {
     if (deviceInfo.deviceCode != null && deviceInfo.ip != null) {
       _upgradeViewModel.setDeviceInfo(deviceInfo.deviceCode!, deviceInfo.ip!);
-      _upgradeViewModel.startUpgrade(context!, 'identity');
+      _upgradeViewModel.startUpgrade('identity');
     } else {
       LoadingUtils.showToast(data: "设备信息不完整");
     }

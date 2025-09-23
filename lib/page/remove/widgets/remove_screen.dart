@@ -66,7 +66,10 @@ class RemoveScreen extends StatelessWidget {
               child: Container(
                 padding:
                     const EdgeInsets.symmetric(vertical: 3, horizontal: 20),
-                color: ColorUtils.colorRed,
+                decoration: BoxDecoration(
+                  color: ColorUtils.colorRed,
+                  borderRadius: BorderRadius.circular(1),
+                ),
                 alignment: Alignment.center,
                 child: const Text(
                   "拆除设备",
@@ -92,7 +95,7 @@ class RemoveScreen extends StatelessWidget {
             const SizedBox(width: 120),
           ],
         ),
-        const SizedBox(height: 5),
+        const SizedBox(height: 10),
       ],
     );
   }
@@ -101,7 +104,8 @@ class RemoveScreen extends StatelessWidget {
     // 检查是否有任何设备数据
     bool hasAnyDevices = model.approvedFailedDeviceList.isNotEmpty ||
         model.pendingApprovalDeviceList.isNotEmpty ||
-        model.remainingDeviceList.isNotEmpty;
+        model.remainingDeviceList.isNotEmpty ||
+        model.noDismantleDeviceList.isNotEmpty;
 
     if (!hasAnyDevices) {
       if (model.isSearchResult) {
@@ -120,140 +124,155 @@ class RemoveScreen extends StatelessWidget {
 
     return Expanded(
       child: Container(
-        margin: const EdgeInsets.only(left: 16, right: 16, top: 0, bottom: 10),
-        padding:
-            const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 16),
+        margin: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 16),
         decoration: BoxDecoration(
-          color: ColorUtils.colorBackgroundLine,
+          color: ColorUtils.transparent,
           borderRadius: BorderRadius.circular(3),
         ),
         width: double.infinity,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 已选择拆除设备
-            if (model.remainingDeviceList.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              const Row(
-                children: [
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      "已选择拆除设备",
-                      style: TextStyle(
-                          fontSize: 16,
-                          color: ColorUtils.colorWhite,
-                          fontWeight: FontWeight.bold),
-                    ),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 已申请拆除，审核通过，删除失败
+              if (model.approvedFailedDeviceList.isNotEmpty) ...[
+                Container(
+                  decoration: BoxDecoration(
+                    color: "#FF4D4F".toColor().withAlpha(30),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                ],
-              ),
-              const SizedBox(height: 8),
+                  padding: const EdgeInsets.all(12),
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                  child: Column(
+                    children: [
+                      const Row(
+                        children: [
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              "已申请拆除，审核通过，删除失败（技术人员正在处理）",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: ColorUtils.colorRed,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      _deviceShowList1(model.approvedFailedDeviceList,
+                          readOnly: true),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+              ],
+
+              // 已申请拆除，待审核
+              if (model.pendingApprovalDeviceList.isNotEmpty) ...[
+                Container(
+                  decoration: BoxDecoration(
+                    color: "#FF940E".toColor().withAlpha(30),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  padding: const EdgeInsets.all(12),
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                  child: Column(
+                    children: [
+                      const Row(
+                        children: [
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              "已申请拆除，待审核",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: ColorUtils.colorYellow,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      _deviceShowList1(model.pendingApprovalDeviceList,
+                          readOnly: true),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+              ],
+
+              // 已选择拆除设备
               Container(
-                height: 120,
-                child: _deviceShowList1(model.remainingDeviceList, onTap: (index) {
-                  model.selectedItemEventAction(false, index);
-                }),
-              ),
-              const SizedBox(height: 16),
-            ],
-            
-            // 已申请拆除，审核通过，删除失败
-            if (model.approvedFailedDeviceList.isNotEmpty) ...[
-              DashLine(
-                height: 1,
-                width: double.infinity,
-                color: "#678384".toColor(),
-                gap: 3,
-                margin: const EdgeInsets.symmetric(horizontal: 10),
-              ),
-              const SizedBox(height: 8),
-              const Row(
-                children: [
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      "已申请拆除，审核通过，删除失败",
-                      style: TextStyle(
-                          fontSize: 16,
-                          color: ColorUtils.colorRed,
-                          fontWeight: FontWeight.bold),
+                decoration: BoxDecoration(
+                  color: "#4E5353".toColor(),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: const EdgeInsets.all(12),
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                child: Column(
+                  children: [
+                    const Row(
+                      children: [
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            "已选择拆除设备",
+                            style: TextStyle(
+                                fontSize: 16,
+                                color: ColorUtils.colorWhite,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
                     ),
+                    const SizedBox(height: 8),
+                    _deviceShowList1(model.remainingDeviceList, onTap: (index) {
+                      model.selectedItemEventAction(false, index);
+                    }),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 6),
+
+              // 不拆除设备
+              if (model.noDismantleDeviceList.isNotEmpty) ...[
+                Container(
+                  decoration: BoxDecoration(
+                    color: "#4E5353".toColor(),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Container(
-                height: 120,
-                child: _deviceShowList1(model.approvedFailedDeviceList, readOnly: true),
-              ),
-              const SizedBox(height: 16),
-            ],
-            
-            // 已申请拆除，待审核
-            if (model.pendingApprovalDeviceList.isNotEmpty) ...[
-              DashLine(
-                height: 1,
-                width: double.infinity,
-                color: "#678384".toColor(),
-                gap: 3,
-                margin: const EdgeInsets.symmetric(horizontal: 10),
-              ),
-              const SizedBox(height: 8),
-              const Row(
-                children: [
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      "已申请拆除，待审核",
-                      style: TextStyle(
-                          fontSize: 16,
-                          color: ColorUtils.colorYellow,
-                          fontWeight: FontWeight.bold),
-                    ),
+                  padding: const EdgeInsets.all(12),
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                  child: Column(
+                    children: [
+                      const Row(
+                        children: [
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              "不拆除设备",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: ColorUtils.colorWhite,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      _deviceShowList1(model.noDismantleDeviceList,
+                          onTap: (index) {
+                        model.selectedItemEventAction(true, index,
+                            listType: 'noDismantle');
+                      }, readOnly: false),
+                    ],
                   ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Container(
-                height: 120,
-                child: _deviceShowList1(model.pendingApprovalDeviceList, readOnly: true),
-              ),
-              const SizedBox(height: 16),
+                ),
+                const SizedBox(height: 10),
+              ],
             ],
-            
-            // 剩余待绑定设备
-            if (model.remainingDeviceList.isNotEmpty) ...[
-              DashLine(
-                height: 1,
-                width: double.infinity,
-                color: "#678384".toColor(),
-                gap: 3,
-                margin: const EdgeInsets.symmetric(horizontal: 10),
-              ),
-              const SizedBox(height: 8),
-              const Row(
-                children: [
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      "剩余待绑定设备",
-                      style: TextStyle(
-                          fontSize: 16,
-                          color: ColorUtils.colorGreen,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Expanded(
-                child: _deviceShowList1(model.remainingDeviceList, onTap: (index) {
-                  model.selectedItemEventAction(true, index, listType: 'remaining');
-                }),
-              ),
-            ],
-          ],
+          ),
         ),
       ),
     );
@@ -403,105 +422,129 @@ class RemoveScreen extends StatelessWidget {
     Function(int)? onTap,
     bool readOnly = false,
   }) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.only(left: 12, right: 12, top: 10, bottom: 10),
-      child: Wrap(
-        spacing: 10, // 水平间距
-        runSpacing: 10, // 垂直间距
-        children: List.generate(deviceData.length, (index) {
-          String? imageUrl;
-          Color? color;
-          if (deviceData[index].selected == true) {
-            imageUrl = "home/ic_device_remove";
-            color = "#FF4D4F".toColor();
-          }
-          return Clickable(
-              onTap: readOnly ? null : (onTap != null
-                  ? () {
-                      onTap(index);
-                    }
-                  : null),
-            child: Container(
-              width: 90, // 固定宽度
-              height: 76, // 固定高度
-              decoration: BoxDecoration(
-                border: Border.all(
-                  width: 1,
-                  color: color ?? "#5D6666".toColor(),
-                ),
-                borderRadius: BorderRadius.circular(3),
-                color: color?.withOpacity(0.1) ?? ColorUtils.transparent,
-                boxShadow: [
-                  BoxShadow(
-                    color: '#82FFFC'.toColor(opacity: .05),
-                  ),
-                ],
-              ),
-              child: Stack(
-                children: [
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 8),
-                        Expanded(
-                          flex: 5,
-                          child: ImageView(
-                            src: source(DeviceUtils.getDeviceImage(
-                                deviceData[index].type ?? 0)),
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Expanded(
-                          flex: 2,
-                          child: FittedBox(
-                            fit: BoxFit.contain,
-                            child: Text(
-                              deviceData[index].typeText ?? "-",
-                              style:
-                                  const TextStyle(color: ColorUtils.colorWhite),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: FittedBox(
-                            fit: BoxFit.contain,
-                            child: Container(
-                              margin: const EdgeInsets.only(
-                                  left: 2, right: 2, bottom: 4),
-                              child: Text(
-                                deviceData[index].ip.defaultStr(
-                                    data: deviceData[index].desc ?? ''),
-                                style: const TextStyle(
-                                    color: ColorUtils.colorWhite, fontSize: 10),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Visibility(
-                    visible: true,
-                    child: Positioned(
-                      top: 2,
-                      right: 2,
-                      width: 16,
-                      height: 16,
-                      child: ImageView(
-                        src: source(imageUrl ?? "home/ic_device_add"),
-                      ),
-                    ),
-                  ),
-                ],
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: SingleChildScrollView(
+        padding:
+            const EdgeInsets.only(left: 12, right: 12, top: 10, bottom: 10),
+        child: Wrap(
+          direction: Axis.horizontal,
+          alignment: WrapAlignment.start,
+          crossAxisAlignment: WrapCrossAlignment.start,
+          spacing: 10,
+          runSpacing: 10,
+          children: List.generate(deviceData.length, (index) {
+            return _buildDeviceItem(deviceData[index], index, onTap, readOnly);
+          }),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDeviceItem(
+    DeviceListData device,
+    int index,
+    Function(int)? onTap,
+    bool readOnly,
+  ) {
+    // 确定设备状态样式
+    String? imageUrl;
+    Color? color;
+
+    if (readOnly != true) {
+      if (device.selected == true) {
+        imageUrl = "home/ic_device_remove";
+        color = "#FF4D4F".toColor();
+      }
+    }
+
+    return Clickable(
+      onTap: readOnly ? null : (onTap != null ? () => onTap(index) : null),
+      child: Container(
+        width: 90,
+        height: 76,
+        decoration: _buildDeviceDecoration(color),
+        child: Stack(
+          children: [
+            _buildDeviceContent(device),
+            if (readOnly != true) _buildDeviceStatusIcon(imageUrl),
+          ],
+        ),
+      ),
+    );
+  }
+
+  BoxDecoration _buildDeviceDecoration(Color? color) {
+    return BoxDecoration(
+      border: Border.all(
+        width: 1,
+        color: color ?? "#5D6666".toColor(),
+      ),
+      borderRadius: BorderRadius.circular(3),
+      color: color?.withOpacity(0.1) ?? ColorUtils.transparent,
+      boxShadow: [
+        BoxShadow(
+          color: '#82FFFC'.toColor(opacity: .05),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDeviceContent(DeviceListData device) {
+    return Positioned(
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      child: Column(
+        children: [
+          const SizedBox(height: 8),
+          Expanded(
+            flex: 5,
+            child: ImageView(
+              src: source(DeviceUtils.getDeviceImage(device.type ?? 0)),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Expanded(
+            flex: 2,
+            child: FittedBox(
+              fit: BoxFit.contain,
+              child: Text(
+                device.typeText ?? "-",
+                style: const TextStyle(color: ColorUtils.colorWhite),
               ),
             ),
-          );
-        }),
+          ),
+          Expanded(
+            flex: 2,
+            child: FittedBox(
+              fit: BoxFit.contain,
+              child: Container(
+                margin: const EdgeInsets.only(left: 2, right: 2, bottom: 4),
+                child: Text(
+                  device.ip.defaultStr(data: device.desc ?? ''),
+                  style: const TextStyle(
+                    color: ColorUtils.colorWhite,
+                    fontSize: 10,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDeviceStatusIcon(String? imageUrl) {
+    return Positioned(
+      top: 2,
+      right: 2,
+      width: 16,
+      height: 16,
+      child: ImageView(
+        src: source(imageUrl ?? "home/ic_device_add"),
       ),
     );
   }

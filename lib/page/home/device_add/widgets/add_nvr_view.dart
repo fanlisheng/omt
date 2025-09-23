@@ -392,39 +392,41 @@ class NvrInfoWidget {
                   ),
                 ),
                 DataCell(
-                  OutlinedButton(
-                    onPressed: () {
-                      removeChannelAction(
-                        deviceCode: deviceCode,
-                        info: info,
-                        nodeId: nodeId,
-                        onSuccess: onRemoveSuccess,
-                      );
-                    },
-                    style: ButtonStyle(
-                      padding: const WidgetStatePropertyAll(
-                        EdgeInsets.symmetric(vertical: 0.0, horizontal: 16),
-                      ),
-                      shape: WidgetStatePropertyAll(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5),
+                  (info.recordStatus ?? "") == "正在录像"
+                      ? Container()
+                      : OutlinedButton(
+                          onPressed: () {
+                            removeChannelAction(
+                              deviceCode: deviceCode,
+                              info: info,
+                              nodeId: nodeId,
+                              onSuccess: onRemoveSuccess,
+                            );
+                          },
+                          style: ButtonStyle(
+                            padding: const WidgetStatePropertyAll(
+                              EdgeInsets.symmetric(vertical: 0.0, horizontal: 16),
+                            ),
+                            shape: WidgetStatePropertyAll(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                            ),
+                            side: const WidgetStatePropertyAll(
+                              BorderSide(
+                                color: ColorUtils.colorRed,
+                                width: 1.0,
+                              ),
+                            ),
+                          ),
+                          child: const Text(
+                            "删除通道",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: ColorUtils.colorRed,
+                            ),
+                          ),
                         ),
-                      ),
-                      side: const WidgetStatePropertyAll(
-                        BorderSide(
-                          color: ColorUtils.colorRed,
-                          width: 1.0,
-                        ),
-                      ),
-                    ),
-                    child: const Text(
-                      "删除通道",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: ColorUtils.colorRed,
-                      ),
-                    ),
-                  ),
                 ),
               ],
             );

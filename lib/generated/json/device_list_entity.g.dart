@@ -34,6 +34,10 @@ DeviceListData $DeviceListDataFromJson(Map<String, dynamic> json) {
   if (id != null) {
     deviceListData.id = id;
   }
+  final String? nodeId = jsonConvert.convert<String>(json['node_id']);
+  if (nodeId != null) {
+    deviceListData.nodeId = nodeId;
+  }
   final String? nodeCode = jsonConvert.convert<String>(json['node_code']);
   if (nodeCode != null) {
     deviceListData.nodeCode = nodeCode;
@@ -76,6 +80,7 @@ DeviceListData $DeviceListDataFromJson(Map<String, dynamic> json) {
 Map<String, dynamic> $DeviceListDataToJson(DeviceListData entity) {
   final Map<String, dynamic> data = <String, dynamic>{};
   data['id'] = entity.id;
+  data['node_id'] = entity.nodeId;
   data['node_code'] = entity.nodeCode;
   data['name'] = entity.name;
   data['type'] = entity.type;
@@ -91,6 +96,7 @@ Map<String, dynamic> $DeviceListDataToJson(DeviceListData entity) {
 extension DeviceListDataExtension on DeviceListData {
   DeviceListData copyWith({
     String? id,
+    String? nodeId,
     String? nodeCode,
     String? name,
     int? type,
@@ -103,6 +109,7 @@ extension DeviceListDataExtension on DeviceListData {
   }) {
     return DeviceListData()
       ..id = id ?? this.id
+      ..nodeId = nodeId ?? this.nodeId
       ..nodeCode = nodeCode ?? this.nodeCode
       ..name = name ?? this.name
       ..type = type ?? this.type
@@ -112,5 +119,125 @@ extension DeviceListDataExtension on DeviceListData {
       ..mac = mac ?? this.mac
       ..desc = desc ?? this.desc
       ..selected = selected ?? this.selected;
+  }
+}
+
+DevicesRemoveStatusEntity $DevicesRemoveStatusEntityFromJson(
+    Map<String, dynamic> json) {
+  final DevicesRemoveStatusEntity devicesRemoveStatusEntity = DevicesRemoveStatusEntity();
+  final List<
+      DeviceListData>? uninstallFailedDevices = (json['uninstall_failed_devices'] as List<
+      dynamic>?)
+      ?.map(
+          (e) => jsonConvert.convert<DeviceListData>(e) as DeviceListData)
+      .toList();
+  if (uninstallFailedDevices != null) {
+    devicesRemoveStatusEntity.uninstallFailedDevices = uninstallFailedDevices;
+  }
+  final List<
+      DeviceListData>? waitApproveDevices = (json['wait_approve_devices'] as List<
+      dynamic>?)
+      ?.map(
+          (e) => jsonConvert.convert<DeviceListData>(e) as DeviceListData)
+      .toList();
+  if (waitApproveDevices != null) {
+    devicesRemoveStatusEntity.waitApproveDevices = waitApproveDevices;
+  }
+  final List<
+      DeviceListData>? uninstallableDevices = (json['uninstallable_devices'] as List<
+      dynamic>?)
+      ?.map(
+          (e) => jsonConvert.convert<DeviceListData>(e) as DeviceListData)
+      .toList();
+  if (uninstallableDevices != null) {
+    devicesRemoveStatusEntity.uninstallableDevices = uninstallableDevices;
+  }
+  return devicesRemoveStatusEntity;
+}
+
+Map<String, dynamic> $DevicesRemoveStatusEntityToJson(
+    DevicesRemoveStatusEntity entity) {
+  final Map<String, dynamic> data = <String, dynamic>{};
+  data['uninstall_failed_devices'] =
+      entity.uninstallFailedDevices?.map((v) => v.toJson()).toList();
+  data['wait_approve_devices'] =
+      entity.waitApproveDevices?.map((v) => v.toJson()).toList();
+  data['uninstallable_devices'] =
+      entity.uninstallableDevices?.map((v) => v.toJson()).toList();
+  return data;
+}
+
+extension DevicesRemoveStatusEntityExtension on DevicesRemoveStatusEntity {
+  DevicesRemoveStatusEntity copyWith({
+    List<DeviceListData>? uninstallFailedDevices,
+    List<DeviceListData>? waitApproveDevices,
+    List<DeviceListData>? uninstallableDevices,
+  }) {
+    return DevicesRemoveStatusEntity()
+      ..uninstallFailedDevices = uninstallFailedDevices ??
+          this.uninstallFailedDevices
+      ..waitApproveDevices = waitApproveDevices ?? this.waitApproveDevices
+      ..uninstallableDevices = uninstallableDevices ??
+          this.uninstallableDevices;
+  }
+}
+
+DevicesRemoveStatusData $DevicesRemoveStatusDataFromJson(
+    Map<String, dynamic> json) {
+  final DevicesRemoveStatusData devicesRemoveStatusData = DevicesRemoveStatusData();
+  final List<
+      DeviceListData>? uninstallFailedDevices = (json['uninstall_failed_devices'] as List<
+      dynamic>?)
+      ?.map(
+          (e) => jsonConvert.convert<DeviceListData>(e) as DeviceListData)
+      .toList();
+  if (uninstallFailedDevices != null) {
+    devicesRemoveStatusData.uninstallFailedDevices = uninstallFailedDevices;
+  }
+  final List<
+      DeviceListData>? waitApproveDevices = (json['wait_approve_devices'] as List<
+      dynamic>?)
+      ?.map(
+          (e) => jsonConvert.convert<DeviceListData>(e) as DeviceListData)
+      .toList();
+  if (waitApproveDevices != null) {
+    devicesRemoveStatusData.waitApproveDevices = waitApproveDevices;
+  }
+  final List<
+      DeviceListData>? uninstallableDevices = (json['uninstallable_devices'] as List<
+      dynamic>?)
+      ?.map(
+          (e) => jsonConvert.convert<DeviceListData>(e) as DeviceListData)
+      .toList();
+  if (uninstallableDevices != null) {
+    devicesRemoveStatusData.uninstallableDevices = uninstallableDevices;
+  }
+  return devicesRemoveStatusData;
+}
+
+Map<String, dynamic> $DevicesRemoveStatusDataToJson(
+    DevicesRemoveStatusData entity) {
+  final Map<String, dynamic> data = <String, dynamic>{};
+  data['uninstall_failed_devices'] =
+      entity.uninstallFailedDevices?.map((v) => v.toJson()).toList();
+  data['wait_approve_devices'] =
+      entity.waitApproveDevices?.map((v) => v.toJson()).toList();
+  data['uninstallable_devices'] =
+      entity.uninstallableDevices?.map((v) => v.toJson()).toList();
+  return data;
+}
+
+extension DevicesRemoveStatusDataExtension on DevicesRemoveStatusData {
+  DevicesRemoveStatusData copyWith({
+    List<DeviceListData>? uninstallFailedDevices,
+    List<DeviceListData>? waitApproveDevices,
+    List<DeviceListData>? uninstallableDevices,
+  }) {
+    return DevicesRemoveStatusData()
+      ..uninstallFailedDevices = uninstallFailedDevices ??
+          this.uninstallFailedDevices
+      ..waitApproveDevices = waitApproveDevices ?? this.waitApproveDevices
+      ..uninstallableDevices = uninstallableDevices ??
+          this.uninstallableDevices;
   }
 }

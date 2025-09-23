@@ -1,12 +1,43 @@
 import 'package:flutter/cupertino.dart';
 import 'package:omt/http/api.dart';
 import 'package:omt/http/http_manager.dart';
+import 'package:omt/http/service/fileService/fileService.dart';
 
 ///
 /// 升级服务类
 /// 处理AI设备的升级相关功能
 ///
 class UpgradeService {
+  final FileService _fileService = FileService();
+  
+  // 升级接口路径常量
+  static const String _upgradeMainPath = '/upgrade/local/main';
+  static const String _upgradeAiPath = '/upgrade/local/ai';
+  
+  /// 检查在线升级状态
+  /// 获取设备可用的升级信息
+  /// 返回参数json: status
+  /// status=1 可以在线升级，status=2 不可以在线升级
+  checkOnlineUpgradeStatus({
+    required String deviceIp,
+    ValueChanged<Map<String, dynamic>?>? onSuccess,
+    ValueChanged<String>? onError,
+  }) async {
+    try {
+      String url = '${API.share.hostDeviceConfiguration(deviceIp)}/upgrade/online/status';
+      HttpManager.share.doHttpPost<Map<String, dynamic>>(
+        url,
+        {},
+        method: 'POST',
+        autoHideDialog: false,
+        autoShowDialog: false,
+        onSuccess: onSuccess,
+        onError: onError,
+      );
+    } catch (e) {
+      onError?.call('检查在线升级状态失败: ${e.toString()}');
+    }
+  }
   
   /// 检查工控机连通性
   /// 参考video_configuration_service.dart中的connect方法
@@ -39,68 +70,28 @@ class UpgradeService {
     ValueChanged<String>? onError,
     ValueChanged<double>? onProgress,
   }) async {
-    try {
-      // 构建上传URL
-      String uploadUrl = 'http://$deviceIp:8000/upgrade/upload';
-      
-      // 模拟文件上传过程
-      // 实际实现中需要使用dio或http包进行文件上传
-      await Future.delayed(const Duration(seconds: 2));
-      
-      // 模拟上传成功
-      onSuccess?.call({'status': 'success', 'message': '文件上传成功'});
-    } catch (e) {
-      onError?.call('文件上传失败: ${e.toString()}');
+    // 根据upgradeType选择对应的API路径
+    String apiPath;
+    switch (upgradeType) {
+      case 'program':
+        apiPath = _upgradeMainPath;
+        break;
+      case 'identity':
+        apiPath = _upgradeAiPath;
+        break;
+      default:
+        onError?.call('不支持的升级类型: $upgradeType');
+        return;
     }
+    
+    await _fileService.uploadUpgradeFile(
+      deviceIp,
+      filePath,
+      apiPath,
+      onProgress: onProgress,
+      onSuccess: () => onSuccess?.call(null),
+      onError: onError,
+    );
   }
-  
-  /// 检查升级状态
-  checkUpgradeStatus({
-    required String deviceIp,
-    required String upgradeType,
-    ValueChanged<Map<String, dynamic>?>? onSuccess,
-    ValueChanged<String>? onError,
-  }) async {
-    try {
-      String url = '${API.share.hostDeviceConfiguration(deviceIp)}/upgrade/status';
-      HttpManager.share.doHttpPost<Map<String, dynamic>>(
-        url,
-        {'type': upgradeType},
-        method: 'GET',
-        autoHideDialog: true,
-        autoShowDialog: false,
-        onSuccess: onSuccess,
-        onError: onError,
-      );
-    } catch (e) {
-      onError?.call('检查升级状态失败: ${e.toString()}');
-    }
-  }
-  
-  /// Ping设备IP检查连通性
-  Future<bool> pingDevice(String ip) async {
-    try {
-      // 使用HTTP请求模拟ping检查
-      bool isReachable = false;
-      HttpManager.share.doHttpPost<dynamic>(
-        'http://$ip:8000/ping',
-        {},
-        method: 'GET',
-        autoHideDialog: false,
-        autoShowDialog: false,
-        onSuccess: (data) {
-          isReachable = true;
-        },
-        onError: (error) {
-          isReachable = false;
-        },
-      );
-      
-      // 等待请求完成
-      await Future.delayed(const Duration(seconds: 1));
-      return isReachable;
-    } catch (e) {
-      return false;
-    }
-  }
+
 }

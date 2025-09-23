@@ -1,5 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/material.dart' hide showDialog;
+import 'package:flutter/material.dart' hide showDialog, FilledButton, ButtonStyle, Colors;
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/page/camera/camera_bound/camera_bound_page.dart';
 import 'package:omt/page/camera/camera_bound_delete/camera_bound_delete_page.dart';
@@ -18,11 +18,13 @@ import 'package:omt/utils/auth_utils.dart';
 import 'package:omt/utils/shared_utils.dart';
 import 'package:omt/utils/sys_utils.dart';
 import 'package:omt/widget/combobox.dart';
+import 'package:omt/widget/common_option_dialog.dart';
 import 'package:omt/services/install_cache_service.dart';
 import 'package:omt/router_utils.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:omt/widget/update/update_manager.dart';
 import 'package:omt/http/service/update/update_service.dart';
+import 'package:omt/utils/context_utils.dart';
 
 import '../../../test/select_detail_page.dart';
 import '../search_device/widgets/search_device_screen.dart';
@@ -113,7 +115,7 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
         notifyListeners();
         
         // 显示更新对话框
-        final context = KayoPackage.share.navigatorKey.currentState?.overlay?.context;
+        final context = ContextUtils.instance.getGlobalContext();
         if (context != null) {
           UpdateManager().showUpdateDialog(context, localUpdateInfo);
         }
@@ -380,30 +382,76 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
 
   /// 显示缓存恢复对话框
   void _showCacheDialog() {
-    var context = KayoPackage.share.navigatorKey.currentState?.overlay?.context;
+    var context = ContextUtils.instance.getGlobalContext();
     if (context == null) return;
 
     showDialog<void>(
       context: context,
-      builder: (context) => ContentDialog(
-        title: const Text('发现未完成的安装'),
-        content: const Text('检测到有未完成的设备安装，是否继续之前的安装？'),
-        actions: [
-          Button(
-            child: const Text('清除重新开始'),
-            onPressed: () {
-              Navigator.of(context).pop();
-              _clearCache();
-            },
+      builder: (context) => BaseCommonDialog(
+        title: '安装提醒',
+        width: 460,
+        height: 260,
+        child: Container(
+          margin: const EdgeInsets.only(left: 20, right: 20, top: 40),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const Text(
+                '检测到上次的安装流程尚未完成，请确认是否继续安装。\n点击"继续安装"即可从中断的地方继续安装，或者点击"取消安装"重新开始。',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Color(0xFF678384),
+                ),
+                textAlign: TextAlign.left,
+              ),
+              const SizedBox(height: 25),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  FilledButton(
+                    style: const ButtonStyle(
+                      backgroundColor: WidgetStatePropertyAll(Color(0xFFE74C3C)),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      _clearCache();
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+                      child: const Text(
+                        '取消安装',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 30),
+                  FilledButton(
+                    style: const ButtonStyle(
+                      backgroundColor: WidgetStatePropertyAll(Color(0xFF4ECDC4)),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      _continueInstall();
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+                      child: const Text(
+                        '继续安装',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-          Button(
-            child: const Text('继续安装'),
-            onPressed: () {
-              Navigator.of(context).pop();
-              _continueInstall();
-            },
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -415,8 +463,7 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
 
   /// 继续安装
   void _continueInstall() {
-    final context =
-        KayoPackage.share.navigatorKey.currentState?.overlay?.context;
+    final context = ContextUtils.instance.getGlobalContext();
     if (context == null) return;
 
     _triggerCacheRestore();

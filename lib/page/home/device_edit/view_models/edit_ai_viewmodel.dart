@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
+import 'package:kayo_package/utils/loading_utils.dart';
 import 'package:omt/bean/home/home_page/device_detail_ai_entity.dart';
 import 'package:omt/bean/home/home_page/device_entity.dart';
 import 'package:omt/http/http_query.dart';
 import 'package:omt/utils/device_utils.dart';
+import 'package:omt/utils/dialog_utils.dart';
+import 'package:omt/utils/intent_utils.dart';
 import 'package:omt/utils/sys_utils.dart';
 
-import '../../../../utils/intent_utils.dart';
 import '../../device_add/widgets/ai_search_view.dart';
-import '../../search_device/services/device_search_service.dart';
-
 import '../../search_device/services/device_search_service.dart';
 
 class EditAiViewModel extends BaseViewModel {
@@ -131,6 +131,19 @@ class EditAiViewModel extends BaseViewModel {
         nodeId: int.parse(deviceInfo.nodeId ?? "0"),
         ip: device.ip ?? "",
         mac: device.mac ?? "",
+        retryCallback: () {
+          // 显示重试对话框
+          DialogUtils.showContentDialog(
+              context: context!,
+              title: "替换失败",
+              content: "设备端验证失败，是否重试？",
+              deleteText: "重试").then((result) {
+            if (result != '取消') {
+              // 用户选择重试，再次调用替换方法
+              replaceAiDevice();
+            }
+          });
+        },
         onSuccess: (result) {
           LoadingUtils.showToast(data: "修改信息成功");
           IntentUtils.share.popResultOk(context!);

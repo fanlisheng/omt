@@ -1,16 +1,13 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:kayo_package/kayo_package.dart';
-import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
 import 'package:omt/http/http_query.dart';
 import 'package:omt/page/home/search_device/services/device_search_service.dart';
 import 'package:omt/page/remove/widgets/remove_dialog_page.dart';
 import 'package:omt/utils/dialog_utils.dart';
 
 import '../../../bean/common/id_name_value.dart';
-import '../../../bean/home/home_page/device_entity.dart';
 import '../../../bean/remove/device_list_entity.dart';
-import '../../../bean/remove/device_status_list_entity.dart';
-import '../../../utils/device_utils.dart';
+import '../widgets/result_dialog.dart';
 
 class RemoveViewModel extends BaseViewModelRefresh<dynamic> {
   List<StrIdNameValue> instanceList = [];
@@ -26,7 +23,7 @@ class RemoveViewModel extends BaseViewModelRefresh<dynamic> {
 
   //设备数据 - 三种状态的设备列表
   List<DeviceListData> noDismantleDeviceList = []; // 保留原有的未选中设备列表
-  
+
   // 新增三种状态的设备列表
   List<DeviceListData> approvedFailedDeviceList = []; // 已申请拆除，审核通过，删除失败
   List<DeviceListData> pendingApprovalDeviceList = []; // 已申请拆除，待审核
@@ -71,6 +68,17 @@ class RemoveViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   searchEventAction() {
+    // 成功弹窗
+    // ResultDialog.showSuccess(
+    //   context: context!,
+    //   onDismiss: (){
+    //
+    //   }
+    // );
+
+// 失败弹窗
+    ResultDialog.showError(context: context!);
+    return;
     //判断 3个筛选，1.如果都没有提示 2.其它请求
     if (selectedInstance?.id == null) {
       LoadingUtils.showToast(data: "至少选择一个筛选条件");
@@ -84,13 +92,13 @@ class RemoveViewModel extends BaseViewModelRefresh<dynamic> {
         gateId: selectedDoor?.id,
         onSuccess: (data) {
           // 解析新的数据结构
-          approvedFailedDeviceList = data?.approvedFailedDevices ?? [];
-          pendingApprovalDeviceList = data?.pendingApprovalDevices ?? [];
-          remainingDeviceList = data?.remainingDevices ?? [];
-          
+          approvedFailedDeviceList = data?.uninstallFailedDevices ?? [];
+          pendingApprovalDeviceList = data?.waitApproveDevices ?? [];
+          remainingDeviceList = data?.uninstallableDevices ?? [];
+
           // 清空原有的选中列表
           noDismantleDeviceList = [];
-          
+
           isSearchResult = true;
           notifyListeners();
         },
@@ -102,9 +110,10 @@ class RemoveViewModel extends BaseViewModelRefresh<dynamic> {
 
   //拆除设备
   dismantleEventAction() async {
+    if(remainingDeviceList.isEmpty) return;
     List<int> nodeIds = [];
     for (DeviceListData d in remainingDeviceList) {
-      nodeIds.add(d.id.toInt());
+      nodeIds.add(d.nodeId.toInt());
     }
     RemoveDialogPage.showAndSubmit(
         context: context!,
@@ -113,6 +122,7 @@ class RemoveViewModel extends BaseViewModelRefresh<dynamic> {
         gateId: selectedDoor?.id ?? 0,
         passId: selectedInOut?.id ?? 0,
         onSuccess: () {
+          
           searchEventAction();
         });
     // RemoveViewModel.removeDevices(
@@ -176,21 +186,24 @@ class RemoveViewModel extends BaseViewModelRefresh<dynamic> {
     } else {
       // 添加到选中列表
       DeviceListData? a;
-      
+
       if (listType == 'remaining') {
         a = remainingDeviceList[index];
         remainingDeviceList.remove(a);
+      } else if (listType == 'noDismantle') {
+        a = noDismantleDeviceList[index];
+        noDismantleDeviceList.remove(a);
       } else {
         a = noDismantleDeviceList[index];
         noDismantleDeviceList.remove(a);
       }
-      
+
       a.selected = true;
       remainingDeviceList.add(a);
     }
     notifyListeners();
   }
-  
+
   // 新增：从剩余设备列表选择设备
   selectFromRemainingDevices(int index) {
     DeviceListData device = remainingDeviceList[index];

@@ -4,6 +4,7 @@ import 'package:kayo_package/kayo_package.dart';
 import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
 import 'package:omt/bean/home/home_page/device_detail_ai_entity.dart';
 import 'package:omt/bean/home/home_page/device_entity.dart';
+import 'package:omt/bean/video/video_configuration/Video_Connect_entity.dart';
 import 'package:omt/http/http_query.dart';
 import 'package:omt/utils/device_utils.dart';
 import 'package:omt/utils/sys_utils.dart';
@@ -110,21 +111,31 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
       //请求设备信息
       String deviceCode =
           DeviceUtils.getDeviceCodeByMacAddress(macAddress: mac);
-      HttpQuery.share.homePageService.deviceDetailAi(
-          deviceCode: deviceCode,
-          onSuccess: (DeviceDetailAiData? data) {
-            if (data != null) {
-              data.mac = mac;
-              data.ip = aiControllers[index].text;
-              data.enabled = true;
-              if (index < aiDeviceList.length) {
-                aiDeviceList[index] = data;
-              }
-            }
-            _saveAiCache(); // 保存缓存
-            notifyListeners();
-            LoadingUtils.dismiss;
-          });
+
+      HttpQuery.share.homePageService.removeConfigAllAi(
+        deviceIp: aiControllers[index].text,
+        onSuccess: (dynamic result) {
+          // 删除配置成功后，调用设备详情接口
+          HttpQuery.share.homePageService.deviceDetailAi(
+              deviceCode: deviceCode,
+              onSuccess: (DeviceDetailAiData? data) {
+                if (data != null) {
+                  data.mac = mac;
+                  data.ip = aiControllers[index].text;
+                  data.enabled = true;
+                  if (index < aiDeviceList.length) {
+                    aiDeviceList[index] = data;
+                  }
+                }
+                notifyListeners();
+                LoadingUtils.dismiss();
+              });
+        },
+        onError: (String error) {
+          LoadingUtils.dismiss();
+          LoadingUtils.showToast(data: '该Ai设备的信息清除失败！');
+        },
+      );
     } else {
       LoadingUtils.showToast(data: '请输入正确的IP地址');
     }

@@ -5,6 +5,7 @@ import '../../bean/update/update_info.dart';
 import '../../http/service/update/update_service.dart';
 import '../../theme.dart';
 import '../../utils/color_utils.dart';
+import '../../utils/context_utils.dart';
 
 class UpdateDialog extends StatefulWidget {
   final UpdateInfo updateInfo;
@@ -28,8 +29,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
   bool _isInstalling = false;
 
   BuildContext _snackContext() {
-    final overlayCtx =
-        KayoPackage.share.navigatorKey.currentState?.overlay?.context;
+    final overlayCtx = ContextUtils.instance.getGlobalContext();
     return overlayCtx ?? context;
   }
 

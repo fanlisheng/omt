@@ -515,7 +515,7 @@ class AddCameraView extends StatelessWidget {
                       const SizedBox(height: 10),
                       EquallyRow(
                         one: const RowTitle(
-                          name: "视频接入ID",
+                          name: "视频接入ID(国标ID)",
                           isMust: false,
                         ),
                         two: Container(),
