@@ -270,6 +270,7 @@ Route<dynamic> generateRoute(RouteSettings settings, {uniqueId}) {
           builder: (context) {
             return EditCameraView(
               model: arguments["data"],
+              isReplace: arguments["isReplace"],
             );
           });
 

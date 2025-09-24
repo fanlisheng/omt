@@ -384,7 +384,53 @@ class DetailCameraView extends StatelessWidget {
               ),
             ),
             const SizedBox(
-              width: 16,
+              width: 10,
+            ),
+            Clickable(
+              child: Container(
+                padding: const EdgeInsets.only(
+                    left: 25, right: 25, top: 6, bottom: 6),
+                decoration: BoxDecoration(
+                  color: "#2F94DD".toColor(),
+                  borderRadius: BorderRadius.circular(3),
+                ),
+                child: const Text(
+                  "替换设备",
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: ColorUtils.colorWhite,
+                  ),
+                ),
+              ),
+              onTap: () {
+                model.replaceAction();
+              },
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            Clickable(
+              child: Container(
+                padding: const EdgeInsets.only(
+                    left: 25, right: 25, top: 6, bottom: 6),
+                decoration: BoxDecoration(
+                  color: ColorUtils.colorRed,
+                  borderRadius: BorderRadius.circular(3),
+                ),
+                child: const Text(
+                  "拆除设备",
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: ColorUtils.colorWhite,
+                  ),
+                ),
+              ),
+              onTap: () {
+                model.removeAction();
+              },
+            ),
+            const SizedBox(
+              width: 10,
             ),
           ],
         ),

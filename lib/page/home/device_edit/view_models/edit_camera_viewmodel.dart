@@ -16,17 +16,19 @@ import '../../../../bean/common/code_data.dart';
 import '../../../../bean/home/home_page/device_detail_ai_entity.dart';
 import '../../../../bean/home/home_page/device_detail_camera_entity.dart';
 import '../../../../utils/image_utils.dart';
+import '../../device_add/view_models/add_camera_viewmodel.dart';
 
 class EditCameraViewModel extends BaseViewModelRefresh<dynamic> {
   final DeviceDetailCameraData deviceInfo;
-
-  EditCameraViewModel(this.deviceInfo);
+  final bool isReplace; //是替换 默认否
+  EditCameraViewModel(this.deviceInfo, this.isReplace);
 
   // ===== 摄像头相关属性 =====
   List<IdNameValue> inOutList = [];
   List<IdNameValue> cameraTypeList = [];
   List<IdNameValue> regulationList = [];
   CameraDeviceEntity cameraDevice = CameraDeviceEntity();
+  AddCameraViewModel? addCameraViewModel;
 
   // late final player = Player();
   // late var videoController = VideoController(player);
@@ -40,8 +42,6 @@ class EditCameraViewModel extends BaseViewModelRefresh<dynamic> {
     super.initState();
     // 初始化摄像头列表和控制器
     cameraDevice.code = deviceInfo.deviceCode;
-    // cameraDevice.ip = deviceInfo.ip;
-    // cameraDevice.mac = deviceInfo.mac;
     cameraDevice.rtsp = deviceInfo.rtspUrl;
     cameraDevice.rtspController =
         TextEditingController(text: deviceInfo.rtspUrl);
@@ -50,9 +50,6 @@ class EditCameraViewModel extends BaseViewModelRefresh<dynamic> {
     cameraDevice.videoIdController =
         TextEditingController(text: deviceInfo.cameraCode);
     cameraDevice.isOpen = true;
-
-    // cameraDeviceList = [cameraDevice];
-    // deviceDetailNvr = [TextEditingController()];
 
     // 初始化摄像头类型列表
     _getCameraStatusList();
@@ -63,15 +60,25 @@ class EditCameraViewModel extends BaseViewModelRefresh<dynamic> {
       onSuccess: (List<IdNameValue>? data) {
         inOutList = data ?? [];
         // 设置选中的进出口
-        for (var entry in inOutList) {
-          if (entry.name == deviceInfo.passName) {
-            cameraDevice.selectedEntryExit = entry;
-            break;
+        if (deviceInfo.passName != null) {
+          for (var entry in inOutList) {
+            if (entry.name == deviceInfo.passName) {
+              cameraDevice.selectedEntryExit = entry;
+              break;
+            }
           }
         }
         notifyListeners();
       },
     );
+
+    if (isReplace) {
+      cameraDevice.rtsp = "";
+      cameraDevice.rtspController.text = "";
+      cameraDevice.isOpen = false;
+      addCameraViewModel = AddCameraViewModel("", [],
+          isReplace: true, cameraDeviceList: [cameraDevice]);
+    }
   }
 
   @override
@@ -111,10 +118,12 @@ class EditCameraViewModel extends BaseViewModelRefresh<dynamic> {
       onSuccess: (List<IdNameValue>? data) {
         cameraTypeList = data ?? [];
         // 设置选中的摄像头类型
-        for (var entry in cameraTypeList) {
-          if (entry.name == deviceInfo.cameraTypeText) {
-            cameraDevice.selectedCameraType = entry;
-            break;
+        if (deviceInfo.cameraTypeText != null) {
+          for (var entry in cameraTypeList) {
+            if (entry.name == deviceInfo.cameraTypeText) {
+              cameraDevice.selectedCameraType = entry;
+              break;
+            }
           }
         }
         notifyListeners();
@@ -128,10 +137,12 @@ class EditCameraViewModel extends BaseViewModelRefresh<dynamic> {
       onSuccess: (List<IdNameValue>? data) {
         regulationList = data ?? [];
         // 设置选中的监管状态
-        for (var entry in regulationList) {
-          if (entry.name == deviceInfo.controlStatusText) {
-            cameraDevice.selectedRegulation = entry;
-            break;
+        if (deviceInfo.controlStatusText != null) {
+          for (var entry in regulationList) {
+            if (entry.name == deviceInfo.controlStatusText) {
+              cameraDevice.selectedRegulation = entry;
+              break;
+            }
           }
         }
         notifyListeners();

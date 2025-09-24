@@ -24,12 +24,19 @@ import '../../search_device/services/device_search_service.dart';
 
 class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
   final String pNodeCode;
+  final bool isReplace; //是替换 默认否
 
   List<DeviceDetailAiData> aiDeviceList;
   int gateId = 0;
   String instanceId = "";
+  List<CameraDeviceEntity> cameraDeviceList = [CameraDeviceEntity()];
 
-  AddCameraViewModel(this.pNodeCode, this.aiDeviceList);
+  AddCameraViewModel(this.pNodeCode, this.aiDeviceList,
+      {this.isReplace = false, this.cameraDeviceList = const []}) {
+    cameraDeviceList = cameraDeviceList.isNotEmpty
+        ? cameraDeviceList
+        : [CameraDeviceEntity()];
+  }
 
   // ===== 摄像头相关属性 =====
 
@@ -39,8 +46,6 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
 
   // 缓存服务
   final InstallCacheService _cacheService = InstallCacheService.instance;
-
-  List<CameraDeviceEntity> cameraDeviceList = [CameraDeviceEntity()];
 
   @override
   void initState() {
@@ -52,7 +57,6 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
 
     // 然后加载基础数据
     _loadInitialData();
-
   }
 
   /// 加载初始数据
@@ -278,6 +282,12 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
     }
 
     LoadingUtils.dismiss();
+    //如果是替换，连接成功了直接把状态改了
+    if(isReplace && e.connectionStatus == 2){
+       e.isAddEnd = true;
+       e.readOnly = true;
+       cameraDeviceList[index] = e;
+    }
     notifyListeners();
   }
 

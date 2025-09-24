@@ -31,6 +31,31 @@ class FComboBox<T> extends StatelessWidget {
     this.icon, // 接收外部传入图标
   });
 
+  String _getDisplayText(T item) {
+    if (item is IdNameValue) {
+      return item.name ?? "";
+    }
+    return item.toString();
+  }
+
+  // 根据内容查找匹配的项目
+  T? _findMatchingItem() {
+    if (selectedValue == null) return null;
+    
+    // 如果是IdNameValue类型，根据name进行匹配
+    if (selectedValue is IdNameValue) {
+      final selectedName = (selectedValue as IdNameValue).name;
+      for (var item in items) {
+        if (item is IdNameValue && item.name == selectedName) {
+          return item;
+        }
+      }
+    }
+    
+    // 其他类型直接返回selectedValue
+    return selectedValue;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -41,14 +66,14 @@ class FComboBox<T> extends StatelessWidget {
       ),
       child: ui.ComboBox<T>(
         isExpanded: true,
-        value: selectedValue,
+        value: _findMatchingItem(),
         icon: icon ?? const Icon(ui.FluentIcons.chevron_down), // 默认图标
         items: items
             .map<ui.ComboBoxItem<T>>(
               (item) => ui.ComboBoxItem<T>(
                 value: item,
                 child: Text(
-                  item.toString(),
+                  _getDisplayText(item),
                   textAlign: TextAlign.start,
                   style: itemStyle ??
                       const TextStyle(

@@ -112,30 +112,49 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
       String deviceCode =
           DeviceUtils.getDeviceCodeByMacAddress(macAddress: mac);
 
-      HttpQuery.share.homePageService.removeConfigAllAi(
-        deviceIp: aiControllers[index].text,
-        onSuccess: (dynamic result) {
-          // 删除配置成功后，调用设备详情接口
-          HttpQuery.share.homePageService.deviceDetailAi(
-              deviceCode: deviceCode,
-              onSuccess: (DeviceDetailAiData? data) {
-                if (data != null) {
-                  data.mac = mac;
-                  data.ip = aiControllers[index].text;
-                  data.enabled = true;
-                  if (index < aiDeviceList.length) {
-                    aiDeviceList[index] = data;
+      if (isInstall) {
+        // 安装模式：先清除配置再获取设备详情
+        HttpQuery.share.homePageService.removeConfigAllAi(
+          deviceIp: aiControllers[index].text,
+          onSuccess: (dynamic result) {
+            // 删除配置成功后，调用设备详情接口
+            HttpQuery.share.homePageService.deviceDetailAi(
+                deviceCode: deviceCode,
+                onSuccess: (DeviceDetailAiData? data) {
+                  if (data != null) {
+                    data.mac = mac;
+                    data.ip = aiControllers[index].text;
+                    data.enabled = true;
+                    if (index < aiDeviceList.length) {
+                      aiDeviceList[index] = data;
+                    }
                   }
+                  notifyListeners();
+                  LoadingUtils.dismiss();
+                });
+          },
+          onError: (String error) {
+            LoadingUtils.dismiss();
+            LoadingUtils.showToast(data: '该Ai设备的信息清除失败！');
+          },
+        );
+      } else {
+        // 非安装模式：直接获取设备详情
+        HttpQuery.share.homePageService.deviceDetailAi(
+            deviceCode: deviceCode,
+            onSuccess: (DeviceDetailAiData? data) {
+              if (data != null) {
+                data.mac = mac;
+                data.ip = aiControllers[index].text;
+                data.enabled = true;
+                if (index < aiDeviceList.length) {
+                  aiDeviceList[index] = data;
                 }
-                notifyListeners();
-                LoadingUtils.dismiss();
-              });
-        },
-        onError: (String error) {
-          LoadingUtils.dismiss();
-          LoadingUtils.showToast(data: '该Ai设备的信息清除失败！');
-        },
-      );
+              }
+              notifyListeners();
+              LoadingUtils.dismiss();
+            });
+      }
     } else {
       LoadingUtils.showToast(data: '请输入正确的IP地址');
     }
