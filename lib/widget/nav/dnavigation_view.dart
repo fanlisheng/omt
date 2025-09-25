@@ -3,7 +3,6 @@ import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kayo_package/kayo_package_utils.dart';
 import 'package:kayo_package/views/widget/base/clickable.dart';
-import 'package:omt/routing/routes.dart';
 import 'package:omt/test/test.dart';
 
 import '../../utils/color_utils.dart';

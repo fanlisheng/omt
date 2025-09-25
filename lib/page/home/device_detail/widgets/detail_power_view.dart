@@ -5,7 +5,7 @@ import 'package:omt/page/home/device_detail/view_models/device_detail_viewmodel.
 import 'package:omt/utils/color_utils.dart';
 import 'package:omt/widget/checkbox.dart';
 
-import '../../../remove/widgets/remove_screen.dart';
+import '../../../remove/widgets/remove_dialog_page.dart';
 import '../view_models/detail_power_viewmodel.dart';
 import 'detail_ai_view.dart';
 

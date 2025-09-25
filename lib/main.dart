@@ -69,6 +69,7 @@ void main() async {
       await flutter_acrylic.Window.hideWindowControls();
     }
     var isWindows = defaultTargetPlatform == TargetPlatform.windows;
+    var isMacOS = defaultTargetPlatform == TargetPlatform.macOS;
 
     await WindowManager.instance.ensureInitialized();
     windowManager.waitUntilReadyToShow().then((_) async {
@@ -76,6 +77,7 @@ void main() async {
         TitleBarStyle.hidden,
         windowButtonVisibility: false,
       );
+      
       if (isWindows) {
         // await windowManager.setTitle('');
       }
