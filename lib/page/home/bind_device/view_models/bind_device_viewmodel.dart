@@ -2,7 +2,6 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:kayo_package/mvvm/base/base_view_model_refresh.dart';
-import 'package:omt/routing/routes.dart';
 import 'package:omt/utils/device_utils.dart';
 import 'package:omt/utils/dialog_utils.dart';
 

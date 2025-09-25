@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/home/home_page/device_entity.dart';
 import 'package:omt/router_utils.dart';
-import 'package:omt/routing/routes.dart';
 import 'package:omt/utils/intent_utils.dart';
 import 'package:omt/utils/log_utils.dart';
 import '../../../../bean/common/id_name_value.dart';

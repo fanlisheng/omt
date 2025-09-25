@@ -8,7 +8,6 @@ import 'package:omt/utils/log_utils.dart';
 import 'package:omt/widget/checkbox.dart';
 import 'package:omt/widget/combobox.dart';
 
-import '../../../../routing/routes.dart';
 import '../view_models/search_device_viewmodel.dart';
 
 class FilterView extends StatefulWidget {
