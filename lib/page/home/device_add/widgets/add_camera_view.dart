@@ -433,29 +433,9 @@ class AddCameraView extends StatelessWidget {
                         two: Container(),
                       ),
                       const SizedBox(height: 20),
-<<<<<<< HEAD
-                      Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            if (!e.readOnly) ...[
-                              Clickable(
-                                child: Container(
-                                  padding: const EdgeInsets.only(
-                                      left: 30, right: 30, top: 8, bottom: 8),
-                                  decoration: BoxDecoration(
-                                    color: ColorUtils.colorGreen,
-                                    borderRadius: BorderRadius.circular(3),
-                                  ),
-                                  child: Text(
-                                    model.operationType.completeButtonText,
-                                    style: const TextStyle(
-                                        fontSize: 12,
-                                        color: ColorUtils.colorWhite),
-=======
-                      Visibility(
-                        visible: !model.isReplace,
-                        child: Center(
+                      // 只有在非替换模式下才显示完成按钮
+                      if (!model.isReplace) ...[
+                        Center(
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -468,13 +448,12 @@ class AddCameraView extends StatelessWidget {
                                       color: ColorUtils.colorGreen,
                                       borderRadius: BorderRadius.circular(3),
                                     ),
-                                    child: const Text(
-                                      "添加完成",
-                                      style: TextStyle(
+                                    child: Text(
+                                      model.operationType.completeButtonText,
+                                      style: const TextStyle(
                                           fontSize: 12,
                                           color: ColorUtils.colorWhite),
                                     ),
->>>>>>> backup-current-changes
                                   ),
                                   onTap: () {
                                     // e.readOnly = true;
@@ -538,7 +517,7 @@ class AddCameraView extends StatelessWidget {
                             ],
                           ),
                         ),
-                      ),
+                      ]
                     ],
                   ],
                 ],
