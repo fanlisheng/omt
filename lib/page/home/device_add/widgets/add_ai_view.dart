@@ -23,12 +23,15 @@ class AddAiView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ProviderWidget<AddAiViewModel>(
-        model: model..themeNotifier = true,
-        autoLoadData: true,
+    // 使用ChangeNotifierProvider.value来监听状态变化，但不管理生命周期
+    return ChangeNotifierProvider<AddAiViewModel>.value(
+      value: model,
+      child: Consumer<AddAiViewModel>(
         builder: (context, model, child) {
           return aiView(model, context);
-        });
+        },
+      ),
+    );
   }
 
   Column aiView(AddAiViewModel model, BuildContext context) {

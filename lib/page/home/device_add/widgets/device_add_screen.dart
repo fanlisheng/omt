@@ -210,7 +210,6 @@ class DeviceAddScreen extends StatelessWidget {
       case DeviceType.camera:
       case DeviceType.aiAndCamera:
         return AddAiView(model: model.aiViewModel!);
-        return AddAiView(model: model.aiViewModel!);
       // return AddCameraView(model: model.cameraViewModel!);
       case DeviceType.nvr:
         return AddNvrView(model: model.nvrViewModel!);

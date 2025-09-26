@@ -159,10 +159,15 @@ class DeviceAddViewModel extends BaseViewModelRefresh<dynamic> {
         return;
       case StepNumber.second:
         stepNumber = StepNumber.first;
+        break;
       case StepNumber.third:
         stepNumber = StepNumber.second;
+        // 从第三步返回第二步时，保持aiViewModel不销毁，直接复用
+        // 不需要重新创建，保持原有的ViewModel状态
+        break;
       case StepNumber.four:
         stepNumber = StepNumber.third;
+        break;
     }
     notifyListeners();
   }
@@ -180,7 +185,7 @@ class DeviceAddViewModel extends BaseViewModelRefresh<dynamic> {
           case DeviceType.ai:
           case DeviceType.camera:
           case DeviceType.aiAndCamera:
-            aiViewModel = AddAiViewModel(pNodeCode);
+            aiViewModel ??= AddAiViewModel(pNodeCode);
             break;
           case DeviceType.nvr:
             nvrViewModel = AddNvrViewModel(pNodeCode);

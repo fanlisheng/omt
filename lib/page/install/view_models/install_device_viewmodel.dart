@@ -293,7 +293,7 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
         //如果只有一个
         if (cameraViewModel.cameraDeviceList.length == 1 &&
             (!cameraViewModel.cameraDeviceList.first.isAddEnd)) {
-          LoadingUtils.showInfo(data: "至少添加1个AI设备!");
+          LoadingUtils.showInfo(data: "至少添加1个摄像头!");
           return false;
         }
 
