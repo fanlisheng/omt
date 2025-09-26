@@ -144,6 +144,7 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
   /// 节点代码，用于标识设备绑定场景
   /// 格式："{instanceId}-2#{gateId}"
   final String pNodeCode;
+  final bool isReplace; //是替换 默认否
 
   /// AI设备列表，摄像头需要关联到AI设备
   List<DeviceDetailAiData> aiDeviceList;
@@ -153,8 +154,9 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
   
   /// 实例ID，用于API调用
   String instanceId = "";
+  List<CameraDeviceEntity> cameraDeviceList = [CameraDeviceEntity()];
 
-  /// 当前操作类型，根据pNodeCode自动确定
+  /// 当前操作类型，根据pNodeCode和isReplace自动确定
   /// 决定了使用哪个API和验证哪些参数
   late CameraOperationType operationType;
 
@@ -166,11 +168,23 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
   /// 
   /// [pNodeCode] 节点代码，不为空时表示设备绑定场景
   /// [aiDeviceList] 可用的AI设备列表
-  /// [operationType] 可选的操作类型，如果不提供则根据pNodeCode自动判断
-  AddCameraViewModel(this.pNodeCode, this.aiDeviceList, {CameraOperationType? operationType}) {
-    // 如果明确指定了操作类型，则使用指定的类型
+  /// [isReplace] 是否为替换操作，默认为false
+  /// [cameraDeviceList] 摄像头设备列表，默认包含一个空设备
+  /// [operationType] 可选的操作类型，如果不提供则根据pNodeCode和isReplace自动判断
+  AddCameraViewModel(this.pNodeCode, this.aiDeviceList,
+      {this.isReplace = false, this.cameraDeviceList = const [], CameraOperationType? operationType}) {
+    // 初始化摄像头设备列表
+    this.cameraDeviceList = cameraDeviceList.isNotEmpty
+        ? cameraDeviceList
+        : [CameraDeviceEntity()];
+    
+    // 确定操作类型
     if (operationType != null) {
+      // 如果明确指定了操作类型，则使用指定的类型
       this.operationType = operationType;
+    } else if (isReplace) {
+      // 如果是替换操作，使用替换类型
+      this.operationType = CameraOperationType.replace;
     } else {
       // 根据pNodeCode自动确定操作类型
       // pNodeCode不为空时为安装操作（设备绑定场景），为空时为添加操作（直接添加场景）
@@ -195,9 +209,6 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
   /// 缓存服务实例，用于数据持久化
   final InstallCacheService _cacheService = InstallCacheService.instance;
 
-  /// 摄像头设备列表，支持批量操作
-  List<CameraDeviceEntity> cameraDeviceList = [CameraDeviceEntity()];
-
   @override
   void initState() {
     super.initState();
@@ -208,7 +219,6 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
 
     // 然后加载基础数据
     _loadInitialData();
-
   }
 
   /// 加载初始数据
@@ -434,6 +444,12 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
     }
 
     LoadingUtils.dismiss();
+    //如果是替换，连接成功了直接把状态改了
+    if(isReplace && e.connectionStatus == 2){
+       e.isAddEnd = true;
+       e.readOnly = true;
+       cameraDeviceList[index] = e;
+    }
     notifyListeners();
   }
 

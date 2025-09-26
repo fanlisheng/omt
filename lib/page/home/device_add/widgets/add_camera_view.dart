@@ -40,25 +40,27 @@ class AddCameraView extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          margin: const EdgeInsets.only(left: 16, right: 16),
-          padding:
-              const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),
-          decoration: BoxDecoration(
-            color: ColorUtils.colorBackgroundLine,
-            borderRadius: BorderRadius.circular(3),
-          ),
-          width: double.infinity,
-          child: const Text(
-            "第三步：添加摄像头",
-            style: TextStyle(
-              fontSize: 14,
-              color: ColorUtils.colorGreenLiteLite,
-              fontWeight: FontWeight.w500,
+        if (model.isReplace == false) ...[
+          Container(
+            margin: const EdgeInsets.only(left: 16, right: 16),
+            padding:
+                const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 10),
+            decoration: BoxDecoration(
+              color: ColorUtils.colorBackgroundLine,
+              borderRadius: BorderRadius.circular(3),
+            ),
+            width: double.infinity,
+            child: const Text(
+              "第三步：添加摄像头",
+              style: TextStyle(
+                fontSize: 14,
+                color: ColorUtils.colorGreenLiteLite,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: 10),
+          const SizedBox(height: 10),
+        ],
         Expanded(
             child: ListView(
           children: model.cameraDeviceList.asMap().keys.map((index) {
@@ -67,7 +69,11 @@ class AddCameraView extends StatelessWidget {
             if ((e.rtsp ?? "").isNotEmpty) {
               height = 248;
               if (e.isOpen == true) {
-                height = 990;
+                if (model.isReplace) {
+                  height = 900;
+                } else {
+                  height = 990;
+                }
               }
             }
             String statusText;
@@ -90,7 +96,7 @@ class AddCameraView extends StatelessWidget {
               height: height,
               margin: const EdgeInsets.only(left: 16, right: 16, bottom: 10),
               padding: const EdgeInsets.only(
-                  left: 16, right: 16, top: 16, bottom: 16),
+                  left: 16, right: 16, top: 12, bottom: 16),
               decoration: BoxDecoration(
                 color: ColorUtils.colorBackgroundLine,
                 borderRadius: BorderRadius.circular(3),
@@ -111,60 +117,6 @@ class AddCameraView extends StatelessWidget {
                             ),
                           ),
                         ),
-                        // Button(
-                        //   onPressed: () {
-                        //     model.deleteCameraAction(index);
-                        //   },
-                        //   child: Row(
-                        //     children: [
-                        //       ImageView(
-                        //         src: source(
-                        //           "home/ic_camera_delete",
-                        //         ),
-                        //         width: 10,
-                        //         height: 18,
-                        //         color: ColorUtils.colorRed,
-                        //       ),
-                        //       const SizedBox(
-                        //         width: 4,
-                        //       ),
-                        //       const Text(
-                        //         "删除设备",
-                        //         style: TextStyle(
-                        //           fontSize: 12,
-                        //           color: ColorUtils.colorRed,
-                        //         ),
-                        //       )
-                        //     ],
-                        //   ),
-                        // ),
-                        // const SizedBox(width: 10),
-                        // Button(
-                        //     child: Row(
-                        //       children: [
-                        //         ImageView(
-                        //           width: 10,
-                        //           height: 18,
-                        //           src: source(
-                        //             "home/ic_camera_edit",
-                        //           ),
-                        //           color: ColorUtils.colorGreen,
-                        //         ),
-                        //         const SizedBox(
-                        //           width: 4,
-                        //         ),
-                        //         const Text(
-                        //           "编辑",
-                        //           style: TextStyle(
-                        //             fontSize: 12,
-                        //             color: ColorUtils.colorGreen,
-                        //           ),
-                        //         )
-                        //       ],
-                        //     ),
-                        //     onPressed: () {
-                        //       model.editCameraAction(e);
-                        //     }),
                       ],
                     ),
                   ],
@@ -195,36 +147,16 @@ class AddCameraView extends StatelessWidget {
                               ],
                             ),
                             const SizedBox(height: 8),
-                            ComboBox<DeviceDetailAiData>(
-                              isExpanded: true,
-                              value: e.selectedAi,
-                              items: model.aiDeviceList
-                                  .map<ComboBoxItem<DeviceDetailAiData>>((e) {
-                                return ComboBoxItem<DeviceDetailAiData>(
-                                  value: e,
-                                  child: Text(
-                                    e.ip ?? "",
-                                    textAlign: TextAlign.start,
-                                    style: const TextStyle(
-                                        fontSize: 12,
-                                        color: ColorUtils.colorWhite),
-                                  ),
-                                );
-                              }).toList(),
+                            FComboBox<DeviceDetailAiData>(
+                              selectedValue: e.selectedAi,
+                              items: model.aiDeviceList,
                               onChanged: e.readOnly
                                   ? null
                                   : (a) {
                                       e.selectedAi = a!;
                                       model.notifyListeners();
                                     },
-                              placeholder: const Text(
-                                "请选择已添加AI设备IP",
-                                textAlign: TextAlign.start,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: ColorUtils.colorBlackLiteLite,
-                                ),
-                              ),
+                              placeholder: "请选择已添加AI设备IP",
                             ),
                           ],
                         ),
@@ -274,7 +206,7 @@ class AddCameraView extends StatelessWidget {
                           child: TextBox(
                             placeholder: '请输入RTSP地址',
                             controller: e.rtspController,
-                            enabled: !e.readOnly,
+                            enabled: model.isReplace ? true : !e.readOnly,
                             style: const TextStyle(
                               fontSize: 12.0,
                               color: ColorUtils.colorGreenLiteLite,
@@ -288,7 +220,7 @@ class AddCameraView extends StatelessWidget {
                       ),
                       const SizedBox(width: 20),
                       Clickable(
-                        onTap: e.readOnly
+                        onTap: (e.readOnly && !model.isReplace)
                             ? null
                             : () {
                                 model.connectCameraAction(index);
@@ -310,34 +242,36 @@ class AddCameraView extends StatelessWidget {
                     ],
                   ),
                   if ((e.code ?? "").isNotEmpty) ...[
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Clickable(
-                          onTap: () {
-                            e.isOpen = !(e.isOpen ?? false);
-                            model.notifyListeners();
-                          },
-                          padding: const EdgeInsets.all(5),
-                          child: const Text(
-                            "展开详情",
-                            style: TextStyle(
-                                fontSize: 12,
-                                color: ColorUtils.colorGreenLiteLite),
+                    if (model.isReplace == false) ...[
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Clickable(
+                            onTap: () {
+                              e.isOpen = !(e.isOpen ?? false);
+                              model.notifyListeners();
+                            },
+                            padding: const EdgeInsets.all(5),
+                            child: const Text(
+                              "展开详情",
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  color: ColorUtils.colorGreenLiteLite),
+                            ),
                           ),
-                        ),
-                        const SizedBox(
-                          width: 8,
-                        ),
-                        Expanded(
-                          child: DashLine(
-                              height: 1,
-                              width: double.infinity,
-                              color: "#678384".toColor(),
-                              gap: 3),
-                        )
-                      ],
-                    ),
+                          const SizedBox(
+                            width: 8,
+                          ),
+                          Expanded(
+                            child: DashLine(
+                                height: 1,
+                                width: double.infinity,
+                                color: "#678384".toColor(),
+                                gap: 3),
+                          )
+                        ],
+                      ),
+                    ],
                     if (e.isOpen ?? false) ...[
                       const SizedBox(height: 16),
                       Row(
@@ -433,10 +367,12 @@ class AddCameraView extends StatelessWidget {
                         two: FComboBox<IdNameValue>(
                             selectedValue: e.selectedCameraType,
                             items: model.cameraTypeList,
-                            onChanged: (a) {
-                              e.selectedCameraType = a!;
-                              model.notifyListeners();
-                            },
+                            onChanged: e.readOnly
+                                ? null
+                                : (a) {
+                                    e.selectedCameraType = a!;
+                                    model.notifyListeners();
+                                  },
                             placeholder: "请选择大门编号"),
                       ),
                       const SizedBox(height: 10),
@@ -450,66 +386,27 @@ class AddCameraView extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       EquallyRow(
-                        one: ComboBox<IdNameValue>(
-                          isExpanded: true,
-                          value: e.selectedEntryExit,
-                          items: model.inOutList
-                              .map<ComboBoxItem<IdNameValue>>((e) {
-                            return ComboBoxItem<IdNameValue>(
-                              value: e,
-                              child: Text(
-                                e.name ?? "",
-                                textAlign: TextAlign.start,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: ColorUtils.colorGreenLiteLite,
-                                ),
-                              ),
-                            );
-                          }).toList(),
+                        one: FComboBox<IdNameValue>(
+                          selectedValue: e.selectedEntryExit,
+                          items: model.inOutList,
                           onChanged: e.readOnly
                               ? null
                               : (a) {
                                   e.selectedEntryExit = a!;
                                   model.notifyListeners();
                                 },
-                          placeholder: const Text(
-                            "请选择进/出口",
-                            textAlign: TextAlign.start,
-                            style: TextStyle(
-                                fontSize: 12,
-                                color: ColorUtils.colorBlackLiteLite),
-                          ),
+                          placeholder: "请选择进/出口",
                         ),
-                        two: ComboBox<IdNameValue>(
-                          isExpanded: true,
-                          value: e.selectedRegulation,
-                          items: model.regulationList
-                              .map<ComboBoxItem<IdNameValue>>((e) {
-                            return ComboBoxItem<IdNameValue>(
-                              value: e,
-                              child: Text(
-                                e.name ?? "",
-                                textAlign: TextAlign.start,
-                                style: const TextStyle(
-                                    fontSize: 12,
-                                    color: ColorUtils.colorGreenLiteLite),
-                              ),
-                            );
-                          }).toList(),
+                        two: FComboBox<IdNameValue>(
+                          selectedValue: e.selectedRegulation,
+                          items: model.regulationList,
                           onChanged: e.readOnly
                               ? null
                               : (a) {
                                   e.selectedRegulation = a!;
                                   model.notifyListeners();
                                 },
-                          placeholder: const Text(
-                            "请选择是否纳入监管",
-                            textAlign: TextAlign.start,
-                            style: TextStyle(
-                                fontSize: 12,
-                                color: ColorUtils.colorBlackLiteLite),
-                          ),
+                          placeholder: "请选择是否纳入监管",
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -536,6 +433,7 @@ class AddCameraView extends StatelessWidget {
                         two: Container(),
                       ),
                       const SizedBox(height: 20),
+<<<<<<< HEAD
                       Center(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -554,65 +452,91 @@ class AddCameraView extends StatelessWidget {
                                     style: const TextStyle(
                                         fontSize: 12,
                                         color: ColorUtils.colorWhite),
+=======
+                      Visibility(
+                        visible: !model.isReplace,
+                        child: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (!e.readOnly) ...[
+                                Clickable(
+                                  child: Container(
+                                    padding: const EdgeInsets.only(
+                                        left: 30, right: 30, top: 8, bottom: 8),
+                                    decoration: BoxDecoration(
+                                      color: ColorUtils.colorGreen,
+                                      borderRadius: BorderRadius.circular(3),
+                                    ),
+                                    child: const Text(
+                                      "添加完成",
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: ColorUtils.colorWhite),
+                                    ),
+>>>>>>> backup-current-changes
                                   ),
+                                  onTap: () {
+                                    // e.readOnly = true;
+                                    // model.notifyListeners();
+                                    if (model.checkCameraInfo(e)) {
+                                      showConfirmDialog(
+                                          context, e, model, index);
+                                    }
+                                    // model.completeCameraAction(e);
+                                  },
                                 ),
-                                onTap: () {
-                                  // e.readOnly = true;
-                                  // model.notifyListeners();
-                                  if (model.checkCameraInfo(e)) {
-                                    showConfirmDialog(context, e, model, index);
-                                  }
-                                  // model.completeCameraAction(e);
-                                },
-                              ),
-                            ] else ...[
-                              Clickable(
-                                child: Container(
-                                  padding: const EdgeInsets.only(
-                                      left: 30, right: 30, top: 8, bottom: 8),
-                                  // color: ColorUtils.colorGreen,
-                                  decoration: BoxDecoration(
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(3)),
-                                    border: Border.all(
-                                        width: 1, color: ColorUtils.colorGreen),
+                              ] else ...[
+                                Clickable(
+                                  child: Container(
+                                    padding: const EdgeInsets.only(
+                                        left: 30, right: 30, top: 8, bottom: 8),
+                                    // color: ColorUtils.colorGreen,
+                                    decoration: BoxDecoration(
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(3)),
+                                      border: Border.all(
+                                          width: 1,
+                                          color: ColorUtils.colorGreen),
+                                    ),
+                                    child: const Text(
+                                      "重启识别",
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: ColorUtils.colorGreen),
+                                    ),
                                   ),
-                                  child: const Text(
-                                    "重启识别",
-                                    style: TextStyle(
-                                        fontSize: 12,
-                                        color: ColorUtils.colorGreen),
-                                  ),
+                                  onTap: () {
+                                    model.restartRecognitionAction(e);
+                                  },
                                 ),
-                                onTap: () {
-                                  model.restartRecognitionAction(e);
-                                },
-                              ),
-                              const SizedBox(width: 18),
-                              Clickable(
-                                child: Container(
-                                  padding: const EdgeInsets.only(
-                                      left: 30, right: 30, top: 8, bottom: 8),
-                                  // color: ColorUtils.colorGreen,
-                                  decoration: BoxDecoration(
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(3)),
-                                    border: Border.all(
-                                        width: 1, color: ColorUtils.colorGreen),
+                                const SizedBox(width: 18),
+                                Clickable(
+                                  child: Container(
+                                    padding: const EdgeInsets.only(
+                                        left: 30, right: 30, top: 8, bottom: 8),
+                                    // color: ColorUtils.colorGreen,
+                                    decoration: BoxDecoration(
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(3)),
+                                      border: Border.all(
+                                          width: 1,
+                                          color: ColorUtils.colorGreen),
+                                    ),
+                                    child: const Text(
+                                      "图片预览",
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: ColorUtils.colorGreen),
+                                    ),
                                   ),
-                                  child: const Text(
-                                    "图片预览",
-                                    style: TextStyle(
-                                        fontSize: 12,
-                                        color: ColorUtils.colorGreen),
-                                  ),
+                                  onTap: () {
+                                    model.photoPreviewAction(e);
+                                  },
                                 ),
-                                onTap: () {
-                                  model.photoPreviewAction(e);
-                                },
-                              ),
+                              ],
                             ],
-                          ],
+                          ),
                         ),
                       ),
                     ],
@@ -623,30 +547,33 @@ class AddCameraView extends StatelessWidget {
           }).toList(),
         )),
         const SizedBox(height: 10),
-        Row(
-          children: [
-            const SizedBox(width: 16),
-            Clickable(
-              child: Text(
-                model.operationType.continueActionText,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: AppTheme().color,
-                  fontWeight: FontWeight.w500,
+        // 只有在非替换模式下才显示继续添加按钮
+        if (!model.isReplace) ...[
+          Row(
+            children: [
+              const SizedBox(width: 16),
+              Clickable(
+                child: Text(
+                  model.operationType.continueActionText,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: AppTheme().color,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
+                onTap: () {
+                  if (model.cameraDeviceList.last.isAddEnd == true) {
+                    model.cameraDeviceList.add(CameraDeviceEntity());
+                    model.notifyListeners();
+                  } else {
+                    LoadingUtils.showInfo(data: "请${model.operationType.displayName}完上一个设备!");
+                  }
+                },
               ),
-              onTap: () {
-                if (model.cameraDeviceList.last.isAddEnd == true) {
-                  model.cameraDeviceList.add(CameraDeviceEntity());
-                  model.notifyListeners();
-                } else {
-                  LoadingUtils.showInfo(data: "请${model.operationType.displayName}完上一个设备!");
-                }
-              },
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
+            ],
+          ),
+          const SizedBox(height: 10),
+        ]
       ],
     );
   }

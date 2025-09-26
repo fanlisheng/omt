@@ -1,6 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as ui;
 import 'package:kayo_package/kayo_package.dart';
+import '../../../../widget/combobox.dart';
 import 'package:kayo_package/mvvm/base/provider_widget.dart';
 import 'package:kayo_package/views/widget/base/clickable.dart';
 import 'package:kayo_package/views/widget/base/dash_line.dart';
@@ -15,23 +16,27 @@ import '../../../../theme.dart';
 import '../../../../utils/device_utils.dart';
 import '../../../../utils/intent_utils.dart';
 import '../../../../widget/nav/dnavigation_view.dart';
+import '../../device_add/view_models/add_camera_viewmodel.dart';
 import '../view_models/edit_camera_viewmodel.dart';
 
 class EditCameraView extends StatelessWidget {
   final DeviceDetailCameraData model;
-
-  const EditCameraView({super.key, required this.model});
+  final bool? isReplace; //是替换 默认否
+  const EditCameraView(
+      {super.key, required this.model, required this.isReplace});
 
   @override
   Widget build(BuildContext context) {
     return ProviderWidget<EditCameraViewModel>(
-        model: EditCameraViewModel(model)..themeNotifier = true,
+        model: EditCameraViewModel(model, isReplace ?? false)..themeNotifier = true,
         autoLoadData: true,
         builder: (context, model, child) {
           return DHeaderPage(
             title: "修改信息",
             titlePath: "首页 / 摄像头 / ",
-            content: cameraView(model),
+            content: (model.isReplace && (model.addCameraViewModel != null))
+                ? replaceView(model)
+                : cameraView(model),
           );
         });
   }
@@ -85,31 +90,14 @@ class EditCameraView extends StatelessWidget {
                   children: [
                     const RowTitle(name: "摄像头类型"),
                     const SizedBox(height: 8),
-                    ComboBox<IdNameValue>(
-                      isExpanded: true,
-                      value: model.cameraDevice.selectedCameraType,
-                      items: model.cameraTypeList
-                          .map<ComboBoxItem<IdNameValue>>((ct) {
-                        return ComboBoxItem<IdNameValue>(
-                          value: ct,
-                          child: Text(
-                            ct.name ?? "",
-                            textAlign: TextAlign.start,
-                            style: const TextStyle(
-                                fontSize: 12, color: ColorUtils.colorWhite),
-                          ),
-                        );
-                      }).toList(),
+                    FComboBox<IdNameValue>(
+                      selectedValue: model.cameraDevice.selectedCameraType,
+                      items: model.cameraTypeList,
                       onChanged: (a) {
                         model.cameraDevice.selectedCameraType = a!;
                         model.notifyListeners();
                       },
-                      placeholder: const Text(
-                        "请选择摄像头类型",
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                            fontSize: 12, color: ColorUtils.colorBlackLiteLite),
-                      ),
+                      placeholder: "请选择摄像头类型",
                     ),
                   ],
                 ),
@@ -121,31 +109,14 @@ class EditCameraView extends StatelessWidget {
                   children: [
                     const RowTitle(name: "进/出口"),
                     const SizedBox(height: 8),
-                    ComboBox<IdNameValue>(
-                      isExpanded: true,
-                      value: model.cameraDevice.selectedEntryExit,
-                      items:
-                          model.inOutList.map<ComboBoxItem<IdNameValue>>((ee) {
-                        return ComboBoxItem<IdNameValue>(
-                          value: ee,
-                          child: Text(
-                            ee.name ?? "",
-                            textAlign: TextAlign.start,
-                            style: const TextStyle(
-                                fontSize: 12, color: ColorUtils.colorWhite),
-                          ),
-                        );
-                      }).toList(),
+                    FComboBox<IdNameValue>(
+                      selectedValue: model.cameraDevice.selectedEntryExit,
+                      items: model.inOutList,
                       onChanged: (a) {
                         model.cameraDevice.selectedEntryExit = a!;
                         model.notifyListeners();
                       },
-                      placeholder: const Text(
-                        "请选择进/出口",
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                            fontSize: 12, color: ColorUtils.colorBlackLiteLite),
-                      ),
+                      placeholder: "请选择进/出口",
                     ),
                   ],
                 ),
@@ -154,31 +125,14 @@ class EditCameraView extends StatelessWidget {
                   children: [
                     const RowTitle(name: "是否纳入监管"),
                     const SizedBox(height: 8),
-                    ComboBox<IdNameValue>(
-                      isExpanded: true,
-                      value: model.cameraDevice.selectedRegulation,
-                      items: model.regulationList
-                          .map<ComboBoxItem<IdNameValue>>((ct) {
-                        return ComboBoxItem<IdNameValue>(
-                          value: ct,
-                          child: Text(
-                            ct.name ?? "",
-                            textAlign: TextAlign.start,
-                            style: const TextStyle(
-                                fontSize: 12, color: ColorUtils.colorWhite),
-                          ),
-                        );
-                      }).toList(),
+                    FComboBox<IdNameValue>(
+                      selectedValue: model.cameraDevice.selectedRegulation,
+                      items: model.regulationList,
                       onChanged: (a) {
                         model.cameraDevice.selectedRegulation = a!;
                         model.notifyListeners();
                       },
-                      placeholder: const Text(
-                        "请选择是否纳入监管",
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                            fontSize: 12, color: ColorUtils.colorBlackLiteLite),
-                      ),
+                      placeholder: "请选择是否纳入监管",
                     ),
                   ],
                 ),
@@ -259,6 +213,68 @@ class EditCameraView extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 30),
+      ],
+    );
+  }
+
+  Widget replaceView(EditCameraViewModel model) {
+    return Column(
+      children: [
+        Expanded(
+          child: AddCameraView(model: model.addCameraViewModel!),
+        ),
+        const SizedBox(height: 5),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Clickable(
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 38, vertical: 8),
+                // width: 120,
+                // height: 36,
+                decoration: BoxDecoration(
+                  color: ColorUtils.colorRed,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  "取消",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: ColorUtils.colorWhite,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              onTap: () {
+                IntentUtils.share.pop(model.context!);
+              },
+            ),
+            const SizedBox(width: 10),
+            Clickable(
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppTheme().color,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  "确认替换",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: ColorUtils.colorWhite,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              onTap: () {
+                // model.replaceAiDevice();
+              },
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
       ],
     );
   }

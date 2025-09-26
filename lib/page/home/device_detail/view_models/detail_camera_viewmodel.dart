@@ -12,6 +12,7 @@ import '../../../../http/http_query.dart';
 import '../../../../router_utils.dart';
 import '../../../../utils/dialog_utils.dart';
 import '../../../../utils/intent_utils.dart';
+import '../../../remove/widgets/remove_dialog_page.dart';
 import '../../device_add/view_models/device_add_viewmodel.dart';
 
 class DetailCameraViewModel extends BaseViewModelRefresh<dynamic> {
@@ -115,6 +116,32 @@ class DetailCameraViewModel extends BaseViewModelRefresh<dynamic> {
         requestData();
       }
     });
+  }
+
+    //替换
+  replaceAction() {
+    IntentUtils.share.push(context!, routeName: RouterPage.EditCameraPage, data: {
+      "data": deviceInfo,
+      "isReplace": true,
+    })?.then((value) {
+      if (IntentUtils.share.isResultOk(value)) {
+        isChange = true;
+        onChange(isChange);
+        requestData();
+      }
+    });
+  }
+
+  //删除
+  removeAction() {
+    RemoveDialogPage.showAndSubmit(
+      context: context!,
+      instanceId: deviceInfo.instanceName ?? "",
+      removeIds: [(deviceInfo.nodeId ?? "0").toInt()],
+      onSuccess: () {
+        IntentUtils.share.popResultOk(context!);
+      },
+    );
   }
 
   gotoPhotoPreviewScreen() {
