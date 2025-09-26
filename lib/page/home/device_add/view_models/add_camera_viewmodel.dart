@@ -164,6 +164,9 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
   /// 根据操作类型自动选择相应的策略
   late CameraOperationStrategy _operationStrategy;
 
+  /// 获取当前操作策略实例
+  CameraOperationStrategy get operationStrategy => _operationStrategy;
+
   /// 构造函数
   /// 
   /// [pNodeCode] 节点代码，不为空时表示设备绑定场景

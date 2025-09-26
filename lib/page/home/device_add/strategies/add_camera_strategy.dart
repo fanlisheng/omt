@@ -20,6 +20,21 @@ class AddCameraStrategy implements CameraOperationStrategy {
   bool get shouldSetReadOnlyAfterSuccess => true;
 
   @override
+  String get displayName => '添加';
+
+  @override
+  String get completeButtonText => '添加完成';
+
+  @override
+  String get continueActionText => '+继续添加';
+
+  @override
+  String get confirmDialogTitle => '请确认摄像头添加信息是否有误，摄像头信息将更新至服务端';
+
+  @override
+  String get confirmButtonText => '确认添加';
+
+  @override
   ValidationResult validateParameters({
     required CameraDeviceEntity cameraDevice,
     String? pNodeCode,

@@ -17,6 +17,21 @@ abstract class CameraOperationStrategy {
   /// 操作完成后是否设置只读状态
   bool get shouldSetReadOnlyAfterSuccess;
   
+  /// 操作类型的显示名称
+  String get displayName;
+  
+  /// 完成按钮的文本
+  String get completeButtonText;
+  
+  /// 继续操作的文本
+  String get continueActionText;
+  
+  /// 确认对话框的标题
+  String get confirmDialogTitle;
+  
+  /// 确认按钮的文本
+  String get confirmButtonText;
+  
   /// 验证操作所需的参数
   /// 返回验证结果，如果验证失败会包含错误信息
   ValidationResult validateParameters({

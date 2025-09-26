@@ -20,6 +20,21 @@ class ReplaceCameraStrategy implements CameraOperationStrategy {
   bool get shouldSetReadOnlyAfterSuccess => true;
 
   @override
+  String get displayName => '替换';
+
+  @override
+  String get completeButtonText => '替换完成';
+
+  @override
+  String get continueActionText => '+继续替换';
+
+  @override
+  String get confirmDialogTitle => '请确认摄像头替换信息是否有误，摄像头信息将更新至服务端';
+
+  @override
+  String get confirmButtonText => '确认替换';
+
+  @override
   ValidationResult validateParameters({
     required CameraDeviceEntity cameraDevice,
     String? pNodeCode,

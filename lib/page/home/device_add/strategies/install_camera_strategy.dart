@@ -20,6 +20,21 @@ class InstallCameraStrategy implements CameraOperationStrategy {
   bool get shouldSetReadOnlyAfterSuccess => true;
 
   @override
+  String get displayName => '安装';
+
+  @override
+  String get completeButtonText => '安装完成';
+
+  @override
+  String get continueActionText => '+继续安装';
+
+  @override
+  String get confirmDialogTitle => '请确认摄像头安装信息是否有误，摄像头信息将更新至服务端';
+
+  @override
+  String get confirmButtonText => '确认安装';
+
+  @override
   ValidationResult validateParameters({
     required CameraDeviceEntity cameraDevice,
     String? pNodeCode,

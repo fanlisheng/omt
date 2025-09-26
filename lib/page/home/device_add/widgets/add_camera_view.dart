@@ -449,7 +449,7 @@ class AddCameraView extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(3),
                                     ),
                                     child: Text(
-                                      model.operationType.completeButtonText,
+                                      model.operationStrategy.completeButtonText,
                                       style: const TextStyle(
                                           fontSize: 12,
                                           color: ColorUtils.colorWhite),
@@ -533,7 +533,7 @@ class AddCameraView extends StatelessWidget {
               const SizedBox(width: 16),
               Clickable(
                 child: Text(
-                  model.operationType.continueActionText,
+                  model.operationStrategy.continueActionText,
                   style: TextStyle(
                     fontSize: 14,
                     color: AppTheme().color,
@@ -545,7 +545,7 @@ class AddCameraView extends StatelessWidget {
                     model.cameraDeviceList.add(CameraDeviceEntity());
                     model.notifyListeners();
                   } else {
-                    LoadingUtils.showInfo(data: "请${model.operationType.displayName}完上一个设备!");
+                    LoadingUtils.showInfo(data: "请${model.operationStrategy.displayName}完上一个设备!");
                   }
                 },
               ),
@@ -708,7 +708,7 @@ class AddCameraView extends StatelessWidget {
               children: [
                 const SizedBox(height: 20),
                 Text(
-                  model.operationType.confirmDialogTitle,
+                  model.operationStrategy.confirmDialogTitle,
                   style: const TextStyle(fontSize: 16, color: ColorUtils.colorWhite),
                 ),
                 const SizedBox(height: 28),
@@ -754,7 +754,7 @@ class AddCameraView extends StatelessWidget {
                             WidgetStatePropertyAll(AppTheme().color),
                       ),
                       child: Text(
-                        model.operationType.confirmButtonText,
+                        model.operationStrategy.confirmButtonText,
                         style: const TextStyle(color: Colors.white),
                       ),
                     ),
