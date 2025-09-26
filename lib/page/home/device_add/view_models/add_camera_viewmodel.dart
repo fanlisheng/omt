@@ -21,25 +21,181 @@ import '../../../../utils/image_utils.dart';
 import '../../../../utils/shared_utils.dart';
 import '../../photo_preview/widgets/photo_preview_screen.dart';
 import '../../search_device/services/device_search_service.dart';
+import '../strategies/camera_operation_strategy.dart';
+import '../strategies/camera_operation_strategy_factory.dart';
 
+/// 摄像头操作类型枚举
+enum CameraOperationType {
+  /// 添加新摄像头
+  add,
+  /// 安装摄像头到AI设备
+  install,
+  /// 替换现有摄像头
+  replace,
+}
+
+/// 摄像头操作类型扩展方法
+extension CameraOperationTypeExtension on CameraOperationType {
+  /// 获取操作类型的显示名称
+  String get displayName {
+    switch (this) {
+      case CameraOperationType.add:
+        return '添加';
+      case CameraOperationType.install:
+        return '安装';
+      case CameraOperationType.replace:
+        return '替换';
+    }
+  }
+
+  /// 获取完成按钮的文本
+  String get completeButtonText {
+    switch (this) {
+      case CameraOperationType.add:
+        return '添加完成';
+      case CameraOperationType.install:
+        return '安装完成';
+      case CameraOperationType.replace:
+        return '替换完成';
+    }
+  }
+
+  /// 判断是否需要pNodeCode参数
+  bool get requiresPNodeCode {
+    switch (this) {
+      case CameraOperationType.add:
+        return true;  // 添加操作需要pNodeCode
+      case CameraOperationType.install:
+        return false; // 安装操作不需要pNodeCode
+      case CameraOperationType.replace:
+        return true;  // 替换操作需要pNodeCode
+    }
+  }
+
+  /// 判断是否需要gateId和instanceId参数
+  bool get requiresGateAndInstance {
+    switch (this) {
+      case CameraOperationType.add:
+        return true;  // 添加操作需要这些参数
+      case CameraOperationType.install:
+        return true;  // 安装操作也需要这些参数
+      case CameraOperationType.replace:
+        return true;  // 替换操作需要这些参数
+    }
+  }
+
+  /// 获取成功消息
+  String get successMessage => '${displayName}成功';
+
+  /// 获取失败消息前缀
+  String get failureMessagePrefix => '${displayName}失败';
+
+  /// 判断操作完成后是否应该设置为只读
+  bool get shouldSetReadOnlyAfterSuccess => true;
+
+  /// 获取确认对话框的标题
+  String get confirmDialogTitle {
+    switch (this) {
+      case CameraOperationType.add:
+        return '请确认摄像头添加信息是否有误，摄像头信息将更新至服务端';
+      case CameraOperationType.install:
+        return '请确认摄像头安装信息是否有误，摄像头信息将更新至服务端';
+      case CameraOperationType.replace:
+        return '请确认摄像头替换信息是否有误，摄像头信息将更新至服务端';
+    }
+  }
+
+  /// 获取确认按钮的文本
+  String get confirmButtonText {
+    switch (this) {
+      case CameraOperationType.add:
+        return '确认添加';
+      case CameraOperationType.install:
+        return '确认安装';
+      case CameraOperationType.replace:
+        return '确认替换';
+    }
+  }
+
+  /// 获取继续操作的文本
+  String get continueActionText {
+    switch (this) {
+      case CameraOperationType.add:
+        return '+继续添加';
+      case CameraOperationType.install:
+        return '+继续安装';
+      case CameraOperationType.replace:
+        return '+继续替换';
+    }
+  }
+}
+
+/// 摄像头添加/安装/替换的ViewModel
+/// 
+/// 该类负责处理摄像头设备的各种操作，包括：
+/// - 添加新摄像头到系统
+/// - 安装摄像头到AI设备
+/// - 替换现有摄像头
+/// 
+/// 操作类型通过pNodeCode自动判断：
+/// - pNodeCode不为空：安装操作（设备绑定场景）
+/// - pNodeCode为空：添加操作（直接添加场景）
 class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
+  /// 节点代码，用于标识设备绑定场景
+  /// 格式："{instanceId}-2#{gateId}"
   final String pNodeCode;
 
+  /// AI设备列表，摄像头需要关联到AI设备
   List<DeviceDetailAiData> aiDeviceList;
+  
+  /// 大门ID，用于API调用
   int gateId = 0;
+  
+  /// 实例ID，用于API调用
   String instanceId = "";
 
-  AddCameraViewModel(this.pNodeCode, this.aiDeviceList);
+  /// 当前操作类型，根据pNodeCode自动确定
+  /// 决定了使用哪个API和验证哪些参数
+  late CameraOperationType operationType;
+
+  /// 相机操作策略实例
+  /// 根据操作类型自动选择相应的策略
+  late CameraOperationStrategy _operationStrategy;
+
+  /// 构造函数
+  /// 
+  /// [pNodeCode] 节点代码，不为空时表示设备绑定场景
+  /// [aiDeviceList] 可用的AI设备列表
+  /// [operationType] 可选的操作类型，如果不提供则根据pNodeCode自动判断
+  AddCameraViewModel(this.pNodeCode, this.aiDeviceList, {CameraOperationType? operationType}) {
+    // 如果明确指定了操作类型，则使用指定的类型
+    if (operationType != null) {
+      this.operationType = operationType;
+    } else {
+      // 根据pNodeCode自动确定操作类型
+      // pNodeCode不为空时为安装操作（设备绑定场景），为空时为添加操作（直接添加场景）
+      this.operationType = pNodeCode.isNotEmpty ? CameraOperationType.install : CameraOperationType.add;
+    }
+    
+    // 根据操作类型创建相应的策略实例
+    _operationStrategy = CameraOperationStrategyFactory.createStrategy(this.operationType);
+  }
 
   // ===== 摄像头相关属性 =====
 
+  /// 进出口选项列表
   List<IdNameValue> inOutList = [];
+  
+  /// 摄像头类型选项列表
   List<IdNameValue> cameraTypeList = [];
+  
+  /// 监管选项列表
   List<IdNameValue> regulationList = [];
 
-  // 缓存服务
+  /// 缓存服务实例，用于数据持久化
   final InstallCacheService _cacheService = InstallCacheService.instance;
 
+  /// 摄像头设备列表，支持批量操作
   List<CameraDeviceEntity> cameraDeviceList = [CameraDeviceEntity()];
 
   @override
@@ -293,8 +449,33 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
     return true;
   }
 
+  /// 验证操作参数（使用策略模式）
+  bool _validateParameters(CameraDeviceEntity cameraDeviceEntity) {
+    // 使用策略进行参数验证
+    final validationResult = _operationStrategy.validateParameters(
+      cameraDevice: cameraDeviceEntity,
+      pNodeCode: pNodeCode,
+      gateId: gateId,
+      instanceId: instanceId,
+    );
+
+    if (!validationResult.isValid) {
+      LoadingUtils.showToast(data: validationResult.errorMessage ?? '参数验证失败');
+      return false;
+    }
+
+    return true;
+  }
+
+  /// 完成摄像头操作（统一处理添加、安装、替换）
   Future<void> completeCameraAction(
       BuildContext context, CameraDeviceEntity cameraDeviceEntity) async {
+    
+    // 参数验证
+    if (!_validateParameters(cameraDeviceEntity)) {
+      return;
+    }
+
     CameraDeviceEntity cameraDevice = cameraDeviceEntity;
 
     var webcam = VideoInfoCamEntity()
@@ -309,74 +490,87 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
     HttpQuery.share.homePageService.configAi(
         data: webcam,
         onSuccess: (data) {
-          //调用添加
-          Map<String, dynamic> aiParams = {
-            "ip": cameraDevice.selectedAi?.ip ?? "",
-            "mac": cameraDevice.selectedAi?.mac ?? "",
-          };
-          Map<String, dynamic> cameraParams = {
-            "device_code": cameraDeviceEntity.code ?? "",
-            "name": cameraDeviceEntity.deviceNameController.text ?? "",
-            "ip": cameraDeviceEntity.ip ?? "",
-            "mac": cameraDeviceEntity.mac,
-            "rtsp_url": cameraDeviceEntity.rtsp,
-            "pass_id": cameraDeviceEntity.selectedEntryExit?.id ?? -1,
-            "camera_type":
-                cameraDeviceEntity.selectedCameraType?.value.toInt() ?? 0,
-            "control_status":
-                cameraDeviceEntity.selectedRegulation?.value.toInt() ?? 0,
-          };
-          if (cameraDeviceEntity.videoIdController.text.isNotEmpty) {
-            cameraParams["camera_code"] =
-                cameraDeviceEntity.videoIdController.text;
-          }
-
-          //如果是添加
-          if (pNodeCode.isNotEmpty) {
-            HttpQuery.share.installService.aiDeviceCameraInstall(
-                pNodeCode: pNodeCode,
-                aiDevice: aiParams,
-                camera: cameraParams,
-                onSuccess: (data) {
-                  cameraDeviceEntity.readOnly = true;
-                  cameraDeviceEntity.isAddEnd = true;
-                  Navigator.pop(context);
-                  notifyListeners();
-                },
-                onError: (error) {
-                  //如果安装失败需要删除Ai上的配置
-                  HttpQuery.share.homePageService.removeConfigAi(
-                      deviceCode: cameraDeviceEntity.code,
-                      onSuccess: (data) {});
-                  LoadingUtils.showToast(data: '添加失败: $error');
-                });
-          } else {
-            HttpQuery.share.installService.installStep1(
-                aiDevice: aiParams,
-                camera: cameraParams,
-                gateId: gateId,
-                instanceId: instanceId,
-                onSuccess: (data) {
-                  cameraDeviceEntity.readOnly = true;
-                  cameraDeviceEntity.isAddEnd = true;
-
-                  // 保存摄像头缓存数据
-                  _saveCameraCache();
-                  Navigator.pop(context);
-                  notifyListeners();
-                },
-                onError: (error) {
-                  //如果安装失败需要删除Ai上的配置
-                  HttpQuery.share.homePageService.removeConfigAi(
-                      deviceCode: cameraDeviceEntity.code,
-                      onSuccess: (data) {});
-                  LoadingUtils.showToast(data: '安装失败: $error');
-                });
-          }
+          //调用相应的操作
+          _performCameraOperation(context, cameraDeviceEntity);
         },
         onError: (e) {
           LoadingUtils.showError(data: "配置本地AI设备信息失败");
         });
+  }
+
+  /// 根据操作类型执行相应的摄像头操作
+  void _performCameraOperation(
+      BuildContext context, CameraDeviceEntity cameraDeviceEntity) {
+    Map<String, dynamic> aiParams = {
+      "ip": cameraDeviceEntity.selectedAi?.ip ?? "",
+      "mac": cameraDeviceEntity.selectedAi?.mac ?? "",
+    };
+    Map<String, dynamic> cameraParams = {
+      "device_code": cameraDeviceEntity.code ?? "",
+      "name": cameraDeviceEntity.deviceNameController.text ?? "",
+      "ip": cameraDeviceEntity.ip ?? "",
+      "mac": cameraDeviceEntity.mac,
+      "rtsp_url": cameraDeviceEntity.rtsp,
+      "pass_id": cameraDeviceEntity.selectedEntryExit?.id ?? -1,
+      "camera_type":
+          cameraDeviceEntity.selectedCameraType?.value.toInt() ?? 0,
+      "control_status":
+          cameraDeviceEntity.selectedRegulation?.value.toInt() ?? 0,
+    };
+    if (cameraDeviceEntity.videoIdController.text.isNotEmpty) {
+      cameraParams["camera_code"] = cameraDeviceEntity.videoIdController.text;
+    }
+
+    // 根据操作类型调用相应的API
+    _callApiByOperationType(context, cameraDeviceEntity, aiParams, cameraParams);
+  }
+
+  /// 根据操作类型调用相应的API（使用策略模式）
+  void _callApiByOperationType(
+    BuildContext context,
+    CameraDeviceEntity cameraDeviceEntity,
+    Map<String, dynamic> aiParams,
+    Map<String, dynamic> cameraParams,
+  ) {
+    // 使用策略执行操作
+    _operationStrategy.executeOperation(
+      cameraDevice: cameraDeviceEntity,
+      aiParams: aiParams,
+      cameraParams: cameraParams,
+      pNodeCode: pNodeCode,
+      gateId: gateId,
+      instanceId: instanceId,
+      onSuccess: (message) {
+        _onOperationSuccess(context, cameraDeviceEntity, message);
+      },
+      onError: (error) {
+        _onOperationError(cameraDeviceEntity, error);
+      },
+    );
+  }
+
+  /// 操作成功的通用处理
+  void _onOperationSuccess(
+      BuildContext context, CameraDeviceEntity cameraDeviceEntity, String message) {
+    cameraDeviceEntity.readOnly = true;
+    cameraDeviceEntity.isAddEnd = true;
+    
+    // 保存摄像头缓存数据
+    _saveCameraCache();
+    Navigator.pop(context);
+    notifyListeners();
+    
+    // 可选：显示成功消息
+    // LoadingUtils.showToast(data: message);
+  }
+
+  /// 操作失败的通用处理
+  void _onOperationError(CameraDeviceEntity cameraDeviceEntity, String errorMessage) {
+    //如果操作失败需要删除Ai上的配置
+    HttpQuery.share.homePageService.removeConfigAi(
+        deviceCode: cameraDeviceEntity.code,
+        onSuccess: (data) {});
+    LoadingUtils.showToast(data: errorMessage);
   }
 
   // 重启识别

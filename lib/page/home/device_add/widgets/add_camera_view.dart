@@ -549,9 +549,9 @@ class AddCameraView extends StatelessWidget {
                                     color: ColorUtils.colorGreen,
                                     borderRadius: BorderRadius.circular(3),
                                   ),
-                                  child: const Text(
-                                    "添加完成",
-                                    style: TextStyle(
+                                  child: Text(
+                                    model.operationType.completeButtonText,
+                                    style: const TextStyle(
                                         fontSize: 12,
                                         color: ColorUtils.colorWhite),
                                   ),
@@ -628,7 +628,7 @@ class AddCameraView extends StatelessWidget {
             const SizedBox(width: 16),
             Clickable(
               child: Text(
-                "+继续添加",
+                model.operationType.continueActionText,
                 style: TextStyle(
                   fontSize: 14,
                   color: AppTheme().color,
@@ -640,7 +640,7 @@ class AddCameraView extends StatelessWidget {
                   model.cameraDeviceList.add(CameraDeviceEntity());
                   model.notifyListeners();
                 } else {
-                  LoadingUtils.showInfo(data: "请添加完上一个设备!");
+                  LoadingUtils.showInfo(data: "请${model.operationType.displayName}完上一个设备!");
                 }
               },
             ),
@@ -801,9 +801,9 @@ class AddCameraView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 20),
-                const Text(
-                  '请确认摄像头添加信息是否有误，摄像头信息将更新至服务端',
-                  style: TextStyle(fontSize: 16, color: ColorUtils.colorWhite),
+                Text(
+                  model.operationType.confirmDialogTitle,
+                  style: const TextStyle(fontSize: 16, color: ColorUtils.colorWhite),
                 ),
                 const SizedBox(height: 28),
                 _videoView(cameraDeviceEntity.videoController, model, index),
@@ -847,9 +847,9 @@ class AddCameraView extends StatelessWidget {
                         backgroundColor:
                             WidgetStatePropertyAll(AppTheme().color),
                       ),
-                      child: const Text(
-                        "提交       ",
-                        style: TextStyle(color: Colors.white),
+                      child: Text(
+                        model.operationType.confirmButtonText,
+                        style: const TextStyle(color: Colors.white),
                       ),
                     ),
                   ],
