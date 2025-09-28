@@ -33,7 +33,7 @@ class DeviceAddScreen extends StatelessWidget {
           bool complete = (model.stepNumber == StepNumber.second &&
                   model.deviceType != DeviceType.aiAndCamera) ||
               (model.stepNumber == StepNumber.third);
-          bool showTooltip = model.stepNumber == StepNumber.third;
+          bool showTooltip = (model.stepNumber == StepNumber.third && model.isInstall);
           // bool showTooltip = true;
           return Container(
             color: "#3B3F3F".toColor(),

@@ -138,8 +138,8 @@ extension CameraOperationTypeExtension on CameraOperationType {
 /// - 替换现有摄像头
 /// 
 /// 操作类型通过pNodeCode自动判断：
-/// - pNodeCode不为空：安装操作（设备绑定场景）
-/// - pNodeCode为空：添加操作（直接添加场景）
+/// - pNodeCode不为空：添加操作
+/// - pNodeCode为空：安装操作
 class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
   /// 节点代码，用于标识设备绑定场景
   /// 格式："{instanceId}-2#{gateId}"
@@ -167,37 +167,6 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
   /// 获取当前操作策略实例
   CameraOperationStrategy get operationStrategy => _operationStrategy;
 
-  /// 构造函数
-  /// 
-  /// [pNodeCode] 节点代码，不为空时表示设备绑定场景
-  /// [aiDeviceList] 可用的AI设备列表
-  /// [isReplace] 是否为替换操作，默认为false
-  /// [cameraDeviceList] 摄像头设备列表，默认包含一个空设备
-  /// [operationType] 可选的操作类型，如果不提供则根据pNodeCode和isReplace自动判断
-  AddCameraViewModel(this.pNodeCode, this.aiDeviceList,
-      {this.isReplace = false, this.cameraDeviceList = const [], CameraOperationType? operationType}) {
-    // 初始化摄像头设备列表
-    this.cameraDeviceList = cameraDeviceList.isNotEmpty
-        ? cameraDeviceList
-        : [CameraDeviceEntity()];
-    
-    // 确定操作类型
-    if (operationType != null) {
-      // 如果明确指定了操作类型，则使用指定的类型
-      this.operationType = operationType;
-    } else if (isReplace) {
-      // 如果是替换操作，使用替换类型
-      this.operationType = CameraOperationType.replace;
-    } else {
-      // 根据pNodeCode自动确定操作类型
-      // pNodeCode不为空时为安装操作（设备绑定场景），为空时为添加操作（直接添加场景）
-      this.operationType = pNodeCode.isNotEmpty ? CameraOperationType.install : CameraOperationType.add;
-    }
-    
-    // 根据操作类型创建相应的策略实例
-    _operationStrategy = CameraOperationStrategyFactory.createStrategy(this.operationType);
-  }
-
   // ===== 摄像头相关属性 =====
 
   /// 进出口选项列表
@@ -211,6 +180,38 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
 
   /// 缓存服务实例，用于数据持久化
   final InstallCacheService _cacheService = InstallCacheService.instance;
+
+
+  /// 构造函数
+  ///
+  /// [pNodeCode] 节点代码，不为空时表示设备绑定场景
+  /// [aiDeviceList] 可用的AI设备列表
+  /// [isReplace] 是否为替换操作，默认为false
+  /// [cameraDeviceList] 摄像头设备列表，默认包含一个空设备
+  /// [operationType] 可选的操作类型，如果不提供则根据pNodeCode和isReplace自动判断
+  AddCameraViewModel(this.pNodeCode, this.aiDeviceList,
+      {this.isReplace = false, this.cameraDeviceList = const [], CameraOperationType? operationType}) {
+    // 初始化摄像头设备列表
+    this.cameraDeviceList = cameraDeviceList.isNotEmpty
+        ? cameraDeviceList
+        : [CameraDeviceEntity()];
+
+    // 确定操作类型
+    if (operationType != null) {
+      // 如果明确指定了操作类型，则使用指定的类型
+      this.operationType = operationType;
+    } else if (isReplace) {
+      // 如果是替换操作，使用替换类型
+      this.operationType = CameraOperationType.replace;
+    } else {
+      // 根据pNodeCode自动确定操作类型
+      // pNodeCode不为空时为添加操作，为空时为安装操作
+      this.operationType = pNodeCode.isNotEmpty ? CameraOperationType.add : CameraOperationType.install;
+    }
+
+    // 根据操作类型创建相应的策略实例
+    _operationStrategy = CameraOperationStrategyFactory.createStrategy(this.operationType);
+  }
 
   @override
   void initState() {
@@ -495,26 +496,8 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
       return;
     }
 
-    CameraDeviceEntity cameraDevice = cameraDeviceEntity;
-
-    var webcam = VideoInfoCamEntity()
-      ..name = cameraDeviceEntity.deviceNameController.text
-      ..value = cameraDeviceEntity.code ?? ""
-      ..rtsp = cameraDeviceEntity.rtsp
-      ..in_out = cameraDeviceEntity.selectedEntryExit?.id ?? -1;
-
-    await SharedUtils.setControlIP(cameraDevice.selectedAi?.ip ?? "");
-
-    //修改本地ai设备信息
-    HttpQuery.share.homePageService.configAi(
-        data: webcam,
-        onSuccess: (data) {
-          //调用相应的操作
-          _performCameraOperation(context, cameraDeviceEntity);
-        },
-        onError: (e) {
-          LoadingUtils.showError(data: "配置本地AI设备信息失败");
-        });
+    // 直接调用相应的操作
+    _performCameraOperation(context, cameraDeviceEntity);
   }
 
   /// 根据操作类型执行相应的摄像头操作
@@ -571,24 +554,20 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
   /// 操作成功的通用处理
   void _onOperationSuccess(
       BuildContext context, CameraDeviceEntity cameraDeviceEntity, String message) {
-    cameraDeviceEntity.readOnly = true;
-    cameraDeviceEntity.isAddEnd = true;
-    
-    // 保存摄像头缓存数据
-    _saveCameraCache();
-    Navigator.pop(context);
+    // 使用策略模式处理成功后的逻辑，传入缓存保存回调
+    _operationStrategy.onOperationSuccess(
+      context,
+      cameraDeviceEntity,
+      onSaveCache: _saveCameraCache,
+    );
+    // 通知UI更新
     notifyListeners();
-    
     // 可选：显示成功消息
     // LoadingUtils.showToast(data: message);
   }
 
   /// 操作失败的通用处理
   void _onOperationError(CameraDeviceEntity cameraDeviceEntity, String errorMessage) {
-    //如果操作失败需要删除Ai上的配置
-    HttpQuery.share.homePageService.removeConfigAi(
-        deviceCode: cameraDeviceEntity.code,
-        onSuccess: (data) {});
     LoadingUtils.showToast(data: errorMessage);
   }
 

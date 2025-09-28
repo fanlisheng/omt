@@ -1,6 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import '../../../../bean/home/home_page/camera_device_entity.dart';
+import '../../../../bean/video/video_configuration/Video_Connect_entity.dart';
 import '../../../../http/http_query.dart';
+import '../../../../utils/shared_utils.dart';
 import 'camera_operation_strategy.dart';
 
 /// 设备添加策略
@@ -33,6 +36,13 @@ class AddCameraStrategy implements CameraOperationStrategy {
 
   @override
   String get confirmButtonText => '确认添加';
+
+  @override
+  void onOperationSuccess(BuildContext context, CameraDeviceEntity cameraDeviceEntity, {void Function()? onSaveCache}) {
+    cameraDeviceEntity.readOnly = true;
+    cameraDeviceEntity.isAddEnd = true;
+    Navigator.pop(context);
+  }
 
   @override
   ValidationResult validateParameters({
@@ -80,14 +90,39 @@ class AddCameraStrategy implements CameraOperationStrategy {
     required Function(String) onError,
   }) async {
     try {
-      await HttpQuery.share.installService.aiDeviceCameraInstall(
-        pNodeCode: pNodeCode!,
-        aiDevice: aiParams,
-        camera: cameraParams,
-        gateId: gateId!,
-        instanceId: instanceId!,
-        onSuccess: onSuccess,
-        onError: onError,
+      // 第一步：创建本地AI设备配置信息
+      var webcam = VideoInfoCamEntity()
+        ..name = cameraDevice.deviceNameController.text
+        ..value = cameraDevice.code ?? ""
+        ..rtsp = cameraDevice.rtsp
+        ..in_out = cameraDevice.selectedEntryExit?.id ?? -1;
+
+      // 第二步：设置控制IP
+      await SharedUtils.setControlIP(cameraDevice.selectedAi?.ip ?? "");
+
+      // 第三步：配置本地AI设备信息
+      HttpQuery.share.homePageService.configAi(
+        data: webcam,
+        onSuccess: (data) {
+          // 第四步：配置成功后，调用添加API（aiDeviceCameraInstall）
+          HttpQuery.share.installService.aiDeviceCameraInstall(
+            pNodeCode: pNodeCode!,
+            aiDevice: aiParams,
+            camera: cameraParams,
+            onSuccess: onSuccess,
+            onError: (error) {
+              // 如果添加失败需要删除AI上的配置
+              HttpQuery.share.homePageService.removeConfigAi(
+                deviceCode: cameraDevice.code,
+                onSuccess: (data) {},
+              );
+              onError('$failureMessagePrefix: $error');
+            },
+          );
+        },
+        onError: (error) {
+          onError('配置本地AI设备信息失败: $error');
+        },
       );
     } catch (e) {
       onError('$failureMessagePrefix: $e');

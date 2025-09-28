@@ -5,6 +5,8 @@ import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/theme.dart';
 import 'package:omt/utils/color_utils.dart';
 
+import '../bean/home/home_page/device_detail_ai_entity.dart';
+
 class FComboBox<T> extends StatelessWidget {
   final T? selectedValue;
   final List<T> items;
@@ -34,6 +36,8 @@ class FComboBox<T> extends StatelessWidget {
   String _getDisplayText(T item) {
     if (item is IdNameValue) {
       return item.name ?? "";
+    }else if (item is DeviceDetailAiData){
+      return item.ip ?? "";
     }
     return item.toString();
   }

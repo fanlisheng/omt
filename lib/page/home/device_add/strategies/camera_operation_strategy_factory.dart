@@ -27,13 +27,13 @@ class CameraOperationStrategyFactory {
 
   /// 根据pNodeCode自动选择策略
   /// 
-  /// [pNodeCode] 节点代码，不为空时选择安装策略，为空时选择添加策略
+  /// [pNodeCode] 节点代码，不为空时选择添加策略，为空时选择安装策略
   /// 返回对应的策略实例
   static CameraOperationStrategy createStrategyByPNodeCode(String pNodeCode) {
     if (pNodeCode.isNotEmpty) {
-      return InstallCameraStrategy();
-    } else {
       return AddCameraStrategy();
+    } else {
+      return InstallCameraStrategy();
     }
   }
 

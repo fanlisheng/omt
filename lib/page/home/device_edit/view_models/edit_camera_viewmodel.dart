@@ -150,6 +150,19 @@ class EditCameraViewModel extends BaseViewModelRefresh<dynamic> {
     );
   }
 
+  replaceCameraDevice() {
+    HttpQuery.share.homePageService.replaceCamera(
+      ip: "192.168.101.82",
+      oldUdid: deviceInfo.deviceCode ?? "",
+      newUdid: cameraDevice.code ?? "",
+      rtsp: cameraDevice.rtsp ?? "",
+      onSuccess: (data) {
+        LoadingUtils.showSuccess(data: "替换成功!");
+        IntentUtils.share.popResultOk(context!);
+      },
+    );
+  }
+
   @override
   loadData(
       {ValueChanged? onSuccess,

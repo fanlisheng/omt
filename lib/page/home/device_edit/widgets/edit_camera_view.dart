@@ -269,7 +269,7 @@ class EditCameraView extends StatelessWidget {
                 ),
               ),
               onTap: () {
-                // model.replaceAiDevice();
+                model.replaceCameraDevice();
               },
             ),
           ],

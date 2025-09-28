@@ -1,11 +1,15 @@
+import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
 import '../../../../bean/home/home_page/camera_device_entity.dart';
+import '../../../../bean/video/video_configuration/Video_Connect_entity.dart';
 import '../../../../http/http_query.dart';
+import '../../../../utils/shared_utils.dart';
+import '../../../../services/install_cache_service.dart';
 import 'camera_operation_strategy.dart';
 
 /// 设备安装策略
 /// 用于处理设备绑定场景，即pNodeCode不为空的情况
-/// 调用installStep1 API进行设备安装
+/// 调用aiDeviceCameraInstall API进行设备安装
 class InstallCameraStrategy implements CameraOperationStrategy {
   @override
   String get strategyName => 'InstallCameraStrategy';
@@ -33,6 +37,17 @@ class InstallCameraStrategy implements CameraOperationStrategy {
 
   @override
   String get confirmButtonText => '确认安装';
+
+  @override
+  void onOperationSuccess(BuildContext context, CameraDeviceEntity cameraDeviceEntity, {void Function()? onSaveCache}) {
+    cameraDeviceEntity.readOnly = true;
+    cameraDeviceEntity.isAddEnd = true;
+    // 安装操作需要保存摄像头缓存数据
+    if (onSaveCache != null) {
+      onSaveCache();
+    }
+    Navigator.pop(context);
+  }
 
   @override
   ValidationResult validateParameters({
@@ -75,13 +90,39 @@ class InstallCameraStrategy implements CameraOperationStrategy {
     required Function(String) onError,
   }) async {
     try {
-      await HttpQuery.share.installService.installStep1(
-        aiDevice: aiParams,
-        camera: cameraParams,
-        gateId: gateId!,
-        instanceId: instanceId!,
-        onSuccess: onSuccess,
-        onError: onError,
+      // 1. 设置控制IP
+      await SharedUtils.setControlIP(cameraDevice.selectedAi?.ip ?? "");
+
+      // 2. 配置AI设备信息
+      var webcam = VideoInfoCamEntity()
+        ..name = cameraDevice.deviceNameController.text
+        ..value = cameraDevice.code ?? ""
+        ..rtsp = cameraDevice.rtsp
+        ..in_out = cameraDevice.selectedEntryExit?.id ?? -1;
+
+      HttpQuery.share.homePageService.configAi(
+        data: webcam,
+        onSuccess: (data) {
+          // 3. 调用安装API (pNodeCode为空时使用installStep1)
+          HttpQuery.share.installService.installStep1(
+            aiDevice: aiParams,
+            camera: cameraParams,
+            gateId: gateId!,
+            instanceId: instanceId!,
+            onSuccess: onSuccess,
+            onError: (error) {
+              // 如果安装失败需要删除AI上的配置
+              HttpQuery.share.homePageService.removeConfigAi(
+                deviceCode: cameraDevice.code,
+                onSuccess: (data) {},
+              );
+              onError('$failureMessagePrefix: $error');
+            },
+          );
+        },
+        onError: (e) {
+          onError("配置本地AI设备信息失败");
+        },
       );
     } catch (e) {
       onError('$failureMessagePrefix: $e');

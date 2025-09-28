@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import '../../../../bean/home/home_page/camera_device_entity.dart';
 import '../../../../utils/result.dart';
 import '../../../../http/http_query.dart';
@@ -53,6 +54,10 @@ abstract class CameraOperationStrategy {
     required Function(dynamic) onSuccess,
     required Function(String) onError,
   });
+  
+  /// 操作成功后的处理
+  /// 由各个具体策略实现，处理特定于该策略的成功后逻辑
+  void onOperationSuccess(BuildContext context, CameraDeviceEntity cameraDeviceEntity, {void Function()? onSaveCache});
 }
 
 /// 参数验证结果

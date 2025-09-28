@@ -67,7 +67,7 @@ class UpdateService {
         final currentVersion = await getCurrentVersion();
 
         // 比较版本号
-        if (_compareVersions(updateInfo.version, currentVersion.version) >= 0) {
+        if (_compareVersions(updateInfo.version, currentVersion.version) > 0) {
           return updateInfo;
         }
       }

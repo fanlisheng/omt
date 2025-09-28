@@ -119,6 +119,8 @@ class HomePageService {
 
   get _replacePowerBox => '${API.share.host}api/device/power_box/replace';
 
+  get _replaceCamera => '/webcam/replace';
+
   //_configAi
   get _configAi async => await API.share
       .buildControlWebcamUrl(VideoConfigurationService.webcamSave);
@@ -130,6 +132,7 @@ class HomePageService {
       .buildControlWebcamUrl(VideoConfigurationService.webcamRemove);
 
   get _eventStatusAi => '/event/status';
+
 
   getInstanceList(
     String areaCode, {
@@ -988,6 +991,35 @@ class HomePageService {
           onSuccess(data);
         }
       },
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  /// 替换摄像头
+  replaceCamera({
+    required String ip,
+    required String oldUdid,
+    required String newUdid,
+    required String rtsp,
+    required ValueChanged<CodeMessageData?> onSuccess,
+    ValueChanged<CodeMessageData?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    String url = '${API.share.hostDeviceConfiguration(ip)}$_replaceCamera';
+    Map<String, dynamic> params = {
+      "old_udid": oldUdid,
+      "new_udid": newUdid,
+      "rtsp": rtsp,
+    };
+
+    HttpManager.share.doHttpPost<CodeMessageData>(
+      url,
+      params,
+      method: 'POST',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
       onCache: onCache,
       onError: onError,
     );
