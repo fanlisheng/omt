@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kayo_package/kayo_package.dart';
 
 import '../../../../bean/home/home_page/camera_device_entity.dart';
 import '../../../../bean/video/video_configuration/Video_Connect_entity.dart';
@@ -70,19 +71,22 @@ class ReplaceCameraStrategy implements CameraOperationStrategy {
     required Function(dynamic) onSuccess,
     required Function(String) onError,
   }) async {
-    try {
-      // 直接调用替换API
-      HttpQuery.share.homePageService.replaceCamera(
-        ip: "192.168.101.82",
-        oldUdid: pNodeCode ?? "",
-        newUdid: cameraDevice.code ?? "",
-        rtsp: cameraDevice.rtsp ?? "",
-        onSuccess: onSuccess,
-        onError: onError,
-      );
-    } catch (e) {
-      onError('$failureMessagePrefix: $e');
-    }
+    // try {
+    //   // 直接调用本地替换API
+    //   if((cameraDevice.aiIp ?? "").isEmpty){
+    //     LoadingUtils.showError(data: "未获取到AI设备的IP地址!");
+    //   }
+    //   HttpQuery.share.homePageService.replaceCameraLocal(
+    //     ip: cameraDevice.aiIp ?? "",
+    //     oldUdid: pNodeCode ?? "",
+    //     newUdid: cameraDevice.code ?? "",
+    //     rtsp: cameraDevice.rtsp ?? "",
+    //     onSuccess: onSuccess,
+    //     onError: onError,
+    //   );
+    // } catch (e) {
+    //   onError('$failureMessagePrefix: $e');
+    // }
   }
 
   /// 验证基础摄像头信息

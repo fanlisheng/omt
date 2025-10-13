@@ -77,8 +77,8 @@ class RemoveViewModel extends BaseViewModelRefresh<dynamic> {
     // );
 
 // 失败弹窗
-    ResultDialog.showError(context: context!);
-    return;
+//     ResultDialog.showError(context: context!);
+//     return;
     //判断 3个筛选，1.如果都没有提示 2.其它请求
     if (selectedInstance?.id == null) {
       LoadingUtils.showToast(data: "至少选择一个筛选条件");

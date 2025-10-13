@@ -119,7 +119,9 @@ class HomePageService {
 
   get _replacePowerBox => '${API.share.host}api/device/power_box/replace';
 
-  get _replaceCamera => '/webcam/replace';
+  get _replaceCameraLocal => '/webcam/replace';
+
+  get _replaceCamera => '${API.share.host}api/device/camera/replace';
 
   //_configAi
   get _configAi async => await API.share
@@ -997,16 +999,15 @@ class HomePageService {
   }
 
   /// 替换摄像头
-  replaceCamera({
+  Future<CodeMessageData?> replaceCameraLocal({
     required String ip,
     required String oldUdid,
     required String newUdid,
     required String rtsp,
-    required ValueChanged<CodeMessageData?> onSuccess,
-    ValueChanged<CodeMessageData?>? onCache,
-    ValueChanged<String>? onError,
-  }) async {
-    String url = '${API.share.hostDeviceConfiguration(ip)}$_replaceCamera';
+  }) {
+    final completer = Completer<CodeMessageData?>();
+
+    String url = '${API.share.hostDeviceConfiguration(ip)}$_replaceCameraLocal';
     Map<String, dynamic> params = {
       "old_udid": oldUdid,
       "new_udid": newUdid,
@@ -1017,12 +1018,45 @@ class HomePageService {
       url,
       params,
       method: 'POST',
-      autoHideDialog: true,
-      autoShowDialog: true,
-      onSuccess: onSuccess,
-      onCache: onCache,
-      onError: onError,
+      autoHideDialog: false,
+      autoShowDialog: false,
+      onSuccess: (data) => completer.complete(data),
+      onCache: (data) => completer.complete(data),
+      onError: (err) => completer.completeError(err),
     );
+    return completer.future;
+  }
+
+  /// 替换摄像头
+  Future<CodeMessageData?> replaceCamera({
+    required int nodeId,
+    required String newDeviceCode,
+    required String newRtspUrl,
+    required String mac,
+    required String ip,
+  }) async {
+    final completer = Completer<CodeMessageData?>();
+
+    Map<String, dynamic> params = {
+      "node_id": nodeId,
+      "new_device_code": newDeviceCode,
+      "new_rtsp_url": newRtspUrl,
+      "new_mac": mac,
+      "new_ip": ip,
+    };
+
+    HttpManager.share.doHttpPost<CodeMessageData>(
+      await _replaceCamera,
+      params,
+      method: 'POST',
+      autoHideDialog: false,
+      autoShowDialog: false,
+      onSuccess: (data) => completer.complete(data),
+      onCache: (data) => completer.complete(data),
+      onError: (err) => completer.completeError(err),
+    );
+
+    return completer.future;
   }
 
   replaceNvr({

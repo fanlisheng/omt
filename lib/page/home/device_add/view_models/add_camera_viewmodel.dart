@@ -553,7 +553,7 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
 
   /// 操作成功的通用处理
   void _onOperationSuccess(
-      BuildContext context, CameraDeviceEntity cameraDeviceEntity, String message) {
+      BuildContext context, CameraDeviceEntity cameraDeviceEntity, String? message) {
     // 使用策略模式处理成功后的逻辑，传入缓存保存回调
     _operationStrategy.onOperationSuccess(
       context,

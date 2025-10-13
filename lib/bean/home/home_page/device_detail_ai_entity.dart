@@ -54,13 +54,15 @@ class DeviceDetailAiData {
   String? programUrl;
   @JSONField(name: "identity_url")
   String? identityUrl;
+
   ///自己加的属性
   //是否可以操作
   bool? enabled;
+
   //是否end
   bool? end;
 
-  DeviceDetailAiData();
+  DeviceDetailAiData({this.ip});
 
   factory DeviceDetailAiData.fromJson(Map<String, dynamic> json) =>
       $DeviceDetailAiDataFromJson(json);

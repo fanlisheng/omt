@@ -16,7 +16,8 @@ class CameraDeviceEntity {
 
   String? mac;
   String? ip;
-  
+  String? aiIp;
+
   // 连接状态：0-未连接，1-连接中，2-连接成功，3-连接失败
   int connectionStatus = 0;
   

@@ -61,15 +61,6 @@ class AddCameraStrategy implements CameraOperationStrategy {
       return const ValidationResult.failure('pNodeCode不能为空');
     }
 
-    // 添加操作需要gateId和instanceId
-    if (gateId == null || gateId <= 0) {
-      return const ValidationResult.failure('gateId不能为空或无效');
-    }
-
-    if (instanceId == null || instanceId.isEmpty) {
-      return const ValidationResult.failure('instanceId不能为空');
-    }
-
     // AI设备验证
     if (cameraDevice.selectedAi == null) {
       return const ValidationResult.failure('请选择AI设备');

@@ -50,6 +50,7 @@ class EditCameraViewModel extends BaseViewModelRefresh<dynamic> {
     cameraDevice.videoIdController =
         TextEditingController(text: deviceInfo.cameraCode);
     cameraDevice.isOpen = true;
+    cameraDevice.aiIp = deviceInfo.aiDeviceIp;
 
     // 初始化摄像头类型列表
     _getCameraStatusList();
@@ -76,7 +77,8 @@ class EditCameraViewModel extends BaseViewModelRefresh<dynamic> {
       cameraDevice.rtsp = "";
       cameraDevice.rtspController.text = "";
       cameraDevice.isOpen = false;
-      addCameraViewModel = AddCameraViewModel("", [],
+      addCameraViewModel = AddCameraViewModel(
+          "", [DeviceDetailAiData(ip: deviceInfo.aiDeviceIp)],
           isReplace: true, cameraDeviceList: [cameraDevice]);
     }
   }
@@ -150,17 +152,53 @@ class EditCameraViewModel extends BaseViewModelRefresh<dynamic> {
     );
   }
 
-  replaceCameraDevice() {
-    HttpQuery.share.homePageService.replaceCamera(
-      ip: "192.168.101.82",
-      oldUdid: deviceInfo.deviceCode ?? "",
-      newUdid: cameraDevice.code ?? "",
-      rtsp: cameraDevice.rtsp ?? "",
-      onSuccess: (data) {
-        LoadingUtils.showSuccess(data: "替换成功!");
+  replaceCameraDevice() async {
+    if(cameraDevice.connectionStatus != 2){
+      LoadingUtils.showInfo(data: "请先链接摄像头!");
+      return;
+    }
+    // 直接调用本地替换API
+    if ((cameraDevice.aiIp ?? "").isEmpty) {
+      LoadingUtils.showError(data: "未获取到AI设备的IP地址!");
+      return;
+    }
+
+    try {
+      LoadingUtils.show(data: "替换摄像头中...");
+      await HttpQuery.share.homePageService.replaceCameraLocal(
+        ip: cameraDevice.aiIp ?? "",
+        oldUdid: "",
+        newUdid: cameraDevice.code ?? "",
+        rtsp: cameraDevice.rtsp ?? "",
+      );
+
+      await Future.delayed(const Duration(seconds: 2));
+
+      try {
+        // 第二个请求
+        await HttpQuery.share.homePageService.replaceCamera(
+          nodeId: deviceInfo.nodeId.toInt(),
+          newDeviceCode: cameraDevice.code ?? "",
+          newRtspUrl: cameraDevice.rtsp ?? "",
+          mac: cameraDevice.mac ?? "",
+          ip: cameraDevice.ip ?? "",
+        );
         IntentUtils.share.popResultOk(context!);
-      },
-    );
+        LoadingUtils.showSuccess(data: "替换成功");
+      } catch (e2) {
+        LoadingUtils.showError(data: "替换摄像头http接口报错: $e2");
+        print("⚠️ 替换摄像头http接口报错: $e2");
+        // 备用接口逻辑
+        // await HttpQuery.share.homePageService.someBackupApi(
+        //   nodeId: deviceInfo.nodeId.toInt(),
+        //   newDeviceCode: cameraDevice.code ?? "",
+        //   newRtspUrl: cameraDevice.rtsp ?? "",
+        // );
+      }
+    } catch (e1) {
+      LoadingUtils.showError(data: "替换摄像头,配置摄像信息失败！");
+      print("❌ 替换摄像头本地接口报错: $e1");
+    }
   }
 
   @override
