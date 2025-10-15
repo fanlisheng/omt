@@ -183,17 +183,14 @@ class EditCameraViewModel extends BaseViewModelRefresh<dynamic> {
           mac: cameraDevice.mac ?? "",
           ip: cameraDevice.ip ?? "",
         );
+        await Future.delayed(const Duration(seconds: 1));
+
         IntentUtils.share.popResultOk(context!);
+
         LoadingUtils.showSuccess(data: "替换成功");
       } catch (e2) {
         LoadingUtils.showError(data: "替换摄像头http接口报错: $e2");
         print("⚠️ 替换摄像头http接口报错: $e2");
-        // 备用接口逻辑
-        // await HttpQuery.share.homePageService.someBackupApi(
-        //   nodeId: deviceInfo.nodeId.toInt(),
-        //   newDeviceCode: cameraDevice.code ?? "",
-        //   newRtspUrl: cameraDevice.rtsp ?? "",
-        // );
       }
     } catch (e1) {
       LoadingUtils.showError(data: "替换摄像头,配置摄像信息失败！");
