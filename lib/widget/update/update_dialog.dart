@@ -155,15 +155,20 @@ class _UpdateDialogState extends State<UpdateDialog> {
 
                     // 更新内容列表
                     Container(
-                      height: 80,
+                      width: double.infinity,
+                      height: 120,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: ColorUtils.colorBackgroundLine,
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: ColorUtils.colorGrayLight),
+                      ),
                       child: SingleChildScrollView(
                         child: Text(
-                          '• 新增一键绑定功能',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Color(0xFF666666),
-                            height: 1.4,
-                          ),
+                          widget.updateInfo.changelog.isEmpty
+                              ? '暂无更新说明'
+                              : widget.updateInfo.changelog,
+                          style: const TextStyle(fontSize: 12, height: 1.4),
                         ),
                       ),
                     ),
@@ -377,7 +382,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
     }
   }
 
-  void _startDownload() async {
+  Future<void> _startDownload() async {
     setState(() {
       _isDownloading = true;
       _downloadProgress = 0.0;
@@ -392,21 +397,25 @@ class _UpdateDialogState extends State<UpdateDialog> {
       },
     );
 
+    // 先更新下载状态
     setState(() {
       _isDownloading = false;
-      if (success) {
-        _downloadCompleted = true;
-        _extractAndCheck();
-      }
+      _downloadCompleted = success;
     });
 
-    // 只有在非用户取消的情况下才显示失败提示
-    if (!success && _updateService.cancelToken?.isCancelled != true) {
+    if (success) {
+      // ✅ 等待提取和检查完成
+      await _extractAndCheck();
+      // ✅ 再执行提取完成后的逻辑
+      _showSnack('提取完成', Colors.green);
+      await _installWithFeedback();
+    } else if (_updateService.cancelToken?.isCancelled != true) {
+      // ✅ 下载失败且不是取消
       _showSnack('下载失败，请检查网络连接后重试', Colors.red);
     }
   }
 
-  void _extractAndCheck() async {
+  Future<void> _extractAndCheck() async {
     try {
       _showSnack('正在解压更新包...', Colors.blue, seconds: 2);
 
@@ -414,6 +423,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
 
       if (extractSuccess) {
         bool found = false;
+
         if (Platform.isWindows) {
           found = await _updateService.existsByExtension('.exe');
         } else {
@@ -423,7 +433,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
         if (found) {
           _showSnack('解压完成，安装介质已就绪', Colors.green, seconds: 2);
         } else {
-          _showSnack('解压完成，但未找到安装程序(.exe文件)', Colors.orange);
+          _showSnack('解压完成，但未找到安装程序 (.exe 文件)', Colors.orange);
         }
       } else {
         _showSnack('解压失败，请检查文件完整性', Colors.red);
