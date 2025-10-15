@@ -113,20 +113,23 @@ class _UpdateDialogState extends State<UpdateDialog> {
                     ),
                   ),
                   // 关闭按钮
-                  Positioned(
-                    top: 0,
-                    right: 6,
-                    child: GestureDetector(
-                      onTap: () {
-                        widget.onCancel?.call();
-                        Navigator.of(context).pop();
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        child: const Icon(
-                          Icons.close,
-                          color: Color(0xFF999999),
-                          size: 24,
+                  Visibility(
+                    visible: widget.updateInfo.forceUpdate != true,
+                    child: Positioned(
+                      top: 0,
+                      right: 6,
+                      child: GestureDetector(
+                        onTap: () {
+                          widget.onCancel?.call();
+                          Navigator.of(context).pop();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          child: const Icon(
+                            Icons.close,
+                            color: Color(0xFF999999),
+                            size: 24,
+                          ),
                         ),
                       ),
                     ),
@@ -151,24 +154,22 @@ class _UpdateDialogState extends State<UpdateDialog> {
                         color: Color(0xFF333333),
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 6),
 
                     // 更新内容列表
                     Container(
                       width: double.infinity,
-                      height: 120,
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: ColorUtils.colorBackgroundLine,
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: ColorUtils.colorGrayLight),
-                      ),
+                      height: 80,
                       child: SingleChildScrollView(
                         child: Text(
                           widget.updateInfo.changelog.isEmpty
                               ? '暂无更新说明'
                               : widget.updateInfo.changelog,
-                          style: const TextStyle(fontSize: 12, height: 1.4),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF666666),
+                            height: 1.3,
+                          ),
                         ),
                       ),
                     ),
