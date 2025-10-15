@@ -74,7 +74,7 @@ class AddAiView extends StatelessWidget {
                             onTap: (e.enabled ?? true)
                                 ? () {
                                     model.selectedAiIp = null;
-                                    model.startAiSearch(index);
+                                    model.startAiSearch(context,index);
                                   }
                                 : null,
                             child: Container(

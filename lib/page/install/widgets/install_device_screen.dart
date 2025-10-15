@@ -35,14 +35,14 @@ class InstallDeviceScreen extends StatefulWidget {
 class _InstallDeviceScreenState extends State<InstallDeviceScreen> {
   // 用于强制重建整个组件
   Key _contentKey = UniqueKey();
-  
+
   // 添加标志位
   bool _shouldRestoreFromCache = false;
-  
+
   @override
   void initState() {
     super.initState();
-  
+
     // 监听重置事件
     resetManager.getResetStream(installDeviceResetKey).listen((_) {
       // 先清除缓存数据
@@ -88,77 +88,85 @@ class _InstallDeviceScreenState extends State<InstallDeviceScreen> {
   Widget build(BuildContext context) {
     // 检查是否需要从首页恢复缓存
     _checkRestoreFromHome();
-    
-    return ProviderWidget<InstallDeviceViewModel>(
-      model: InstallDeviceViewModel()..themeNotifier = true,
-      onModelReady: (model) {
-        // 检查是否需要恢复缓存数据
-        if (_shouldRestoreFromCache) {
-          _shouldRestoreFromCache = false;
-          Future.delayed(const Duration(milliseconds: 200), () {
-            model.restoreFromCache();
-          });
-          Future.delayed(const Duration(milliseconds: 200), () {
-            // _clearCache();
-          });
-        }
-      },
-      builder: (context, model, child) {
-        return Container(
-          color: "#3B3F3F".toColor(),
-          child: fu.ScaffoldPage(
-            header: fu.PageHeader(
-              title: DNavigationView(
-                title: "安装",
-                titlePass: "",
-                hasReturn: false,
-                rightWidget: Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Visibility(
-                        visible: model.currentStep != 1,
-                        child: Clickable(
-                          child: Container(
-                            padding: const EdgeInsets.only(
-                                left: 12, right: 12, top: 4, bottom: 4),
-                            color: ColorUtils.colorGreen,
-                            child: const Text(
-                              "上一步",
-                              style: TextStyle(
-                                  fontSize: 12, color: ColorUtils.colorWhite),
+
+    return KeyedSubtree(
+        key: _contentKey,
+        child: ProviderWidget<InstallDeviceViewModel>(
+          model: InstallDeviceViewModel()
+            ..themeNotifier = true,
+          onModelReady: (model) {
+            // 检查是否需要恢复缓存数据
+            if (_shouldRestoreFromCache) {
+              _shouldRestoreFromCache = false;
+              Future.delayed(const Duration(milliseconds: 200), () {
+                model.restoreFromCache();
+              });
+              Future.delayed(const Duration(milliseconds: 200), () {
+                // _clearCache();
+              });
+            }
+          },
+          builder: (context, model, child) {
+            return Container(
+              color: "#3B3F3F".toColor(),
+              child: fu.ScaffoldPage(
+                header: fu.PageHeader(
+                  title: DNavigationView(
+                    title: "安装",
+                    titlePass: "",
+                    hasReturn: false,
+                    rightWidget: Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Visibility(
+                            visible: model.currentStep != 1,
+                            child: Clickable(
+                              child: Container(
+                                padding: const EdgeInsets.only(
+                                    left: 12, right: 12, top: 4, bottom: 4),
+                                color: ColorUtils.colorGreen,
+                                child: const Text(
+                                  "上一步",
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      color: ColorUtils.colorWhite),
+                                ),
+                              ),
+                              onTap: () {
+                                model.backStepEventAction();
+                              },
                             ),
                           ),
-                          onTap: () {
-                            model.backStepEventAction();
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Clickable(
-                        child: Container(
-                          padding: const EdgeInsets.only(
-                              left: 12, right: 12, top: 4, bottom: 4),
-                          color: ColorUtils.colorGreen,
-                          child: Text(
-                            model.currentStep == 7 ? "安装完成" : (model.currentStep == 6 ? "生成拓扑图" : "下一步"),
-                            style: const TextStyle(
-                                fontSize: 12, color: ColorUtils.colorWhite),
+                          const SizedBox(width: 10),
+                          Clickable(
+                            child: Container(
+                              padding: const EdgeInsets.only(
+                                  left: 12, right: 12, top: 4, bottom: 4),
+                              color: ColorUtils.colorGreen,
+                              child: Text(
+                                model.currentStep == 7 ? "安装完成" : (model
+                                    .currentStep == 6
+                                    ? "生成拓扑图"
+                                    : "下一步"),
+                                style: const TextStyle(
+                                    fontSize: 12, color: ColorUtils.colorWhite),
+                              ),
+                            ),
+                            onTap: () {
+                              model.nextStepEventAction();
+                            },
                           ),
-                        ),
-                        onTap: () {
-                          model.nextStepEventAction();
-                        },
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
+                content: contentView(model),
               ),
-            ),
-            content: contentView(model),
-          ),
-        );
-      },
+            );
+          },
+        ),
     );
   }
 
@@ -182,9 +190,9 @@ class _InstallDeviceScreenState extends State<InstallDeviceScreen> {
       children: [
         Container(
           margin:
-              const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 20),
+          const EdgeInsets.only(left: 16, right: 16, top: 10, bottom: 20),
           padding:
-              const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 16),
+          const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 16),
           decoration: BoxDecoration(
             color: ColorUtils.colorBackgroundLine,
             borderRadius: BorderRadius.circular(3),
@@ -224,14 +232,14 @@ class _InstallDeviceScreenState extends State<InstallDeviceScreen> {
                 two: FComboBox<IdNameValue>(
                     selectedValue: model.selectedDoor,
                     items: model.doorList,
-                    disabled:  model.selectedInstance == null,
+                    disabled: model.selectedInstance == null,
                     onChanged: (a) {
                       model.onDoorSelected(a);
                     },
                     placeholder: "请选择大门编号"),
               ),
               const SizedBox(height: 20),
-              const RowTitle(name: "标签",isMust: false),
+              const RowTitle(name: "标签", isMust: false),
               const SizedBox(height: 10),
               Row(
                 children: [
@@ -284,8 +292,8 @@ class _InstallDeviceScreenState extends State<InstallDeviceScreen> {
                         color: index == 0
                             ? ColorUtils.transparent
                             : (index < model.currentStep
-                                ? ColorUtils.colorGreen
-                                : ColorUtils.colorGreenLiteLite),
+                            ? ColorUtils.colorGreen
+                            : ColorUtils.colorGreenLiteLite),
                       ),
                     ),
                     // 圆形
@@ -315,8 +323,8 @@ class _InstallDeviceScreenState extends State<InstallDeviceScreen> {
                         color: (index == model.stepTitles.length - 1)
                             ? ColorUtils.transparent
                             : ((index + 1) < model.currentStep
-                                ? ColorUtils.colorGreen
-                                : ColorUtils.colorGreenLiteLite),
+                            ? ColorUtils.colorGreen
+                            : ColorUtils.colorGreenLiteLite),
                       ),
                     ),
                   ],

@@ -28,8 +28,10 @@ import '../strategies/camera_operation_strategy_factory.dart';
 enum CameraOperationType {
   /// 添加新摄像头
   add,
+
   /// 安装摄像头到AI设备
   install,
+
   /// 替换现有摄像头
   replace,
 }
@@ -64,11 +66,11 @@ extension CameraOperationTypeExtension on CameraOperationType {
   bool get requiresPNodeCode {
     switch (this) {
       case CameraOperationType.add:
-        return true;  // 添加操作需要pNodeCode
+        return true; // 添加操作需要pNodeCode
       case CameraOperationType.install:
         return false; // 安装操作不需要pNodeCode
       case CameraOperationType.replace:
-        return true;  // 替换操作需要pNodeCode
+        return true; // 替换操作需要pNodeCode
     }
   }
 
@@ -76,11 +78,11 @@ extension CameraOperationTypeExtension on CameraOperationType {
   bool get requiresGateAndInstance {
     switch (this) {
       case CameraOperationType.add:
-        return true;  // 添加操作需要这些参数
+        return true; // 添加操作需要这些参数
       case CameraOperationType.install:
-        return true;  // 安装操作也需要这些参数
+        return true; // 安装操作也需要这些参数
       case CameraOperationType.replace:
-        return true;  // 替换操作需要这些参数
+        return true; // 替换操作需要这些参数
     }
   }
 
@@ -131,12 +133,12 @@ extension CameraOperationTypeExtension on CameraOperationType {
 }
 
 /// 摄像头添加/安装/替换的ViewModel
-/// 
+///
 /// 该类负责处理摄像头设备的各种操作，包括：
 /// - 添加新摄像头到系统
 /// - 安装摄像头到AI设备
 /// - 替换现有摄像头
-/// 
+///
 /// 操作类型通过pNodeCode自动判断：
 /// - pNodeCode不为空：添加操作
 /// - pNodeCode为空：安装操作
@@ -148,10 +150,10 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
 
   /// AI设备列表，摄像头需要关联到AI设备
   List<DeviceDetailAiData> aiDeviceList;
-  
+
   /// 大门ID，用于API调用
   int gateId = 0;
-  
+
   /// 实例ID，用于API调用
   String instanceId = "";
   List<CameraDeviceEntity> cameraDeviceList = [CameraDeviceEntity()];
@@ -171,16 +173,15 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
 
   /// 进出口选项列表
   List<IdNameValue> inOutList = [];
-  
+
   /// 摄像头类型选项列表
   List<IdNameValue> cameraTypeList = [];
-  
+
   /// 监管选项列表
   List<IdNameValue> regulationList = [];
 
   /// 缓存服务实例，用于数据持久化
   final InstallCacheService _cacheService = InstallCacheService.instance;
-
 
   /// 构造函数
   ///
@@ -190,11 +191,12 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
   /// [cameraDeviceList] 摄像头设备列表，默认包含一个空设备
   /// [operationType] 可选的操作类型，如果不提供则根据pNodeCode和isReplace自动判断
   AddCameraViewModel(this.pNodeCode, this.aiDeviceList,
-      {this.isReplace = false, this.cameraDeviceList = const [], CameraOperationType? operationType}) {
+      {this.isReplace = false,
+      this.cameraDeviceList = const [],
+      CameraOperationType? operationType}) {
     // 初始化摄像头设备列表
-    this.cameraDeviceList = cameraDeviceList.isNotEmpty
-        ? cameraDeviceList
-        : [CameraDeviceEntity()];
+    this.cameraDeviceList =
+        cameraDeviceList.isNotEmpty ? cameraDeviceList : [CameraDeviceEntity()];
 
     // 确定操作类型
     if (operationType != null) {
@@ -206,11 +208,14 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
     } else {
       // 根据pNodeCode自动确定操作类型
       // pNodeCode不为空时为添加操作，为空时为安装操作
-      this.operationType = pNodeCode.isNotEmpty ? CameraOperationType.add : CameraOperationType.install;
+      this.operationType = pNodeCode.isNotEmpty
+          ? CameraOperationType.add
+          : CameraOperationType.install;
     }
 
     // 根据操作类型创建相应的策略实例
-    _operationStrategy = CameraOperationStrategyFactory.createStrategy(this.operationType);
+    _operationStrategy =
+        CameraOperationStrategyFactory.createStrategy(this.operationType);
   }
 
   @override
@@ -437,22 +442,27 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
         e.mac = deviceEntity.mac;
         e.isOpen = true;
         e.connectionStatus = 2; // 连接成功
+        e.playResult = true;
         cameraDeviceList[index] = e;
       } else {
+        e.playResult = false;
         e.connectionStatus = 3; // 连接失败
         LoadingUtils.showError(data: "连接失败!");
       }
+      notifyListeners();
     } catch (e) {
+      cameraDeviceList[index].playResult = false;
       cameraDeviceList[index].connectionStatus = 3; // 连接失败
+      notifyListeners();
       LoadingUtils.showError(data: "连接失败, 请检查rtsp!");
     }
 
     LoadingUtils.dismiss();
     //如果是替换，连接成功了直接把状态改了
-    if(isReplace && e.connectionStatus == 2){
-       e.isAddEnd = true;
-       e.readOnly = true;
-       cameraDeviceList[index] = e;
+    if (isReplace && e.connectionStatus == 2) {
+      e.isAddEnd = true;
+      e.readOnly = true;
+      cameraDeviceList[index] = e;
     }
     notifyListeners();
   }
@@ -490,7 +500,6 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
   /// 完成摄像头操作（统一处理添加、安装、替换）
   Future<void> completeCameraAction(
       BuildContext context, CameraDeviceEntity cameraDeviceEntity) async {
-    
     // 参数验证
     if (!_validateParameters(cameraDeviceEntity)) {
       return;
@@ -514,8 +523,7 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
       "mac": cameraDeviceEntity.mac,
       "rtsp_url": cameraDeviceEntity.rtsp,
       "pass_id": cameraDeviceEntity.selectedEntryExit?.id ?? -1,
-      "camera_type":
-          cameraDeviceEntity.selectedCameraType?.value.toInt() ?? 0,
+      "camera_type": cameraDeviceEntity.selectedCameraType?.value.toInt() ?? 0,
       "control_status":
           cameraDeviceEntity.selectedRegulation?.value.toInt() ?? 0,
     };
@@ -524,7 +532,8 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
     }
 
     // 根据操作类型调用相应的API
-    _callApiByOperationType(context, cameraDeviceEntity, aiParams, cameraParams);
+    _callApiByOperationType(
+        context, cameraDeviceEntity, aiParams, cameraParams);
   }
 
   /// 根据操作类型调用相应的API（使用策略模式）
@@ -552,8 +561,8 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   /// 操作成功的通用处理
-  void _onOperationSuccess(
-      BuildContext context, CameraDeviceEntity cameraDeviceEntity, String? message) {
+  void _onOperationSuccess(BuildContext context,
+      CameraDeviceEntity cameraDeviceEntity, String? message) {
     // 使用策略模式处理成功后的逻辑，传入缓存保存回调
     _operationStrategy.onOperationSuccess(
       context,
@@ -567,7 +576,8 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   /// 操作失败的通用处理
-  void _onOperationError(CameraDeviceEntity cameraDeviceEntity, String errorMessage) {
+  void _onOperationError(
+      CameraDeviceEntity cameraDeviceEntity, String errorMessage) {
     LoadingUtils.showToast(data: errorMessage);
   }
 

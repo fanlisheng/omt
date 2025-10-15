@@ -114,8 +114,8 @@ class DeviceUtils {
             //摄像头
             try {
               DeviceEntity? a = await hikvisionDeviceInfo(ipAddress: ip);
-              if (ip == "192.168.101.52") {
-                LogUtils.info(msg: "192.168.101.52 ---------${a.toString()}");
+              if (ip == "192.168.101.155") {
+                LogUtils.info(msg: "192.168.101.155 ---------${a.toString()}");
               }
               if (a != null) {
                 deviceEntity = a;

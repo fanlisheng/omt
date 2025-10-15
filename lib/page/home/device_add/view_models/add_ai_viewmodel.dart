@@ -17,14 +17,18 @@ import '../../../../bean/install/install_cache_data.dart';
 class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
   final String pNodeCode;
 
-  AddAiViewModel(this.pNodeCode);
+  AddAiViewModel(this.pNodeCode) {
+    if (pNodeCode.isEmpty) {
+      isInstall = true;
+    }
+  }
 
   bool isInstall = false; //是否是安装 默认否
-  
+
   // ===== 大门编号相关属性 =====
   int? gateId;
   String? instanceId;
-  
+
   // ===== AI设备相关属性 =====
   List<DeviceDetailAiData> aiDeviceList = [DeviceDetailAiData()];
   List<TextEditingController> aiControllers = [TextEditingController()];
@@ -33,15 +37,13 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
 
   // List<DeviceEntity> aiSearchResults = [];
   bool stopAiScanning = false;
-  
+
   // 缓存服务
   final InstallCacheService _cacheService = InstallCacheService.instance;
 
   @override
   void initState() {
     super.initState();
-    isInstall = pNodeCode.isEmpty;
-    notifyListeners();
   }
 
   @override
@@ -56,10 +58,9 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
     }
     try {
       super.dispose();
-    } catch (e) {
-    }
+    } catch (e) {}
   }
-  
+
   /// 同步aiControllers和aiDeviceList
   /// 确保控制器数量与设备列表匹配，并填充IP地址
   void syncControllersWithDeviceList() {
@@ -72,23 +73,22 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
         aiControllers.removeLast().dispose();
       }
     }
-    
+
     // 同步IP地址到控制器
     for (int i = 0; i < aiDeviceList.length && i < aiControllers.length; i++) {
       aiControllers[i].text = aiDeviceList[i].ip ?? '';
     }
-    
+
     notifyListeners();
   }
 
   // 连接AI设备
   connectAiDeviceAction(int index) async {
-
     //改变别的设备成已完成
-    for (int i = 0 ; i < aiDeviceList.length ; i ++){
-      if(i != index ){
+    for (int i = 0; i < aiDeviceList.length; i++) {
+      if (i != index) {
         String mac = aiDeviceList[i].mac ?? "";
-        if(mac.isNotEmpty){
+        if (mac.isNotEmpty) {
           aiDeviceList[i].end = true;
         }
       }
@@ -161,8 +161,8 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   // 开始搜索AI设备
-  void startAiSearch(int rowIndex) async {
-    showAiSearchDialog(context!).then((ip) {
+  void startAiSearch(BuildContext context, int rowIndex) async {
+    showAiSearchDialog(context).then((ip) {
       selectedAiIp = ip;
       handleSelectedAiIp(rowIndex);
     });
@@ -170,7 +170,8 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
 
   // 添加
   void addAiAction() {
-    if((aiDeviceList.last.mac?.isEmpty ?? true) || (aiDeviceList.last.ip?.isEmpty ?? true)){
+    if ((aiDeviceList.last.mac?.isEmpty ?? true) ||
+        (aiDeviceList.last.ip?.isEmpty ?? true)) {
       LoadingUtils.showInfo(data: '请先把上面AI设备信息完善');
       return;
     }
@@ -185,7 +186,7 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   //删除
-  deleteAiAction(int index) async{
+  deleteAiAction(int index) async {
     final result = await DialogUtils.showContentDialog(
         context: context!,
         title: "确定删除",
@@ -204,11 +205,10 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
     }
   }
 
-
   ///私有方法
   //移除index对应的数据
-  removeAiDataForIndex(int index){
-    if( index < aiDeviceList.length && index < aiControllers.length){
+  removeAiDataForIndex(int index) {
+    if (index < aiDeviceList.length && index < aiControllers.length) {
       aiDeviceList.removeAt(index);
       // 先释放控制器再移除
       aiControllers[index].dispose();
@@ -217,7 +217,7 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
       notifyListeners();
     }
   }
-  
+
   /// 保存AI设备缓存数据
   void _saveAiCache() async {
     try {
@@ -263,14 +263,14 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
           selectedExchangeInOut: cacheData.selectedExchangeInOut,
           createdAt: cacheData.createdAt,
         );
-        
+
         _cacheService.saveCacheData(updatedCacheData);
       }
     } catch (e) {
       print('保存AI设备缓存数据失败: $e');
     }
   }
-  
+
   /// 从缓存恢复AI设备数据
   void restoreFromCache() async {
     try {
@@ -278,14 +278,14 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
       if (cacheData != null) {
         gateId = cacheData.gateId;
         instanceId = cacheData.instanceId;
-        
+
         // 恢复AI设备列表
         if (cacheData.aiDeviceList.isNotEmpty) {
           aiDeviceList.clear();
           aiDeviceList.addAll(cacheData.aiDeviceList);
           syncControllersWithDeviceList();
         }
-        
+
         notifyListeners();
       }
     } catch (e) {
@@ -304,5 +304,4 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
       onSuccess(aiDeviceList);
     }
   }
-
 }

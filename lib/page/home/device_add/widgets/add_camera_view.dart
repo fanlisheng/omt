@@ -449,7 +449,8 @@ class AddCameraView extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(3),
                                     ),
                                     child: Text(
-                                      model.operationStrategy.completeButtonText,
+                                      model
+                                          .operationStrategy.completeButtonText,
                                       style: const TextStyle(
                                           fontSize: 12,
                                           color: ColorUtils.colorWhite),
@@ -545,7 +546,8 @@ class AddCameraView extends StatelessWidget {
                     model.cameraDeviceList.add(CameraDeviceEntity());
                     model.notifyListeners();
                   } else {
-                    LoadingUtils.showInfo(data: "请${model.operationStrategy.displayName}完上一个设备!");
+                    LoadingUtils.showInfo(
+                        data: "请${model.operationStrategy.displayName}完上一个设备!");
                   }
                 },
               ),
@@ -559,7 +561,56 @@ class AddCameraView extends StatelessWidget {
 
   Widget _videoView(
       VideoController? controller, AddCameraViewModel model, int index) {
-    // 获取当前摄像头设备
+    final cameraDevice = model.cameraDeviceList[index];
+    return Center(
+      child: SizedBox(
+        width: 640,
+        height: 360,
+        child: Stack(children: [
+          (cameraDevice.connectionStatus == 2)
+              ? Video(controller: controller!)
+              : Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  color: Colors.black,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        material.Icon(
+                          material.Icons.videocam_off,
+                          size: 48,
+                          color: Colors.white.withOpacity(0.7),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          '无画面',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.7),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '请检查RTSP地址是否正确',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.54),
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+        ]),
+      ),
+    );
+  }
+
+  //暂时没用
+  Widget _videoView2(
+      VideoController? controller, AddCameraViewModel model, int index) {
     final cameraDevice = model.cameraDeviceList[index];
 
     // 使用设备自己的videoController
@@ -709,7 +760,8 @@ class AddCameraView extends StatelessWidget {
                 const SizedBox(height: 20),
                 Text(
                   model.operationStrategy.confirmDialogTitle,
-                  style: const TextStyle(fontSize: 16, color: ColorUtils.colorWhite),
+                  style: const TextStyle(
+                      fontSize: 16, color: ColorUtils.colorWhite),
                 ),
                 const SizedBox(height: 28),
                 _videoView(cameraDeviceEntity.videoController, model, index),
@@ -725,6 +777,8 @@ class AddCameraView extends StatelessWidget {
                         '进/出口: ${cameraDeviceEntity.selectedEntryExit?.name ?? ""}'),
                     Text(
                         '是否纳入监管: ${cameraDeviceEntity.selectedRegulation?.name ?? ""}'),
+                    Text(
+                        '视频接入ID(国标ID): ${cameraDeviceEntity.videoIdController.text}'),
                   ],
                 ),
                 const SizedBox(height: 60),
