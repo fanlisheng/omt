@@ -574,11 +574,6 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
         for (var child in jck) {
           setNextList(child);
         }
-        // if(nvr.isNotEmpty){
-        //   opd.children[0].nextList.addAll(nvr);
-        //   _powerSub(opd.children[0].nextList[0],
-        //       jck: [], lyq: [], nvr: nvr, jhj: [], yxwl: [], aisb: []);
-        // }
       } else {
         if (gdsb.isNotEmpty) {
           opd.children = gdsb;
