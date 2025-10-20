@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:omt/bean/common/code_data.dart';
 import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/bean/one_picture/one_picture/one_picture_data_entity.dart';
@@ -31,7 +34,19 @@ class OnePictureService {
   ValueChanged<OnePictureDataData?>? onCache,
   ValueChanged<String>? onError,
 }) async {
-
+    var test = true;
+    if (test) {
+      try {
+        final path = '/Volumes/U/system/app/flutter/omt/lib/page/one_picture/one_picture/test.json';
+        final jsonStr = await File(path).readAsString();
+        final Map<String, dynamic> jsonMap = json.decode(jsonStr) as Map<String, dynamic>;
+        final entity = OnePictureDataEntity.fromJson(jsonMap);
+        onSuccess?.call(entity.data);
+      } catch (e) {
+        onError?.call('读取测试数据失败: $e');
+      }
+      return;
+    }
 
     Map<String, dynamic> map = {};
     if (instanceId!= null) {

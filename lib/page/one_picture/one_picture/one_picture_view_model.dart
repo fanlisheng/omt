@@ -10,6 +10,7 @@ import 'package:omt/http/http_query.dart';
 import 'package:omt/utils/color_utils.dart';
 import 'package:omt/utils/device_utils.dart';
 import 'package:omt/utils/json_utils.dart';
+import 'package:omt/utils/log_utils.dart';
 import 'package:omt/utils/shared_utils.dart';
 import 'package:omt/utils/sys_utils.dart';
 
@@ -570,10 +571,14 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
       }
     } else if (opd.type == OnePictureType.DM.index) {
       if (jck.isNotEmpty && jck[0].showBorder == true) {
-        // opd.children = jck;
         for (var child in jck) {
           setNextList(child);
         }
+        // if(nvr.isNotEmpty){
+        //   opd.children[0].nextList.addAll(nvr);
+        //   _powerSub(opd.children[0].nextList[0],
+        //       jck: [], lyq: [], nvr: nvr, jhj: [], yxwl: [], aisb: []);
+        // }
       } else {
         if (gdsb.isNotEmpty) {
           opd.children = gdsb;
@@ -818,8 +823,6 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
       List<OnePictureDataData>? aisb,
       List<OnePictureDataData>? sxt}) {
     if (jck?.isNotEmpty == true) {
-      //todo
-      // opd.nextList.addAll(jck!);
       opd.nextList.insert(0, jck![0]);
     }
 
