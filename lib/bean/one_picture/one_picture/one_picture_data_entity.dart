@@ -196,7 +196,8 @@ class OnePictureDataData {
         for (var child in children) {
           if (child.type != OnePictureType.AISB.index &&
               child.type != OnePictureType.SXT.index &&
-              child.type != OnePictureType.NVR.index) {
+              child.type != OnePictureType.NVR.index &&
+              child.type != OnePictureType.JHJ.index) {
             show = false;
           }
         }
@@ -367,7 +368,8 @@ class OnePictureDataData {
           for (var child in children) {
             if (child.type != OnePictureType.AISB.index &&
                 child.type != OnePictureType.SXT.index &&
-                child.type != OnePictureType.NVR.index) {
+                child.type != OnePictureType.NVR.index &&
+                child.type != OnePictureType.JHJ.index) {
               this.showBorder = true;
               break;
             }

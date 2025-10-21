@@ -1,0 +1,193 @@
+{
+  "code": 200,
+  "message": "ok",
+  "data": {
+    "id": "2",
+    "name": "1号门",
+    "node_code": "124#12812-2#1",
+    "type": 2,
+    "type_text": "大门",
+    "desc": "",
+    "device_code": "",
+    "ip": "",
+    "mac": "",
+    "children": [
+      {
+        "id": "5",
+        "name": "进口",
+        "node_code": "124#12812-2#1-3#1",
+        "type": 3,
+        "type_text": "进出口",
+        "desc": "",
+        "device_code": "",
+        "ip": "",
+        "mac": "",
+        "children": [
+          {
+            "id": "724",
+            "name": "",
+            "node_code": "124#12812-2#1-3#1-10#4563",
+            "type": 10,
+            "type_text": "AI设备",
+            "desc": "",
+            "device_code": "00044be659b9",
+            "ip": "192.168.101.51",
+            "mac": "00:04:4b:e6:59:b9",
+            "children": [],
+            "fault": []
+          },
+          {
+            "id": "723",
+            "name": "摄像头236",
+            "node_code": "124#12812-2#1-3#1-11#4617",
+            "type": 11,
+            "type_text": "摄像头",
+            "desc": "",
+            "device_code": "a0a3c000-92a2-11b5-8466-d4e853b50f9d",
+            "ip": "192.168.101.236",
+            "mac": "d4:e8:53:b5:0f:9d",
+            "children": [],
+            "fault": []
+          },
+          {
+            "id": "727",
+            "name": "",
+            "node_code": "124#12812-2#1-3#2-9#173",
+            "type": 9,
+            "type_text": "交换机",
+            "desc": "8口 DC",
+            "device_code": "",
+            "ip": "",
+            "mac": "",
+            "children": [],
+            "fault": []
+          }
+        ],
+        "fault": []
+      },
+      {
+        "id": "23",
+        "name": "出口",
+        "node_code": "124#12812-2#1-3#2",
+        "type": 3,
+        "type_text": "进出口",
+        "desc": "",
+        "device_code": "",
+        "ip": "",
+        "mac": "",
+        "children": [
+          {
+            "id": "726",
+            "name": "",
+            "node_code": "124#12812-2#1-3#2-10#4564",
+            "type": 10,
+            "type_text": "AI设备",
+            "desc": "",
+            "device_code": "00044be6f461",
+            "ip": "192.168.101.82",
+            "mac": "00:04:4b:e6:f4:61",
+            "children": [],
+            "fault": []
+          },
+          {
+            "id": "725",
+            "name": "摄像头252",
+            "node_code": "124#12812-2#1-3#2-11#4618",
+            "type": 11,
+            "type_text": "摄像头",
+            "desc": "",
+            "device_code": "539c0000-f4b0-11b4-839d-c0517e8a4e5a",
+            "ip": "192.168.101.252",
+            "mac": "c0:51:7e:8a:4e:5a",
+            "children": [],
+            "fault": []
+          }
+        ],
+        "fault": []
+      },
+      {
+        "id": "729",
+        "name": "",
+        "node_code": "124#12812-2#1-4#171",
+        "type": 4,
+        "type_text": "电源",
+        "desc": "市电、电池 80AH",
+        "device_code": "",
+        "ip": "",
+        "mac": "",
+        "children": [
+          {
+            "id": "730",
+            "name": "",
+            "node_code": "124#12812-2#1-4#171-12#285",
+            "type": 12,
+            "type_text": "市电",
+            "desc": "",
+            "device_code": "",
+            "ip": "",
+            "mac": "",
+            "children": [],
+            "fault": []
+          },
+          {
+            "id": "731",
+            "name": "",
+            "node_code": "124#12812-2#1-4#171-13#286",
+            "type": 13,
+            "type_text": "电池",
+            "desc": "80 AH",
+            "device_code": "",
+            "ip": "",
+            "mac": "",
+            "children": [],
+            "fault": []
+          }
+        ],
+        "fault": []
+      },
+      {
+        "id": "732",
+        "name": "",
+        "node_code": "124#12812-2#1-5#1694",
+        "type": 5,
+        "type_text": "电源箱",
+        "desc": "",
+        "device_code": "0107022284000183",
+        "ip": "",
+        "mac": "",
+        "children": [],
+        "fault": []
+      },
+      {
+        "id": "728",
+        "name": "",
+        "node_code": "124#12812-2#1-6#179",
+        "type": 6,
+        "type_text": "路由器",
+        "desc": "",
+        "device_code": "9ce895566662",
+        "ip": "192.168.101.1",
+        "mac": "9c:e8:95:56:66:62",
+        "children": [],
+        "fault": []
+      },
+      {
+        "id": "733",
+        "name": "",
+        "node_code": "124#12812-2#1-8#6",
+        "type": 8,
+        "type_text": "NVR",
+        "desc": "",
+        "device_code": "2428fd303d96",
+        "ip": "192.168.101.12",
+        "mac": "24:28:fd:30:3d:96",
+        "children": [],
+        "fault": []
+      }
+    ],
+    "fault": []
+  },
+  "status": "",
+  "details": null,
+  "request_id": ""
+}
