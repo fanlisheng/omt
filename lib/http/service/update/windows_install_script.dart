@@ -95,7 +95,7 @@ pause >nul
   }
 
   /// 生成简化版本的安装脚本（不启动应用）
-  static String generateSimpleScript2({
+  static String generateSimpleScript({
     required String extractedPath,
     required String downloadPath,
     String appName = 'omt.exe',
@@ -164,7 +164,7 @@ pause >nul
   }
 
   /// 生成测试版本的安装脚本（包含详细日志）
-  static String generateTestScript2({
+  static String generateTestScript({
     required String extractedPath,
     required String downloadPath,
     String appName = 'omt.exe',
@@ -458,7 +458,7 @@ return
   }
 
   /// 生成测试版本的安装脚本（包含详细日志）
-  static String generateTestScript({
+  static String generateTestScript2({
     required String extractedPath,
     required String downloadPath,
     String appName = 'omt.exe',
@@ -481,7 +481,7 @@ set "APP_NAME=$appName"
 set "SOURCE_DIR=$extractedPathWin"
 set "TARGET_DIR=$targetDirWin"
 set "APP_PATH=%TARGET_DIR%\\%APP_NAME%"
-set "LOG_FILE=%TEMP%\\omt_update_log.txt"
+set "LOG_FILE=%~dp0omt_update_log.txt"
 set "ZIP_PATH=$downloadPathWin"
 echo LOG FILE: %LOG_FILE%
 echo ZIP PATH: %ZIP_PATH%
