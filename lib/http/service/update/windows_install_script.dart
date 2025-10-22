@@ -492,6 +492,10 @@ REM ========================================
 REM     OMT Update Installer (Win7+ Compatible) - Silent Mode
 REM ========================================
 
+REM CRITICAL: Wait for application to completely exit before starting update
+echo Waiting for application to exit completely...
+timeout /t 3 /nobreak >nul 2>&1
+
 REM Detect Windows version and set encoding (silent)
 ver | find "Version 6.1" >nul 2>&1 && set "WIN7=1" || set "WIN7=0"
 if "%WIN7%"=="0" (

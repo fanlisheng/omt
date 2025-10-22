@@ -477,9 +477,7 @@ class UpdateService {
         return false;
       }
 
-      // 延迟2秒后执行脚本
-      await logMessage('延迟2秒后执行脚本...');
-      await Future.delayed(Duration(seconds: 2));
+      // 脚本内部已包含延迟，直接启动
       await logMessage('开始执行安装脚本');
 
       // 读取脚本内容的前几行进行验证
@@ -510,21 +508,41 @@ class UpdateService {
         return false;
       }
       
+      // 尝试多种异步启动方式
+      bool scriptStarted = false;
+      
       try {
-        // 尝试多种异步启动方式
-        bool scriptStarted = false;
         
-        // 方法1: 使用 cmd start 异步启动（真正的后台启动）
+        // 方法0: 使用 Process.start 真正的 fire-and-forget 启动
         if (!scriptStarted) {
           try {
-            await logMessage('尝试方法1: CMD异步启动');
-            await logMessage('执行命令: cmd /c start "" "$scriptPath"');
+            await logMessage('尝试方法0: Process.start fire-and-forget启动');
+            await logMessage('启动脚本: $scriptPath');
+            // 使用 Process.start 并立即分离，不等待任何结果
+            final process = await Process.start(
+              scriptPath, 
+              [],
+              workingDirectory: scriptDir,
+              mode: ProcessStartMode.detached,
+            );
+            await logMessage('方法0成功: 脚本进程已启动，PID: ${process.pid}');
+            scriptStarted = true;
+          } catch (e0) {
+            await logMessage('方法0失败: $e0');
+          }
+        }
+        
+        // 方法1: 使用 cmd start 异步启动（隐藏窗口）
+        if (!scriptStarted) {
+          try {
+            await logMessage('尝试方法1: CMD异步启动（隐藏窗口）');
+            await logMessage('执行命令: cmd /c start /MIN "" "$scriptPath"');
             await logMessage('工作目录: $scriptDir');
-            // 使用 start 命令异步启动，不等待脚本执行完成
-            final result = await Process.run('cmd', ['/c', 'start', '', scriptPath], 
+            // 使用 start /MIN 命令异步启动并最小化窗口
+            final result = await Process.run('cmd', ['/c', 'start', '/MIN', '', scriptPath], 
               workingDirectory: scriptDir);
             if (result.exitCode == 0) {
-              await logMessage('方法1成功: 安装脚本已异步启动');
+              await logMessage('方法1成功: 安装脚本已异步启动（隐藏窗口）');
               scriptStarted = true;
             } else {
               await logMessage('方法1失败: 退出码 ${result.exitCode}');
@@ -535,16 +553,17 @@ class UpdateService {
           }
         }
         
-        // 方法2: 使用 PowerShell 异步启动
+        // 方法2: 使用 PowerShell 隐藏窗口启动
         if (!scriptStarted) {
           try {
-            await logMessage('尝试方法2: PowerShell异步启动');
-            await logMessage('执行命令: powershell -Command "Start-Process \\"$scriptPath\\""');
+            await logMessage('尝试方法2: PowerShell隐藏窗口启动');
+            await logMessage('执行命令: powershell -WindowStyle Hidden -Command "Start-Process \\"$scriptPath\\" -WindowStyle Hidden"');
             final result = await Process.run('powershell', [
-              '-Command', 'Start-Process "$scriptPath"'
+              '-WindowStyle', 'Hidden',
+              '-Command', 'Start-Process "$scriptPath" -WindowStyle Hidden'
             ], workingDirectory: scriptDir);
             if (result.exitCode == 0) {
-              await logMessage('方法2成功: 安装脚本已通过PowerShell异步启动');
+              await logMessage('方法2成功: 安装脚本已通过PowerShell隐藏启动');
               scriptStarted = true;
             } else {
               await logMessage('方法2失败: 退出码 ${result.exitCode}');
@@ -603,16 +622,10 @@ WshShell.Run """$scriptPath""", 0, False
         return false;
       }
 
-      await logMessage('安装脚本启动成功，应用将退出...');
+      await logMessage('安装脚本启动成功，应用将立即退出...');
       
-      // 短暂延迟确保脚本完全启动
-      await logMessage('等待脚本完全启动...');
-      await Future.delayed(Duration(milliseconds: 500));
-      
-      // 退出应用，让脚本接管更新过程
-      await logMessage('正在退出应用...');
-      
-      // 强制退出应用
+      // 立即退出应用，让脚本处理延迟
+      await logMessage('脚本已启动，立即退出应用以释放文件锁定...');
       await _forceExitApp(0);
     } catch (e) {
       await logMessage('installUpdate总体失败: $e');
@@ -853,6 +866,28 @@ WshShell.Run """$scriptPath""", 0, False
   // 强制退出应用程序
   Future<void> _forceExitApp(int exitCode) async {
     await logMessage('强制退出应用，退出码: $exitCode');
-    exit(exitCode);
+    
+    // 多重保障退出机制
+    try {
+      // 方法1: 直接调用 exit()
+      await logMessage('尝试方法1: 直接调用 exit()');
+      exit(exitCode);
+    } catch (e) {
+      await logMessage('方法1失败: $e');
+      
+      try {
+        // 方法2: 使用 Future.delayed 后退出
+        await logMessage('尝试方法2: 延迟后退出');
+        Future.delayed(Duration(milliseconds: 10), () => exit(exitCode));
+        await Future.delayed(Duration(milliseconds: 50));
+        exit(exitCode); // 备用退出
+      } catch (e2) {
+        await logMessage('方法2失败: $e2');
+        
+        // 方法3: 最后的保障 - 直接退出
+        await logMessage('执行最后保障退出');
+        exit(exitCode);
+      }
+    }
   }
 }
