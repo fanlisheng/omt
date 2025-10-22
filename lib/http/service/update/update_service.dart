@@ -479,7 +479,7 @@ class UpdateService {
 
       // 延迟2秒后执行脚本
       await logMessage('延迟2秒后执行脚本...');
-      await Future.delayed(Duration(seconds: 1));
+      await Future.delayed(Duration(seconds: 2));
       await logMessage('开始执行安装脚本');
 
       // 读取脚本内容的前几行进行验证
@@ -585,10 +585,10 @@ WshShell.Run """$scriptPath""", 0, False
         // 如果所有方法都失败了
         if (!scriptStarted) {
           await logMessage('ERROR: 所有启动方法都失败了');
-          return false;
+          await logMessage('WARNING: 即使脚本启动失败，也将退出应用以释放文件锁定');
+        } else {
+          await logMessage('脚本已成功启动（异步模式）');
         }
-        
-        await logMessage('脚本已成功启动（异步模式）');
         
       } catch (e) {
         await logMessage('启动安装脚本失败，详细错误: $e');
@@ -612,13 +612,20 @@ WshShell.Run """$scriptPath""", 0, False
       // 退出应用，让脚本接管更新过程
       await logMessage('正在退出应用...');
       
-      // 退出应用
-      exit(0);
+      // 强制退出应用
+      await _forceExitApp(0);
     } catch (e) {
       await logMessage('installUpdate总体失败: $e');
       await logMessage('错误堆栈: ${StackTrace.current}');
-      return false;
+      await logMessage('ERROR: 更新过程中发生异常，但仍将强制退出应用以释放文件锁定');
+      
+      // 即使发生异常也要退出应用，避免文件被占用
+      await _forceExitApp(1); // 使用退出码1表示异常退出
     }
+    
+    // 这行代码永远不会执行，因为上面总是调用exit()
+    // 但是为了满足返回类型要求而添加
+    return false;
   }
 
   // 解压ZIP更新包
@@ -841,5 +848,11 @@ WshShell.Run """$scriptPath""", 0, False
   Future<void> clearLocalUpdateInfo() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('lastUpdateInfo');
+  }
+
+  // 强制退出应用程序
+  Future<void> _forceExitApp(int exitCode) async {
+    await logMessage('强制退出应用，退出码: $exitCode');
+    exit(exitCode);
   }
 }
