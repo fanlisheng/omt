@@ -92,7 +92,7 @@ class DetailCameraViewModel extends BaseViewModelRefresh<dynamic> {
     HttpQuery.share.homePageService.restartAiDevicePython(
       // deviceCode: cameraDeviceEntity.code ?? "",
       // aiDeviceCode: cameraDeviceEntity.selectedAi?.deviceCode ?? "",
-      ip:  "192.168.101.82",
+      ip:  deviceInfo.aiDeviceIp ?? "",
       onSuccess: (a) {
         LoadingUtils.showToast(data: "重启识别成功!");
       },

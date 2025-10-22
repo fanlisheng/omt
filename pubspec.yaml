@@ -79,6 +79,7 @@ flutter:
     - assets/login/
     - assets/home/
     - assets/device_detail/
+    - assets/scripts/
     - json/
 
   #     fvm flutter build web --web-browser-flag "--disable-web-security"
@@ -89,5 +90,5 @@ flutter:
 #  dart pub global activate flutter_cors
 #  fluttercors --disable
 
-#    http://192.168.101.189:3000/a.mkv
+#    http://.192.168.101.189:3000/a.mkv
 # https://blog.csdn.net/weixin_43787969/article/details/131086842
