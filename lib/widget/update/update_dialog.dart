@@ -255,53 +255,81 @@ class _UpdateDialogState extends State<UpdateDialog> {
   }
 
   Widget _buildNormalButtons() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Column(
       children: [
-        // 版本记录按钮
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // 版本记录按钮
+            Container(
+              width: 110,
+              height: 32,
+              child: OutlinedButton(
+                onPressed: () {
+                  // 版本记录功能
+                },
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Color(0xFFE5E5E5), width: 1),
+                  backgroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+                child: const Text(
+                  '版本记录',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF44C5C4),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 16),
+            // 立即安装按钮
+            Container(
+              width: 110,
+              height: 32,
+              child: ElevatedButton(
+                onPressed: _startDownload,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF44C5C4),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  elevation: 0,
+                ),
+                child: const Text(
+                  '立即安装',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        // 测试脚本按钮（仅在调试模式下显示）
         Container(
           width: 110,
-          height: 32,
+          height: 28,
           child: OutlinedButton(
-            onPressed: () {
-              // 版本记录功能
-            },
+            onPressed: _testScriptCreation,
             style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: Color(0xFFE5E5E5), width: 1),
+              side: const BorderSide(color: Color(0xFFFF9800), width: 1),
               backgroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
             child: const Text(
-              '版本记录',
+              '测试脚本',
               style: TextStyle(
-                fontSize: 12,
-                color: Color(0xFF44C5C4),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 16),
-        // 立即安装按钮
-        Container(
-          width: 110,
-          height: 32,
-          child: ElevatedButton(
-            onPressed: _startDownload,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF44C5C4),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(4),
-              ),
-              elevation: 0,
-            ),
-            child: const Text(
-              '立即安装',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.white,
+                fontSize: 10,
+                color: Color(0xFFFF9800),
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -484,6 +512,66 @@ class _UpdateDialogState extends State<UpdateDialog> {
           _isInstalling = false;
         });
       }
+    }
+  }
+
+  // 测试脚本创建（用于诊断）
+  Future<void> _testScriptCreation() async {
+    try {
+      _showSnack('开始测试脚本创建...', Colors.blue);
+      
+      final result = await _updateService.testScriptCreation();
+      
+      // 显示测试结果
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('脚本测试结果'),
+            content: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('平台: ${result['platform'] ?? 'unknown'}'),
+                  Text('Windows: ${result['isWindows'] ?? false}'),
+                  Text('应用目录: ${result['appDir'] ?? 'unknown'}'),
+                  Text('应用目录存在: ${result['appDirExists'] ?? false}'),
+                  Text('脚本创建: ${result['scriptCreated'] ?? false}'),
+                  Text('脚本路径: ${result['scriptPath'] ?? 'unknown'}'),
+                  Text('脚本存在: ${result['scriptExists'] ?? false}'),
+                  Text('脚本大小: ${result['scriptSize'] ?? 0} 字节'),
+                  Text('CMD可用: ${result['cmdAvailable'] ?? false}'),
+                  Text('工作目录可写: ${result['workDirWritable'] ?? false}'),
+                  if (result['error'] != null) 
+                    Text('错误: ${result['error']}', style: const TextStyle(color: Colors.red)),
+                  if (result['scriptFirstLine'] != null)
+                    Text('脚本首行: ${result['scriptFirstLine']}'),
+                  if (result['testCommand1'] != null)
+                    Text('测试命令1: ${result['testCommand1']}'),
+                  if (result['testCommand2'] != null)
+                    Text('测试命令2: ${result['testCommand2']}'),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('关闭'),
+              ),
+            ],
+          ),
+        );
+      }
+      
+      if (result['success'] == true) {
+         _showSnack('脚本测试完成，请查看项目目录/logs/文件夹中的日志获取详细信息', Colors.green);
+       } else {
+         _showSnack('脚本测试失败: ${result['error'] ?? '未知错误'}', Colors.red);
+       }
+      
+    } catch (e) {
+      _showSnack('测试脚本创建失败: $e', Colors.red);
     }
   }
 }

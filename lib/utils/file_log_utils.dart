@@ -18,11 +18,14 @@ class FileLogUtils {
     if (_logFilePaths.containsKey(logType)) return _logFilePaths[logType];
     
     try {
+      // 获取当前项目目录
       Directory baseDir;
-      if (Platform.isWindows) {
-        final downloads = await getDownloadsDirectory();
-        baseDir = downloads ?? await getApplicationDocumentsDirectory();
+      if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+        // 获取可执行文件所在目录作为项目根目录
+        final executableDir = Directory(Platform.resolvedExecutable).parent;
+        baseDir = executableDir;
       } else {
+        // 移动端回退到应用文档目录
         baseDir = await getApplicationDocumentsDirectory();
       }
       
@@ -30,7 +33,8 @@ class FileLogUtils {
         await baseDir.create(recursive: true);
       }
       
-      final logsDir = Directory('${baseDir.path}/omt_logs');
+      // 在项目目录下创建logs文件夹
+      final logsDir = Directory('${baseDir.path}/logs');
       if (!await logsDir.exists()) {
         await logsDir.create(recursive: true);
       }

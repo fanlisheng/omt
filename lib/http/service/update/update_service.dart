@@ -40,6 +40,133 @@ class UpdateService {
     await _fileLogger.log(_logType, message);
   }
 
+  /// 测试脚本创建和执行（用于诊断）
+  Future<Map<String, dynamic>> testScriptCreation() async {
+    final result = <String, dynamic>{};
+    
+    try {
+      await logMessage('=== 开始脚本创建测试 ===');
+      await logMessage('日志文件位置: 项目目录/logs/update_YYYYMMDD.log');
+      
+      // 1. 检查平台
+      result['platform'] = Platform.operatingSystem;
+      result['isWindows'] = Platform.isWindows;
+      await logMessage('平台检查: ${result['platform']}, isWindows: ${result['isWindows']}');
+      
+      if (!Platform.isWindows) {
+        result['error'] = '非Windows平台';
+        return result;
+      }
+      
+      // 2. 获取应用程序目录
+      final appDir = Directory(Platform.resolvedExecutable).parent;
+      result['appDir'] = appDir.path;
+      result['appDirExists'] = await appDir.exists();
+      await logMessage('应用程序目录: ${appDir.path}, 存在: ${result['appDirExists']}');
+      
+      // 3. 创建脚本
+      final scriptPath = await _createInstallScript();
+      result['scriptPath'] = scriptPath;
+      result['scriptCreated'] = scriptPath != null;
+      await logMessage('脚本路径: $scriptPath, 创建成功: ${result['scriptCreated']}');
+      
+      if (scriptPath == null) {
+        result['error'] = '脚本创建失败';
+        return result;
+      }
+      
+      // 4. 验证脚本文件
+      final scriptFile = File(scriptPath);
+      result['scriptExists'] = await scriptFile.exists();
+      await logMessage('脚本文件存在: ${result['scriptExists']}');
+      
+      if (result['scriptExists']) {
+        final fileSize = await scriptFile.length();
+        result['scriptSize'] = fileSize;
+        await logMessage('脚本文件大小: $fileSize 字节');
+        
+        // 读取脚本内容
+        try {
+          final content = await scriptFile.readAsString();
+          result['scriptContentLength'] = content.length;
+          result['scriptFirstLine'] = content.split('\n').first;
+          await logMessage('脚本内容长度: ${content.length}');
+          await logMessage('脚本第一行: ${result['scriptFirstLine']}');
+        } catch (e) {
+          result['scriptReadError'] = e.toString();
+          await logMessage('读取脚本内容失败: $e');
+        }
+      }
+      
+      // 5. 检查cmd命令可用性
+      try {
+        final cmdResult = await Process.run('cmd', ['/c', 'echo', 'test']);
+        result['cmdAvailable'] = cmdResult.exitCode == 0;
+        result['cmdOutput'] = cmdResult.stdout.toString().trim();
+        await logMessage('cmd命令可用: ${result['cmdAvailable']}, 输出: ${result['cmdOutput']}');
+      } catch (e) {
+        result['cmdError'] = e.toString();
+        await logMessage('cmd命令测试失败: $e');
+      }
+      
+      // 6. 测试脚本执行（不实际启动，只测试命令构造）
+       if (result['scriptExists']) {
+         try {
+           // 测试不同的启动方式
+           final testCommands = [
+             {'exe': 'cmd', 'args': ['/c', scriptPath]},
+             {'exe': 'cmd', 'args': ['/c', 'start', '/min', scriptPath]},
+           ];
+           
+           for (int i = 0; i < testCommands.length; i++) {
+             final cmd = testCommands[i];
+             try {
+               // 只测试命令构造，不实际执行
+               final exe = cmd['exe'] as String;
+               final args = cmd['args'] as List<String>;
+               await logMessage('测试命令 ${i + 1}: $exe ${args.join(' ')}');
+               result['testCommand${i + 1}'] = '$exe ${args.join(' ')}';
+             } catch (e) {
+               result['testCommand${i + 1}Error'] = e.toString();
+               await logMessage('测试命令 ${i + 1} 失败: $e');
+             }
+           }
+         } catch (e) {
+           result['commandTestError'] = e.toString();
+           await logMessage('命令测试失败: $e');
+         }
+       }
+      
+      // 7. 检查工作目录权限
+      try {
+        final workDir = Directory(scriptPath).parent;
+        result['workDir'] = workDir.path;
+        result['workDirExists'] = await workDir.exists();
+        
+        // 尝试在工作目录创建测试文件
+        final testFile = File('${workDir.path}/test_permissions.txt');
+        await testFile.writeAsString('test');
+        result['workDirWritable'] = await testFile.exists();
+        if (result['workDirWritable']) {
+          await testFile.delete();
+        }
+        await logMessage('工作目录: ${workDir.path}, 可写: ${result['workDirWritable']}');
+      } catch (e) {
+        result['workDirError'] = e.toString();
+        await logMessage('工作目录权限测试失败: $e');
+      }
+      
+      await logMessage('=== 脚本创建测试完成 ===');
+      result['success'] = true;
+      
+    } catch (e) {
+      result['error'] = e.toString();
+      await logMessage('脚本创建测试失败: $e');
+    }
+    
+    return result;
+  }
+
   // 检查更新
   Future<UpdateInfo?> checkForUpdate({bool useMock = false}) async {
     try {
@@ -261,11 +388,13 @@ class UpdateService {
       }
 
       await logMessage('开始安装更新流程');
+      await logMessage('当前工作目录: ${Directory.current.path}');
+      await logMessage('Platform.resolvedExecutable: ${Platform.resolvedExecutable}');
       
       // 创建安装脚本
       final scriptPath = await _createInstallScript();
       if (scriptPath == null) {
-        await logMessage('创建安装脚本失败');
+        await logMessage('ERROR: 创建安装脚本失败');
         return false;
       }
 
@@ -273,18 +402,101 @@ class UpdateService {
       await logMessage('解压路径: $_extractedPath');
       await logMessage('下载路径: $_downloadPath');
 
-      // 启动安装脚本
+      // 验证脚本文件
+      final scriptFile = File(scriptPath);
+      if (!await scriptFile.exists()) {
+        await logMessage('ERROR: 脚本文件不存在: $scriptPath');
+        return false;
+      }
+      
+      final fileSize = await scriptFile.length();
+      await logMessage('脚本文件大小: $fileSize 字节');
+      
+      if (fileSize == 0) {
+        await logMessage('ERROR: 脚本文件为空');
+        return false;
+      }
+
+      // 读取脚本内容的前几行进行验证
       try {
-        final process = await Process.start('cmd', ['/c', scriptPath], 
-          mode: ProcessStartMode.detached);
-        await logMessage('Windows安装脚本已启动，PID: ${process.pid}');
+        final lines = await scriptFile.readAsLines();
+        await logMessage('脚本总行数: ${lines.length}');
+        if (lines.isNotEmpty) {
+          await logMessage('脚本第一行: ${lines.first}');
+        }
+        if (lines.length > 1) {
+          await logMessage('脚本第二行: ${lines[1]}');
+        }
+      } catch (e) {
+        await logMessage('WARNING: 无法读取脚本内容进行验证: $e');
+      }
+
+      // 启动安装脚本
+      await logMessage('准备启动安装脚本...');
+      try {
+        // 尝试多种启动方式
+        Process? process;
         
-        // 等待脚本完全启动
-        await Future.delayed(Duration(milliseconds: 500));
-        await logMessage('脚本启动延迟完成');
+        // 方法1: 使用cmd /c
+        try {
+          await logMessage('尝试方法1: cmd /c "$scriptPath"');
+          process = await Process.start('cmd', ['/c', scriptPath], 
+            mode: ProcessStartMode.detached,
+            workingDirectory: Directory(scriptPath).parent.path);
+          await logMessage('方法1成功: Windows安装脚本已启动，PID: ${process.pid}');
+        } catch (e1) {
+          await logMessage('方法1失败: $e1');
+          
+          // 方法2: 直接启动bat文件
+          try {
+            await logMessage('尝试方法2: 直接启动 "$scriptPath"');
+            process = await Process.start(scriptPath, [], 
+              mode: ProcessStartMode.detached,
+              workingDirectory: Directory(scriptPath).parent.path);
+            await logMessage('方法2成功: Windows安装脚本已启动，PID: ${process.pid}');
+          } catch (e2) {
+            await logMessage('方法2失败: $e2');
+            
+            // 方法3: 使用start命令
+            try {
+              await logMessage('尝试方法3: start /min "$scriptPath"');
+              process = await Process.start('cmd', ['/c', 'start', '/min', scriptPath], 
+                mode: ProcessStartMode.detached,
+                workingDirectory: Directory(scriptPath).parent.path);
+              await logMessage('方法3成功: Windows安装脚本已启动，PID: ${process.pid}');
+            } catch (e3) {
+              await logMessage('方法3失败: $e3');
+              await logMessage('ERROR: 所有启动方法都失败了');
+              await logMessage('最后的错误信息: $e3');
+              return false;
+            }
+          }
+        }
+        
+        if (process != null) {
+          // 等待脚本完全启动
+          await Future.delayed(Duration(milliseconds: 1000));
+          await logMessage('脚本启动延迟完成');
+          
+          // 检查进程是否还在运行
+          try {
+            final isRunning = !process.kill(ProcessSignal.sigusr1); // 发送无害信号测试进程状态
+            await logMessage('进程状态检查: ${isRunning ? "运行中" : "已退出"}');
+          } catch (e) {
+            await logMessage('无法检查进程状态: $e');
+          }
+        }
         
       } catch (e) {
         await logMessage('启动安装脚本失败，详细错误: $e');
+        await logMessage('错误类型: ${e.runtimeType}');
+        if (e is ProcessException) {
+          await logMessage('ProcessException详情:');
+          await logMessage('  executable: ${e.executable}');
+          await logMessage('  arguments: ${e.arguments}');
+          await logMessage('  message: ${e.message}');
+          await logMessage('  errorCode: ${e.errorCode}');
+        }
         return false;
       }
 
@@ -298,7 +510,8 @@ class UpdateService {
       
       return true;
     } catch (e) {
-      await logMessage('启动安装脚本失败: $e');
+      await logMessage('installUpdate总体失败: $e');
+      await logMessage('错误堆栈: ${StackTrace.current}');
       return false;
     }
   }
