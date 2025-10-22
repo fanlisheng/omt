@@ -505,16 +505,35 @@ set "SOURCE_DIR=\${sourceDir}"
 set "TARGET_DIR=\${targetDir}"
 set "APP_PATH=%TARGET_DIR%\\%APP_NAME%"
 set "ZIP_PATH=\${zipPath}"
-set "LOG_FILE=%~dp0omt_update_log.txt"
+
+REM Get script directory more reliably
+set "SCRIPT_DIR=%~dp0"
+if "%SCRIPT_DIR%"=="" (
+    REM Fallback: use current directory
+    set "SCRIPT_DIR=%CD%"
+)
+REM Remove trailing backslash if present
+if "%SCRIPT_DIR:~-1%"=="\\" set "SCRIPT_DIR=%SCRIPT_DIR:~0,-1%"
+set "LOG_FILE=%SCRIPT_DIR%\\omt_update_log.txt"
 
 REM All output redirected to log file for silent operation
+REM First, test if we can create the log file
+echo Testing log file creation... > "%LOG_FILE%" 2>&1
+if %ERRORLEVEL% NEQ 0 (
+    REM If log file creation fails, try using TEMP directory
+    set "LOG_FILE=%TEMP%\\omt_update_log.txt"
+    echo Testing TEMP log file creation... > "%LOG_FILE%" 2>&1
+)
+
 echo ======================================== > "%LOG_FILE%"
 echo        OMT Update Installer - Silent Mode >> "%LOG_FILE%"
 echo ======================================== >> "%LOG_FILE%"
+echo SCRIPT_DIR: %SCRIPT_DIR% >> "%LOG_FILE%"
 echo LOG FILE: %LOG_FILE% >> "%LOG_FILE%"
 echo ZIP PATH: %ZIP_PATH% >> "%LOG_FILE%"
 echo Windows Version: Win7=%WIN7% >> "%LOG_FILE%"
 echo Start update: %date% %time% >> "%LOG_FILE%"
+echo Current working directory: %CD% >> "%LOG_FILE%"
 
 echo ======== INITIAL PATH ANALYSIS ======== >> "%LOG_FILE%"
 echo Analyzing passed SOURCE_DIR: %SOURCE_DIR% >> "%LOG_FILE%"

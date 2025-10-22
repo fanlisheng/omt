@@ -477,6 +477,11 @@ class UpdateService {
         return false;
       }
 
+      // 延迟2秒后执行脚本
+      await logMessage('延迟2秒后执行脚本...');
+      await Future.delayed(Duration(seconds: 1));
+      await logMessage('开始执行安装脚本');
+
       // 读取脚本内容的前几行进行验证
       try {
         final lines = await scriptFile.readAsLines();
@@ -506,38 +511,45 @@ class UpdateService {
       }
       
       try {
-        // 尝试多种静默启动方式
-        Process? process;
+        // 尝试多种异步启动方式
         bool scriptStarted = false;
         
-        // 方法1: 使用 powershell 静默启动（最佳方法）
+        // 方法1: 使用 cmd start 异步启动（真正的后台启动）
         if (!scriptStarted) {
           try {
-            await logMessage('尝试方法1: PowerShell静默启动');
-            await logMessage('执行命令: powershell -WindowStyle Hidden -Command "Start-Process \\"$scriptPath\\" -WindowStyle Hidden"');
-            process = await Process.start('powershell', [
-              '-WindowStyle', 'Hidden',
-              '-Command', 'Start-Process "$scriptPath" -WindowStyle Hidden'
-            ], 
-              mode: ProcessStartMode.detached,
+            await logMessage('尝试方法1: CMD异步启动');
+            await logMessage('执行命令: cmd /c start "" "$scriptPath"');
+            await logMessage('工作目录: $scriptDir');
+            // 使用 start 命令异步启动，不等待脚本执行完成
+            final result = await Process.run('cmd', ['/c', 'start', '', scriptPath], 
               workingDirectory: scriptDir);
-            await logMessage('方法1成功: 安装脚本已静默启动，PID: ${process.pid}');
-            scriptStarted = true;
+            if (result.exitCode == 0) {
+              await logMessage('方法1成功: 安装脚本已异步启动');
+              scriptStarted = true;
+            } else {
+              await logMessage('方法1失败: 退出码 ${result.exitCode}');
+              await logMessage('stderr: ${result.stderr}');
+            }
           } catch (e1) {
             await logMessage('方法1失败: $e1');
           }
         }
         
-        // 方法2: 使用 cmd 静默启动
+        // 方法2: 使用 PowerShell 异步启动
         if (!scriptStarted) {
           try {
-            await logMessage('尝试方法2: CMD静默启动');
-            await logMessage('执行命令: cmd /c start /B /MIN "$scriptPath"');
-            process = await Process.start('cmd', ['/c', 'start', '/B', '/MIN', scriptPath], 
-              mode: ProcessStartMode.detached,
-              workingDirectory: scriptDir);
-            await logMessage('方法2成功: 安装脚本已静默启动，PID: ${process.pid}');
-            scriptStarted = true;
+            await logMessage('尝试方法2: PowerShell异步启动');
+            await logMessage('执行命令: powershell -Command "Start-Process \\"$scriptPath\\""');
+            final result = await Process.run('powershell', [
+              '-Command', 'Start-Process "$scriptPath"'
+            ], workingDirectory: scriptDir);
+            if (result.exitCode == 0) {
+              await logMessage('方法2成功: 安装脚本已通过PowerShell异步启动');
+              scriptStarted = true;
+            } else {
+              await logMessage('方法2失败: 退出码 ${result.exitCode}');
+              await logMessage('stderr: ${result.stderr}');
+            }
           } catch (e2) {
             await logMessage('方法2失败: $e2');
           }
@@ -556,11 +568,15 @@ WshShell.Run """$scriptPath""", 0, False
             await File(vbsPath).writeAsString(vbsContent);
             await logMessage('VBS脚本已创建: $vbsPath');
             
-            process = await Process.start('wscript', [vbsPath], 
-              mode: ProcessStartMode.detached,
+            final result = await Process.run('wscript', [vbsPath], 
               workingDirectory: scriptDir);
-            await logMessage('方法3成功: 安装脚本已通过VBS静默启动，PID: ${process.pid}');
-            scriptStarted = true;
+            if (result.exitCode == 0) {
+              await logMessage('方法3成功: 安装脚本已通过VBS静默启动');
+              scriptStarted = true;
+            } else {
+              await logMessage('方法3失败: 退出码 ${result.exitCode}');
+              await logMessage('stderr: ${result.stderr}');
+            }
           } catch (e3) {
             await logMessage('方法3失败: $e3');
           }
@@ -572,34 +588,7 @@ WshShell.Run """$scriptPath""", 0, False
           return false;
         }
         
-        if (process != null) {
-          await logMessage('脚本进程已启动，PID: ${process.pid}');
-          
-          // 等待脚本完全启动（增加延迟时间）
-          await logMessage('等待脚本完全启动...');
-          await Future.delayed(Duration(milliseconds: 2000));
-          await logMessage('脚本启动延迟完成');
-          
-          // 检查脚本日志文件是否开始生成
-          try {
-            final logFile = File('${scriptDir}${Platform.pathSeparator}omt_update_log.txt');
-            if (await logFile.exists()) {
-              await logMessage('脚本日志文件已创建: ${logFile.path}');
-              try {
-                final logContent = await logFile.readAsString();
-                await logMessage('脚本日志内容预览: ${logContent.substring(0, logContent.length > 200 ? 200 : logContent.length)}...');
-              } catch (e) {
-                await logMessage('无法读取脚本日志内容: $e');
-              }
-            } else {
-              await logMessage('WARNING: 脚本日志文件尚未创建');
-            }
-          } catch (e) {
-            await logMessage('检查脚本日志文件时出错: $e');
-          }
-        } else {
-          await logMessage('WARNING: process对象为null');
-        }
+        await logMessage('脚本已成功启动（异步模式）');
         
       } catch (e) {
         await logMessage('启动安装脚本失败，详细错误: $e');
@@ -616,13 +605,15 @@ WshShell.Run """$scriptPath""", 0, False
 
       await logMessage('安装脚本启动成功，应用将退出...');
       
+      // 短暂延迟确保脚本完全启动
+      await logMessage('等待脚本完全启动...');
+      await Future.delayed(Duration(milliseconds: 500));
+      
       // 退出应用，让脚本接管更新过程
       await logMessage('正在退出应用...');
       
       // 退出应用
       exit(0);
-      
-      return true;
     } catch (e) {
       await logMessage('installUpdate总体失败: $e');
       await logMessage('错误堆栈: ${StackTrace.current}');
