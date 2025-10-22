@@ -494,7 +494,12 @@ REM ========================================
 
 REM CRITICAL: Wait for application to completely exit before starting update
 echo Waiting for application to exit completely...
-timeout /t 3 /nobreak >nul 2>&1
+echo Please wait 3 seconds...
+
+REM Use more compatible waiting method
+ping 127.0.0.1 -n 4 >nul 2>&1
+
+echo Application should be closed now, continuing...
 
 REM Detect Windows version and set encoding (silent)
 ver | find "Version 6.1" >nul 2>&1 && set "WIN7=1" || set "WIN7=0"
@@ -719,13 +724,85 @@ echo Cleanup complete >> "%LOG_FILE%"
 
 REM Step 6: Starting application (silent)
 echo [6/6] Launching app... >> "%LOG_FILE%"
+echo DEBUG: Current directory before cd: %CD% >> "%LOG_FILE%"
+echo DEBUG: Target directory: %TARGET_DIR% >> "%LOG_FILE%"
+echo DEBUG: App path: %APP_PATH% >> "%LOG_FILE%"
+echo DEBUG: App name: %APP_NAME% >> "%LOG_FILE%"
+
 cd /d "%TARGET_DIR%"
+echo DEBUG: Current directory after cd: %CD% >> "%LOG_FILE%"
+echo DEBUG: Listing target directory contents: >> "%LOG_FILE%"
+dir "%TARGET_DIR%" >> "%LOG_FILE%" 2>&1
+
 if exist "%APP_PATH%" (
-  echo [INFO] Launching: %APP_PATH% >> "%LOG_FILE%"
-  start "" "%APP_PATH%"
-  echo [OK] Application started >> "%LOG_FILE%"
+  echo [INFO] Found executable: %APP_PATH% >> "%LOG_FILE%"
+  echo DEBUG: File info: >> "%LOG_FILE%"
+  dir "%APP_PATH%" >> "%LOG_FILE%" 2>&1
+  
+  echo [INFO] Attempting to launch: %APP_PATH% >> "%LOG_FILE%"
+  
+  REM Try multiple launch methods for better reliability
+  echo DEBUG: Method 1 - Using start with full path >> "%LOG_FILE%"
+  start "" "%APP_PATH%" >> "%LOG_FILE%" 2>&1
+  set "START_ERR1=%ERRORLEVEL%"
+  echo DEBUG: Start method 1 result: %START_ERR1% >> "%LOG_FILE%"
+  
+  REM Wait a moment and check if process started
+   ping 127.0.0.1 -n 3 >nul 2>&1
+  tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
+  if %ERRORLEVEL% EQU 0 (
+    echo [OK] Application is running (Method 1 success) >> "%LOG_FILE%"
+    goto launch_success
+  )
+  
+  echo DEBUG: Method 2 - Using start with app name only >> "%LOG_FILE%"
+  start "" "%APP_NAME%" >> "%LOG_FILE%" 2>&1
+  set "START_ERR2=%ERRORLEVEL%"
+  echo DEBUG: Start method 2 result: %START_ERR2% >> "%LOG_FILE%"
+  
+  REM Wait a moment and check if process started
+   ping 127.0.0.1 -n 3 >nul 2>&1
+   tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
+   if %ERRORLEVEL% EQU 0 (
+     echo [OK] Application is running (Method 2 success) >> "%LOG_FILE%"
+     goto launch_success
+   )
+  
+  echo DEBUG: Method 3 - Direct execution >> "%LOG_FILE%"
+  "%APP_PATH%" >> "%LOG_FILE%" 2>&1 &
+  set "START_ERR3=%ERRORLEVEL%"
+  echo DEBUG: Direct execution result: %START_ERR3% >> "%LOG_FILE%"
+  
+  REM Wait a moment and check if process started
+   ping 127.0.0.1 -n 4 >nul 2>&1
+  tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
+  if %ERRORLEVEL% EQU 0 (
+    echo [OK] Application is running (Method 3 success) >> "%LOG_FILE%"
+    goto launch_success
+  )
+  
+  echo [WARNING] All launch methods failed or application not detected >> "%LOG_FILE%"
+  echo DEBUG: Final process check: >> "%LOG_FILE%"
+  tasklist | find /I "%APP_NAME%" >> "%LOG_FILE%" 2>&1
+  
+  :launch_success
+  echo [OK] Application launch completed >> "%LOG_FILE%"
 ) else (
   echo [ERROR] Executable not found: %APP_PATH% >> "%LOG_FILE%"
+  echo DEBUG: Searching for alternative executables: >> "%LOG_FILE%"
+  for %%f in ("%TARGET_DIR%\\*.exe") do (
+    echo DEBUG: Found: %%f >> "%LOG_FILE%"
+    if /I "%%~nxf"=="omt.exe" (
+      echo DEBUG: Attempting to launch alternative: %%f >> "%LOG_FILE%"
+      start "" "%%f" >> "%LOG_FILE%" 2>&1
+      ping 127.0.0.1 -n 3 >nul 2>&1
+      tasklist /FI "IMAGENAME eq %%~nxf" 2>nul | find /I "%%~nxf" >nul
+      if %ERRORLEVEL% EQU 0 (
+        echo [OK] Alternative application started: %%~nxf >> "%LOG_FILE%"
+        goto launch_success
+      )
+    )
+  )
   goto error_end
 )
 
@@ -734,6 +811,21 @@ echo       UPDATE PROCESS COMPLETED! >> "%LOG_FILE%"
 echo ======================================== >> "%LOG_FILE%"
 echo Update complete: %date% %time% >> "%LOG_FILE%"
 
+REM Final verification that application is running
+echo DEBUG: Final application status check... >> "%LOG_FILE%"
+ping 127.0.0.1 -n 4 >nul 2>&1
+tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
+if %ERRORLEVEL% EQU 0 (
+  echo [SUCCESS] Application is confirmed running >> "%LOG_FILE%"
+  echo DEBUG: Application process details: >> "%LOG_FILE%"
+  tasklist /FI "IMAGENAME eq %APP_NAME%" >> "%LOG_FILE%" 2>&1
+) else (
+  echo [WARNING] Application process not detected in final check >> "%LOG_FILE%"
+  echo DEBUG: All running processes containing 'omt': >> "%LOG_FILE%"
+  tasklist | find /I "omt" >> "%LOG_FILE%" 2>&1
+)
+
+echo Script exit: %date% %time% >> "%LOG_FILE%"
 REM Silent exit - no delay, no console output
 exit /b 0
 
