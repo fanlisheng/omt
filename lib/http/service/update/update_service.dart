@@ -388,7 +388,7 @@ class UpdateService {
         projectDir = appDir.path;
       }
       
-      final scriptDir = Directory('$projectDir/install_scripts');
+      final scriptDir = Directory('$projectDir${Platform.pathSeparator}install_scripts');
       if (!await scriptDir.exists()) {
         await scriptDir.create(recursive: true);
       }
@@ -399,7 +399,7 @@ class UpdateService {
       String scriptContent;
       
       if (Platform.isWindows) {
-        scriptPath = '${scriptDir.path}/install_update.bat';
+        scriptPath = '${scriptDir.path}${Platform.pathSeparator}install_update.bat';
         // 使用项目目录作为安装目标目录
         String currentAppDir = projectDir;
         await logMessage('使用项目目录作为安装目标: $currentAppDir');
@@ -495,7 +495,7 @@ class UpdateService {
       await logMessage('准备启动安装脚本（静默模式）...');
       
       // 获取脚本所在目录作为工作目录
-      final scriptDir = Directory(scriptPath).parent.path;
+      final scriptDir = File(scriptPath).parent.path;
       await logMessage('脚本工作目录: $scriptDir');
       
       // 检查脚本文件是否可执行
@@ -510,45 +510,56 @@ class UpdateService {
         Process? process;
         bool scriptStarted = false;
         
-        // 方法1: 使用 start /B 后台运行（无窗口）
+        // 方法1: 使用 powershell 静默启动（最佳方法）
         if (!scriptStarted) {
           try {
-            await logMessage('尝试方法1: start /B（后台静默运行）');
-            await logMessage('执行命令: cmd /c start /B "$scriptPath"');
-            process = await Process.start('cmd', ['/c', 'start', '/B', '"$scriptPath"'], 
+            await logMessage('尝试方法1: PowerShell静默启动');
+            await logMessage('执行命令: powershell -WindowStyle Hidden -Command "Start-Process \\"$scriptPath\\" -WindowStyle Hidden"');
+            process = await Process.start('powershell', [
+              '-WindowStyle', 'Hidden',
+              '-Command', 'Start-Process "$scriptPath" -WindowStyle Hidden'
+            ], 
               mode: ProcessStartMode.detached,
               workingDirectory: scriptDir);
-            await logMessage('方法1成功: 安装脚本已在后台启动，PID: ${process.pid}');
+            await logMessage('方法1成功: 安装脚本已静默启动，PID: ${process.pid}');
             scriptStarted = true;
           } catch (e1) {
             await logMessage('方法1失败: $e1');
           }
         }
         
-        // 方法2: 使用 start /MIN 最小化窗口
+        // 方法2: 使用 cmd 静默启动
         if (!scriptStarted) {
           try {
-            await logMessage('尝试方法2: start /MIN（最小化窗口）');
-            await logMessage('执行命令: cmd /c start /MIN "$scriptPath"');
-            process = await Process.start('cmd', ['/c', 'start', '/MIN', '"$scriptPath"'], 
+            await logMessage('尝试方法2: CMD静默启动');
+            await logMessage('执行命令: cmd /c start /B /MIN "$scriptPath"');
+            process = await Process.start('cmd', ['/c', 'start', '/B', '/MIN', scriptPath], 
               mode: ProcessStartMode.detached,
               workingDirectory: scriptDir);
-            await logMessage('方法2成功: 安装脚本已最小化启动，PID: ${process.pid}');
+            await logMessage('方法2成功: 安装脚本已静默启动，PID: ${process.pid}');
             scriptStarted = true;
           } catch (e2) {
             await logMessage('方法2失败: $e2');
           }
         }
         
-        // 方法3: 直接执行脚本文件
+        // 方法3: 使用 wscript 完全静默启动
         if (!scriptStarted) {
           try {
-            await logMessage('尝试方法3: 直接执行脚本');
-            await logMessage('执行命令: "$scriptPath"');
-            process = await Process.start(scriptPath, [], 
+            await logMessage('尝试方法3: WScript静默启动');
+            // 创建临时VBS脚本来静默启动批处理文件
+            final vbsPath = '${scriptDir}${Platform.pathSeparator}silent_start.vbs';
+            final vbsContent = '''
+Set WshShell = CreateObject("WScript.Shell")
+WshShell.Run """$scriptPath""", 0, False
+''';
+            await File(vbsPath).writeAsString(vbsContent);
+            await logMessage('VBS脚本已创建: $vbsPath');
+            
+            process = await Process.start('wscript', [vbsPath], 
               mode: ProcessStartMode.detached,
               workingDirectory: scriptDir);
-            await logMessage('方法3成功: 安装脚本已启动，PID: ${process.pid}');
+            await logMessage('方法3成功: 安装脚本已通过VBS静默启动，PID: ${process.pid}');
             scriptStarted = true;
           } catch (e3) {
             await logMessage('方法3失败: $e3');
@@ -571,7 +582,7 @@ class UpdateService {
           
           // 检查脚本日志文件是否开始生成
           try {
-            final logFile = File('${scriptDir}/omt_update_log.txt');
+            final logFile = File('${scriptDir}${Platform.pathSeparator}omt_update_log.txt');
             if (await logFile.exists()) {
               await logMessage('脚本日志文件已创建: ${logFile.path}');
               try {
