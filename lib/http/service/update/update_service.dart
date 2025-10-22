@@ -64,11 +64,52 @@ class UpdateService {
       result['appDirExists'] = await appDir.exists();
       await logMessage('应用程序目录: ${appDir.path}, 存在: ${result['appDirExists']}');
       
-      // 3. 创建脚本
-      final scriptPath = await _createInstallScript();
-      result['scriptPath'] = scriptPath;
-      result['scriptCreated'] = scriptPath != null;
-      await logMessage('脚本路径: $scriptPath, 创建成功: ${result['scriptCreated']}');
+      // 3. 为测试目的，临时设置模拟的解压路径
+      final originalExtractedPath = _extractedPath;
+      final originalDownloadPath = _downloadPath;
+      String? scriptPath;
+      
+      try {
+        // 设置模拟路径用于测试 - 使用项目目录
+        String projectDir;
+        try {
+          if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+            // 桌面平台：使用可执行文件所在目录作为项目根目录
+            final executablePath = Platform.resolvedExecutable;
+            projectDir = Directory(executablePath).parent.path;
+          } else {
+            // 移动端：回退到应用文档目录
+            final appDocDir = await getApplicationDocumentsDirectory();
+            projectDir = appDocDir.path;
+          }
+        } catch (e) {
+          // 如果获取项目目录失败，使用应用文档目录
+          final appDocDir = await getApplicationDocumentsDirectory();
+          projectDir = appDocDir.path;
+        }
+        
+        _extractedPath = '$projectDir/test_update_extracted';
+        _downloadPath = '$projectDir/test_update.zip';
+        
+        await logMessage('项目目录: $projectDir');
+        await logMessage('测试用解压路径: $_extractedPath');
+        await logMessage('测试用下载路径: $_downloadPath');
+        
+        // 创建脚本
+        scriptPath = await _createInstallScript();
+        result['scriptPath'] = scriptPath;
+        result['scriptCreated'] = scriptPath != null;
+        await logMessage('脚本路径: $scriptPath, 创建成功: ${result['scriptCreated']}');
+        
+        // 恢复原始路径
+        _extractedPath = originalExtractedPath;
+        _downloadPath = originalDownloadPath;
+      } catch (e) {
+        // 确保恢复原始路径
+        _extractedPath = originalExtractedPath;
+        _downloadPath = originalDownloadPath;
+        rethrow;
+      }
       
       if (scriptPath == null) {
         result['error'] = '脚本创建失败';
@@ -231,19 +272,33 @@ class UpdateService {
     _cancelToken = CancelToken();
 
     try {
-      Directory baseDir;
-      if (Platform.isWindows) {
-        final downloads = await getDownloadsDirectory();
-        baseDir = downloads ?? await getApplicationDocumentsDirectory();
-      } else {
-        baseDir = await getApplicationDocumentsDirectory();
+      // 使用项目目录存储下载文件
+      String projectDir;
+      try {
+        if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+          // 桌面平台：使用可执行文件所在目录作为项目根目录
+          final executablePath = Platform.resolvedExecutable;
+          projectDir = Directory(executablePath).parent.path;
+        } else {
+          // 移动端：回退到应用文档目录
+          final appDir = await getApplicationDocumentsDirectory();
+          projectDir = appDir.path;
+        }
+      } catch (e) {
+        // 如果获取项目目录失败，使用应用文档目录
+        final appDir = await getApplicationDocumentsDirectory();
+        projectDir = appDir.path;
       }
+      
+      final baseDir = Directory('$projectDir/downloads');
       if (!await baseDir.exists()) {
         await baseDir.create(recursive: true);
       }
 
       final fileName = 'update_${updateInfo.version}.zip';
       _downloadPath = '${baseDir.path}/$fileName';
+      
+      await logMessage('下载目录设置为: ${baseDir.path}');
 
       final targetFile = File(_downloadPath!);
       if (await targetFile.exists()) {
@@ -315,34 +370,39 @@ class UpdateService {
     if (_extractedPath == null) return null;
     
     try {
-      final appDir = await getApplicationDocumentsDirectory();
-      final scriptDir = Directory('${appDir.path}/install_scripts');
+      // 使用项目目录存储脚本
+      String projectDir;
+      try {
+        if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+          // 桌面平台：使用可执行文件所在目录作为项目根目录
+          final executablePath = Platform.resolvedExecutable;
+          projectDir = Directory(executablePath).parent.path;
+        } else {
+          // 移动端：回退到应用文档目录
+          final appDir = await getApplicationDocumentsDirectory();
+          projectDir = appDir.path;
+        }
+      } catch (e) {
+        // 如果获取项目目录失败，使用应用文档目录
+        final appDir = await getApplicationDocumentsDirectory();
+        projectDir = appDir.path;
+      }
+      
+      final scriptDir = Directory('$projectDir/install_scripts');
       if (!await scriptDir.exists()) {
         await scriptDir.create(recursive: true);
       }
+      
+      await logMessage('脚本存储目录: ${scriptDir.path}');
 
       String scriptPath;
       String scriptContent;
       
       if (Platform.isWindows) {
         scriptPath = '${scriptDir.path}/install_update.bat';
-        // 获取当前应用程序的目录作为目标目录
-        // 在Windows环境下，使用更可靠的方法获取应用程序目录
-        String currentAppDir;
-        try {
-          final currentExePath = Platform.resolvedExecutable;
-          currentAppDir = Directory(currentExePath).parent.path;
-          await logMessage('从Platform.resolvedExecutable获取目录: $currentAppDir');
-          
-          // 如果路径包含flutter工具链路径，则使用提取路径的父目录作为目标
-          if (currentAppDir.contains('flutter') || currentAppDir.contains('cache')) {
-            currentAppDir = Directory(_extractedPath!).parent.path;
-            await logMessage('检测到开发环境，使用提取路径的父目录: $currentAppDir');
-          }
-        } catch (e) {
-          await logMessage('获取应用程序目录失败，使用提取路径的父目录: $e');
-          currentAppDir = Directory(_extractedPath!).parent.path;
-        }
+        // 使用项目目录作为安装目标目录
+        String currentAppDir = projectDir;
+        await logMessage('使用项目目录作为安装目标: $currentAppDir');
         
         scriptContent = WindowsInstallScript.generateTestScript(
           extractedPath: _extractedPath!,
@@ -521,8 +581,26 @@ class UpdateService {
     if (_downloadPath == null) return false;
 
     try {
-      final appDir = await getApplicationDocumentsDirectory();
-      _extractedPath = '${appDir.path}/update_extracted';
+      // 使用项目目录存储解压文件
+      String projectDir;
+      try {
+        if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+          // 桌面平台：使用可执行文件所在目录作为项目根目录
+          final executablePath = Platform.resolvedExecutable;
+          projectDir = Directory(executablePath).parent.path;
+        } else {
+          // 移动端：回退到应用文档目录
+          final appDir = await getApplicationDocumentsDirectory();
+          projectDir = appDir.path;
+        }
+      } catch (e) {
+        // 如果获取项目目录失败，使用应用文档目录
+        final appDir = await getApplicationDocumentsDirectory();
+        projectDir = appDir.path;
+      }
+      
+      _extractedPath = '$projectDir/update_extracted';
+      await logMessage('解压目录设置为: $_extractedPath');
 
       // 创建解压目录
       final extractDir = Directory(_extractedPath!);
