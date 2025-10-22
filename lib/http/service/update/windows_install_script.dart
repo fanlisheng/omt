@@ -489,28 +489,16 @@ return
     return '''
 @echo off
 REM ========================================
-REM     OMT Update Installer (Win7+ Compatible)
+REM     OMT Update Installer (Win7+ Compatible) - Silent Mode
 REM ========================================
 
-REM Detect Windows version and set encoding
-ver | find "Version 6.1" >nul && set "WIN7=1" || set "WIN7=0"
+REM Detect Windows version and set encoding (silent)
+ver | find "Version 6.1" >nul 2>&1 && set "WIN7=1" || set "WIN7=0"
 if "%WIN7%"=="0" (
     chcp 65001 >nul 2>&1
-    if not errorlevel 1 (
-        echo UTF-8 encoding enabled
-    ) else (
-        echo Using default encoding
-    )
 )
 
-REM Safely set window title (may not be supported in some environments)
-title OMT Update Installer 2>nul
-
-echo ========================================
-echo        OMT Update Installer
-echo ========================================
-echo Windows Version Detection: Win7=%WIN7%
-echo.
+REM Disable all console output by redirecting to log file
 
 set "APP_NAME=\${appName}"
 set "SOURCE_DIR=\${sourceDir}"
@@ -519,14 +507,14 @@ set "APP_PATH=%TARGET_DIR%\\%APP_NAME%"
 set "ZIP_PATH=\${zipPath}"
 set "LOG_FILE=%~dp0omt_update_log.txt"
 
-echo LOG FILE: %LOG_FILE%
-echo ZIP PATH: %ZIP_PATH%
-echo ========================================
-echo.
-
-echo Init log > "%LOG_FILE%"
-echo Start update >> "%LOG_FILE%"
+REM All output redirected to log file for silent operation
+echo ======================================== > "%LOG_FILE%"
+echo        OMT Update Installer - Silent Mode >> "%LOG_FILE%"
+echo ======================================== >> "%LOG_FILE%"
+echo LOG FILE: %LOG_FILE% >> "%LOG_FILE%"
+echo ZIP PATH: %ZIP_PATH% >> "%LOG_FILE%"
 echo Windows Version: Win7=%WIN7% >> "%LOG_FILE%"
+echo Start update: %date% %time% >> "%LOG_FILE%"
 
 echo ======== INITIAL PATH ANALYSIS ======== >> "%LOG_FILE%"
 echo Analyzing passed SOURCE_DIR: %SOURCE_DIR% >> "%LOG_FILE%"
@@ -576,10 +564,10 @@ echo.
 
 REM Find 7-Zip installation path
 set "SEVENZIP_PATH="
-if exist "C:\\\\Program Files\\\\7-Zip\\\\7z.exe" (
-    set "SEVENZIP_PATH=C:\\\\Program Files\\\\7-Zip\\\\7z.exe"
-) else if exist "C:\\\\Program Files (x86)\\\\7-Zip\\\\7z.exe" (
-    set "SEVENZIP_PATH=C:\\\\Program Files (x86)\\\\7-Zip\\\\7z.exe"
+if exist "C:\\Program Files\\7-Zip\\7z.exe" (
+    set "SEVENZIP_PATH=C:\\Program Files\\7-Zip\\7z.exe"
+) else if exist "C:\\Program Files (x86)\\7-Zip\\7z.exe" (
+    set "SEVENZIP_PATH=C:\\Program Files (x86)\\7-Zip\\7z.exe"
 ) else (
     REM Try to find from PATH environment variable
     where 7z.exe >nul 2>&1
@@ -588,8 +576,8 @@ if exist "C:\\\\Program Files\\\\7-Zip\\\\7z.exe" (
     )
 )
 
-title OMT Update Installer - Step 0/6: Extracting ZIP 2>nul
-echo [0/6] Checking and extracting ZIP...
+REM Step 0: Checking and extracting ZIP (silent)
+echo [0/6] Checking and extracting ZIP... >> "%LOG_FILE%"
 echo DEBUG: SOURCE_DIR = %SOURCE_DIR% >> "%LOG_FILE%"
 echo DEBUG: ZIP_PATH = %ZIP_PATH% >> "%LOG_FILE%"
 echo DEBUG: SEVENZIP_PATH = %SEVENZIP_PATH% >> "%LOG_FILE%"
@@ -598,25 +586,23 @@ if exist "%SOURCE_DIR%" goto source_exists
 if not exist "%ZIP_PATH%" goto zip_missing
 
 if "%SEVENZIP_PATH%"=="" (
-    echo [ERROR] 7-Zip not found. Please install 7-Zip.
-    echo 7-Zip not found >> "%LOG_FILE%"
+    echo [ERROR] 7-Zip not found. Please install 7-Zip. >> "%LOG_FILE%"
     goto error_end
 )
 
-echo Extracting %ZIP_PATH% to %SOURCE_DIR%...
-"%SEVENZIP_PATH%" x "%ZIP_PATH%" -o"%SOURCE_DIR%" -y > "%TEMP%\\\\7z_output.txt" 2>&1
-type "%TEMP%\\\\7z_output.txt" >> "%LOG_FILE%"
+echo Extracting %ZIP_PATH% to %SOURCE_DIR%... >> "%LOG_FILE%"
+"%SEVENZIP_PATH%" x "%ZIP_PATH%" -o"%SOURCE_DIR%" -y > "%TEMP%\\7z_output.txt" 2>&1
+type "%TEMP%\\7z_output.txt" >> "%LOG_FILE%"
 if %ERRORLEVEL% NEQ 0 goto extract_failed
-echo [OK] ZIP extracted
-echo ZIP extracted >> "%LOG_FILE%"
+echo [OK] ZIP extracted >> "%LOG_FILE%"
 echo DEBUG: Checking extracted contents... >> "%LOG_FILE%"
 dir "%SOURCE_DIR%" >> "%LOG_FILE%" 2>&1
 echo DEBUG: Verifying source directory after extraction... >> "%LOG_FILE%"
-if not exist "%SOURCE_DIR%\\\\omt.exe" (
+if not exist "%SOURCE_DIR%\\omt.exe" (
     echo DEBUG: omt.exe not found in expected location, checking subdirectories... >> "%LOG_FILE%"
-    for /d %%d in ("%SOURCE_DIR%\\\\*") do (
+    for /d %%d in ("%SOURCE_DIR%\\*") do (
         echo DEBUG: Found subdirectory: %%d >> "%LOG_FILE%"
-        if exist "%%d\\\\omt.exe" (
+        if exist "%%d\\omt.exe" (
             echo DEBUG: Found omt.exe in %%d, updating SOURCE_DIR... >> "%LOG_FILE%"
             set "SOURCE_DIR=%%d"
             goto extract_done
@@ -626,153 +612,111 @@ if not exist "%SOURCE_DIR%\\\\omt.exe" (
 goto extract_done
 
 :extract_failed
-echo [ERROR] Extraction failed, code: %ERRORLEVEL%
-echo Extract failed >> "%LOG_FILE%"
+echo [ERROR] Extraction failed, code: %ERRORLEVEL% >> "%LOG_FILE%"
 goto error_end
 
 :zip_missing
-echo [ERROR] ZIP not found: %ZIP_PATH%
-echo ZIP not found >> "%LOG_FILE%"
+echo [ERROR] ZIP not found: %ZIP_PATH% >> "%LOG_FILE%"
 goto error_end
 
 :source_exists
-echo [OK] Source dir exists, skipping extract
-echo Source dir exists >> "%LOG_FILE%"
+echo [OK] Source dir exists, skipping extract >> "%LOG_FILE%"
 :extract_done
-echo.
 
-title OMT Update Installer - Step 1/6: Checking Files 2>nul
-echo [1/6] Checking source directory...
+REM Step 1: Checking source directory (silent)
+echo [1/6] Checking source directory... >> "%LOG_FILE%"
 echo DEBUG: Checking if %SOURCE_DIR% exists... >> "%LOG_FILE%"
 if not exist "%SOURCE_DIR%" goto source_missing
-echo [OK] Source directory exists
-echo Source dir exists >> "%LOG_FILE%"
+echo [OK] Source directory exists >> "%LOG_FILE%"
 goto step1_done
 
 :source_missing
-echo [ERROR] Source dir not found: %SOURCE_DIR%
-echo Source dir not found >> "%LOG_FILE%"
+echo [ERROR] Source dir not found: %SOURCE_DIR% >> "%LOG_FILE%"
 echo DEBUG: Listing parent directory... >> "%LOG_FILE%"
 for %%i in ("%SOURCE_DIR%") do dir "%%~dpi" >> "%LOG_FILE%" 2>&1
 goto error_end
 
 :step1_done
-echo.
 
-title OMT Update Installer - Step 2/6: Preparing Directory 2>nul
-echo [2/6] Preparing target dir...
+REM Step 2: Preparing target directory (silent)
+echo [2/6] Preparing target dir... >> "%LOG_FILE%"
 if not exist "%TARGET_DIR%" (
   mkdir "%TARGET_DIR%"
   if errorlevel 1 goto target_create_failed
-  echo Target dir created
+  echo Target dir created >> "%LOG_FILE%"
   goto target_ready
 )
-echo [OK] Target directory exists
+echo [OK] Target directory exists >> "%LOG_FILE%"
 :target_ready
 echo Target ready >> "%LOG_FILE%"
 goto step2_done
 
 :target_create_failed
-echo [ERROR] Failed to create target dir
-echo Target create failed >> "%LOG_FILE%"
+echo [ERROR] Failed to create target dir >> "%LOG_FILE%"
 goto error_end
 
 :step2_done
-echo.
 
-title OMT Update Installer - Step 3/6: Copying Files 2>nul
-echo [3/6] Copying files from "%SOURCE_DIR%" to "%TARGET_DIR%"...
-xcopy "%SOURCE_DIR%\\\\*" "%TARGET_DIR%\\\\" /E /Y /I /R > "%TEMP%\\\\xcopy_output.txt" 2>&1
+REM Step 3: Copying files (silent)
+echo [3/6] Copying files from "%SOURCE_DIR%" to "%TARGET_DIR%"... >> "%LOG_FILE%"
+xcopy "%SOURCE_DIR%\\*" "%TARGET_DIR%\\" /E /Y /I /R > "%TEMP%\\xcopy_output.txt" 2>&1
 set "XCOPY_ERR=%ERRORLEVEL%"
-type "%TEMP%\\\\xcopy_output.txt" >> "%LOG_FILE%"
+type "%TEMP%\\xcopy_output.txt" >> "%LOG_FILE%"
 if %XCOPY_ERR% GEQ 4 goto copy_failed
-echo [OK] Files copied successfully
+echo [OK] Files copied successfully >> "%LOG_FILE%"
 echo Copy complete, code: %XCOPY_ERR% >> "%LOG_FILE%"
 goto step3_done
 
 :copy_failed
-echo [ERROR] Copy failed, code: %XCOPY_ERR%
-echo Copy failed %XCOPY_ERR% >> "%LOG_FILE%"
+echo [ERROR] Copy failed, code: %XCOPY_ERR% >> "%LOG_FILE%"
 goto error_end
 
 :step3_done
-echo.
 
-title OMT Update Installer - Step 4/6: Verifying Files 2>nul
-echo [4/6] Verifying target directory...
+REM Step 4: Verifying files (silent)
+echo [4/6] Verifying target directory... >> "%LOG_FILE%"
 dir "%TARGET_DIR%" /B >> "%LOG_FILE%"
-echo [OK] Verification complete
-echo Verify complete >> "%LOG_FILE%"
-echo.
+echo [OK] Verification complete >> "%LOG_FILE%"
 
-title OMT Update Installer - Step 5/6: Cleaning Up 2>nul
-echo [5/6] Cleaning temporary files...
+REM Step 5: Cleaning up (silent)
+echo [5/6] Cleaning temporary files... >> "%LOG_FILE%"
 if exist "%ZIP_PATH%" (
   del "%ZIP_PATH%" >nul 2>&1
   echo Deleted ZIP: %ZIP_PATH% >> "%LOG_FILE%"
 )
-if exist "%TEMP%\\\\7z_output.txt" (
-  del "%TEMP%\\\\7z_output.txt" >nul 2>&1
+if exist "%TEMP%\\7z_output.txt" (
+  del "%TEMP%\\7z_output.txt" >nul 2>&1
   echo Deleted temp file: 7z_output.txt >> "%LOG_FILE%"
 )
-if exist "%TEMP%\\\\xcopy_output.txt" (
-  del "%TEMP%\\\\xcopy_output.txt" >nul 2>&1
+if exist "%TEMP%\\xcopy_output.txt" (
+  del "%TEMP%\\xcopy_output.txt" >nul 2>&1
   echo Deleted temp file: xcopy_output.txt >> "%LOG_FILE%"
 )
 echo Cleanup complete >> "%LOG_FILE%"
-echo Cleanup done.
-echo.
 
-title OMT Update Installer - Step 6/6: Starting Application 2>nul
-echo [6/6] Launching app...
+REM Step 6: Starting application (silent)
+echo [6/6] Launching app... >> "%LOG_FILE%"
 cd /d "%TARGET_DIR%"
 if exist "%APP_PATH%" (
-  echo [INFO] Launching: %APP_PATH%
-  echo Application launched: %APP_PATH% >> "%LOG_FILE%"
+  echo [INFO] Launching: %APP_PATH% >> "%LOG_FILE%"
   start "" "%APP_PATH%"
   echo [OK] Application started >> "%LOG_FILE%"
 ) else (
-  echo [ERROR] Executable not found: %APP_PATH%
-  echo App not found >> "%LOG_FILE%"
+  echo [ERROR] Executable not found: %APP_PATH% >> "%LOG_FILE%"
   goto error_end
 )
 
-echo.
-title OMT Update Installer - Completed 2>nul
-echo ========================================
-echo       UPDATE PROCESS COMPLETED!
-echo ========================================
-echo.
-echo Update complete >> "%LOG_FILE%"
-echo.
+echo ======================================== >> "%LOG_FILE%"
+echo       UPDATE PROCESS COMPLETED! >> "%LOG_FILE%"
+echo ======================================== >> "%LOG_FILE%"
+echo Update complete: %date% %time% >> "%LOG_FILE%"
 
-REM Compatible delay handling
-echo Auto closing in 3 seconds...
-if "%WIN7%"=="1" (
-    REM Windows 7 compatible delay method
-    ping 127.0.0.1 -n 4 >nul
-) else (
-    REM Windows 8+ use timeout command
-    timeout /t 3 /nobreak >nul 2>&1
-    if errorlevel 1 (
-        REM If timeout fails, use ping as fallback
-        ping 127.0.0.1 -n 4 >nul
-    )
-)
+REM Silent exit - no delay, no console output
 exit /b 0
 
 :error_end
-echo [ERROR] Process failed. Check log.
-type "%LOG_FILE%"
-REM Error delay handling
-if "%WIN7%"=="1" (
-    ping 127.0.0.1 -n 6 >nul
-) else (
-    timeout /t 5 /nobreak >nul 2>&1
-    if errorlevel 1 (
-        ping 127.0.0.1 -n 6 >nul
-    )
-)
+echo [ERROR] Process failed. Check log: %LOG_FILE% >> "%LOG_FILE%"
+REM Silent error exit - no console output
 exit /b 1
 ''';
   }

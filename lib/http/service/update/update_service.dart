@@ -491,60 +491,103 @@ class UpdateService {
         await logMessage('WARNING: 无法读取脚本内容进行验证: $e');
       }
 
-      // 启动安装脚本
-      await logMessage('准备启动安装脚本...');
+      // 启动安装脚本（静默模式）
+      await logMessage('准备启动安装脚本（静默模式）...');
+      
+      // 获取脚本所在目录作为工作目录
+      final scriptDir = Directory(scriptPath).parent.path;
+      await logMessage('脚本工作目录: $scriptDir');
+      
+      // 检查脚本文件是否可执行
+      final scriptFileCheck = File(scriptPath);
+      if (!await scriptFileCheck.exists()) {
+        await logMessage('ERROR: 脚本文件不存在: $scriptPath');
+        return false;
+      }
+      
       try {
-        // 尝试多种启动方式
+        // 尝试多种静默启动方式
         Process? process;
+        bool scriptStarted = false;
         
-        // 方法1: 使用cmd /c
-        try {
-          await logMessage('尝试方法1: cmd /c "$scriptPath"');
-          process = await Process.start('cmd', ['/c', scriptPath], 
-            mode: ProcessStartMode.detached,
-            workingDirectory: Directory(scriptPath).parent.path);
-          await logMessage('方法1成功: Windows安装脚本已启动，PID: ${process.pid}');
-        } catch (e1) {
-          await logMessage('方法1失败: $e1');
-          
-          // 方法2: 直接启动bat文件
+        // 方法1: 使用 start /B 后台运行（无窗口）
+        if (!scriptStarted) {
           try {
-            await logMessage('尝试方法2: 直接启动 "$scriptPath"');
-            process = await Process.start(scriptPath, [], 
+            await logMessage('尝试方法1: start /B（后台静默运行）');
+            await logMessage('执行命令: cmd /c start /B "$scriptPath"');
+            process = await Process.start('cmd', ['/c', 'start', '/B', '"$scriptPath"'], 
               mode: ProcessStartMode.detached,
-              workingDirectory: Directory(scriptPath).parent.path);
-            await logMessage('方法2成功: Windows安装脚本已启动，PID: ${process.pid}');
-          } catch (e2) {
-            await logMessage('方法2失败: $e2');
-            
-            // 方法3: 使用start命令
-            try {
-              await logMessage('尝试方法3: start /min "$scriptPath"');
-              process = await Process.start('cmd', ['/c', 'start', '/min', scriptPath], 
-                mode: ProcessStartMode.detached,
-                workingDirectory: Directory(scriptPath).parent.path);
-              await logMessage('方法3成功: Windows安装脚本已启动，PID: ${process.pid}');
-            } catch (e3) {
-              await logMessage('方法3失败: $e3');
-              await logMessage('ERROR: 所有启动方法都失败了');
-              await logMessage('最后的错误信息: $e3');
-              return false;
-            }
+              workingDirectory: scriptDir);
+            await logMessage('方法1成功: 安装脚本已在后台启动，PID: ${process.pid}');
+            scriptStarted = true;
+          } catch (e1) {
+            await logMessage('方法1失败: $e1');
           }
         }
         
+        // 方法2: 使用 start /MIN 最小化窗口
+        if (!scriptStarted) {
+          try {
+            await logMessage('尝试方法2: start /MIN（最小化窗口）');
+            await logMessage('执行命令: cmd /c start /MIN "$scriptPath"');
+            process = await Process.start('cmd', ['/c', 'start', '/MIN', '"$scriptPath"'], 
+              mode: ProcessStartMode.detached,
+              workingDirectory: scriptDir);
+            await logMessage('方法2成功: 安装脚本已最小化启动，PID: ${process.pid}');
+            scriptStarted = true;
+          } catch (e2) {
+            await logMessage('方法2失败: $e2');
+          }
+        }
+        
+        // 方法3: 直接执行脚本文件
+        if (!scriptStarted) {
+          try {
+            await logMessage('尝试方法3: 直接执行脚本');
+            await logMessage('执行命令: "$scriptPath"');
+            process = await Process.start(scriptPath, [], 
+              mode: ProcessStartMode.detached,
+              workingDirectory: scriptDir);
+            await logMessage('方法3成功: 安装脚本已启动，PID: ${process.pid}');
+            scriptStarted = true;
+          } catch (e3) {
+            await logMessage('方法3失败: $e3');
+          }
+        }
+        
+        // 如果所有方法都失败了
+        if (!scriptStarted) {
+          await logMessage('ERROR: 所有启动方法都失败了');
+          return false;
+        }
+        
         if (process != null) {
-          // 等待脚本完全启动
-          await Future.delayed(Duration(milliseconds: 1000));
+          await logMessage('脚本进程已启动，PID: ${process.pid}');
+          
+          // 等待脚本完全启动（增加延迟时间）
+          await logMessage('等待脚本完全启动...');
+          await Future.delayed(Duration(milliseconds: 2000));
           await logMessage('脚本启动延迟完成');
           
-          // 检查进程是否还在运行
+          // 检查脚本日志文件是否开始生成
           try {
-            final isRunning = !process.kill(ProcessSignal.sigusr1); // 发送无害信号测试进程状态
-            await logMessage('进程状态检查: ${isRunning ? "运行中" : "已退出"}');
+            final logFile = File('${scriptDir}/omt_update_log.txt');
+            if (await logFile.exists()) {
+              await logMessage('脚本日志文件已创建: ${logFile.path}');
+              try {
+                final logContent = await logFile.readAsString();
+                await logMessage('脚本日志内容预览: ${logContent.substring(0, logContent.length > 200 ? 200 : logContent.length)}...');
+              } catch (e) {
+                await logMessage('无法读取脚本日志内容: $e');
+              }
+            } else {
+              await logMessage('WARNING: 脚本日志文件尚未创建');
+            }
           } catch (e) {
-            await logMessage('无法检查进程状态: $e');
+            await logMessage('检查脚本日志文件时出错: $e');
           }
+        } else {
+          await logMessage('WARNING: process对象为null');
         }
         
       } catch (e) {
