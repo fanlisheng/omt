@@ -480,108 +480,300 @@ return
   /// 读取脚本模板内容
   /// 返回Windows安装脚本模板字符串
   static String _readScriptTemplate() {
-    try {
-      // 从assets/scripts目录读取脚本模板文件
-      final file = File('assets/scripts/windows_update_script.bat');
-      if (file.existsSync()) {
-        return file.readAsStringSync();
-      } else {
-        print('警告: 脚本模板文件不存在，使用内置模板');
-        return "";
-      }
-    } catch (e) {
-      print('读取脚本模板文件出错: $e');
-      return "";
-    }
+    // 直接使用内置模板，确保在所有环境下都能正常工作
+    return _getDefaultScriptTemplate();
   }
   
   /// 获取默认的脚本模板（作为备用）
   static String _getDefaultScriptTemplate() {
     return '''
 @echo off
-chcp 65001 >nul
+REM ========================================
+REM     OMT Update Installer (Win7+ Compatible)
+REM ========================================
+
+REM Detect Windows version and set encoding
+ver | find "Version 6.1" >nul && set "WIN7=1" || set "WIN7=0"
+if "%WIN7%"=="0" (
+    chcp 65001 >nul 2>&1
+    if not errorlevel 1 (
+        echo UTF-8 encoding enabled
+    ) else (
+        echo Using default encoding
+    )
+)
+
+REM Safely set window title (may not be supported in some environments)
+title OMT Update Installer 2>nul
+
 echo ========================================
-echo           OMT Update Installer
+echo        OMT Update Installer
 echo ========================================
+echo Windows Version Detection: Win7=%WIN7%
 echo.
 
-REM ===== CONFIG =====
 set "APP_NAME=\${appName}"
 set "SOURCE_DIR=\${sourceDir}"
 set "TARGET_DIR=\${targetDir}"
 set "APP_PATH=%TARGET_DIR%\\%APP_NAME%"
-set "LOG_FILE=%TEMP%\\omt_update_log.txt"
-REM ==================
+set "ZIP_PATH=\${zipPath}"
+set "LOG_FILE=%~dp0omt_update_log.txt"
 
-echo %date% %time% - 开始安装更新 > "%LOG_FILE%"
-echo [1/5] 检查更新包...
-echo %date% %time% - 检查源目录: %SOURCE_DIR% >> "%LOG_FILE%"
+echo LOG FILE: %LOG_FILE%
+echo ZIP PATH: %ZIP_PATH%
+echo ========================================
+echo.
 
-if not exist "%SOURCE_DIR%" (
-    echo [ERROR] 源目录未找到: %SOURCE_DIR%
-    echo %date% %time% - 错误：源目录未找到: %SOURCE_DIR% >> "%LOG_FILE%"
-    pause
-    exit /b 1
+echo Init log > "%LOG_FILE%"
+echo Start update >> "%LOG_FILE%"
+echo Windows Version: Win7=%WIN7% >> "%LOG_FILE%"
+
+echo ======== INITIAL PATH ANALYSIS ======== >> "%LOG_FILE%"
+echo Analyzing passed SOURCE_DIR: %SOURCE_DIR% >> "%LOG_FILE%"
+
+REM Check if SOURCE_DIR variable is empty
+if "%SOURCE_DIR%"=="" (
+    echo ERROR: SOURCE_DIR is empty >> "%LOG_FILE%"
+    goto error_end
 )
 
-if not exist "%TARGET_DIR%" (
-    echo 目标目录未找到，正在创建...
-    mkdir "%TARGET_DIR%"
-    if errorlevel 1 (
-        echo [ERROR] 创建目标目录失败
-        echo %date% %time% - 错误：创建目标目录失败 >> "%LOG_FILE%"
-        pause
-        exit /b 1
+REM Check path format and accessibility
+echo Testing path accessibility... >> "%LOG_FILE%"
+pushd "%SOURCE_DIR%" 2>nul
+if %ERRORLEVEL% EQU 0 (
+    echo SUCCESS: Can access SOURCE_DIR >> "%LOG_FILE%"
+    echo Current directory after pushd: %CD% >> "%LOG_FILE%"
+    popd
+) else (
+    echo FAILED: Cannot access SOURCE_DIR (Error: %ERRORLEVEL%) >> "%LOG_FILE%"
+)
+
+REM Check if it's a directory
+if exist "%SOURCE_DIR%\\." (
+    echo SUCCESS: SOURCE_DIR is a valid directory >> "%LOG_FILE%"
+) else (
+    echo FAILED: SOURCE_DIR is not a valid directory >> "%LOG_FILE%"
+)
+
+REM List directory contents
+echo Directory contents: >> "%LOG_FILE%"
+dir "%SOURCE_DIR%" >> "%LOG_FILE%" 2>&1
+
+REM Check for key files
+if exist "%SOURCE_DIR%\\omt.exe" (
+    echo SUCCESS: Found omt.exe in SOURCE_DIR >> "%LOG_FILE%"
+) else (
+    echo WARNING: omt.exe not found in SOURCE_DIR >> "%LOG_FILE%"
+)
+
+REM Check path length
+echo Path length analysis: >> "%LOG_FILE%"
+echo SOURCE_DIR length: >> "%LOG_FILE%"
+echo %SOURCE_DIR% | find /c /v "" >> "%LOG_FILE%"
+
+echo ======== END PATH ANALYSIS ======== >> "%LOG_FILE%"
+echo.
+
+REM Find 7-Zip installation path
+set "SEVENZIP_PATH="
+if exist "C:\\\\Program Files\\\\7-Zip\\\\7z.exe" (
+    set "SEVENZIP_PATH=C:\\\\Program Files\\\\7-Zip\\\\7z.exe"
+) else if exist "C:\\\\Program Files (x86)\\\\7-Zip\\\\7z.exe" (
+    set "SEVENZIP_PATH=C:\\\\Program Files (x86)\\\\7-Zip\\\\7z.exe"
+) else (
+    REM Try to find from PATH environment variable
+    where 7z.exe >nul 2>&1
+    if not errorlevel 1 (
+        set "SEVENZIP_PATH=7z.exe"
     )
-    echo 目标目录已创建
 )
 
-echo.
-echo [2/5] 关闭旧进程...
-echo %date% %time% - 尝试关闭旧进程: %APP_NAME% >> "%LOG_FILE%"
-taskkill /IM "%APP_NAME%" /F >nul 2>&1
-timeout /t 2 >nul
+title OMT Update Installer - Step 0/6: Extracting ZIP 2>nul
+echo [0/6] Checking and extracting ZIP...
+echo DEBUG: SOURCE_DIR = %SOURCE_DIR% >> "%LOG_FILE%"
+echo DEBUG: ZIP_PATH = %ZIP_PATH% >> "%LOG_FILE%"
+echo DEBUG: SEVENZIP_PATH = %SEVENZIP_PATH% >> "%LOG_FILE%"
 
+if exist "%SOURCE_DIR%" goto source_exists
+if not exist "%ZIP_PATH%" goto zip_missing
+
+if "%SEVENZIP_PATH%"=="" (
+    echo [ERROR] 7-Zip not found. Please install 7-Zip.
+    echo 7-Zip not found >> "%LOG_FILE%"
+    goto error_end
+)
+
+echo Extracting %ZIP_PATH% to %SOURCE_DIR%...
+"%SEVENZIP_PATH%" x "%ZIP_PATH%" -o"%SOURCE_DIR%" -y > "%TEMP%\\\\7z_output.txt" 2>&1
+type "%TEMP%\\\\7z_output.txt" >> "%LOG_FILE%"
+if %ERRORLEVEL% NEQ 0 goto extract_failed
+echo [OK] ZIP extracted
+echo ZIP extracted >> "%LOG_FILE%"
+echo DEBUG: Checking extracted contents... >> "%LOG_FILE%"
+dir "%SOURCE_DIR%" >> "%LOG_FILE%" 2>&1
+echo DEBUG: Verifying source directory after extraction... >> "%LOG_FILE%"
+if not exist "%SOURCE_DIR%\\\\omt.exe" (
+    echo DEBUG: omt.exe not found in expected location, checking subdirectories... >> "%LOG_FILE%"
+    for /d %%d in ("%SOURCE_DIR%\\\\*") do (
+        echo DEBUG: Found subdirectory: %%d >> "%LOG_FILE%"
+        if exist "%%d\\\\omt.exe" (
+            echo DEBUG: Found omt.exe in %%d, updating SOURCE_DIR... >> "%LOG_FILE%"
+            set "SOURCE_DIR=%%d"
+            goto extract_done
+        )
+    )
+)
+goto extract_done
+
+:extract_failed
+echo [ERROR] Extraction failed, code: %ERRORLEVEL%
+echo Extract failed >> "%LOG_FILE%"
+goto error_end
+
+:zip_missing
+echo [ERROR] ZIP not found: %ZIP_PATH%
+echo ZIP not found >> "%LOG_FILE%"
+goto error_end
+
+:source_exists
+echo [OK] Source dir exists, skipping extract
+echo Source dir exists >> "%LOG_FILE%"
+:extract_done
 echo.
-echo [3/5] 复制文件...
-echo %date% %time% - 开始复制文件 >> "%LOG_FILE%"
-xcopy "%SOURCE_DIR%\\*" "%TARGET_DIR%\\" /E /Y /I /R
+
+title OMT Update Installer - Step 1/6: Checking Files 2>nul
+echo [1/6] Checking source directory...
+echo DEBUG: Checking if %SOURCE_DIR% exists... >> "%LOG_FILE%"
+if not exist "%SOURCE_DIR%" goto source_missing
+echo [OK] Source directory exists
+echo Source dir exists >> "%LOG_FILE%"
+goto step1_done
+
+:source_missing
+echo [ERROR] Source dir not found: %SOURCE_DIR%
+echo Source dir not found >> "%LOG_FILE%"
+echo DEBUG: Listing parent directory... >> "%LOG_FILE%"
+for %%i in ("%SOURCE_DIR%") do dir "%%~dpi" >> "%LOG_FILE%" 2>&1
+goto error_end
+
+:step1_done
+echo.
+
+title OMT Update Installer - Step 2/6: Preparing Directory 2>nul
+echo [2/6] Preparing target dir...
+if not exist "%TARGET_DIR%" (
+  mkdir "%TARGET_DIR%"
+  if errorlevel 1 goto target_create_failed
+  echo Target dir created
+  goto target_ready
+)
+echo [OK] Target directory exists
+:target_ready
+echo Target ready >> "%LOG_FILE%"
+goto step2_done
+
+:target_create_failed
+echo [ERROR] Failed to create target dir
+echo Target create failed >> "%LOG_FILE%"
+goto error_end
+
+:step2_done
+echo.
+
+title OMT Update Installer - Step 3/6: Copying Files 2>nul
+echo [3/6] Copying files from "%SOURCE_DIR%" to "%TARGET_DIR%"...
+xcopy "%SOURCE_DIR%\\\\*" "%TARGET_DIR%\\\\" /E /Y /I /R > "%TEMP%\\\\xcopy_output.txt" 2>&1
 set "XCOPY_ERR=%ERRORLEVEL%"
+type "%TEMP%\\\\xcopy_output.txt" >> "%LOG_FILE%"
+if %XCOPY_ERR% GEQ 4 goto copy_failed
+echo [OK] Files copied successfully
+echo Copy complete, code: %XCOPY_ERR% >> "%LOG_FILE%"
+goto step3_done
 
-if %XCOPY_ERR% GEQ 4 (
-    echo [ERROR] 复制失败，代码: %XCOPY_ERR%
-    echo %date% %time% - 错误：复制文件失败，代码: %XCOPY_ERR% >> "%LOG_FILE%"
-    pause
-    exit /b 1
-) else (
-    echo [OK] 文件复制成功，代码: %XCOPY_ERR%
-    echo %date% %time% - 文件复制成功 >> "%LOG_FILE%"
+:copy_failed
+echo [ERROR] Copy failed, code: %XCOPY_ERR%
+echo Copy failed %XCOPY_ERR% >> "%LOG_FILE%"
+goto error_end
+
+:step3_done
+echo.
+
+title OMT Update Installer - Step 4/6: Verifying Files 2>nul
+echo [4/6] Verifying target directory...
+dir "%TARGET_DIR%" /B >> "%LOG_FILE%"
+echo [OK] Verification complete
+echo Verify complete >> "%LOG_FILE%"
+echo.
+
+title OMT Update Installer - Step 5/6: Cleaning Up 2>nul
+echo [5/6] Cleaning temporary files...
+if exist "%ZIP_PATH%" (
+  del "%ZIP_PATH%" >nul 2>&1
+  echo Deleted ZIP: %ZIP_PATH% >> "%LOG_FILE%"
 )
-
+if exist "%TEMP%\\\\7z_output.txt" (
+  del "%TEMP%\\\\7z_output.txt" >nul 2>&1
+  echo Deleted temp file: 7z_output.txt >> "%LOG_FILE%"
+)
+if exist "%TEMP%\\\\xcopy_output.txt" (
+  del "%TEMP%\\\\xcopy_output.txt" >nul 2>&1
+  echo Deleted temp file: xcopy_output.txt >> "%LOG_FILE%"
+)
+echo Cleanup complete >> "%LOG_FILE%"
+echo Cleanup done.
 echo.
-echo [4/5] 清理包(可选)...
-echo %date% %time% - 清理临时文件 >> "%LOG_FILE%"
-REM rmdir /s /q "%SOURCE_DIR%"
-REM if exist "\${zipPath}" del "\${zipPath}"
 
-echo.
-echo [5/5] 启动新版本...
-echo %date% %time% - 尝试启动新版本 >> "%LOG_FILE%"
+title OMT Update Installer - Step 6/6: Starting Application 2>nul
+echo [6/6] Launching app...
+cd /d "%TARGET_DIR%"
 if exist "%APP_PATH%" (
-    start "" "%APP_PATH%"
-    echo [OK] 已启动: %APP_PATH%
-    echo %date% %time% - 应用程序启动成功: %APP_PATH% >> "%LOG_FILE%"
+  echo [INFO] Launching: %APP_PATH%
+  echo Application launched: %APP_PATH% >> "%LOG_FILE%"
+  start "" "%APP_PATH%"
+  echo [OK] Application started >> "%LOG_FILE%"
 ) else (
-    echo [WARN] 未找到应用程序: %APP_PATH%
-    echo %date% %time% - 警告：未找到应用程序: %APP_PATH% >> "%LOG_FILE%"
+  echo [ERROR] Executable not found: %APP_PATH%
+  echo App not found >> "%LOG_FILE%"
+  goto error_end
 )
 
 echo.
+title OMT Update Installer - Completed 2>nul
 echo ========================================
-echo           更新完成!
+echo       UPDATE PROCESS COMPLETED!
 echo ========================================
-echo %date% %time% - 更新脚本完成 >> "%LOG_FILE%"
-pause >nul
+echo.
+echo Update complete >> "%LOG_FILE%"
+echo.
+
+REM Compatible delay handling
+echo Auto closing in 3 seconds...
+if "%WIN7%"=="1" (
+    REM Windows 7 compatible delay method
+    ping 127.0.0.1 -n 4 >nul
+) else (
+    REM Windows 8+ use timeout command
+    timeout /t 3 /nobreak >nul 2>&1
+    if errorlevel 1 (
+        REM If timeout fails, use ping as fallback
+        ping 127.0.0.1 -n 4 >nul
+    )
+)
+exit /b 0
+
+:error_end
+echo [ERROR] Process failed. Check log.
+type "%LOG_FILE%"
+REM Error delay handling
+if "%WIN7%"=="1" (
+    ping 127.0.0.1 -n 6 >nul
+) else (
+    timeout /t 5 /nobreak >nul 2>&1
+    if errorlevel 1 (
+        ping 127.0.0.1 -n 6 >nul
+    )
+)
+exit /b 1
 ''';
   }
 }
