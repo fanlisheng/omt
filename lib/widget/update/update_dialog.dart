@@ -255,81 +255,53 @@ class _UpdateDialogState extends State<UpdateDialog> {
   }
 
   Widget _buildNormalButtons() {
-    return Column(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // 版本记录按钮
-            Container(
-              width: 110,
-              height: 32,
-              child: OutlinedButton(
-                onPressed: () {
-                  // 版本记录功能
-                },
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Color(0xFFE5E5E5), width: 1),
-                  backgroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-                child: const Text(
-                  '版本记录',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF44C5C4),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 16),
-            // 立即安装按钮
-            Container(
-              width: 110,
-              height: 32,
-              child: ElevatedButton(
-                onPressed: _startDownload,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF44C5C4),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  elevation: 0,
-                ),
-                child: const Text(
-                  '立即安装',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        // 测试脚本按钮（仅在调试模式下显示）
+        // 版本记录按钮
         Container(
           width: 110,
-          height: 28,
+          height: 32,
           child: OutlinedButton(
-            onPressed: _testScriptCreation,
+            onPressed: () {
+              // 版本记录功能
+            },
             style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: Color(0xFFFF9800), width: 1),
+              side: const BorderSide(color: Color(0xFFE5E5E5), width: 1),
               backgroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
             child: const Text(
-              '测试脚本',
+              '版本记录',
               style: TextStyle(
-                fontSize: 10,
-                color: Color(0xFFFF9800),
+                fontSize: 12,
+                color: Color(0xFF44C5C4),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        // 立即安装按钮
+        Container(
+          width: 110,
+          height: 32,
+          child: ElevatedButton(
+            onPressed: _startDownload,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF44C5C4),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+              elevation: 0,
+            ),
+            child: const Text(
+              '立即安装',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.white,
                 fontWeight: FontWeight.w500,
               ),
             ),
