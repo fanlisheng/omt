@@ -513,15 +513,15 @@ class UpdateService {
       
       try {
         
-        // 方法0: 使用 Process.start 真正的 fire-and-forget 启动
+        // 方法0: 使用 cmd /c 正确执行 bat 文件
         if (!scriptStarted) {
           try {
-            await logMessage('尝试方法0: Process.start fire-and-forget启动');
+            await logMessage('尝试方法0: 使用cmd /c执行bat文件');
             await logMessage('启动脚本: $scriptPath');
-            // 使用 Process.start 并立即分离，不等待任何结果
+            // 使用 cmd /c 来正确执行 .bat 文件
             final process = await Process.start(
-              scriptPath, 
-              [],
+              'cmd', 
+              ['/c', scriptPath],
               workingDirectory: scriptDir,
               mode: ProcessStartMode.detached,
             );
@@ -539,15 +539,11 @@ class UpdateService {
             await logMessage('执行命令: cmd /c start /MIN "" "$scriptPath"');
             await logMessage('工作目录: $scriptDir');
             // 使用 start /MIN 命令异步启动并最小化窗口
-            final result = await Process.run('cmd', ['/c', 'start', '/MIN', '', scriptPath], 
-              workingDirectory: scriptDir);
-            if (result.exitCode == 0) {
-              await logMessage('方法1成功: 安装脚本已异步启动（隐藏窗口）');
-              scriptStarted = true;
-            } else {
-              await logMessage('方法1失败: 退出码 ${result.exitCode}');
-              await logMessage('stderr: ${result.stderr}');
-            }
+            final process = await Process.start('cmd', ['/c', 'start', '/MIN', '', scriptPath], 
+              workingDirectory: scriptDir,
+              mode: ProcessStartMode.detached);
+            await logMessage('方法1成功: 安装脚本已异步启动（隐藏窗口），PID: ${process.pid}');
+            scriptStarted = true;
           } catch (e1) {
             await logMessage('方法1失败: $e1');
           }
