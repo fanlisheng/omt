@@ -18,15 +18,13 @@ ping 127.0.0.1 -n 4 >nul 2>&1
 
 REM Detect Windows version and set compatibility
 echo [%date% %time%] Detecting Windows version... >> "%LOG_FILE%"
-ver | find "Version 6.1" >nul 2>&1
-if %ERRORLEVEL% EQU 0 (
+for /f "tokens=4-5 delims=. " %%i in ('ver') do set VERSION=%%i.%%j
+if "%VERSION%"=="6.1" (
     set "WIN7=1"
     echo [%date% %time%] Windows 7 detected >> "%LOG_FILE%"
-    echo Windows 7 detected
 ) else (
     set "WIN7=0"
     echo [%date% %time%] Windows 8+ detected >> "%LOG_FILE%"
-    echo Windows 8+ detected
 )
 
 REM Set variables
