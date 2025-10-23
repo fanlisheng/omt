@@ -29,6 +29,31 @@ class UpdateService {
   final FileLogUtils _fileLogger = FileLogUtils();
   CancelToken? _cancelToken;
   final String _logType = 'update';
+  // 获取项目目录（使用FileLogUtils统一管理）
+  Future<String> _getProjectDirectory() async {
+    final projectDir = await _fileLogger.getProjectDirectory();
+    await logMessage('DEBUG: 从FileLogUtils获取项目目录: $projectDir');
+    return projectDir;
+  }
+
+  // 清除项目目录缓存（委托给FileLogUtils）
+  void _clearProjectDirectoryCache() {
+    _fileLogger.clearProjectDirectoryCache();
+    logMessage('DEBUG: 项目目录缓存已清除（通过FileLogUtils）');
+  }
+
+  // 初始化更新服务，确保日志系统正确配置
+  Future<void> initialize() async {
+    await logMessage('=== UpdateService 初始化开始 ===');
+    try {
+      // 获取项目目录（FileLogUtils会自动管理缓存和配置）
+      final projectDir = await _getProjectDirectory();
+      await logMessage('UpdateService 初始化完成，项目目录: $projectDir');
+    } catch (e) {
+      await logMessage('UpdateService 初始化失败: $e');
+    }
+    await logMessage('=== UpdateService 初始化结束 ===');
+  }
 
   // 获取当前版本信息
   Future<PackageInfo> getCurrentVersion() async {
@@ -58,8 +83,9 @@ class UpdateService {
         return result;
       }
       
-      // 2. 获取应用程序目录
-      final appDir = Directory(Platform.resolvedExecutable).parent;
+      // 2. 获取应用程序目录（使用FileLogUtils统一管理）
+      final projectDir = await _getProjectDirectory();
+      final appDir = Directory(projectDir);
       result['appDir'] = appDir.path;
       result['appDirExists'] = await appDir.exists();
       await logMessage('应用程序目录: ${appDir.path}, 存在: ${result['appDirExists']}');
@@ -70,23 +96,8 @@ class UpdateService {
       String? scriptPath;
       
       try {
-        // 设置模拟路径用于测试 - 使用项目目录
-        String projectDir;
-        try {
-          if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
-            // 桌面平台：使用可执行文件所在目录作为项目根目录
-            final executablePath = Platform.resolvedExecutable;
-            projectDir = Directory(executablePath).parent.path;
-          } else {
-            // 移动端：回退到应用文档目录
-            final appDocDir = await getApplicationDocumentsDirectory();
-            projectDir = appDocDir.path;
-          }
-        } catch (e) {
-          // 如果获取项目目录失败，使用应用文档目录
-          final appDocDir = await getApplicationDocumentsDirectory();
-          projectDir = appDocDir.path;
-        }
+        // 设置模拟路径用于测试 - 使用FileLogUtils统一获取项目目录
+        final projectDir = await _getProjectDirectory();
         
         _extractedPath = '$projectDir/test_update_extracted';
         _downloadPath = '$projectDir/test_update.zip';
@@ -272,30 +283,15 @@ class UpdateService {
     _cancelToken = CancelToken();
 
     try {
-      // 使用项目目录存储下载文件
-      String projectDir;
-      try {
-        if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
-          // 桌面平台：使用可执行文件所在目录作为项目根目录
-          final executablePath = Platform.resolvedExecutable;
-          projectDir = Directory(executablePath).parent.path;
-        } else {
-          // 移动端：回退到应用文档目录
-          final appDir = await getApplicationDocumentsDirectory();
-          projectDir = appDir.path;
-        }
-      } catch (e) {
-        // 如果获取项目目录失败，使用应用文档目录
-        final appDir = await getApplicationDocumentsDirectory();
-        projectDir = appDir.path;
-      }
+      // 使用统一的项目目录获取方法
+      final projectDir = await _getProjectDirectory();
       
       final baseDir = Directory('$projectDir/downloads');
       if (!await baseDir.exists()) {
         await baseDir.create(recursive: true);
       }
 
-      final fileName = 'update_${updateInfo.version}.zip';
+      final fileName = 'update.zip';
       _downloadPath = '${baseDir.path}/$fileName';
       
       await logMessage('下载目录设置为: ${baseDir.path}');
@@ -370,23 +366,8 @@ class UpdateService {
     if (_extractedPath == null) return null;
     
     try {
-      // 使用项目目录存储脚本
-      String projectDir;
-      try {
-        if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
-          // 桌面平台：使用可执行文件所在目录作为项目根目录
-          final executablePath = Platform.resolvedExecutable;
-          projectDir = Directory(executablePath).parent.path;
-        } else {
-          // 移动端：回退到应用文档目录
-          final appDir = await getApplicationDocumentsDirectory();
-          projectDir = appDir.path;
-        }
-      } catch (e) {
-        // 如果获取项目目录失败，使用应用文档目录
-        final appDir = await getApplicationDocumentsDirectory();
-        projectDir = appDir.path;
-      }
+      // 使用统一的项目目录获取方法
+      final projectDir = await _getProjectDirectory();
       
       final scriptDir = Directory('$projectDir${Platform.pathSeparator}install_scripts');
       if (!await scriptDir.exists()) {
@@ -642,23 +623,8 @@ WshShell.Run """$scriptPath""", 0, False
     if (_downloadPath == null) return false;
 
     try {
-      // 使用项目目录存储解压文件
-      String projectDir;
-      try {
-        if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
-          // 桌面平台：使用可执行文件所在目录作为项目根目录
-          final executablePath = Platform.resolvedExecutable;
-          projectDir = Directory(executablePath).parent.path;
-        } else {
-          // 移动端：回退到应用文档目录
-          final appDir = await getApplicationDocumentsDirectory();
-          projectDir = appDir.path;
-        }
-      } catch (e) {
-        // 如果获取项目目录失败，使用应用文档目录
-        final appDir = await getApplicationDocumentsDirectory();
-        projectDir = appDir.path;
-      }
+      // 使用统一的项目目录获取方法
+      final projectDir = await _getProjectDirectory();
       
       _extractedPath = '$projectDir/update_extracted';
       await logMessage('解压目录设置为: $_extractedPath');
