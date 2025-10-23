@@ -3,167 +3,8 @@ import 'dart:io';
 /// Windows安装脚本模板
 /// 用于生成自动更新安装的批处理脚本
 class WindowsInstallScript {
-  /// 生成Windows安装脚本内容
-  ///
-  /// [extractedPath] 解压后的文件路径
-  /// [downloadPath] 下载的ZIP文件路径
-  /// [appName] 应用名称，默认为omt.exe
-  /// [targetDir] 目标安装目录，如果为空则使用解压目录的父目录
-  static String generateScript({
-    required String extractedPath,
-    required String downloadPath,
-    String appName = 'omt.exe',
-    String? targetDir,
-  }) {
-    final extractedPathWin = extractedPath.replaceAll('/', '\\');
-    final targetDirWin = (targetDir ?? Directory(extractedPath).parent.path)
-        .replaceAll('/', '\\');
-    final downloadPathWin = downloadPath.replaceAll('/', '\\');
-
-    return '''
-@echo off
-title OMT Update Installer - Please Wait...
-chcp 65001 >nul
-echo ========================================
-echo           Client Update Script
-echo ========================================
-echo.
-
-REM ===== CONFIG =====
-set "APP_NAME=$appName"
-set "SOURCE_DIR=$extractedPathWin"
-set "TARGET_DIR=$targetDirWin"
-set "APP_PATH=%TARGET_DIR%\\%APP_NAME%"
-REM ==================
-
-echo (1/5) Killing old process: %APP_NAME% ...
-taskkill /IM "%APP_NAME%" /F >nul 2>&1
-ping 127.0.0.1 -n 3 >nul 2>&1
-
-echo.
-echo (2/5) Checking update package...
-if not exist "%SOURCE_DIR%" (
-    echo (ERROR) Source dir not found: %SOURCE_DIR%
-    pause
-    exit /b 1
-)
-
-if not exist "%TARGET_DIR%" (
-    echo Target dir not found, creating...
-    mkdir "%TARGET_DIR%"
-    if errorlevel 1 (
-        echo (ERROR) Failed to create target dir
-        pause
-        exit /b 1
-    )
-    echo Target dir created
-)
-
-echo.
-echo (3/5) Copying files...
-xcopy "%SOURCE_DIR%\\*" "%TARGET_DIR%\\" /E /Y /I /R
-set "XCOPY_ERR=%ERRORLEVEL%"
-
-if %XCOPY_ERR% GEQ 4 (
-    echo (ERROR) Copy failed, code: %XCOPY_ERR%
-    pause
-    exit /b 1
-) else (
-    echo (OK) Files copied, code: %XCOPY_ERR%
-)
-
-echo.
-echo (4/5) Cleaning package (optional)...
-REM rmdir /s /q "%SOURCE_DIR%"
-REM if exist "$downloadPathWin" del "$downloadPathWin"
-
-echo.
-echo (5/5) Launching new version...
-if exist "%APP_PATH%" (
-    start "" "%APP_PATH%"
-    echo (OK) Started: %APP_PATH%
-) else (
-    echo (WARN) App not found: %APP_PATH%
-)
-
-echo.
-echo ========================================
-echo           Update Finished!
-echo ========================================
-pause >nul
-''';
-  }
-
-  /// 生成简化版本的安装脚本（不启动应用）
-  static String generateSimpleScript({
-    required String extractedPath,
-    required String downloadPath,
-    String appName = 'omt.exe',
-    String? targetDir,
-  }) {
-    final extractedPathWin = extractedPath.replaceAll('/', '\\');
-    final targetDirWin = (targetDir ?? Directory(extractedPath).parent.path)
-        .replaceAll('/', '\\');
-    final downloadPathWin = downloadPath.replaceAll('/', '\\');
-
-    return '''
-@echo off
-chcp 65001 >nul
-echo ========================================
-echo           Simple Update Script
-echo ========================================
-echo.
-
-REM ===== CONFIG =====
-set "SOURCE_DIR=$extractedPathWin"
-set "TARGET_DIR=$targetDirWin"
-REM ==================
-
-echo (1/3) Checking update package...
-if not exist "%SOURCE_DIR%" (
-    echo (ERROR) Source dir not found: %SOURCE_DIR%
-    pause
-    exit /b 1
-)
-
-if not exist "%TARGET_DIR%" (
-    echo Target dir not found, creating...
-    mkdir "%TARGET_DIR%"
-    if errorlevel 1 (
-        echo (ERROR) Failed to create target dir
-        pause
-        exit /b 1
-    )
-    echo Target dir created
-)
-
-echo.
-echo (2/3) Copying files...
-xcopy "%SOURCE_DIR%\\*" "%TARGET_DIR%\\" /E /Y /I /R
-set "XCOPY_ERR=%ERRORLEVEL%"
-
-if %XCOPY_ERR% GEQ 4 (
-    echo (ERROR) Copy failed, code: %XCOPY_ERR%
-    pause
-    exit /b 1
-) else (
-    echo (OK) Files copied, code: %XCOPY_ERR%
-)
-
-echo.
-echo (3/3) Cleaning package (optional)...
-REM rmdir /s /q "%SOURCE_DIR%"
-REM if exist "$downloadPathWin" del "$downloadPathWin"
-
-echo.
-echo ========================================
-echo           Update Finished!
-echo ========================================
-pause >nul
-''';
-  }
-
-  /// 生成测试版本的安装脚本（包含详细日志）
+  
+  /// 生成测试版本的安装脚本（简化版本）
   static String generateTestScript({
     required String extractedPath,
     required String downloadPath,
@@ -175,21 +16,59 @@ pause >nul
         .replaceAll('/', '\\');
     final downloadPathWin = downloadPath.replaceAll('/', '\\');
     
-    // 直接调用脚本模板文件
-    return _readScriptTemplate()
+    // 使用简化的脚本模板
+    return _getSimplifiedScriptTemplate()
         .replaceAll('\${appName}', appName)
         .replaceAll('\${sourceDir}', extractedPathWin)
         .replaceAll('\${targetDir}', targetDirWin)
         .replaceAll('\${zipPath}', downloadPathWin);
   }
 
-  /// 读取脚本模板内容
-  /// 返回Windows安装脚本模板字符串
-  static String _readScriptTemplate() {
-    // 直接使用内置模板，确保在所有环境下都能正常工作
-    return _getDefaultScriptTemplate();
+  /// 获取简化的脚本模板
+  static String _getSimplifiedScriptTemplate() {
+    return '''
+@echo off
+echo OMT Update Installer Starting...
+
+REM Wait for application to exit
+timeout /t 3 /nobreak >nul 2>&1
+
+REM Set variables
+set "APP_NAME=\${appName}"
+set "SOURCE_DIR=\${sourceDir}"
+set "TARGET_DIR=\${targetDir}"
+set "ZIP_PATH=\${zipPath}"
+
+echo Checking source: %SOURCE_DIR%
+if not exist "%SOURCE_DIR%" (
+    echo ERROR: Source not found
+    pause
+    exit /b 1
+)
+
+echo Preparing target: %TARGET_DIR%
+if not exist "%TARGET_DIR%" mkdir "%TARGET_DIR%"
+
+echo Copying files...
+robocopy "%SOURCE_DIR%" "%TARGET_DIR%" /E /R:1 /W:1 >nul
+if %ERRORLEVEL% GTR 7 (
+    echo ERROR: Copy failed
+    pause
+    exit /b 1
+)
+
+echo Cleaning up...
+if exist "%ZIP_PATH%" del "%ZIP_PATH%" >nul 2>&1
+
+echo Starting application...
+cd /d "%TARGET_DIR%"
+start "" "%APP_NAME%"
+
+echo Update completed!
+exit /b 0
+''';
   }
-  
+
   /// 获取默认的脚本模板（作为备用）
   static String _getDefaultScriptTemplate() {
     return '''
@@ -209,16 +88,28 @@ echo (SCRIPT) Application should be closed now, continuing...
 echo (SCRIPT) Starting update process...
 
 REM Detect Windows version and set encoding (silent)
-ver | find "Version 6.1" >nul 2>&1 && set "WIN7=1" || set "WIN7=0"
+set "WIN7=0"
+ver | find "Version 6.1" >nul 2>&1
+if %ERRORLEVEL% EQU 0 (
+    set "WIN7=1"
+) else (
+    set "WIN7=0"
+)
 if "%WIN7%"=="0" (
     chcp 65001 >nul 2>&1
 )
+echo (SCRIPT) Windows version detection completed, WIN7=%WIN7%
 
 set "APP_NAME=\${appName}"
 set "SOURCE_DIR=\${sourceDir}"
 set "TARGET_DIR=\${targetDir}"
 set "APP_PATH=%TARGET_DIR%\\%APP_NAME%"
 set "ZIP_PATH=\${zipPath}"
+
+echo (SCRIPT) Variables set:
+echo (SCRIPT) APP_NAME=%APP_NAME%
+echo (SCRIPT) SOURCE_DIR=%SOURCE_DIR%
+echo (SCRIPT) TARGET_DIR=%TARGET_DIR%
 
 REM Get script directory more reliably
 set "SCRIPT_DIR=%~dp0"
@@ -279,10 +170,13 @@ echo (ERROR) Failed to create target dir >> "%LOG_FILE%"
 goto error_end
 
 :step2_done
+echo (SCRIPT) Step 2 completed, proceeding to step 3...
+echo Step 2 completed, proceeding to step 3... >> "%LOG_FILE%"
 
 REM Step 3: Copying files (silent)
 echo (SCRIPT) (3/6) Copying files...
 echo (3/6) Copying files from "%SOURCE_DIR%" to "%TARGET_DIR%"... >> "%LOG_FILE%"
+echo (DEBUG) About to execute xcopy command... >> "%LOG_FILE%"
 xcopy "%SOURCE_DIR%\\*" "%TARGET_DIR%\\" /E /Y /I /R > "%TEMP%\\xcopy_output.txt" 2>&1
 set "XCOPY_ERR=%ERRORLEVEL%"
 type "%TEMP%\\xcopy_output.txt" >> "%LOG_FILE%"
