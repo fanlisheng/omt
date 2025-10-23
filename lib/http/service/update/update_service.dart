@@ -291,7 +291,7 @@ class UpdateService {
         await baseDir.create(recursive: true);
       }
 
-      final fileName = 'update.zip';
+      const fileName = 'update.zip';
       _downloadPath = '${baseDir.path}/$fileName';
       
       await logMessage('下载目录设置为: ${baseDir.path}');
