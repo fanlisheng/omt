@@ -74,7 +74,7 @@ class HomePageService {
 
   get _restartAiDevice => '/contrl/golang/restart';
 
-  get _restartAiDevicePython => '/contrl/python/restart';
+  get _restartAiDevicePython => '/new/contrl/python/restart';
 
   get _upgradeAiDeviceProgram =>
       '${API.share.host}api/device/ai_device/upgrade_program';
@@ -134,7 +134,6 @@ class HomePageService {
       .buildControlWebcamUrl(VideoConfigurationService.webcamRemove);
 
   get _eventStatusAi => '/event/status';
-
 
   getInstanceList(
     String areaCode, {
@@ -508,13 +507,13 @@ class HomePageService {
   /// 重启AI识别
   restartAiDevicePython({
     required String ip,
-    required ValueChanged<dynamic> onSuccess,
-    ValueChanged<dynamic>? onCache,
+    required ValueChanged<CodeMessageData?> onSuccess,
+    ValueChanged<CodeMessageData?>? onCache,
     ValueChanged<String>? onError,
   }) async {
     String url =
         '${API.share.hostDeviceConfiguration(ip)}$_restartAiDevicePython';
-    HttpManager.share.doHttpPost<dynamic>(
+    HttpManager.share.doHttpPost<CodeMessageData>(
       url,
       {},
       method: 'POST',
