@@ -15,7 +15,7 @@ import 'package:omt/page/home/device_add/widgets/add_power_view.dart';
 import 'package:omt/page/install/widgets/preview_page.dart';
 import 'package:omt/utils/color_utils.dart';
 import 'package:omt/utils/reset_manager.dart';
-import 'package:omt/services/install_cache_service.dart';
+import '../../../http/service/install/install_cache_service.dart';
 import '../../../widget/combobox.dart';
 import '../../../widget/nav/dnavigation_view.dart';
 import '../../../widget/searchable_dropdown.dart';

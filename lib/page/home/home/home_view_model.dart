@@ -19,13 +19,12 @@ import 'package:omt/utils/shared_utils.dart';
 import 'package:omt/utils/sys_utils.dart';
 import 'package:omt/widget/combobox.dart';
 import 'package:omt/widget/common_option_dialog.dart';
-import 'package:omt/services/install_cache_service.dart';
-import 'package:omt/router_utils.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:omt/widget/update/update_manager.dart';
 import 'package:omt/http/service/update/update_service.dart';
 import 'package:omt/utils/context_utils.dart';
 
+import '../../../http/service/install/install_cache_service.dart';
 import '../../../test/select_detail_page.dart';
 import '../search_device/widgets/search_device_screen.dart';
 import 'keep_alive_page.dart';

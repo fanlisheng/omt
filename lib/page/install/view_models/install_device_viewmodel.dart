@@ -12,7 +12,6 @@ import 'package:omt/page/home/device_add/view_models/add_power_box_viewmodel.dar
 import 'package:omt/page/home/device_add/view_models/add_power_viewmodel.dart';
 import 'package:omt/page/install/view_models/preview_viewmodel.dart';
 import 'package:omt/utils/reset_utils.dart';
-import 'package:omt/services/install_cache_service.dart';
 import 'package:omt/bean/install/install_cache_data.dart';
 
 import '../../../bean/common/id_name_value.dart';
@@ -21,6 +20,7 @@ import '../../../bean/home/home_page/device_detail_ai_entity.dart';
 import '../../../bean/home/home_page/device_detail_nvr_entity.dart';
 import '../../../bean/home/home_page/device_detail_power_box_entity.dart';
 import '../../../bean/home/home_page/device_entity.dart';
+import '../../../http/service/install/install_cache_service.dart';
 import '../../home/device_add/view_models/add_ai_viewmodel.dart';
 import '../../home/device_add/view_models/add_battery_exchange_viewmodel.dart';
 import '../../home/device_add/view_models/add_camera_viewmodel.dart';

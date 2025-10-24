@@ -167,7 +167,7 @@ class EditCameraViewModel extends BaseViewModelRefresh<dynamic> {
       LoadingUtils.show(data: "替换摄像头中...");
       await HttpQuery.share.homePageService.replaceCameraLocal(
         ip: cameraDevice.aiIp ?? "",
-        oldUdid: "",
+        oldUdid: deviceInfo.deviceCode ?? "",
         newUdid: cameraDevice.code ?? "",
         rtsp: cameraDevice.rtsp ?? "",
       );
