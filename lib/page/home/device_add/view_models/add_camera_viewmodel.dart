@@ -10,11 +10,17 @@ import 'package:omt/http/http_query.dart';
 import 'package:omt/utils/device_utils.dart';
 import 'package:omt/utils/hikvision_utils.dart';
 import 'package:omt/utils/intent_utils.dart';
+import 'package:omt/utils/sys_utils.dart';
+import 'package:omt/http/service/install/install_cache_service.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import '../../../../bean/home/home_page/device_detail_ai_entity.dart';
-import '../../../../http/service/install/install_cache_service.dart';
+import '../../../../bean/home/home_page/device_detail_camera_entity.dart';
+import '../../../../bean/video/video_configuration/Video_Connect_entity.dart';
 import '../../../../router_utils.dart';
+import '../../../../utils/image_utils.dart';
+import '../../../../utils/shared_utils.dart';
 import '../../photo_preview/widgets/photo_preview_screen.dart';
+import '../../search_device/services/device_search_service.dart';
 import '../strategies/camera_operation_strategy.dart';
 import '../strategies/camera_operation_strategy_factory.dart';
 
