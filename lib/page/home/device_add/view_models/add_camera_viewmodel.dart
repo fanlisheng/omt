@@ -585,7 +585,7 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
   restartRecognitionAction(CameraDeviceEntity cameraDeviceEntity) {
     notifyListeners();
     HttpQuery.share.homePageService.restartAiDevicePython(
-      ip: cameraDeviceEntity.selectedAi?.deviceCode ?? "",
+      ip: cameraDeviceEntity.selectedAi?.ip ?? "",
       onSuccess: (a) {
         LoadingUtils.showToast(data: "重启识别成功!");
       },
