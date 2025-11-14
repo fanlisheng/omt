@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:fluent_ui/fluent_ui.dart' as fu;
 import 'package:flutter/cupertino.dart';
@@ -258,6 +259,7 @@ class _MyHomePageState extends State<MyHomePage>
               GlobalWidgetsLocalizations.delegate,
               FallbackCupertinoLocalisationsDelegate(),
             ],
+            scrollBehavior: AppScrollBehavior(),
             supportedLocales: const [
               Locale('zh', 'CN'),
               Locale('en', 'US'),
@@ -416,4 +418,14 @@ class WindowButtons extends StatelessWidget {
       ),
     );
   }
+}
+class AppScrollBehavior extends MaterialScrollBehavior {
+  // 允许鼠标拖动和触摸拖动
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+    PointerDeviceKind.stylus,
+    PointerDeviceKind.unknown,
+  };
 }
