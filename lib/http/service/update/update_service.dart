@@ -29,6 +29,31 @@ class UpdateService {
   final FileLogUtils _fileLogger = FileLogUtils();
   CancelToken? _cancelToken;
   final String _logType = 'update';
+  // 获取项目目录（使用FileLogUtils统一管理）
+  Future<String> _getProjectDirectory() async {
+    final projectDir = await _fileLogger.getProjectDirectory();
+    await logMessage('DEBUG: 从FileLogUtils获取项目目录: $projectDir');
+    return projectDir;
+  }
+
+  // 清除项目目录缓存（委托给FileLogUtils）
+  void _clearProjectDirectoryCache() {
+    _fileLogger.clearProjectDirectoryCache();
+    logMessage('DEBUG: 项目目录缓存已清除（通过FileLogUtils）');
+  }
+
+  // 初始化更新服务，确保日志系统正确配置
+  Future<void> initialize() async {
+    await logMessage('=== UpdateService 初始化开始 ===');
+    try {
+      // 获取项目目录（FileLogUtils会自动管理缓存和配置）
+      final projectDir = await _getProjectDirectory();
+      await logMessage('UpdateService 初始化完成，项目目录: $projectDir');
+    } catch (e) {
+      await logMessage('UpdateService 初始化失败: $e');
+    }
+    await logMessage('=== UpdateService 初始化结束 ===');
+  }
 
   // 获取当前版本信息
   Future<PackageInfo> getCurrentVersion() async {
@@ -38,6 +63,160 @@ class UpdateService {
   /// 记录日志到文件
   Future<void> logMessage(String message) async {
     await _fileLogger.log(_logType, message);
+  }
+
+  /// 测试脚本创建和执行（用于诊断）
+  Future<Map<String, dynamic>> testScriptCreation() async {
+    final result = <String, dynamic>{};
+    
+    try {
+      await logMessage('=== 开始脚本创建测试 ===');
+      await logMessage('日志文件位置: 项目目录/logs/update_YYYYMMDD.log');
+      
+      // 1. 检查平台
+      result['platform'] = Platform.operatingSystem;
+      result['isWindows'] = Platform.isWindows;
+      await logMessage('平台检查: ${result['platform']}, isWindows: ${result['isWindows']}');
+      
+      if (!Platform.isWindows) {
+        result['error'] = '非Windows平台';
+        return result;
+      }
+      
+      // 2. 获取应用程序目录（使用FileLogUtils统一管理）
+      final projectDir = await _getProjectDirectory();
+      final appDir = Directory(projectDir);
+      result['appDir'] = appDir.path;
+      result['appDirExists'] = await appDir.exists();
+      await logMessage('应用程序目录: ${appDir.path}, 存在: ${result['appDirExists']}');
+      
+      // 3. 为测试目的，临时设置模拟的解压路径
+      final originalExtractedPath = _extractedPath;
+      final originalDownloadPath = _downloadPath;
+      String? scriptPath;
+      
+      try {
+        // 设置模拟路径用于测试 - 使用FileLogUtils统一获取项目目录
+        final projectDir = await _getProjectDirectory();
+        
+        _extractedPath = '$projectDir/test_update_extracted';
+        _downloadPath = '$projectDir/test_update.zip';
+        
+        await logMessage('项目目录: $projectDir');
+        await logMessage('测试用解压路径: $_extractedPath');
+        await logMessage('测试用下载路径: $_downloadPath');
+        
+        // 创建脚本
+        scriptPath = await _createInstallScript();
+        result['scriptPath'] = scriptPath;
+        result['scriptCreated'] = scriptPath != null;
+        await logMessage('脚本路径: $scriptPath, 创建成功: ${result['scriptCreated']}');
+        
+        // 恢复原始路径
+        _extractedPath = originalExtractedPath;
+        _downloadPath = originalDownloadPath;
+      } catch (e) {
+        // 确保恢复原始路径
+        _extractedPath = originalExtractedPath;
+        _downloadPath = originalDownloadPath;
+        rethrow;
+      }
+      
+      if (scriptPath == null) {
+        result['error'] = '脚本创建失败';
+        return result;
+      }
+      
+      // 4. 验证脚本文件
+      final scriptFile = File(scriptPath);
+      result['scriptExists'] = await scriptFile.exists();
+      await logMessage('脚本文件存在: ${result['scriptExists']}');
+      
+      if (result['scriptExists']) {
+        final fileSize = await scriptFile.length();
+        result['scriptSize'] = fileSize;
+        await logMessage('脚本文件大小: $fileSize 字节');
+        
+        // 读取脚本内容
+        try {
+          final content = await scriptFile.readAsString();
+          result['scriptContentLength'] = content.length;
+          result['scriptFirstLine'] = content.split('\n').first;
+          await logMessage('脚本内容长度: ${content.length}');
+          await logMessage('脚本第一行: ${result['scriptFirstLine']}');
+        } catch (e) {
+          result['scriptReadError'] = e.toString();
+          await logMessage('读取脚本内容失败: $e');
+        }
+      }
+      
+      // 5. 检查cmd命令可用性
+      try {
+        final cmdResult = await Process.run('cmd', ['/c', 'echo', 'test']);
+        result['cmdAvailable'] = cmdResult.exitCode == 0;
+        result['cmdOutput'] = cmdResult.stdout.toString().trim();
+        await logMessage('cmd命令可用: ${result['cmdAvailable']}, 输出: ${result['cmdOutput']}');
+      } catch (e) {
+        result['cmdError'] = e.toString();
+        await logMessage('cmd命令测试失败: $e');
+      }
+      
+      // 6. 测试脚本执行（不实际启动，只测试命令构造）
+       if (result['scriptExists']) {
+         try {
+           // 测试不同的启动方式
+           final testCommands = [
+             {'exe': 'cmd', 'args': ['/c', scriptPath]},
+             {'exe': 'cmd', 'args': ['/c', 'start', '/min', scriptPath]},
+           ];
+           
+           for (int i = 0; i < testCommands.length; i++) {
+             final cmd = testCommands[i];
+             try {
+               // 只测试命令构造，不实际执行
+               final exe = cmd['exe'] as String;
+               final args = cmd['args'] as List<String>;
+               await logMessage('测试命令 ${i + 1}: $exe ${args.join(' ')}');
+               result['testCommand${i + 1}'] = '$exe ${args.join(' ')}';
+             } catch (e) {
+               result['testCommand${i + 1}Error'] = e.toString();
+               await logMessage('测试命令 ${i + 1} 失败: $e');
+             }
+           }
+         } catch (e) {
+           result['commandTestError'] = e.toString();
+           await logMessage('命令测试失败: $e');
+         }
+       }
+      
+      // 7. 检查工作目录权限
+      try {
+        final workDir = Directory(scriptPath).parent;
+        result['workDir'] = workDir.path;
+        result['workDirExists'] = await workDir.exists();
+        
+        // 尝试在工作目录创建测试文件
+        final testFile = File('${workDir.path}/test_permissions.txt');
+        await testFile.writeAsString('test');
+        result['workDirWritable'] = await testFile.exists();
+        if (result['workDirWritable']) {
+          await testFile.delete();
+        }
+        await logMessage('工作目录: ${workDir.path}, 可写: ${result['workDirWritable']}');
+      } catch (e) {
+        result['workDirError'] = e.toString();
+        await logMessage('工作目录权限测试失败: $e');
+      }
+      
+      await logMessage('=== 脚本创建测试完成 ===');
+      result['success'] = true;
+      
+    } catch (e) {
+      result['error'] = e.toString();
+      await logMessage('脚本创建测试失败: $e');
+    }
+    
+    return result;
   }
 
   // 检查更新
@@ -104,19 +283,18 @@ class UpdateService {
     _cancelToken = CancelToken();
 
     try {
-      Directory baseDir;
-      if (Platform.isWindows) {
-        final downloads = await getDownloadsDirectory();
-        baseDir = downloads ?? await getApplicationDocumentsDirectory();
-      } else {
-        baseDir = await getApplicationDocumentsDirectory();
-      }
+      // 使用统一的项目目录获取方法
+      final projectDir = await _getProjectDirectory();
+      
+      final baseDir = Directory('$projectDir/downloads');
       if (!await baseDir.exists()) {
         await baseDir.create(recursive: true);
       }
 
-      final fileName = 'update_${updateInfo.version}.zip';
+      const fileName = 'update.zip';
       _downloadPath = '${baseDir.path}/$fileName';
+      
+      await logMessage('下载目录设置为: ${baseDir.path}');
 
       final targetFile = File(_downloadPath!);
       if (await targetFile.exists()) {
@@ -188,34 +366,24 @@ class UpdateService {
     if (_extractedPath == null) return null;
     
     try {
-      final appDir = await getApplicationDocumentsDirectory();
-      final scriptDir = Directory('${appDir.path}/install_scripts');
+      // 使用统一的项目目录获取方法
+      final projectDir = await _getProjectDirectory();
+      
+      final scriptDir = Directory('$projectDir${Platform.pathSeparator}install_scripts');
       if (!await scriptDir.exists()) {
         await scriptDir.create(recursive: true);
       }
+      
+      await logMessage('脚本存储目录: ${scriptDir.path}');
 
       String scriptPath;
       String scriptContent;
       
       if (Platform.isWindows) {
-        scriptPath = '${scriptDir.path}/install_update.bat';
-        // 获取当前应用程序的目录作为目标目录
-        // 在Windows环境下，使用更可靠的方法获取应用程序目录
-        String currentAppDir;
-        try {
-          final currentExePath = Platform.resolvedExecutable;
-          currentAppDir = Directory(currentExePath).parent.path;
-          await logMessage('从Platform.resolvedExecutable获取目录: $currentAppDir');
-          
-          // 如果路径包含flutter工具链路径，则使用提取路径的父目录作为目标
-          if (currentAppDir.contains('flutter') || currentAppDir.contains('cache')) {
-            currentAppDir = Directory(_extractedPath!).parent.path;
-            await logMessage('检测到开发环境，使用提取路径的父目录: $currentAppDir');
-          }
-        } catch (e) {
-          await logMessage('获取应用程序目录失败，使用提取路径的父目录: $e');
-          currentAppDir = Directory(_extractedPath!).parent.path;
-        }
+        scriptPath = '${scriptDir.path}${Platform.pathSeparator}install_update.bat';
+        // 使用项目目录作为安装目标目录
+        String currentAppDir = projectDir;
+        await logMessage('使用项目目录作为安装目标: $currentAppDir');
         
         scriptContent = WindowsInstallScript.generateTestScript(
           extractedPath: _extractedPath!,
@@ -261,11 +429,13 @@ class UpdateService {
       }
 
       await logMessage('开始安装更新流程');
+      await logMessage('当前工作目录: ${Directory.current.path}');
+      await logMessage('Platform.resolvedExecutable: ${Platform.resolvedExecutable}');
       
       // 创建安装脚本
       final scriptPath = await _createInstallScript();
       if (scriptPath == null) {
-        await logMessage('创建安装脚本失败');
+        await logMessage('ERROR: 创建安装脚本失败');
         return false;
       }
 
@@ -273,34 +443,179 @@ class UpdateService {
       await logMessage('解压路径: $_extractedPath');
       await logMessage('下载路径: $_downloadPath');
 
-      // 启动安装脚本
-      try {
-        final process = await Process.start('cmd', ['/c', scriptPath], 
-          mode: ProcessStartMode.detached);
-        await logMessage('Windows安装脚本已启动，PID: ${process.pid}');
-        
-        // 等待脚本完全启动
-        await Future.delayed(Duration(milliseconds: 500));
-        await logMessage('脚本启动延迟完成');
-        
-      } catch (e) {
-        await logMessage('启动安装脚本失败，详细错误: $e');
+      // 验证脚本文件
+      final scriptFile = File(scriptPath);
+      if (!await scriptFile.exists()) {
+        await logMessage('ERROR: 脚本文件不存在: $scriptPath');
+        return false;
+      }
+      
+      final fileSize = await scriptFile.length();
+      await logMessage('脚本文件大小: $fileSize 字节');
+      
+      if (fileSize == 0) {
+        await logMessage('ERROR: 脚本文件为空');
         return false;
       }
 
-      await logMessage('安装脚本启动成功，应用将退出...');
+      // 脚本内部已包含延迟，直接启动
+      await logMessage('开始执行安装脚本');
+
+      // 读取脚本内容的前几行进行验证
+      try {
+        final lines = await scriptFile.readAsLines();
+        await logMessage('脚本总行数: ${lines.length}');
+        if (lines.isNotEmpty) {
+          await logMessage('脚本第一行: ${lines.first}');
+        }
+        if (lines.length > 1) {
+          await logMessage('脚本第二行: ${lines[1]}');
+        }
+      } catch (e) {
+        await logMessage('WARNING: 无法读取脚本内容进行验证: $e');
+      }
+
+      // 启动安装脚本（静默模式）
+      await logMessage('准备启动安装脚本（静默模式）...');
       
-      // 退出应用，让脚本接管更新过程
-      await logMessage('正在退出应用...');
+      // 获取脚本所在目录作为工作目录
+      final scriptDir = File(scriptPath).parent.path;
+      await logMessage('脚本工作目录: $scriptDir');
       
-      // 退出应用
-      exit(0);
+      // 检查脚本文件是否可执行
+      final scriptFileCheck = File(scriptPath);
+      if (!await scriptFileCheck.exists()) {
+        await logMessage('ERROR: 脚本文件不存在: $scriptPath');
+        return false;
+      }
       
-      return true;
+      // 尝试多种异步启动方式
+      bool scriptStarted = false;
+      
+      try {
+        
+        // 方法0: 使用 cmd /c 正确执行 bat 文件
+        if (!scriptStarted) {
+          try {
+            await logMessage('尝试方法0: 使用cmd /c执行bat文件');
+            await logMessage('启动脚本: $scriptPath');
+            // 使用 cmd /c 来正确执行 .bat 文件
+            final process = await Process.start(
+              'cmd', 
+              ['/c', scriptPath],
+              workingDirectory: scriptDir,
+              mode: ProcessStartMode.detached,
+            );
+            await logMessage('方法0成功: 脚本进程已启动，PID: ${process.pid}');
+            scriptStarted = true;
+          } catch (e0) {
+            await logMessage('方法0失败: $e0');
+          }
+        }
+        
+        // 方法1: 使用 cmd start 异步启动（隐藏窗口）
+        if (!scriptStarted) {
+          try {
+            await logMessage('尝试方法1: CMD异步启动（隐藏窗口）');
+            await logMessage('执行命令: cmd /c start /MIN "" "$scriptPath"');
+            await logMessage('工作目录: $scriptDir');
+            // 使用 start /MIN 命令异步启动并最小化窗口
+            final process = await Process.start('cmd', ['/c', 'start', '/MIN', '', scriptPath], 
+              workingDirectory: scriptDir,
+              mode: ProcessStartMode.detached);
+            await logMessage('方法1成功: 安装脚本已异步启动（隐藏窗口），PID: ${process.pid}');
+            scriptStarted = true;
+          } catch (e1) {
+            await logMessage('方法1失败: $e1');
+          }
+        }
+        
+        // 方法2: 使用 PowerShell 隐藏窗口启动
+        if (!scriptStarted) {
+          try {
+            await logMessage('尝试方法2: PowerShell隐藏窗口启动');
+            await logMessage('执行命令: powershell -WindowStyle Hidden -Command "Start-Process \\"$scriptPath\\" -WindowStyle Hidden"');
+            final result = await Process.run('powershell', [
+              '-WindowStyle', 'Hidden',
+              '-Command', 'Start-Process "$scriptPath" -WindowStyle Hidden'
+            ], workingDirectory: scriptDir);
+            if (result.exitCode == 0) {
+              await logMessage('方法2成功: 安装脚本已通过PowerShell隐藏启动');
+              scriptStarted = true;
+            } else {
+              await logMessage('方法2失败: 退出码 ${result.exitCode}');
+              await logMessage('stderr: ${result.stderr}');
+            }
+          } catch (e2) {
+            await logMessage('方法2失败: $e2');
+          }
+        }
+        
+        // 方法3: 使用 wscript 完全静默启动
+        if (!scriptStarted) {
+          try {
+            await logMessage('尝试方法3: WScript静默启动');
+            // 创建临时VBS脚本来静默启动批处理文件
+            final vbsPath = '${scriptDir}${Platform.pathSeparator}silent_start.vbs';
+            final vbsContent = '''
+Set WshShell = CreateObject("WScript.Shell")
+WshShell.Run """$scriptPath""", 0, False
+''';
+            await File(vbsPath).writeAsString(vbsContent);
+            await logMessage('VBS脚本已创建: $vbsPath');
+            
+            final result = await Process.run('wscript', [vbsPath], 
+              workingDirectory: scriptDir);
+            if (result.exitCode == 0) {
+              await logMessage('方法3成功: 安装脚本已通过VBS静默启动');
+              scriptStarted = true;
+            } else {
+              await logMessage('方法3失败: 退出码 ${result.exitCode}');
+              await logMessage('stderr: ${result.stderr}');
+            }
+          } catch (e3) {
+            await logMessage('方法3失败: $e3');
+          }
+        }
+        
+        // 如果所有方法都失败了
+        if (!scriptStarted) {
+          await logMessage('ERROR: 所有启动方法都失败了');
+          await logMessage('WARNING: 即使脚本启动失败，也将退出应用以释放文件锁定');
+        } else {
+          await logMessage('脚本已成功启动（异步模式）');
+        }
+        
+      } catch (e) {
+        await logMessage('启动安装脚本失败，详细错误: $e');
+        await logMessage('错误类型: ${e.runtimeType}');
+        if (e is ProcessException) {
+          await logMessage('ProcessException详情:');
+          await logMessage('  executable: ${e.executable}');
+          await logMessage('  arguments: ${e.arguments}');
+          await logMessage('  message: ${e.message}');
+          await logMessage('  errorCode: ${e.errorCode}');
+        }
+        return false;
+      }
+
+      await logMessage('安装脚本启动成功，应用将立即退出...');
+      
+      // 立即退出应用，让脚本处理延迟
+      await logMessage('脚本已启动，立即退出应用以释放文件锁定...');
+      await _forceExitApp(0);
     } catch (e) {
-      await logMessage('启动安装脚本失败: $e');
-      return false;
+      await logMessage('installUpdate总体失败: $e');
+      await logMessage('错误堆栈: ${StackTrace.current}');
+      await logMessage('ERROR: 更新过程中发生异常，但仍将强制退出应用以释放文件锁定');
+      
+      // 即使发生异常也要退出应用，避免文件被占用
+      await _forceExitApp(1); // 使用退出码1表示异常退出
     }
+    
+    // 这行代码永远不会执行，因为上面总是调用exit()
+    // 但是为了满足返回类型要求而添加
+    return false;
   }
 
   // 解压ZIP更新包
@@ -308,8 +623,11 @@ class UpdateService {
     if (_downloadPath == null) return false;
 
     try {
-      final appDir = await getApplicationDocumentsDirectory();
-      _extractedPath = '${appDir.path}/update_extracted';
+      // 使用统一的项目目录获取方法
+      final projectDir = await _getProjectDirectory();
+      
+      _extractedPath = '$projectDir/update_extracted';
+      await logMessage('解压目录设置为: $_extractedPath');
 
       // 创建解压目录
       final extractDir = Directory(_extractedPath!);
@@ -505,5 +823,33 @@ class UpdateService {
   Future<void> clearLocalUpdateInfo() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('lastUpdateInfo');
+  }
+
+  // 强制退出应用程序
+  Future<void> _forceExitApp(int exitCode) async {
+    await logMessage('强制退出应用，退出码: $exitCode');
+    
+    // 多重保障退出机制
+    try {
+      // 方法1: 直接调用 exit()
+      await logMessage('尝试方法1: 直接调用 exit()');
+      exit(exitCode);
+    } catch (e) {
+      await logMessage('方法1失败: $e');
+      
+      try {
+        // 方法2: 使用 Future.delayed 后退出
+        await logMessage('尝试方法2: 延迟后退出');
+        Future.delayed(Duration(milliseconds: 10), () => exit(exitCode));
+        await Future.delayed(Duration(milliseconds: 50));
+        exit(exitCode); // 备用退出
+      } catch (e2) {
+        await logMessage('方法2失败: $e2');
+        
+        // 方法3: 最后的保障 - 直接退出
+        await logMessage('执行最后保障退出');
+        exit(exitCode);
+      }
+    }
   }
 }

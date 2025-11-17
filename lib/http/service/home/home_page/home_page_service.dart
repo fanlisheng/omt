@@ -51,6 +51,9 @@ class HomePageService {
 
   get _bindGate => '${API.share.host}api/device/bind_gate';
 
+  /// 取消安装
+  get _cancelInstall => '${API.share.host}api/device/cancel_install';
+
   get _deviceDetailAi => '${API.share.host}api/device/ai_device/detail';
 
   get _deviceDetailNvr => '${API.share.host}api/device/nvr/detail';
@@ -74,7 +77,7 @@ class HomePageService {
 
   get _restartAiDevice => '/contrl/golang/restart';
 
-  get _restartAiDevicePython => '/contrl/python/restart';
+  get _restartAiDevicePython => '/new/contrl/python/restart';
 
   get _upgradeAiDeviceProgram =>
       '${API.share.host}api/device/ai_device/upgrade_program';
@@ -134,7 +137,6 @@ class HomePageService {
       .buildControlWebcamUrl(VideoConfigurationService.webcamRemove);
 
   get _eventStatusAi => '/event/status';
-
 
   getInstanceList(
     String areaCode, {
@@ -241,6 +243,24 @@ class HomePageService {
       method: 'POST',
       autoHideDialog: false,
       autoShowDialog: false,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+  /// 取消安装流程
+  cancelInstall({
+    required ValueChanged<CodeMessageData?> onSuccess,
+    ValueChanged<CodeMessageData?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<CodeMessageData>(
+      await _cancelInstall,
+      {},
+      method: 'POST',
+      autoHideDialog: true,
+      autoShowDialog: true,
       onSuccess: onSuccess,
       onCache: onCache,
       onError: onError,
@@ -508,13 +528,13 @@ class HomePageService {
   /// 重启AI识别
   restartAiDevicePython({
     required String ip,
-    required ValueChanged<dynamic> onSuccess,
-    ValueChanged<dynamic>? onCache,
+    required ValueChanged<CodeMessageData?> onSuccess,
+    ValueChanged<CodeMessageData?>? onCache,
     ValueChanged<String>? onError,
   }) async {
     String url =
         '${API.share.hostDeviceConfiguration(ip)}$_restartAiDevicePython';
-    HttpManager.share.doHttpPost<dynamic>(
+    HttpManager.share.doHttpPost<CodeMessageData>(
       url,
       {},
       method: 'POST',

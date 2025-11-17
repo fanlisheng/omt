@@ -4,10 +4,11 @@ import 'package:omt/bean/install/install_cache_data.dart';
 import 'package:omt/bean/home/home_page/camera_device_entity.dart';
 import 'package:omt/bean/home/home_page/device_detail_ai_entity.dart';
 import 'package:omt/bean/common/id_name_value.dart';
+import 'package:omt/utils/shared_utils.dart';
 
 /// 安装设备缓存服务
 class InstallCacheService {
-  static const String _cacheKey = 'install_device_cache';
+  static const String _baseCacheKey = 'install_device_cache';
   static InstallCacheService? _instance;
   
   // 标志位：是否应该从首页恢复缓存
@@ -35,12 +36,28 @@ class InstallCacheService {
     _shouldRestoreFromHome = false;
   }
   
+  /// 获取用户特定的缓存key
+  Future<String> _getUserCacheKey() async {
+    try {
+      final userInfo = await SharedUtils.getUserInfo();
+      if (userInfo?.phone != null && userInfo!.phone!.isNotEmpty) {
+        return '${_baseCacheKey}_${userInfo.phone}';
+      }
+      // 如果没有用户信息，使用默认key
+      return _baseCacheKey;
+    } catch (e) {
+      print('获取用户缓存key失败: $e');
+      return _baseCacheKey;
+    }
+  }
+  
   /// 保存缓存数据
   Future<bool> saveCacheData(InstallCacheData cacheData) async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      final cacheKey = await _getUserCacheKey();
       final jsonString = jsonEncode(cacheData.toJson());
-      return await prefs.setString(_cacheKey, jsonString);
+      return await prefs.setString(cacheKey, jsonString);
     } catch (e) {
       print('保存安装缓存数据失败: $e');
       return false;
@@ -51,7 +68,8 @@ class InstallCacheService {
   Future<InstallCacheData?> getCacheData() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final jsonString = prefs.getString(_cacheKey);
+      final cacheKey = await _getUserCacheKey();
+      final jsonString = prefs.getString(cacheKey);
       if (jsonString != null && jsonString.isNotEmpty) {
         final jsonMap = jsonDecode(jsonString) as Map<String, dynamic>;
         return InstallCacheData.fromJson(jsonMap);
@@ -78,7 +96,8 @@ class InstallCacheService {
   Future<bool> clearCacheData() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      return await prefs.remove(_cacheKey);
+      final cacheKey = await _getUserCacheKey();
+      return await prefs.remove(cacheKey);
     } catch (e) {
       print('清除安装缓存数据失败: $e');
       return false;

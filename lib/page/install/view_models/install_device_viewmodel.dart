@@ -12,7 +12,7 @@ import 'package:omt/page/home/device_add/view_models/add_power_box_viewmodel.dar
 import 'package:omt/page/home/device_add/view_models/add_power_viewmodel.dart';
 import 'package:omt/page/install/view_models/preview_viewmodel.dart';
 import 'package:omt/utils/reset_utils.dart';
-import 'package:omt/services/install_cache_service.dart';
+import 'package:omt/http/service/install/install_cache_service.dart';
 import 'package:omt/bean/install/install_cache_data.dart';
 
 import '../../../bean/common/id_name_value.dart';

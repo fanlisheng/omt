@@ -1,5 +1,5 @@
 import 'dart:ffi';
-
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,6 +14,7 @@ import 'package:omt/utils/device_utils.dart';
 import 'package:omt/utils/intent_utils.dart';
 import 'package:omt/utils/log_utils.dart';
 import 'package:omt/utils/shared_utils.dart';
+import 'package:window_manager/window_manager.dart';
 
 import '../../../bean/common/id_name_value.dart';
 import '../../../http/http_query.dart';
@@ -276,6 +277,34 @@ class UserLoginViewModel extends BaseViewModelRefresh<UserInfoData> {
     }
     _macAddress = macAddress;
     notifyListeners();
+  }
+
+  /// 最小化窗口
+  void minimizeWindow() async {
+    try {
+      await windowManager.minimize();
+    } catch (e) {
+      LogUtils.info(msg: '最小化窗口失败: $e');
+    }
+  }
+
+  /// 关闭程序
+  void closeApplication() async {
+    try {
+       windowManager.close();
+      exit(0);
+    } catch (e) {
+      LogUtils.info(msg: '关闭程序失败: $e');
+    }
+  }
+
+  /// 开始拖动窗口
+  void startDragging() async {
+    try {
+      await windowManager.startDragging();
+    } catch (e) {
+      LogUtils.info(msg: '拖动窗口失败: $e');
+    }
   }
 
 }

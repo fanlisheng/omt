@@ -8,10 +8,10 @@ import 'package:omt/bean/video/video_configuration/Video_Connect_entity.dart';
 import 'package:omt/http/http_query.dart';
 import 'package:omt/utils/device_utils.dart';
 import 'package:omt/utils/sys_utils.dart';
+import '../../../../http/service/install/install_cache_service.dart';
 import '../../../../utils/dialog_utils.dart';
 import '../../search_device/services/device_search_service.dart';
 import '../widgets/ai_search_view.dart';
-import '../../../../services/install_cache_service.dart';
 import '../../../../bean/install/install_cache_data.dart';
 
 class AddAiViewModel extends BaseViewModelRefresh<dynamic> {

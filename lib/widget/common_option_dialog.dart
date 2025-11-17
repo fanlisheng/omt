@@ -1,4 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart' show Shortcuts, DoNothingIntent, Intent, ShortcutActivator, SingleActivator;
 import 'package:kayo_package/extension/_index_extension.dart';
 import 'package:kayo_package/views/widget/base/clickable.dart';
 
@@ -40,7 +42,12 @@ class BaseCommonDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ContentDialog(
+    return Shortcuts(
+      shortcuts: const <ShortcutActivator, Intent>{
+        // 禁用 ESC 键关闭对话框
+        SingleActivator(LogicalKeyboardKey.escape): DoNothingIntent(),
+      },
+      child: ContentDialog(
       constraints: BoxConstraints(
         maxWidth: width,
         maxHeight: height,
@@ -106,6 +113,7 @@ class BaseCommonDialog extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }

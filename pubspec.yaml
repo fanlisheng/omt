@@ -1,7 +1,7 @@
 name: omt
 description: "Operation and maintenance tools"
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 1.0.7+7
+version: 1.1.6+16
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
@@ -89,5 +89,5 @@ flutter:
 #  dart pub global activate flutter_cors
 #  fluttercors --disable
 
-#    http://192.168.101.189:3000/a.mkv
+#    http://.192.168.101.189:3000/a.mkv
 # https://blog.csdn.net/weixin_43787969/article/details/131086842

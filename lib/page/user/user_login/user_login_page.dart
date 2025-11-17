@@ -46,10 +46,37 @@ class UserLoginPage extends StatelessWidget {
               ),
               child: Stack(
                 children: [
+                  // 背景图片 - 可拖动区域
                   Positioned.fill(
-                    child: ImageView(
-                      src: source('login/ic_bg'),
-                      fit: BoxFit.cover,
+                    child: GestureDetector(
+                      onPanStart: (details) {
+                        model.startDragging();
+                      },
+                      child: ImageView(
+                        src: source('login/ic_bg'),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  // 拖动区域 - 覆盖整个窗口但排除交互元素
+                  Positioned.fill(
+                    child: GestureDetector(
+                      onPanStart: (details) {
+                        // 检查点击位置是否在登录表单区域内
+                        final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
+                        if (renderBox != null) {
+                          final size = renderBox.size;
+                          final rightAreaStart = size.width * 560 / 1280; // 根据flex比例计算
+                          
+                          // 如果点击在左侧空白区域，允许拖动
+                          if (details.localPosition.dx < rightAreaStart) {
+                            model.startDragging();
+                          }
+                        }
+                      },
+                      child: Container(
+                        color: ColorUtils.transparent,
+                      ),
                     ),
                   ),
                   Row(
@@ -68,6 +95,14 @@ class UserLoginPage extends StatelessWidget {
                         ),
                       ),
                     ],
+                  ),
+                  // 顶部拖动区域
+                  _buildDragArea(model),
+                  // 窗口控制按钮
+                  Positioned(
+                    top: 16,
+                    right: 16,
+                    child: _buildWindowControls(model),
                   ),
                 ],
               ));
@@ -195,6 +230,105 @@ class UserLoginPage extends StatelessWidget {
             fontSize: 14,
             color: ColorUtils.colorBlackLiteLite,
             fontWeight: FontWeight.w400),
+      ),
+    );
+  }
+
+  /// 构建窗口控制按钮
+  Widget _buildWindowControls(UserLoginViewModel model) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // 最小化按钮
+        Container(
+          width: 32,
+          height: 32,
+          margin: const EdgeInsets.only(right: 8),
+          decoration: BoxDecoration(
+            color: ColorUtils.colorBlack.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Material(
+            color: ColorUtils.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(4),
+              onTap: () {
+                model.minimizeWindow();
+              },
+              child: const Icon(
+                Icons.minimize,
+                color: ColorUtils.colorWhite,
+                size: 16,
+              ),
+            ),
+          ),
+        ),
+        // 关闭按钮
+        Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            color: ColorUtils.colorRed.withOpacity(0.8),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Material(
+            color: ColorUtils.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(4),
+              onTap: () {
+                model.closeApplication();
+              },
+              child: const Icon(
+                Icons.close,
+                color: ColorUtils.colorWhite,
+                size: 16,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// 构建拖动区域
+  Widget _buildDragArea(UserLoginViewModel model) {
+    return Positioned(
+      top: 0,
+      left: 0,
+      right: 0,
+      height: 60,
+      child: GestureDetector(
+        onPanStart: (details) {
+          // 检查是否点击在窗口控制按钮区域
+          final buttonAreaWidth = 80; // 按钮区域宽度
+          final screenWidth = MediaQuery.of(model.context!).size.width;
+          
+          if (details.localPosition.dx < screenWidth - buttonAreaWidth) {
+            model.startDragging();
+          }
+        },
+        child: Container(
+          color: ColorUtils.transparent,
+          child: Row(
+            children: [
+              Expanded(
+                child: Container(
+                  alignment: Alignment.centerLeft,
+                  padding: const EdgeInsets.only(left: 16),
+                  child: Text(
+                    '福立盟运维配置客户端',
+                    style: TextStyle(
+                      color: ColorUtils.colorWhite.withOpacity(0.8),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 80), // 为窗口控制按钮预留空间
+            ],
+          ),
+        ),
       ),
     );
   }

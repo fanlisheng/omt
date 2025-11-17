@@ -3,165 +3,8 @@ import 'dart:io';
 /// Windows安装脚本模板
 /// 用于生成自动更新安装的批处理脚本
 class WindowsInstallScript {
-  /// 生成Windows安装脚本内容
-  /// 
-  /// [extractedPath] 解压后的文件路径
-  /// [downloadPath] 下载的ZIP文件路径
-  /// [appName] 应用名称，默认为omt.exe
-  /// [targetDir] 目标安装目录，如果为空则使用解压目录的父目录
-  static String generateScript({
-    required String extractedPath,
-    required String downloadPath,
-    String appName = 'omt.exe',
-    String? targetDir,
-  }) {
-    final extractedPathWin = extractedPath.replaceAll('/', '\\');
-    final targetDirWin = (targetDir ?? Directory(extractedPath).parent.path).replaceAll('/', '\\');
-    final downloadPathWin = downloadPath.replaceAll('/', '\\');
-    
-    return '''
-@echo off
-title OMT Update Installer - Please Wait...
-chcp 65001 >nul
-echo ========================================
-echo           Client Update Script
-echo ========================================
-echo.
-
-REM ===== CONFIG =====
-set "APP_NAME=$appName"
-set "SOURCE_DIR=$extractedPathWin"
-set "TARGET_DIR=$targetDirWin"
-set "APP_PATH=%TARGET_DIR%\\%APP_NAME%"
-REM ==================
-
-echo [1/5] Killing old process: %APP_NAME% ...
-taskkill /IM "%APP_NAME%" /F >nul 2>&1
-timeout /t 2 >nul
-
-echo.
-echo [2/5] Checking update package...
-if not exist "%SOURCE_DIR%" (
-    echo [ERROR] Source dir not found: %SOURCE_DIR%
-    pause
-    exit /b 1
-)
-
-if not exist "%TARGET_DIR%" (
-    echo Target dir not found, creating...
-    mkdir "%TARGET_DIR%"
-    if errorlevel 1 (
-        echo [ERROR] Failed to create target dir
-        pause
-        exit /b 1
-    )
-    echo Target dir created
-)
-
-echo.
-echo [3/5] Copying files...
-xcopy "%SOURCE_DIR%\\*" "%TARGET_DIR%\\" /E /Y /I /R
-set "XCOPY_ERR=%ERRORLEVEL%"
-
-if %XCOPY_ERR% GEQ 4 (
-    echo [ERROR] Copy failed, code: %XCOPY_ERR%
-    pause
-    exit /b 1
-) else (
-    echo [OK] Files copied, code: %XCOPY_ERR%
-)
-
-echo.
-echo [4/5] Cleaning package (optional)...
-REM rmdir /s /q "%SOURCE_DIR%"
-REM if exist "$downloadPathWin" del "$downloadPathWin"
-
-echo.
-echo [5/5] Launching new version...
-if exist "%APP_PATH%" (
-    start "" "%APP_PATH%"
-    echo [OK] Started: %APP_PATH%
-) else (
-    echo [WARN] App not found: %APP_PATH%
-)
-
-echo.
-echo ========================================
-echo           Update Finished!
-echo ========================================
-pause >nul
-''';
-  }
-
-  /// 生成简化版本的安装脚本（不启动应用）
-  static String generateSimpleScript({
-    required String extractedPath,
-    required String downloadPath,
-    String appName = 'omt.exe',
-    String? targetDir,
-  }) {
-    final extractedPathWin = extractedPath.replaceAll('/', '\\');
-    final targetDirWin = (targetDir ?? Directory(extractedPath).parent.path).replaceAll('/', '\\');
-    final downloadPathWin = downloadPath.replaceAll('/', '\\');
-    
-    return '''
-@echo off
-chcp 65001 >nul
-echo ========================================
-echo           Simple Update Script
-echo ========================================
-echo.
-
-REM ===== CONFIG =====
-set "SOURCE_DIR=$extractedPathWin"
-set "TARGET_DIR=$targetDirWin"
-REM ==================
-
-echo [1/3] Checking update package...
-if not exist "%SOURCE_DIR%" (
-    echo [ERROR] Source dir not found: %SOURCE_DIR%
-    pause
-    exit /b 1
-)
-
-if not exist "%TARGET_DIR%" (
-    echo Target dir not found, creating...
-    mkdir "%TARGET_DIR%"
-    if errorlevel 1 (
-        echo [ERROR] Failed to create target dir
-        pause
-        exit /b 1
-    )
-    echo Target dir created
-)
-
-echo.
-echo [2/3] Copying files...
-xcopy "%SOURCE_DIR%\\*" "%TARGET_DIR%\\" /E /Y /I /R
-set "XCOPY_ERR=%ERRORLEVEL%"
-
-if %XCOPY_ERR% GEQ 4 (
-    echo [ERROR] Copy failed, code: %XCOPY_ERR%
-    pause
-    exit /b 1
-) else (
-    echo [OK] Files copied, code: %XCOPY_ERR%
-)
-
-echo.
-echo [3/3] Cleaning package (optional)...
-REM rmdir /s /q "%SOURCE_DIR%"
-REM if exist "$downloadPathWin" del "$downloadPathWin"
-
-echo.
-echo ========================================
-echo           Update Finished!
-echo ========================================
-pause >nul
-''';
-  }
-
-  /// 生成测试版本的安装脚本（包含详细日志）
+  
+  /// 生成测试版本的安装脚本（简化版本）
   static String generateTestScript({
     required String extractedPath,
     required String downloadPath,
@@ -169,288 +12,362 @@ pause >nul
     String? targetDir,
   }) {
     final extractedPathWin = extractedPath.replaceAll('/', '\\');
-    final targetDirWin = (targetDir ?? Directory(extractedPath).parent.path).replaceAll('/', '\\');
+    final targetDirWin = (targetDir ?? Directory(extractedPath).parent.path)
+        .replaceAll('/', '\\');
     final downloadPathWin = downloadPath.replaceAll('/', '\\');
     
+    // 使用简化的脚本模板
+    return _getSimplifiedScriptTemplate()
+        .replaceAll('\${appName}', appName)
+        .replaceAll('\${sourceDir}', extractedPathWin)
+        .replaceAll('\${targetDir}', targetDirWin)
+        .replaceAll('\${zipPath}', downloadPathWin);
+  }
+
+  /// 获取兼容Windows 7+的脚本模板（带日志）
+  static String _getSimplifiedScriptTemplate() {
     return '''
 @echo off
-chcp 65001 >nul
-echo ========================================
-echo           Test Update Script
-echo ========================================
-echo.
+setlocal enabledelayedexpansion
 
-REM ===== CONFIG =====
-set "APP_NAME=$appName"
-set "SOURCE_DIR=$extractedPathWin"
-set "TARGET_DIR=$targetDirWin"
-set "APP_PATH=%TARGET_DIR%\\%APP_NAME%"
-set "LOG_FILE=%TEMP%\\omt_update_log.txt"
-REM ==================
+REM Set log file path
+set "LOG_DIR=%TEMP%\\OMT_Update"
+set "LOG_FILE=%LOG_DIR%\\update_log.txt"
 
-echo %date% %time% - 开始安装更新 > "%LOG_FILE%"
-echo.
-echo ========================================
-echo          OMT UPDATE INSTALLER
-echo ========================================
-echo.
-echo %date% %time% - 开始安装更新
-echo Script is running... Please wait...
-echo.
+REM Create log directory
+if not exist "%LOG_DIR%" mkdir "%LOG_DIR%" >nul 2>&1
 
-echo [INFO] Waiting for application to exit completely...
-echo %date% %time% - 等待应用程序完全退出 >> "%LOG_FILE%"
-echo.
-echo *** UPDATE SCRIPT IS NOW RUNNING ***
-echo Please keep this window open during the update process.
-echo.
-echo Waiting 3 seconds for application to close...
-for /l %%i in (3,-1,1) do (
-    echo Countdown: %%i seconds remaining...
-    timeout /t 1 >nul
+REM Initialize log file
+echo [%date% %time%] OMT Update Installer Starting... > "%LOG_FILE%"
+echo OMT Update Installer Starting...
+
+REM Wait for application to exit (compatible with Win7+)
+echo [%date% %time%] Waiting for application to exit... >> "%LOG_FILE%"
+ping 127.0.0.1 -n 4 >nul 2>&1
+
+REM Detect Windows version and set compatibility
+echo [%date% %time%] Detecting Windows version... >> "%LOG_FILE%"
+for /f "tokens=4-5 delims=. " %%i in ('ver') do set VERSION=%%i.%%j
+if "%VERSION%"=="6.1" (
+    set "WIN7=1"
+    echo [%date% %time%] Windows 7 detected >> "%LOG_FILE%"
+) else (
+    set "WIN7=0"
+    echo [%date% %time%] Windows 8+ detected >> "%LOG_FILE%"
 )
-echo [OK] Application should be closed now
-echo %date% %time% - 应用程序应该已经关闭 >> "%LOG_FILE%"
-echo.
 
-echo [INFO] Configuration:
-echo   APP_NAME: %APP_NAME%
-echo   SOURCE_DIR: %SOURCE_DIR%
-echo   TARGET_DIR: %TARGET_DIR%
-echo   APP_PATH: %APP_PATH%
-echo   LOG_FILE: %LOG_FILE%
-echo.
+REM Set variables
+set "APP_NAME=\${appName}"
+set "SOURCE_DIR=\${sourceDir}"
+set "TARGET_DIR=\${targetDir}"
+set "ZIP_PATH=\${zipPath}"
 
-echo %date% %time% - 配置信息已记录 >> "%LOG_FILE%"
+echo [%date% %time%] Variables set: APP_NAME=%APP_NAME%, SOURCE_DIR=%SOURCE_DIR%, TARGET_DIR=%TARGET_DIR% >> "%LOG_FILE%"
 
-title OMT Update Installer - Step 1/6: Checking Files
-echo [1/6] Checking source directory...
-echo %date% %time% - 检查源目录: %SOURCE_DIR% >> "%LOG_FILE%"
-echo Checking source directory: %SOURCE_DIR%
-
-dir "%SOURCE_DIR%" /B
+echo Checking source: %SOURCE_DIR%
+echo [%date% %time%] Checking source directory: %SOURCE_DIR% >> "%LOG_FILE%"
 if not exist "%SOURCE_DIR%" (
-    echo [ERROR] Source dir not found: %SOURCE_DIR%
-    echo %date% %time% - 错误：源目录未找到: %SOURCE_DIR% >> "%LOG_FILE%"
-    call :save_error_log
-    echo Press any key to exit...
+    echo [%date% %time%] ERROR: Source directory not found: %SOURCE_DIR% >> "%LOG_FILE%"
+    echo ERROR: Source not found
+    echo Check log file: %LOG_FILE%
     pause
     exit /b 1
 )
-echo [OK] Source directory exists
-echo %date% %time% - 源目录存在 >> "%LOG_FILE%"
+echo [%date% %time%] Source directory exists >> "%LOG_FILE%"
 
-echo.
-title OMT Update Installer - Step 2/6: Preparing Directory
-echo [2/6] Checking target directory...
-echo Checking target directory: %TARGET_DIR%
+echo Preparing target: %TARGET_DIR%
+echo [%date% %time%] Preparing target directory: %TARGET_DIR% >> "%LOG_FILE%"
 if not exist "%TARGET_DIR%" (
-    echo Target dir not found, creating...
     mkdir "%TARGET_DIR%"
-    if errorlevel 1 (
-        echo [ERROR] Failed to create target dir
-        call :save_error_log
-        echo Press any key to exit...
+    echo [%date% %time%] Target directory created >> "%LOG_FILE%"
+) else (
+    echo [%date% %time%] Target directory already exists >> "%LOG_FILE%"
+)
+
+echo Copying files...
+echo [%date% %time%] Starting file copy operation... >> "%LOG_FILE%"
+REM Use xcopy for Win7 compatibility, robocopy for Win8+
+if "%WIN7%"=="1" (
+    echo [%date% %time%] Using xcopy for Windows 7 compatibility >> "%LOG_FILE%"
+    xcopy "%SOURCE_DIR%\\*" "%TARGET_DIR%\\" /E /Y /I /R /H >nul 2>&1
+    set "COPY_RESULT=!ERRORLEVEL!"
+    echo [%date% %time%] xcopy completed with exit code: !COPY_RESULT! >> "%LOG_FILE%"
+    if !COPY_RESULT! GEQ 4 (
+        echo [%date% %time%] ERROR: xcopy failed with code !COPY_RESULT! >> "%LOG_FILE%"
+        echo ERROR: Copy failed with xcopy
+        echo Check log file: %LOG_FILE%
         pause
         exit /b 1
     )
-    echo Target dir created
 ) else (
-    echo [OK] Target directory exists
-    echo Current content:
-    dir "%TARGET_DIR%" /B
+    echo [%date% %time%] Using robocopy for Windows 8+ >> "%LOG_FILE%"
+    robocopy "%SOURCE_DIR%" "%TARGET_DIR%" /E /R:1 /W:1 >nul 2>&1
+    set "COPY_RESULT=!ERRORLEVEL!"
+    echo [%date% %time%] robocopy completed with exit code: !COPY_RESULT! >> "%LOG_FILE%"
+    if !COPY_RESULT! GTR 7 (
+        echo [%date% %time%] ERROR: robocopy failed with code !COPY_RESULT! >> "%LOG_FILE%"
+        echo ERROR: Copy failed with robocopy
+        echo Check log file: %LOG_FILE%
+        pause
+        exit /b 1
+    )
+)
+echo [%date% %time%] File copy operation completed successfully >> "%LOG_FILE%"
+
+echo Cleaning up...
+echo [%date% %time%] Starting cleanup... >> "%LOG_FILE%"
+if exist "%ZIP_PATH%" (
+    del "%ZIP_PATH%" >nul 2>&1
+    echo [%date% %time%] Deleted zip file: %ZIP_PATH% >> "%LOG_FILE%"
+) else (
+    echo [%date% %time%] Zip file not found for cleanup: %ZIP_PATH% >> "%LOG_FILE%"
 )
 
-echo.
-title OMT Update Installer - Step 3/6: Copying Files
-echo [3/6] Copying files...
-echo %date% %time% - 开始复制文件: 从 %SOURCE_DIR% 到 %TARGET_DIR% >> "%LOG_FILE%"
-echo Copying from %SOURCE_DIR% to %TARGET_DIR%
-echo This may take a few moments...
+echo Starting application...
+echo [%date% %time%] Changing to target directory: %TARGET_DIR% >> "%LOG_FILE%"
+cd /d "%TARGET_DIR%"
+echo [%date% %time%] Starting application: %APP_NAME% >> "%LOG_FILE%"
+start "" "%APP_NAME%"
 
-xcopy "%SOURCE_DIR%\\*" "%TARGET_DIR%\\" /E /Y /I /R
+echo [%date% %time%] Update process completed successfully >> "%LOG_FILE%"
+echo Update completed!
+echo Log file saved to: %LOG_FILE%
+exit /b 0
+''';
+  }
+
+  /// 获取默认的脚本模板（作为备用）
+  static String _getDefaultScriptTemplate() {
+    return '''
+@echo off
+REM ========================================
+REM     OMT Update Installer (Win7+ Compatible) - Silent Mode
+REM ========================================
+
+REM CRITICAL: Wait for application to completely exit before starting update
+echo (SCRIPT) Waiting for application to exit completely...
+echo (SCRIPT) Please wait 3 seconds...
+
+REM Use more compatible waiting method
+ping 127.0.0.1 -n 4 >nul 2>&1
+
+echo (SCRIPT) Application should be closed now, continuing...
+echo (SCRIPT) Starting update process...
+
+REM Detect Windows version and set encoding (silent)
+set "WIN7=0"
+ver | find "Version 6.1" >nul 2>&1
+if %ERRORLEVEL% EQU 0 (
+    set "WIN7=1"
+) else (
+    set "WIN7=0"
+)
+if "%WIN7%"=="0" (
+    chcp 65001 >nul 2>&1
+)
+echo (SCRIPT) Windows version detection completed, WIN7=%WIN7%
+
+set "APP_NAME=\${appName}"
+set "SOURCE_DIR=\${sourceDir}"
+set "TARGET_DIR=\${targetDir}"
+set "APP_PATH=%TARGET_DIR%\\%APP_NAME%"
+set "ZIP_PATH=\${zipPath}"
+
+echo (SCRIPT) Variables set:
+echo (SCRIPT) APP_NAME=%APP_NAME%
+echo (SCRIPT) SOURCE_DIR=%SOURCE_DIR%
+echo (SCRIPT) TARGET_DIR=%TARGET_DIR%
+
+REM Get script directory more reliably
+set "SCRIPT_DIR=%~dp0"
+if "%SCRIPT_DIR%"=="" (
+    REM Fallback: use current directory
+    set "SCRIPT_DIR=%CD%"
+)
+REM Remove trailing backslash if present
+if "%SCRIPT_DIR:~-1%"=="\\" set "SCRIPT_DIR=%SCRIPT_DIR:~0,-1%"
+set "LOG_FILE=%SCRIPT_DIR%\\omt_update_log.txt"
+
+REM All output redirected to log file for silent operation
+REM First, test if we can create the log file
+echo Testing log file creation... > "%LOG_FILE%" 2>&1
+if %ERRORLEVEL% NEQ 0 (
+    REM If log file creation fails, try using TEMP directory
+    set "LOG_FILE=%TEMP%\\omt_update_log.txt"
+    echo Testing TEMP log file creation... > "%LOG_FILE%" 2>&1
+)
+
+echo ======================================== > "%LOG_FILE%"
+echo        OMT Update Installer - Silent Mode >> "%LOG_FILE%"
+echo ======================================== >> "%LOG_FILE%"
+echo Start update: %date% %time% >> "%LOG_FILE%"
+
+REM Step 1: Checking source directory (silent)
+echo (SCRIPT) (1/6) Checking source directory...
+echo (1/6) Checking source directory... >> "%LOG_FILE%"
+if not exist "%SOURCE_DIR%" goto source_missing
+echo (SCRIPT) (OK) Source directory exists
+echo (OK) Source directory exists >> "%LOG_FILE%"
+goto step1_done
+
+:source_missing
+echo (SCRIPT) (ERROR) Source dir not found: %SOURCE_DIR%
+echo (ERROR) Source dir not found: %SOURCE_DIR% >> "%LOG_FILE%"
+goto error_end
+
+:step1_done
+
+REM Step 2: Preparing target directory (silent)
+echo (SCRIPT) (2/6) Preparing target directory...
+echo (2/6) Preparing target dir... >> "%LOG_FILE%"
+if not exist "%TARGET_DIR%" (
+  mkdir "%TARGET_DIR%"
+  if errorlevel 1 goto target_create_failed
+  echo (SCRIPT) Target directory created
+  echo Target dir created >> "%LOG_FILE%"
+  goto target_ready
+)
+echo (SCRIPT) (OK) Target directory exists
+echo (OK) Target directory exists >> "%LOG_FILE%"
+:target_ready
+goto step2_done
+
+:target_create_failed
+echo (ERROR) Failed to create target dir >> "%LOG_FILE%"
+goto error_end
+
+:step2_done
+echo (SCRIPT) Step 2 completed, proceeding to step 3...
+echo Step 2 completed, proceeding to step 3... >> "%LOG_FILE%"
+
+REM Step 3: Copying files (silent)
+echo (SCRIPT) (3/6) Copying files...
+echo (3/6) Copying files from "%SOURCE_DIR%" to "%TARGET_DIR%"... >> "%LOG_FILE%"
+echo (DEBUG) About to execute xcopy command... >> "%LOG_FILE%"
+xcopy "%SOURCE_DIR%\\*" "%TARGET_DIR%\\" /E /Y /I /R > "%TEMP%\\xcopy_output.txt" 2>&1
 set "XCOPY_ERR=%ERRORLEVEL%"
-echo %date% %time% - 复制文件完成，返回代码: %XCOPY_ERR% >> "%LOG_FILE%"
-echo Copy operation completed with code: %XCOPY_ERR%
+type "%TEMP%\\xcopy_output.txt" >> "%LOG_FILE%"
+if %XCOPY_ERR% GEQ 4 goto copy_failed
+echo (SCRIPT) (OK) Files copied successfully
+echo (OK) Files copied successfully >> "%LOG_FILE%"
+goto step3_done
 
-if %XCOPY_ERR% GEQ 4 (
-    echo [ERROR] Copy failed, code: %XCOPY_ERR%
-    echo %date% %time% - 错误：复制文件失败，代码: %XCOPY_ERR% >> "%LOG_FILE%"
-    call :save_error_log
-    echo Press any key to exit...
-    pause
-    exit /b 1
-) else (
-    echo [OK] Files copied successfully, code: %XCOPY_ERR%
-    echo %date% %time% - 文件复制成功 >> "%LOG_FILE%"
+:copy_failed
+echo (SCRIPT) (ERROR) Copy failed, code: %XCOPY_ERR%
+echo (ERROR) Copy failed, code: %XCOPY_ERR% >> "%LOG_FILE%"
+goto error_end
+
+:step3_done
+
+REM Step 4: Verifying files (silent)
+echo (SCRIPT) (4/6) Verifying files...
+echo (4/6) Verifying target directory... >> "%LOG_FILE%"
+dir "%TARGET_DIR%" /B >> "%LOG_FILE%"
+echo (SCRIPT) (OK) Verification complete
+echo (OK) Verification complete >> "%LOG_FILE%"
+
+REM Step 5: Cleaning up (silent)
+echo (SCRIPT) (5/6) Cleaning up...
+echo (5/6) Cleaning temporary files... >> "%LOG_FILE%"
+if exist "%ZIP_PATH%" (
+  del "%ZIP_PATH%" >nul 2>&1
+  echo Deleted ZIP: %ZIP_PATH% >> "%LOG_FILE%"
+)
+if exist "%TEMP%\\xcopy_output.txt" (
+  del "%TEMP%\\xcopy_output.txt" >nul 2>&1
+  echo Deleted temp file: xcopy_output.txt >> "%LOG_FILE%"
 )
 
-echo.
-title OMT Update Installer - Step 4/6: Verifying Files
-echo [4/6] Verifying copied files...
-echo %date% %time% - 验证复制的文件 >> "%LOG_FILE%"
-echo Verifying files in target directory: %TARGET_DIR%
-echo Files in target directory:
-dir "%TARGET_DIR%" /B
-echo %date% %time% - 目标目录文件列表完成 >> "%LOG_FILE%"
-echo File verification completed
+REM Step 6: Starting application (silent)
+echo (SCRIPT) (6/6) Launching application...
+echo (6/6) Launching app... >> "%LOG_FILE%"
 
-echo.
-title OMT Update Installer - Step 5/6: Cleaning Up
-echo [5/6] Cleaning package (optional)...
-echo %date% %time% - 清理旧包 >> "%LOG_FILE%"
-echo Cleaning up temporary files...
-REM rmdir /s /q "%SOURCE_DIR%"
-REM if exist "$downloadPathWin" del "$downloadPathWin"
-echo Cleanup completed
+cd /d "%TARGET_DIR%"
 
-echo.
-title OMT Update Installer - Step 6/6: Starting Application
-echo [6/6] Starting new version...
-echo %date% %time% - 启动新版本应用程序 >> "%LOG_FILE%"
-echo Attempting to start: %APP_PATH%
-echo %date% %time% - 尝试启动: %APP_PATH% >> "%LOG_FILE%"
-echo Changing to target directory: %TARGET_DIR%
-
-echo [DEBUG] Checking if app exists: %APP_PATH%
 if exist "%APP_PATH%" (
-    echo [INFO] Starting application: %APP_PATH%
-    echo %date% %time% - 找到应用程序，正在启动: %APP_PATH% >> "%LOG_FILE%"
-    
-    REM 使用更可靠的启动方式
-    cd /d "%TARGET_DIR%"
-    echo %date% %time% - 切换到目标目录: %TARGET_DIR% >> "%LOG_FILE%"
-    echo Starting main application: %APP_NAME%
-    
-    start "" "%APP_NAME%"
-    set "START_ERR=%ERRORLEVEL%"
-    echo %date% %time% - 启动应用程序，返回代码: %START_ERR% >> "%LOG_FILE%"
-    echo Start command returned code: %START_ERR%
-    
-    if %START_ERR% EQU 0 (
-        echo [OK] Started: %APP_PATH%
-        echo %date% %time% - 应用程序启动成功 >> "%LOG_FILE%"
-        echo Waiting for application to initialize...
-        timeout /t 3 >nul
-        
-        REM 检查进程是否真的在运行
-        echo Checking if application is running...
-        tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
-        if %ERRORLEVEL% EQU 0 (
-            echo [OK] Application is running successfully
-            echo %date% %time% - 确认应用程序正在运行 >> "%LOG_FILE%"
-        ) else (
-            echo [WARN] Application process not found
-            echo %date% %time% - 警告：未找到应用程序进程 >> "%LOG_FILE%"
-        )
-    ) else (
-        echo [WARN] Application may not have started properly, code: %START_ERR%
-        echo %date% %time% - 警告：应用程序可能未正确启动，代码: %START_ERR% >> "%LOG_FILE%"
-    )
+  echo (SCRIPT) Found executable: %APP_PATH%
+  echo (INFO) Found executable: %APP_PATH% >> "%LOG_FILE%"
+  
+  echo (SCRIPT) Attempting to launch application...
+  echo (INFO) Attempting to launch: %APP_PATH% >> "%LOG_FILE%"
+  
+  REM Try multiple launch methods for better reliability
+  start "" "%APP_PATH%" >> "%LOG_FILE%" 2>&1
+  
+  REM Wait a moment and check if process started
+  ping 127.0.0.1 -n 3 >nul 2>&1
+  tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
+  if %ERRORLEVEL% EQU 0 (
+    echo (SCRIPT) (SUCCESS) Application started with method 1
+    echo (OK) Application is running >> "%LOG_FILE%"
+    goto launch_success
+  )
+  
+  echo (SCRIPT) Trying method 2...
+  start "" "%APP_NAME%" >> "%LOG_FILE%" 2>&1
+  
+  REM Wait a moment and check if process started
+  ping 127.0.0.1 -n 3 >nul 2>&1
+  tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
+  if %ERRORLEVEL% EQU 0 (
+    echo (SCRIPT) (SUCCESS) Application started with method 2
+    echo (OK) Application is running >> "%LOG_FILE%"
+    goto launch_success
+  )
+  
+  echo (SCRIPT) Trying method 3...
+  "%APP_PATH%" >> "%LOG_FILE%" 2>&1 &
+  
+  REM Wait a moment and check if process started
+  ping 127.0.0.1 -n 4 >nul 2>&1
+  tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
+  if %ERRORLEVEL% EQU 0 (
+    echo (SCRIPT) (SUCCESS) Application started with method 3
+    echo (OK) Application is running >> "%LOG_FILE%"
+    goto launch_success
+  )
+  
+  echo (SCRIPT) (WARNING) All launch methods failed
+  echo (WARNING) All launch methods failed >> "%LOG_FILE%"
+  
+  :launch_success
+  echo (SCRIPT) Application launch completed
+  echo (OK) Application launch completed >> "%LOG_FILE%"
 ) else (
-    echo [WARN] App not found: %APP_PATH%
-    echo %date% %time% - 警告：未找到应用程序: %APP_PATH% >> "%LOG_FILE%"
-    echo Available executables:
-    echo %date% %time% - 查找可用的可执行文件: >> "%LOG_FILE%"
-    for /f "tokens=*" %%a in ('dir "%TARGET_DIR%\\*.exe" /B 2^>nul') do (
-        echo %%a
-        echo %%a >> "%LOG_FILE%"
-    )
-    
-    echo [WARNING] Main app not found, looking for alternatives...
-    echo %date% %time% - 警告：主应用程序未找到，寻找替代程序 >> "%LOG_FILE%"
-    echo Searching for executable files in: %TARGET_DIR%
-    
-    REM 尝试查找并启动任何可用的EXE文件
-    for /f "tokens=*" %%a in ('dir "%TARGET_DIR%\\*.exe" /B 2^>nul') do (
-        echo Found alternative executable: %TARGET_DIR%\\%%a
-        echo %date% %time% - 尝试启动替代应用程序: %TARGET_DIR%\\%%a >> "%LOG_FILE%"
-        cd /d "%TARGET_DIR%"
-        echo Starting alternative application: %%a
-        start "" "%%a"
-        set "ALT_START_ERR=%ERRORLEVEL%"
-        echo %date% %time% - 启动替代应用程序，返回代码: %ALT_START_ERR% >> "%LOG_FILE%"
-        echo Alternative start command returned code: %ALT_START_ERR%
-        
-        if %ALT_START_ERR% EQU 0 (
-            echo [OK] Alternative started successfully
-            echo %date% %time% - 替代程序启动成功 >> "%LOG_FILE%"
-            echo Waiting for alternative application to initialize...
-            timeout /t 3 >nul
-            
-            REM 检查替代应用程序是否在运行
-            echo Checking if alternative application is running...
-            tasklist /FI "IMAGENAME eq %%a" 2>nul | find /I "%%a" >nul
-            if %ERRORLEVEL% EQU 0 (
-                echo [OK] Alternative application is running: %%a
-                echo %date% %time% - 确认替代应用程序正在运行: %%a >> "%LOG_FILE%"
-            ) else (
-                echo [WARN] Alternative application process not found: %%a
-                echo %date% %time% - 警告：未找到替代应用程序进程: %%a >> "%LOG_FILE%"
-            )
-        ) else (
-            echo [ERROR] Failed to start alternative: %%a
-            echo %date% %time% - 启动替代程序失败: %%a >> "%LOG_FILE%"
-        )
-        goto :found_exe
-    )
-    
-    echo [ERROR] No executable files found in target directory
-    echo %date% %time% - 错误：目标目录中未找到可执行文件 >> "%LOG_FILE%"
-    
-    :found_exe
+  echo (SCRIPT) (ERROR) Executable not found: %APP_PATH%
+  echo (ERROR) Executable not found: %APP_PATH% >> "%LOG_FILE%"
+  goto error_end
 )
 
-echo.
-title OMT Update Installer - Completed Successfully!
-echo ========================================
-echo          UPDATE PROCESS COMPLETED!
-echo ========================================
-echo.
-echo Status: Update installation finished
-echo Log file: %LOG_FILE%
-echo Target directory: %TARGET_DIR%
-echo.
-echo The script will automatically exit in 5 seconds...
-echo Press any key to exit immediately.
-echo ========================================
-echo %date% %time% - 更新脚本完成 >> "%LOG_FILE%"
-echo %date% %time% - 脚本即将退出 >> "%LOG_FILE%"
+echo (SCRIPT) ========================================
+echo (SCRIPT)       UPDATE PROCESS COMPLETED!
+echo (SCRIPT) ========================================
+echo ======================================== >> "%LOG_FILE%"
+echo       UPDATE PROCESS COMPLETED! >> "%LOG_FILE%"
+echo ======================================== >> "%LOG_FILE%"
+echo Update complete: %date% %time% >> "%LOG_FILE%"
 
-REM 处理日志文件
-echo Processing log file...
-if exist "%TARGET_DIR%\\%APP_NAME%" (
-    echo Update completed successfully, cleaning up log file...
-    echo %date% %time% - 更新成功，清理日志文件 >> "%LOG_FILE%"
-    REM 成功完成，删除日志文件
-    timeout /t 2 >nul
-    del "%LOG_FILE%" 2>nul
-    echo Log file cleaned up
+REM Final verification that application is running
+echo (SCRIPT) Final verification...
+ping 127.0.0.1 -n 4 >nul 2>&1
+tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
+if %ERRORLEVEL% EQU 0 (
+  echo (SCRIPT) (SUCCESS) Application is confirmed running!
+  echo (SUCCESS) Application is confirmed running >> "%LOG_FILE%"
 ) else (
-    echo Update may have failed, preserving log file...
-    echo %date% %time% - 更新可能失败，保存日志到程序目录 >> "%LOG_FILE%"
-    REM 失败时，将日志复制到程序目录
-    if exist "%TARGET_DIR%" (
-        copy "%LOG_FILE%" "%TARGET_DIR%\\update_error.log" >nul 2>&1
-        echo Log file saved to: %TARGET_DIR%\\update_error.log
-    )
+  echo (SCRIPT) (WARNING) Application process not detected in final check
+  echo (WARNING) Application process not detected in final check >> "%LOG_FILE%"
 )
 
-timeout /t 5 >nul
-echo Script exiting...
-goto :eof
+echo (SCRIPT) Script completed. Check log file for details.
+echo Script exit: %date% %time% >> "%LOG_FILE%"
+REM Silent exit - no delay, no console output
+exit /b 0
 
-:save_error_log
-REM 保存错误日志到程序目录
-echo Saving error log to program directory...
-if exist "%TARGET_DIR%" (
-    copy "%LOG_FILE%" "%TARGET_DIR%\\update_error.log" >nul 2>&1
-    echo Error log saved to: %TARGET_DIR%\\update_error.log
-) else (
-    echo Cannot save error log: target directory not accessible
-)
-return
-
+:error_end
+echo (ERROR) Process failed. Check log: %LOG_FILE% >> "%LOG_FILE%"
+REM Silent error exit - no console output
+exit /b 1
 ''';
   }
 }

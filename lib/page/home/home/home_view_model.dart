@@ -19,13 +19,13 @@ import 'package:omt/utils/shared_utils.dart';
 import 'package:omt/utils/sys_utils.dart';
 import 'package:omt/widget/combobox.dart';
 import 'package:omt/widget/common_option_dialog.dart';
-import 'package:omt/services/install_cache_service.dart';
-import 'package:omt/router_utils.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:omt/widget/update/update_manager.dart';
 import 'package:omt/http/service/update/update_service.dart';
 import 'package:omt/utils/context_utils.dart';
+import 'package:omt/http/service/home/home_page/home_page_service.dart';
 
+import '../../../http/service/install/install_cache_service.dart';
 import '../../../test/select_detail_page.dart';
 import '../search_device/widgets/search_device_screen.dart';
 import 'keep_alive_page.dart';
@@ -391,6 +391,7 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
         title: '安装提醒',
         width: 460,
         height: 260,
+        showCloseButton: false,
         child: Container(
           margin: const EdgeInsets.only(left: 20, right: 20, top: 40),
           child: Column(
@@ -413,8 +414,15 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
                       backgroundColor: WidgetStatePropertyAll(Color(0xFFE74C3C)),
                     ),
                     onPressed: () {
-                      Navigator.of(context).pop();
-                      _clearCache();
+                      HomePageService().cancelInstall(
+                        onSuccess: (data) {
+                          Navigator.of(context).pop();
+                          _clearCache();
+                        },
+                        onError: (msg) {
+                          print('取消安装失败: $msg');
+                        },
+                      );
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),

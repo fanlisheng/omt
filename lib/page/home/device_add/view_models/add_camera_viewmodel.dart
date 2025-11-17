@@ -11,7 +11,7 @@ import 'package:omt/utils/device_utils.dart';
 import 'package:omt/utils/hikvision_utils.dart';
 import 'package:omt/utils/intent_utils.dart';
 import 'package:omt/utils/sys_utils.dart';
-import 'package:omt/services/install_cache_service.dart';
+import 'package:omt/http/service/install/install_cache_service.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import '../../../../bean/home/home_page/device_detail_ai_entity.dart';
 import '../../../../bean/home/home_page/device_detail_camera_entity.dart';
@@ -585,9 +585,7 @@ class AddCameraViewModel extends BaseViewModelRefresh<dynamic> {
   restartRecognitionAction(CameraDeviceEntity cameraDeviceEntity) {
     notifyListeners();
     HttpQuery.share.homePageService.restartAiDevicePython(
-      // deviceCode: cameraDeviceEntity.code ?? "",
-      // aiDeviceCode: cameraDeviceEntity.selectedAi?.deviceCode ?? "",
-      ip: cameraDeviceEntity.ip ?? "",
+      ip: cameraDeviceEntity.selectedAi?.ip ?? "",
       onSuccess: (a) {
         LoadingUtils.showToast(data: "重启识别成功!");
       },

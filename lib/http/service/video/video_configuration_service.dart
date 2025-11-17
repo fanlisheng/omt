@@ -45,7 +45,7 @@ class VideoConfigurationService {
       '${await API.share.hostVideoConfiguration}/contrl/python/stop';
 
   get _restart_recognition async =>
-      '${await API.share.hostVideoConfiguration}/contrl/python/restart';
+      '${await API.share.hostVideoConfiguration}/new/contrl/python/restart';
 
   get _restart_centralcontrol async =>
       '${await API.share.hostVideoConfiguration}/contrl/golang/restart';
