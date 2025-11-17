@@ -197,7 +197,12 @@ class OnePictureDataData {
           if (child.type != OnePictureType.AISB.index &&
               child.type != OnePictureType.SXT.index &&
               child.type != OnePictureType.NVR.index &&
-              child.type != OnePictureType.JHJ.index) {
+              child.type != OnePictureType.JHJ.index &&
+              child.type != OnePictureType.LYQ.index &&
+              child.type != OnePictureType.DC.index &&
+              child.type != OnePictureType.DYX.index &&
+              child.type != OnePictureType.SD.index &&
+              child.type != OnePictureType.GDSB.index) {
             show = false;
           }
         }
