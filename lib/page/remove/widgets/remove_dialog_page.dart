@@ -82,7 +82,7 @@ class RemoveDialogPage {
                   ResultDialog.showError(
                     context: context,
                     title: "删除申请提交失败！",
-                    message: '失败了你说为啥呢',
+                    message: '失败了，请尝试重新提交或联系工作人员',
                     buttonText: '重新提交',
                   );
                 },

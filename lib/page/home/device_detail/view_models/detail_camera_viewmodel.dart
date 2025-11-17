@@ -136,7 +136,7 @@ class DetailCameraViewModel extends BaseViewModelRefresh<dynamic> {
   removeAction() {
     RemoveDialogPage.showAndSubmit(
       context: context!,
-      instanceId: deviceInfo.instanceName ?? "",
+      instanceId: deviceInfo.instanceId ?? "",
       removeIds: [(deviceInfo.nodeId ?? "0").toInt()],
       onSuccess: () {
         IntentUtils.share.popResultOk(context!);

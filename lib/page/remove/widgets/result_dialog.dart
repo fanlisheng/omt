@@ -90,7 +90,7 @@ class ResultDialog {
   static Future<void> showError({
     required BuildContext context,
     String title = "删除申请提交失败！",
-    String message = "失败了你说为啥呢",
+    String message = "失败了，请尝试重新提交或联系工作人员",
     String buttonText = "重新提交",
     VoidCallback? onButtonPressed,
     VoidCallback? onDismiss,

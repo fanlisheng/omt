@@ -256,9 +256,9 @@ class UserLoginPage extends StatelessWidget {
                 model.minimizeWindow();
               },
               child: const Icon(
-                Icons.minimize,
+                FluentIcons.chrome_minimize,
                 color: ColorUtils.colorWhite,
-                size: 16,
+                size: 12,
               ),
             ),
           ),

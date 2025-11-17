@@ -58,6 +58,8 @@ class DeviceDetailCameraData {
   String? nodeId;
   @JSONField(name: "ai_device_ip")
   String? aiDeviceIp;
+  @JSONField(name: "instance_id")
+  String? instanceId;
 
   DeviceDetailCameraData();
 

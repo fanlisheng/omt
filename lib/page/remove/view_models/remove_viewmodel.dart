@@ -122,55 +122,8 @@ class RemoveViewModel extends BaseViewModelRefresh<dynamic> {
         gateId: selectedDoor?.id ?? 0,
         passId: selectedInOut?.id ?? 0,
         onSuccess: () {
-          
           searchEventAction();
         });
-    // RemoveViewModel.removeDevices(
-    //   dialogContext: dialogContext,
-    //   context: context!,
-    //   // 确保 context 不为 null
-    //   selectedDismantleCause: selectedDismantleCause,
-    //   remark: remark,
-    //   ids: nodeIds,
-    //   onSuccess: () {
-    //     searchEventAction();
-    //   },
-    //   selectedInstance: selectedInstance,
-    //   selectedDoor: selectedDoor,
-    //   selectedInOut: selectedInOut,
-    // );
-    // if (selectedDismantleCause.isEmpty) {
-    //   LoadingUtils.showToast(data: "请选择拆除原因");
-    //   return;
-    // } else {
-    //   if (selectedDismantleCause == "其它" && remark.isEmpty) {
-    //     LoadingUtils.showToast(data: "请填写其它描述");
-    //     return;
-    //   }
-    // }
-    // Navigator.of(dialogContext).pop();
-    // final result = await DialogUtils.showContentDialog(
-    //     context: context!,
-    //     title: "提交拆除设备申请",
-    //     content: "您确定提交拆除这些设备申请,提交后等待/n'审核'",
-    //     deleteText: "确定");
-    // if (result == '确定') {
-    //   List<int> nodeIds = [];
-    //   for (DeviceListData d in dismantleDeviceList) {
-    //     nodeIds.add(d.id.toInt());
-    //   }
-    //   HttpQuery.share.removeService.removeDevice(
-    //       nodeIds: nodeIds,
-    //       instanceId: selectedInstance?.id ?? "",
-    //       gateId: selectedDoor?.id,
-    //       passId: selectedInOut?.id,
-    //       reason: selectedDismantleCause,
-    //       remark: remark,
-    //       onSuccess: (data) {
-    //         //重新请求数据
-    //         searchEventAction();
-    //       });
-    // }
   }
 
   //选中设备 - 支持从三种状态列表中选择
@@ -249,53 +202,53 @@ class RemoveViewModel extends BaseViewModelRefresh<dynamic> {
     });
   }
 
-  static Future<void> removeDevices({
-    required BuildContext dialogContext,
-    required BuildContext context,
-    required String selectedDismantleCause,
-    required List<int> ids,
-    String? remark,
-    StrIdNameValue? selectedInstance,
-    IdNameValue? selectedDoor,
-    IdNameValue? selectedInOut,
-    required VoidCallback onSuccess,
-  }) async {
-    // 验证拆除原因
-    if (selectedDismantleCause.isEmpty) {
-      LoadingUtils.showToast(data: "请选择拆除原因");
-      return;
-    } else {
-      if (selectedDismantleCause == "其它" && (remark ?? "").isEmpty) {
-        LoadingUtils.showToast(data: "请填写其它描述");
-        return;
-      }
-    }
-
-    // 关闭对话框
-    Navigator.of(dialogContext).pop();
-
-    // 显示确认对话框
-    final result = await DialogUtils.showContentDialog(
-      context: context,
-      title: "提交拆除设备申请",
-      content: "您确定提交拆除这些设备申请,提交后等待\n审核",
-      deleteText: "确定",
-    );
-
-    if (result == '确定') {
-      // 调用拆除设备接口
-      HttpQuery.share.removeService.removeDevice(
-        nodeIds: ids,
-        instanceId: selectedInstance?.id ?? "",
-        gateId: selectedDoor?.id,
-        passId: selectedInOut?.id,
-        reason: selectedDismantleCause,
-        remark: remark,
-        onSuccess: (data) {
-          // 重新请求数据
-          onSuccess();
-        },
-      );
-    }
-  }
+  // static Future<void> removeDevices({
+  //   required BuildContext dialogContext,
+  //   required BuildContext context,
+  //   required String selectedDismantleCause,
+  //   required List<int> ids,
+  //   String? remark,
+  //   StrIdNameValue? selectedInstance,
+  //   IdNameValue? selectedDoor,
+  //   IdNameValue? selectedInOut,
+  //   required VoidCallback onSuccess,
+  // }) async {
+  //   // 验证拆除原因
+  //   if (selectedDismantleCause.isEmpty) {
+  //     LoadingUtils.showToast(data: "请选择拆除原因");
+  //     return;
+  //   } else {
+  //     if (selectedDismantleCause == "其它" && (remark ?? "").isEmpty) {
+  //       LoadingUtils.showToast(data: "请填写其它描述");
+  //       return;
+  //     }
+  //   }
+  //
+  //   // 关闭对话框
+  //   Navigator.of(dialogContext).pop();
+  //
+  //   // 显示确认对话框
+  //   final result = await DialogUtils.showContentDialog(
+  //     context: context,
+  //     title: "提交拆除设备申请",
+  //     content: "您确定提交拆除这些设备申请,提交后等待\n审核",
+  //     deleteText: "确定",
+  //   );
+  //
+  //   if (result == '确定') {
+  //     // 调用拆除设备接口
+  //     HttpQuery.share.removeService.removeDevice(
+  //       nodeIds: ids,
+  //       instanceId: selectedInstance?.id ?? "",
+  //       gateId: selectedDoor?.id,
+  //       passId: selectedInOut?.id,
+  //       reason: selectedDismantleCause,
+  //       remark: remark,
+  //       onSuccess: (data) {
+  //         // 重新请求数据
+  //         onSuccess();
+  //       },
+  //     );
+  //   }
+  // }
 }

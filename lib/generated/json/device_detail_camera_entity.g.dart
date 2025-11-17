@@ -122,6 +122,10 @@ DeviceDetailCameraData $DeviceDetailCameraDataFromJson(
   if (aiDeviceIp != null) {
     deviceDetailCameraData.aiDeviceIp = aiDeviceIp;
   }
+  final String? instanceId = jsonConvert.convert<String>(json['instance_id']);
+  if (instanceId != null) {
+    deviceDetailCameraData.instanceId = instanceId;
+  }
   return deviceDetailCameraData;
 }
 
@@ -147,6 +151,7 @@ Map<String, dynamic> $DeviceDetailCameraDataToJson(
   data['night_basic_photo'] = entity.nightBasicPhoto?.toJson();
   data['node_id'] = entity.nodeId;
   data['ai_device_ip'] = entity.aiDeviceIp;
+  data['instance_id'] = entity.instanceId;
   return data;
 }
 
@@ -170,6 +175,7 @@ extension DeviceDetailCameraDataExtension on DeviceDetailCameraData {
     DeviceDetailCameraDataPhoto? nightBasicPhoto,
     String? nodeId,
     String? aiDeviceIp,
+    String? instanceId,
   }) {
     return DeviceDetailCameraData()
       ..name = name ?? this.name
@@ -189,7 +195,8 @@ extension DeviceDetailCameraDataExtension on DeviceDetailCameraData {
       ..dayBasicPhoto = dayBasicPhoto ?? this.dayBasicPhoto
       ..nightBasicPhoto = nightBasicPhoto ?? this.nightBasicPhoto
       ..nodeId = nodeId ?? this.nodeId
-      ..aiDeviceIp = aiDeviceIp ?? this.aiDeviceIp;
+      ..aiDeviceIp = aiDeviceIp ?? this.aiDeviceIp
+      ..instanceId = instanceId ?? this.instanceId;
   }
 }
 
