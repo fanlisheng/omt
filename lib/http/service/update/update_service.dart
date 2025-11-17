@@ -7,6 +7,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:archive/archive.dart';
+import 'package:window_manager/window_manager.dart';
 import '../../../bean/update/update_info.dart';
 import '../../../utils/file_log_utils.dart';
 import 'mock_update_api.dart';
@@ -829,25 +830,26 @@ WshShell.Run """$scriptPath""", 0, False
   Future<void> _forceExitApp(int exitCode) async {
     await logMessage('强制退出应用，退出码: $exitCode');
     
-    // 多重保障退出机制
     try {
-      // 方法1: 直接调用 exit()
-      await logMessage('尝试方法1: 直接调用 exit()');
-      exit(exitCode);
+      // 方法1: 使用 windowManager.close() (推荐方式，不会卡住)
+      await logMessage('尝试方法1: 使用 windowManager.close()');
+      await windowManager.close();
+      await logMessage('方法1成功: windowManager.close() 执行完成');
+      return;
+      
     } catch (e) {
       await logMessage('方法1失败: $e');
       
       try {
-        // 方法2: 使用 Future.delayed 后退出
-        await logMessage('尝试方法2: 延迟后退出');
-        Future.delayed(Duration(milliseconds: 10), () => exit(exitCode));
-        await Future.delayed(Duration(milliseconds: 50));
-        exit(exitCode); // 备用退出
-      } catch (e2) {
-        await logMessage('方法2失败: $e2');
+        // 方法2: 最后的保障 - 使用 exit() (可能会卡住)
+        await logMessage('尝试方法2: 使用 exit() (最后保障)');
+        await logMessage('警告: exit() 可能会导致应用卡住');
+        exit(exitCode);
         
-        // 方法3: 最后的保障 - 直接退出
-        await logMessage('执行最后保障退出');
+      } catch (e2) {
+        await logMessage('所有退出方法都失败: $e2');
+        await logMessage('错误堆栈: ${StackTrace.current}');
+        // 最后的最后，还是尝试 exit
         exit(exitCode);
       }
     }
