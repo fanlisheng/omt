@@ -252,7 +252,13 @@ class HomePageService {
   T? _deepCopyData<T>(T data) {
     if (data is List) {
       // 对于List类型，创建新列表并拷贝元素
-      return List.from(data) as T;
+      // 使用 List.of() 保持原始的泛型类型，而不是 List.from() 产生 List<dynamic>
+      try {
+        return List.of(data) as T;
+      } catch (e) {
+        // 如果类型转换失败，尝试使用 toList()
+        return data.toList() as T;
+      }
     }
     // 其他类型直接返回（如果需要支持更多类型，可以扩展）
     return data;
