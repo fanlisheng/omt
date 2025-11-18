@@ -500,10 +500,10 @@ class UpdateService {
           try {
             await logMessage('尝试方法0: 使用cmd /c执行bat文件');
             await logMessage('启动脚本: $scriptPath');
-            // 使用 cmd /c 来正确执行 .bat 文件
+            // 使用 cmd /c 来正确执行 .bat 文件（/c 参数会在执行完后自动关闭窗口）
             final process = await Process.start(
               'cmd', 
-              ['/c', scriptPath],
+              ['/c', 'start', '/B', scriptPath],  // /B 参数表示在后台运行，不创建新窗口
               workingDirectory: scriptDir,
               mode: ProcessStartMode.detached,
             );
@@ -831,31 +831,25 @@ WshShell.Run """$scriptPath""", 0, False
     await logMessage('强制退出应用，退出码: $exitCode');
     
     try {
-      // 方法1: 直接使用 destroy() 销毁窗口，不触发 onWindowClose 回调
-      await logMessage('尝试方法1: 使用 windowManager.destroy()');
-      await windowManager.destroy();
-      await logMessage('方法1成功: destroy() 执行完成');
+      // 先记录日志，然后立即退出进程（最可靠的方式）
+      await logMessage('准备强制退出进程...');
       
-      // 等待一小段时间让窗口完全关闭
-      await Future.delayed(Duration(milliseconds: 100));
+      // 尝试销毁窗口（异步，不等待结果）
+      windowManager.destroy().catchError((e) {
+        print('销毁窗口失败: $e');
+      });
       
-      // 如果 destroy() 没有退出进程，则手动退出
-      await logMessage('窗口已销毁，执行 exit()');
+      // 等待50ms让销毁操作开始
+      await Future.delayed(Duration(milliseconds: 50));
+      
+      // 立即强制退出进程
+      await logMessage('执行 exit($exitCode) 强制退出');
       exit(exitCode);
       
     } catch (e) {
-      await logMessage('方法1失败: $e');
-      
-      try {
-        // 方法2: 直接使用 exit() 强制退出进程
-        await logMessage('尝试方法2: 直接使用 exit() 强制退出');
-        exit(exitCode);
-        
-      } catch (e2) {
-        await logMessage('所有退出方法都失败: $e2');
-        // 最终保障
-        exit(exitCode);
-      }
+      await logMessage('退出失败: $e');
+      // 最终保障：无论如何都要退出
+      exit(exitCode);
     }
   }
 }

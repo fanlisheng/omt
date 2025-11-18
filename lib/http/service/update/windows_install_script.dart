@@ -30,6 +30,9 @@ class WindowsInstallScript {
 @echo off
 setlocal enabledelayedexpansion
 
+REM Set window title
+title OMT Update Installer
+
 REM Use TEMP directory for log file (always writable, no permission issues)
 set "LOG_DIR=%TEMP%\\OMT_Update"
 if not exist "%LOG_DIR%" mkdir "%LOG_DIR%" >nul 2>&1
@@ -241,14 +244,25 @@ tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
 if %ERRORLEVEL% EQU 0 (
     echo [%date% %time%] CONFIRMED: Application is running >> "%LOG_FILE%"
     echo [%date% %time%] Update process completed successfully >> "%LOG_FILE%"
-    echo Update completed successfully!
-    echo Log file: %LOG_FILE%
+    echo.
+    echo ========================================
+    echo    Update Completed Successfully!
+    echo ========================================
+    echo Application is running
+    echo Log: %LOG_FILE%
 ) else (
     echo [%date% %time%] WARNING: Application may have closed immediately >> "%LOG_FILE%"
-    echo Update completed, but application status uncertain
-    echo Check log file: %LOG_FILE%
+    echo.
+    echo ========================================
+    echo    Update Completed
+    echo ========================================
+    echo Note: Application status uncertain
+    echo Log: %LOG_FILE%
 )
 
+echo.
+echo This window will close automatically in 3 seconds...
+timeout /t 3 /nobreak >nul 2>&1
 exit /b 0
 ''';
   }
