@@ -831,29 +831,29 @@ WshShell.Run """$scriptPath""", 0, False
     await logMessage('强制退出应用，退出码: $exitCode');
     
     try {
-      // 禁用窗口关闭确认，实现静默退出
-      await logMessage('禁用窗口关闭确认...');
-      await windowManager.setPreventClose(false);
+      // 方法1: 直接使用 destroy() 销毁窗口，不触发 onWindowClose 回调
+      await logMessage('尝试方法1: 使用 windowManager.destroy()');
+      await windowManager.destroy();
+      await logMessage('方法1成功: destroy() 执行完成');
       
-      // 方法1: 使用 windowManager.close() (推荐方式，不会卡住)
-      await logMessage('尝试方法1: 使用 windowManager.close()');
-      await windowManager.close();
-      await logMessage('方法1成功: windowManager.close() 执行完成');
-      return;
+      // 等待一小段时间让窗口完全关闭
+      await Future.delayed(Duration(milliseconds: 100));
+      
+      // 如果 destroy() 没有退出进程，则手动退出
+      await logMessage('窗口已销毁，执行 exit()');
+      exit(exitCode);
       
     } catch (e) {
       await logMessage('方法1失败: $e');
       
       try {
-        // 方法2: 最后的保障 - 使用 exit() (可能会卡住)
-        await logMessage('尝试方法2: 使用 exit() (最后保障)');
-        await logMessage('警告: exit() 可能会导致应用卡住');
+        // 方法2: 直接使用 exit() 强制退出进程
+        await logMessage('尝试方法2: 直接使用 exit() 强制退出');
         exit(exitCode);
         
       } catch (e2) {
         await logMessage('所有退出方法都失败: $e2');
-        await logMessage('错误堆栈: ${StackTrace.current}');
-        // 最后的最后，还是尝试 exit
+        // 最终保障
         exit(exitCode);
       }
     }

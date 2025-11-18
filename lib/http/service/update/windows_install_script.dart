@@ -84,8 +84,11 @@ goto process_exited
 :process_exited
 echo [%date% %time%] Application process has exited >> "%LOG_FILE%"
 echo Application closed successfully
-REM Additional wait to ensure file handles are released
-ping 127.0.0.1 -n 3 >nul 2>&1
+
+REM Critical: Wait longer to ensure ALL file handles are released (including DLLs)
+echo [%date% %time%] Waiting 10 seconds for file handles to release... >> "%LOG_FILE%"
+echo Waiting for file handles to release...
+ping 127.0.0.1 -n 11 >nul 2>&1
 
 REM Detect Windows version and set compatibility
 echo [%date% %time%] Detecting Windows version... >> "%LOG_FILE%"
@@ -114,9 +117,7 @@ echo Checking source: %SOURCE_DIR%
 echo [%date% %time%] Checking source directory: %SOURCE_DIR% >> "%LOG_FILE%"
 if not exist "%SOURCE_DIR%" (
     echo [%date% %time%] ERROR: Source directory not found: %SOURCE_DIR% >> "%LOG_FILE%"
-    echo ERROR: Source not found
-    echo Check log file: %LOG_FILE%
-    pause
+    echo ERROR: Source not found >> "%LOG_FILE%"
     exit /b 1
 )
 echo [%date% %time%] Source directory exists >> "%LOG_FILE%"
@@ -127,14 +128,20 @@ if not exist "%TARGET_DIR%" (
     mkdir "%TARGET_DIR%"
     if %ERRORLEVEL% NEQ 0 (
         echo [%date% %time%] ERROR: Failed to create target directory >> "%LOG_FILE%"
-        echo ERROR: Cannot create target directory
-        echo Check log file: %LOG_FILE%
-        pause
+        echo ERROR: Cannot create target directory >> "%LOG_FILE%"
         exit /b 1
     )
     echo [%date% %time%] Target directory created >> "%LOG_FILE%"
 ) else (
     echo [%date% %time%] Target directory already exists >> "%LOG_FILE%"
+)
+
+REM Double-check process is really gone before copying
+echo [%date% %time%] Final process check before copying... >> "%LOG_FILE%"
+tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
+if %ERRORLEVEL% EQU 0 (
+    echo [%date% %time%] WARNING: Process still detected, waiting additional 5 seconds... >> "%LOG_FILE%"
+    ping 127.0.0.1 -n 6 >nul 2>&1
 )
 
 echo Copying files...
@@ -147,21 +154,17 @@ if "%WIN7%"=="1" (
     echo [%date% %time%] xcopy completed with exit code: !COPY_RESULT! >> "%LOG_FILE%"
     if !COPY_RESULT! GEQ 4 (
         echo [%date% %time%] ERROR: xcopy failed with code !COPY_RESULT! >> "%LOG_FILE%"
-        echo ERROR: Copy failed with xcopy
-        echo Check log file: %LOG_FILE%
-        pause
+        echo ERROR: Copy failed with xcopy >> "%LOG_FILE%"
         exit /b 1
     )
 ) else (
     echo [%date% %time%] Using robocopy for Windows 8+ >> "%LOG_FILE%"
-    robocopy "%SOURCE_DIR%" "%TARGET_DIR%" /E /R:1 /W:1 >nul 2>&1
+    robocopy "%SOURCE_DIR%" "%TARGET_DIR%" /E /R:3 /W:2 >> "%LOG_FILE%" 2>&1
     set "COPY_RESULT=!ERRORLEVEL!"
     echo [%date% %time%] robocopy completed with exit code: !COPY_RESULT! >> "%LOG_FILE%"
     if !COPY_RESULT! GTR 7 (
         echo [%date% %time%] ERROR: robocopy failed with code !COPY_RESULT! >> "%LOG_FILE%"
-        echo ERROR: Copy failed with robocopy
-        echo Check log file: %LOG_FILE%
-        pause
+        echo ERROR: Copy failed, check log file >> "%LOG_FILE%"
         exit /b 1
     )
 )
@@ -183,9 +186,7 @@ cd /d "%TARGET_DIR%"
 REM Verify executable exists
 if not exist "%APP_PATH%" (
     echo [%date% %time%] ERROR: Executable not found: %APP_PATH% >> "%LOG_FILE%"
-    echo ERROR: Application executable not found
-    echo Check log file: %LOG_FILE%
-    pause
+    echo ERROR: Application executable not found >> "%LOG_FILE%"
     exit /b 1
 )
 
@@ -226,14 +227,11 @@ if %ERRORLEVEL% EQU 0 (
 
 REM All methods failed
 echo [%date% %time%] ERROR: All launch methods failed >> "%LOG_FILE%"
-echo ERROR: Failed to start application with all methods
-echo Please check:
-echo 1. Application permissions
-echo 2. Antivirus software blocking
-echo 3. Windows Defender SmartScreen
-echo 4. User Account Control settings
-echo Check detailed log: %LOG_FILE%
-pause
+echo [%date% %time%] Please check: >> "%LOG_FILE%"
+echo [%date% %time%] 1. Application permissions >> "%LOG_FILE%"
+echo [%date% %time%] 2. Antivirus software blocking >> "%LOG_FILE%"
+echo [%date% %time%] 3. Windows Defender SmartScreen >> "%LOG_FILE%"
+echo [%date% %time%] 4. User Account Control settings >> "%LOG_FILE%"
 exit /b 1
 
 :launch_success
