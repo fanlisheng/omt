@@ -831,16 +831,31 @@ WshShell.Run """$scriptPath""", 0, False
     await logMessage('强制退出应用，退出码: $exitCode');
     
     try {
-      // 先记录日志，然后立即退出进程（最可靠的方式）
-      await logMessage('准备强制退出进程...');
+      // 先记录日志
+      await logMessage('准备强制退出进程，PID: ${pid}');
       
       // 尝试销毁窗口（异步，不等待结果）
       windowManager.destroy().catchError((e) {
         print('销毁窗口失败: $e');
       });
       
-      // 等待50ms让销毁操作开始
-      await Future.delayed(Duration(milliseconds: 50));
+      // 等待100ms让窗口销毁
+      await Future.delayed(Duration(milliseconds: 100));
+      
+      // 在Windows上，使用taskkill确保进程被杀死
+      if (Platform.isWindows) {
+        await logMessage('使用taskkill强制终止当前进程...');
+        try {
+          // 异步执行taskkill，不等待结果
+          Process.run('taskkill', ['/F', '/PID', pid.toString()]).then((_) {
+            print('taskkill执行完成');
+          }).catchError((e) {
+            print('taskkill失败: $e');
+          });
+        } catch (e) {
+          await logMessage('taskkill失败: $e');
+        }
+      }
       
       // 立即强制退出进程
       await logMessage('执行 exit($exitCode) 强制退出');

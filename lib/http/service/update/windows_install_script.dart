@@ -59,9 +59,13 @@ if %ERRORLEVEL% EQU 0 (
 REM Set variables early for process checking
 set "APP_NAME=\${appName}"
 
-REM Wait for application to exit with active checking
-echo [%date% %time%] Waiting for application to exit... >> "%LOG_FILE%"
+REM Critical: Initial delay to let application exit gracefully
+echo [%date% %time%] Waiting 5 seconds for application to start exiting... >> "%LOG_FILE%"
 echo Waiting for application to exit...
+ping 127.0.0.1 -n 6 >nul 2>&1
+
+REM Wait for application to exit with active checking
+echo [%date% %time%] Now checking if process has exited... >> "%LOG_FILE%"
 
 REM Check if process is still running and wait up to 30 seconds
 set "WAIT_COUNT=0"
