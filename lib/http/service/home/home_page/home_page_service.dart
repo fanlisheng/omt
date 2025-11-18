@@ -235,7 +235,9 @@ class HomePageService {
         // 缓存新数据的深拷贝，避免外部修改影响缓存
         if (data != null) {
           final dataCopy = _deepCopyData<T>(data);
-          _cacheManager.setCache<T>(cacheKey, dataCopy);
+          if (dataCopy != null) {
+            _cacheManager.setCache<T>(cacheKey, dataCopy);
+          }
         }
         if (onSuccess != null) {
           onSuccess(data);
