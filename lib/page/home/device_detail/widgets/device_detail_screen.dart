@@ -99,6 +99,7 @@ class DeviceDetailScreen extends StatelessWidget {
           onChange: (value) => model.setChange(value),
         );
       case DeviceType.battery:
+      case DeviceType.mainsPower:
       case DeviceType.exchange:
         return DetailBatteryExchangeView(
           nodeId: model.nodeId,

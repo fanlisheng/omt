@@ -15,6 +15,7 @@ import '../../home/device_add/view_models/add_power_box_viewmodel.dart';
 import '../../../bean/common/id_name_value.dart';
 import '../../home/device_add/view_models/add_power_viewmodel.dart';
 import '../../one_picture/one_picture/one_picture_page.dart';
+import '../../../utils/device_utils.dart';
 
 class PreviewViewModel extends BaseViewModel {
   OnePictureDataData? onePictureDataData;
@@ -64,10 +65,14 @@ class PreviewViewModel extends BaseViewModel {
           onSuccess: (data) {
             onePictureDataData = data;
             notifyListeners();
-            Timer(Duration(milliseconds: 200), () {
-              picturePageKey.currentState
-                  ?.refreshWithData(data: onePictureDataData);
-              notifyListeners();
+            
+            // OnePicturePage 的内部状态不会自动响应外部数据变化
+            // 必须通过 refreshWithData 主动通知它更新
+            // 使用 scheduleMicrotask 在下一个事件循环中调用，确保 UI 已经重建
+            Future.microtask(() {
+              if (picturePageKey.currentState != null && onePictureDataData != null) {
+                picturePageKey.currentState?.refreshWithData(data: onePictureDataData);
+              }
             });
           });
     } catch (e) {
@@ -95,79 +100,72 @@ class PreviewViewModel extends BaseViewModel {
     });
   }
 
-  Map<String, dynamic> _getPowersMap(AddPowerViewModel powerViewModel) {
-    List<int> items = [];
-    int? batteryCap = (powerViewModel.battery == false)
-        ? null
-        : (powerViewModel.isCapacity80 ? 80 : 160);
-
-    if (powerViewModel.batteryMains) {
-      items.add(1);
-    }
-    if (batteryCap != null) {
-      items.add(2);
-    }
-    Map<String, dynamic> params = {
-      "PowerType": items,
-      "pass_id": powerViewModel.selectedPowerInOut!.id!,
-    };
-    if (batteryCap != null) {
-      params["battery_capacity"] = batteryCap;
-    }
-    return params;
-  }
-
-  Map<String, dynamic> _getPowerBoxes(AddPowerBoxViewModel powerBoxViewModel) {
-    String deviceCode =
-        powerBoxViewModel.selectedDeviceDetailPowerBox!.deviceCode!;
-    int passId = powerBoxViewModel.selectedPowerBoxInOut!.id!;
-
-    Map<String, dynamic> params = {
-      "device_code": deviceCode,
-      "pass_id": passId,
-    };
-    return params;
-  }
-
-  Map<String, dynamic> _getNetwork(AddPowerViewModel powerViewModel) {
-    int passId = powerViewModel.selectedPowerInOut!.id!;
-    int type = powerViewModel.selectedRouterType!.id!;
-    String mac = powerViewModel.mac!;
-    String ip = powerViewModel.routerIpController.text;
-
-    Map<String, dynamic> params = {
-      "ip": ip,
-      "type": type,
-      "mac": mac,
-      "pass_id": passId,
-    };
-    return params;
-  }
-
-  Map<String, dynamic> _getNvr(AddNvrViewModel nvrViewModel) {
-    int passId = nvrViewModel.selectedNarInOut!.id!;
-    String mac = nvrViewModel.selectedNvr!.mac ?? "";
-    String ip = nvrViewModel.selectedNvr?.ip ?? "";
-
-    Map<String, dynamic> params = {
-      "ip": ip,
-      "mac": mac,
-      "pass_id": passId,
-    };
-    return params;
-  }
-
-  List<Map<String, dynamic>> _getSwitches(AddPowerViewModel powerViewModel) {
-    List<Map<String, dynamic>> paramsList = [];
-    for (ExchangeDeviceModel exchange in powerViewModel.exchangeDevices) {
-      Map<String, dynamic> params = {
-        "interface_num": exchange.selectedPortNumber.toInt(),
-        "power_method": exchange.selectedSupplyMethod,
-        "pass_id": powerViewModel.selectedPowerInOut?.id,
-      };
-      paramsList.add(params);
+  /// 获取设备统计信息
+  /// 返回格式：1个电池 / 1个电源箱 / 2个路由器 / 2个交换机 / 2个AI设备 / 2个摄像头 / 1个NVR
+  String getDeviceStatistics() {
+    if (onePictureDataData == null) {
+      return '暂无设备';
     }
 
-    return paramsList;
+    // 统计各类设备数量，使用Set去重
+    Map<int, int> deviceCounts = {};
+    Set<String> countedNodes = {}; // 记录已统计的节点，使用node_code去重
+    _countDevices(onePictureDataData!, deviceCounts, countedNodes);
+
+    if (deviceCounts.isEmpty) {
+      return '暂无设备';
+    }
+
+    // 直接遍历统计结果
+    List<String> statistics = [];
+    deviceCounts.forEach((deviceType, count) {
+      // 通过 intToDeviceTypeMap + _deviceTypeNameMap 获取名称
+      String name = DeviceUtils.getDeviceTypeNameByInt(deviceType);
+      statistics.add('$count个$name');
+    });
+
+    return '${statistics.join('  /  ')}';
   }
+
+  /// 递归统计设备数量
+  void _countDevices(OnePictureDataData data, Map<int, int> counts, Set<String> countedNodes) {
+    // 使用 node_code 作为唯一标识，避免重复统计
+    String nodeKey = data.nodeCode ?? '';
+    
+    // 如果节点已经统计过，直接返回
+    if (nodeKey.isNotEmpty && countedNodes.contains(nodeKey)) {
+      return;
+    }
+    
+    // 统计当前节点
+    if (data.type != null && _isCountableDevice(data.type!)) {
+      counts[data.type!] = (counts[data.type!] ?? 0) + 1;
+      // 标记该节点已统计
+      if (nodeKey.isNotEmpty) {
+        countedNodes.add(nodeKey);
+      }
+    }
+
+    // 递归统计子节点
+    if (data.children.isNotEmpty) {
+      for (var child in data.children) {
+        _countDevices(child, counts, countedNodes);
+      }
+    }
+
+    // 递归统计 nextList
+    if (data.nextList.isNotEmpty) {
+      for (var next in data.nextList) {
+        _countDevices(next, counts, countedNodes);
+      }
+    }
+  }
+
+  /// 判断是否是需要统计的设备类型
+  bool _isCountableDevice(int type) {
+    // 使用 DeviceUtils.countableDeviceTypes 判断
+    return DeviceUtils.countableDeviceTypes.contains(type);
+  }
+
+
 }

@@ -20,6 +20,7 @@ enum DeviceType {
   camera, //摄像头
   nvr,
   battery, // 电池
+  mainsPower, // 市电
   powerBox, //电源箱
   exchange, //交互机
   router, //路由器
