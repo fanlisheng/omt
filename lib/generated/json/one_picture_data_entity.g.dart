@@ -137,6 +137,11 @@ OnePictureDataData $OnePictureDataDataFromJson(Map<String, dynamic> json) {
   if (unknown != null) {
     onePictureDataData.unknown = unknown;
   }
+  final OnePictureDataData? parent = jsonConvert.convert<OnePictureDataData>(
+      json['parent']);
+  if (parent != null) {
+    onePictureDataData.parent = parent;
+  }
   final List<OnePictureDataData>? nextList = (json['nextList'] as List<
       dynamic>?)
       ?.map(
@@ -191,6 +196,7 @@ Map<String, dynamic> $OnePictureDataDataToJson(OnePictureDataData entity) {
   data['sameTypeData'] = entity.sameTypeData;
   data['ignore'] = entity.ignore;
   data['unknown'] = entity.unknown;
+  data['parent'] = entity.parent?.toJson();
   data['nextList'] = entity.nextList.map((v) => v.toJson()).toList();
   data['lineColor'] = entity.lineColor;
   data['errorTxt'] = entity.errorTxt;
@@ -217,6 +223,7 @@ extension OnePictureDataDataExtension on OnePictureDataData {
     bool? sameTypeData,
     bool? ignore,
     bool? unknown,
+    OnePictureDataData? parent,
     IconData? iconData,
     String? icon,
     List<OnePictureDataData>? nextList,
@@ -242,6 +249,7 @@ extension OnePictureDataDataExtension on OnePictureDataData {
       ..sameTypeData = sameTypeData ?? this.sameTypeData
       ..ignore = ignore ?? this.ignore
       ..unknown = unknown ?? this.unknown
+      ..parent = parent ?? this.parent
       ..iconData = iconData ?? this.iconData
       ..icon = icon ?? this.icon
       ..nextList = nextList ?? this.nextList

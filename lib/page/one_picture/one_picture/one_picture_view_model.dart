@@ -86,8 +86,6 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
   }
 
   void setupOnePictureHttpData() {
-
-
     if (null != onePictureHttpData) {
       OnePictureDataData data = onePictureHttpData!;
       currentIndex = 0;
@@ -382,7 +380,8 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
     }
   }
 
-  String _getNodeId(OnePictureDataData? data) => '${data?.type}_${data?.nodeCode??''}';
+  String _getNodeId(OnePictureDataData? data) =>
+      '${data?.type}_${data?.nodeCode ?? ''}';
 
   OnePictureDataData? _dealHttpData(OnePictureDataData? data) {
     if (data == null) {
@@ -419,6 +418,13 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
     opd.setArrow();
     opd.setBorder();
     opd.setIcon();
+    if (opd.type == OnePictureType.DM.index) {
+      if (opd.children.isNotEmpty) {
+        for (var child in opd.children) {
+          child.parent = opd;
+        }
+      }
+    }
 
     if (opd.children.isNotEmpty) {
       for (var child in opd.children) {
@@ -589,7 +595,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
           opd.children = dyx;
           _powerSub(opd.children[0],
               jck: jck, lyq: lyq, nvr: nvr, jhj: jhj, yxwl: yxwl, aisb: aisb);
-         } else if (jck.isNotEmpty) {
+        } else if (jck.isNotEmpty) {
           opd.children = jck;
           for (var child in jck) {
             setNextList(child);

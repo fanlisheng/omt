@@ -74,6 +74,7 @@ class OnePictureDataData {
   bool sameTypeData = false;
   bool ignore = false;
   bool unknown = false;
+  OnePictureDataData? parent;
 
   List<String> get faultList {
     return fault ?? [];
@@ -370,11 +371,21 @@ class OnePictureDataData {
       } else if (type == OnePictureType.JCK.index) {
         if (children.isNotEmpty) {
           this.showBorder = false;
+          if (this.parent?.type == OnePictureType.DM.index) {
+            if (this.parent?.children.isNotEmpty == true) {
+              for (var child in this.parent!.children) {
+                if (child.type != OnePictureType.JCK.index) {
+                  this.showBorder = true;
+                }
+              }
+            }
+          }
           for (var child in children) {
             if (child.type != OnePictureType.AISB.index &&
                 child.type != OnePictureType.SXT.index &&
                 child.type != OnePictureType.NVR.index &&
-                child.type != OnePictureType.JHJ.index) {
+                child.type != OnePictureType.JHJ.index &&
+                child.type != OnePictureType.LYQ.index) {
               this.showBorder = true;
               break;
             }
