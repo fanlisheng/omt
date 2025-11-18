@@ -831,6 +831,10 @@ WshShell.Run """$scriptPath""", 0, False
     await logMessage('强制退出应用，退出码: $exitCode');
     
     try {
+      // 禁用窗口关闭确认，实现静默退出
+      await logMessage('禁用窗口关闭确认...');
+      await windowManager.setPreventClose(false);
+      
       // 方法1: 使用 windowManager.close() (推荐方式，不会卡住)
       await logMessage('尝试方法1: 使用 windowManager.close()');
       await windowManager.close();

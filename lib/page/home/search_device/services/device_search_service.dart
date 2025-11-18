@@ -20,10 +20,11 @@ class DeviceSearchService {
   DeviceSearchService._internal();
 
   // 获取实例列表
-  Future<List<StrIdNameValue>> getInstanceList() async {
+  Future<List<StrIdNameValue>> getInstanceList({required bool forceRefresh}) async {
     final completer = Completer<List<StrIdNameValue>>();
 
     HttpQuery.share.homePageService.getInstanceList("5101",
+        forceRefresh: forceRefresh,
         onSuccess: (List<StrIdNameValue>? data) {
       completer.complete(data ?? []);
     }, onError: (String error) {
@@ -35,10 +36,11 @@ class DeviceSearchService {
   }
 
   // 获取大门列表
-  Future<List<IdNameValue>> getGateList() async {
+  Future<List<IdNameValue>> getGateList({required bool forceRefresh}) async {
     final completer = Completer<List<IdNameValue>>();
 
     HttpQuery.share.homePageService.getGateList(
+        forceRefresh: forceRefresh,
         onSuccess: (List<IdNameValue>? data) {
       completer.complete(data ?? []);
     }, onError: (String error) {
@@ -50,10 +52,11 @@ class DeviceSearchService {
   }
 
   // 获取进出口列表
-  Future<List<IdNameValue>> getInOutList() async {
+  Future<List<IdNameValue>> getInOutList({required bool forceRefresh}) async {
     final completer = Completer<List<IdNameValue>>();
 
     HttpQuery.share.homePageService.getInOutList(
+        forceRefresh: forceRefresh,
         onSuccess: (List<IdNameValue>? data) {
       completer.complete(data ?? []);
     }, onError: (String error) {
@@ -185,13 +188,13 @@ class DeviceSearchService {
   }
 
   // 初始化设备搜索数据
-  Future<DeviceSearchInitData> initSearchData() async {
+  Future<DeviceSearchInitData> initSearchData({required bool forceRefresh}) async {
     DeviceSearchInitData data = DeviceSearchInitData();
 
     // 并行加载数据
-    Future<List<StrIdNameValue>> instancesFuture = getInstanceList();
-    Future<List<IdNameValue>> doorsFuture = getGateList();
-    Future<List<IdNameValue>> inOutFuture = getInOutList();
+    Future<List<StrIdNameValue>> instancesFuture = getInstanceList(forceRefresh:forceRefresh);
+    Future<List<IdNameValue>> doorsFuture = getGateList(forceRefresh:forceRefresh);
+    Future<List<IdNameValue>> inOutFuture = getInOutList(forceRefresh:forceRefresh);
 
     // 等待所有数据加载完成
     List results =

@@ -30,24 +30,15 @@ class WindowsInstallScript {
 @echo off
 setlocal enabledelayedexpansion
 
-REM Set log file path to project directory with fallback
-set "LOG_DIR=%~dp0"
-if "%LOG_DIR%"=="" set "LOG_DIR=%CD%"
-REM Remove trailing backslash if present
-if "%LOG_DIR:~-1%"=="\\" set "LOG_DIR=%LOG_DIR:~0,-1%"
+REM Use TEMP directory for log file (always writable, no permission issues)
+set "LOG_DIR=%TEMP%\\OMT_Update"
+if not exist "%LOG_DIR%" mkdir "%LOG_DIR%" >nul 2>&1
 set "LOG_FILE=%LOG_DIR%\\omt_update_log.txt"
-
-REM Test if we can write to log file, fallback to TEMP if not
-echo Testing log file creation... > "%LOG_FILE%" 2>&1
-if %ERRORLEVEL% NEQ 0 (
-    set "LOG_DIR=%TEMP%"
-    set "LOG_FILE=%LOG_DIR%\\omt_update_log.txt"
-    echo [%date% %time%] WARNING: Cannot write to project directory, using TEMP >> "%LOG_FILE%"
-)
 
 REM Initialize log file
 echo [%date% %time%] OMT Update Installer Starting... > "%LOG_FILE%"
 echo OMT Update Installer Starting...
+echo Log file: %LOG_FILE%
 
 REM Check admin privileges
 echo [%date% %time%] Checking admin privileges... >> "%LOG_FILE%"
@@ -62,9 +53,39 @@ if %ERRORLEVEL% EQU 0 (
     echo Running without admin privileges...
 )
 
-REM Wait for application to exit (compatible with Win7+)
+REM Set variables early for process checking
+set "APP_NAME=\${appName}"
+
+REM Wait for application to exit with active checking
 echo [%date% %time%] Waiting for application to exit... >> "%LOG_FILE%"
-ping 127.0.0.1 -n 4 >nul 2>&1
+echo Waiting for application to exit...
+
+REM Check if process is still running and wait up to 30 seconds
+set "WAIT_COUNT=0"
+:wait_loop
+tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
+if %ERRORLEVEL% NEQ 0 goto process_exited
+
+set /a WAIT_COUNT+=1
+if %WAIT_COUNT% GEQ 30 goto force_kill
+
+echo [%date% %time%] Process still running, waiting... (attempt %WAIT_COUNT%/30) >> "%LOG_FILE%"
+ping 127.0.0.1 -n 2 >nul 2>&1
+goto wait_loop
+
+:force_kill
+echo [%date% %time%] WARNING: Process did not exit gracefully, forcing termination... >> "%LOG_FILE%"
+echo WARNING: Forcing application to close...
+taskkill /F /IM "%APP_NAME%" >nul 2>&1
+ping 127.0.0.1 -n 3 >nul 2>&1
+echo [%date% %time%] Process forcefully terminated >> "%LOG_FILE%"
+goto process_exited
+
+:process_exited
+echo [%date% %time%] Application process has exited >> "%LOG_FILE%"
+echo Application closed successfully
+REM Additional wait to ensure file handles are released
+ping 127.0.0.1 -n 3 >nul 2>&1
 
 REM Detect Windows version and set compatibility
 echo [%date% %time%] Detecting Windows version... >> "%LOG_FILE%"
@@ -77,8 +98,7 @@ if "%VERSION%"=="6.1" (
     echo [%date% %time%] Windows 8+ detected >> "%LOG_FILE%"
 )
 
-REM Set variables with enhanced path handling
-set "APP_NAME=\${appName}"
+REM Set path variables
 set "SOURCE_DIR=\${sourceDir}"
 set "TARGET_DIR=\${targetDir}"
 set "ZIP_PATH=\${zipPath}"
@@ -171,10 +191,10 @@ if not exist "%APP_PATH%" (
 
 echo [%date% %time%] Starting application with multiple methods... >> "%LOG_FILE%"
 
-REM Method 1: Standard start command
-echo [%date% %time%] Trying Method 1: start command >> "%LOG_FILE%"
+REM Method 1: Standard start command with relative path
+echo [%date% %time%] Trying Method 1: start with relative path >> "%LOG_FILE%"
 start "" "%APP_NAME%" >nul 2>&1
-ping 127.0.0.1 -n 3 >nul 2>&1
+ping 127.0.0.1 -n 5 >nul 2>&1
 tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
 if %ERRORLEVEL% EQU 0 (
     echo [%date% %time%] SUCCESS: Application started with Method 1 >> "%LOG_FILE%"
@@ -182,10 +202,10 @@ if %ERRORLEVEL% EQU 0 (
     goto launch_success
 )
 
-REM Method 2: Direct execution with start command
+REM Method 2: Start command with full path
 echo [%date% %time%] Trying Method 2: start with full path >> "%LOG_FILE%"
 start "" "%APP_PATH%" >nul 2>&1
-ping 127.0.0.1 -n 3 >nul 2>&1
+ping 127.0.0.1 -n 5 >nul 2>&1
 tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
 if %ERRORLEVEL% EQU 0 (
     echo [%date% %time%] SUCCESS: Application started with Method 2 >> "%LOG_FILE%"
@@ -193,38 +213,13 @@ if %ERRORLEVEL% EQU 0 (
     goto launch_success
 )
 
-REM Method 3: PowerShell start-process (for newer Windows)
-if "%WIN7%"=="0" (
-    echo [%date% %time%] Trying Method 3: PowerShell Start-Process >> "%LOG_FILE%"
-    powershell -Command "Start-Process -FilePath '%APP_PATH%' -WindowStyle Normal" >nul 2>&1
-    ping 127.0.0.1 -n 3 >nul 2>&1
-    tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
-    set "PS_RESULT=!ERRORLEVEL!"
-    if !PS_RESULT! EQU 0 (
-        echo [%date% %time%] SUCCESS: Application started with Method 3 >> "%LOG_FILE%"
-        echo Application started successfully!
-        goto launch_success
-    )
-)
-
-REM Method 4: Using call command
-echo [%date% %time%] Trying Method 4: call command >> "%LOG_FILE%"
-call "%APP_PATH%" >nul 2>&1
-ping 127.0.0.1 -n 4 >nul 2>&1
-tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
-if %ERRORLEVEL% EQU 0 (
-    echo [%date% %time%] SUCCESS: Application started with Method 4 >> "%LOG_FILE%"
-    echo Application started successfully!
-    goto launch_success
-)
-
-REM Method 5: CMD /C start (fallback)
-echo [%date% %time%] Trying Method 5: CMD /C start >> "%LOG_FILE%"
+REM Method 3: CMD start as fallback
+echo [%date% %time%] Trying Method 3: cmd /c start >> "%LOG_FILE%"
 cmd /c start "" "%APP_PATH%" >nul 2>&1
-ping 127.0.0.1 -n 4 >nul 2>&1
+ping 127.0.0.1 -n 6 >nul 2>&1
 tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
 if %ERRORLEVEL% EQU 0 (
-    echo [%date% %time%] SUCCESS: Application started with Method 5 >> "%LOG_FILE%"
+    echo [%date% %time%] SUCCESS: Application started with Method 3 >> "%LOG_FILE%"
     echo Application started successfully!
     goto launch_success
 )
@@ -243,18 +238,19 @@ exit /b 1
 
 :launch_success
 echo [%date% %time%] Final verification... >> "%LOG_FILE%"
-ping 127.0.0.1 -n 2 >nul 2>&1
+ping 127.0.0.1 -n 3 >nul 2>&1
 tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
 if %ERRORLEVEL% EQU 0 (
     echo [%date% %time%] CONFIRMED: Application is running >> "%LOG_FILE%"
     echo [%date% %time%] Update process completed successfully >> "%LOG_FILE%"
     echo Update completed successfully!
+    echo Log file: %LOG_FILE%
 ) else (
     echo [%date% %time%] WARNING: Application may have closed immediately >> "%LOG_FILE%"
     echo Update completed, but application status uncertain
+    echo Check log file: %LOG_FILE%
 )
 
-echo Log file saved to: %LOG_FILE%
 exit /b 0
 ''';
   }

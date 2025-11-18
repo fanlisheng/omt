@@ -146,6 +146,7 @@ class HomePageService {
     required ValueChanged<List<StrIdNameValue>?>? onSuccess,
     ValueChanged<List<StrIdNameValue>?>? onCache,
     ValueChanged<String>? onError,
+    bool forceRefresh = false, // 是否强制刷新
   }) async {
     _cacheAndFetch<List<StrIdNameValue>>(
       url: _instanceList,
@@ -155,6 +156,7 @@ class HomePageService {
       onError: onError,
       autoHideDialog: true,
       autoShowDialog: true,
+      forceRefresh: forceRefresh,
     );
   }
 
@@ -162,6 +164,7 @@ class HomePageService {
     required ValueChanged<List<IdNameValue>?>? onSuccess,
     ValueChanged<List<IdNameValue>?>? onCache,
     ValueChanged<String>? onError,
+    bool forceRefresh = false, // 是否强制刷新
   }) async {
     _cacheAndFetch<List<IdNameValue>>(
       url: _gateList,
@@ -171,6 +174,7 @@ class HomePageService {
       onError: onError,
       autoHideDialog: true,
       autoShowDialog: true,
+      forceRefresh: forceRefresh,
     );
   }
 
@@ -178,6 +182,7 @@ class HomePageService {
     required ValueChanged<List<IdNameValue>?>? onSuccess,
     ValueChanged<List<IdNameValue>?>? onCache,
     ValueChanged<String>? onError,
+    bool forceRefresh = false, // 是否强制刷新
   }) async {
     _cacheAndFetch<List<IdNameValue>>(
       url: _inOutList,
@@ -187,6 +192,7 @@ class HomePageService {
       onError: onError,
       autoHideDialog: false,
       autoShowDialog: false,
+      forceRefresh: forceRefresh,
     );
   }
 
@@ -199,19 +205,22 @@ class HomePageService {
     ValueChanged<String>? onError,
     required bool autoHideDialog,
     required bool autoShowDialog,
+    bool forceRefresh = false, // 是否强制刷新，跳过缓存
   }) async {
     // 使用 URL 作为缓存 key
     final actualUrl = await url;
     final cacheKey = actualUrl;
 
-    // 先返回缓存数据
-    final cachedData = _cacheManager.getCache<T>(cacheKey);
-    if (cachedData != null) {
-      // 有缓存数据，直接返回
-      if (onSuccess != null) {
-        onSuccess(cachedData);
+    // 如果不强制刷新，先检查缓存
+    if (!forceRefresh) {
+      final cachedData = _cacheManager.getCache<T>(cacheKey);
+      if (cachedData != null) {
+        // 有缓存数据，直接返回
+        if (onSuccess != null) {
+          onSuccess(cachedData);
+        }
+        return;
       }
-      return;
     }
 
     // 没有缓存，发起网络请求

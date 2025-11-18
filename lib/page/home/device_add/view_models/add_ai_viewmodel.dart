@@ -187,7 +187,6 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
 
   //删除
   deleteAiAction(int index,BuildContext context1) async {
-    LoadingUtils.showInfo(data: "测试一下");
     final result = await DialogUtils.showContentDialog(
         context: context1,
         title: "确定删除",

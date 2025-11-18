@@ -172,7 +172,8 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
     while (!success) {
       try {
         // 使用状态服务初始化数据
-        DeviceSearchInitData data = await _searchService.initSearchData();
+        DeviceSearchInitData data =
+            await _searchService.initSearchData(forceRefresh: false);
 
         instanceList = data.instanceList;
         doorList = data.doorList;
@@ -201,7 +202,8 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
     while (!success) {
       try {
         // 使用状态服务初始化数据
-        DeviceSearchInitData data = await _searchService.initSearchData();
+        DeviceSearchInitData data =
+            await _searchService.initSearchData(forceRefresh: true);
 
         instanceList = data.instanceList;
         doorList = data.doorList;
@@ -604,7 +606,7 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
         // _powerViewModel.syncControllersWithData();
 
         // 跳转到对应步骤
-        if(currentStep > 7){
+        if (currentStep > 7) {
           currentStep = 6;
         }
         pageController.jumpToPage(currentStep - 1);
