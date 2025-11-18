@@ -373,10 +373,27 @@ class OnePictureDataData {
           this.showBorder = false;
           if (this.parent?.type == OnePictureType.DM.index) {
             if (this.parent?.children.isNotEmpty == true) {
+              Map<int, OnePictureDataData> map = {};
               for (var child in this.parent!.children) {
-                if (child.type != OnePictureType.JCK.index) {
-                  this.showBorder = true;
-                }
+                map[child.type!] = child;
+              }
+
+              var hasDY = map[OnePictureType.GDSB.index] != null ||
+                  map[OnePictureType.SD.index] != null ||
+                  map[OnePictureType.DC.index] != null ||
+                  map[OnePictureType.DYX.index] != null;
+
+              var hasOther = map[OnePictureType.AISB.index] != null ||
+                  map[OnePictureType.SXT.index] != null ||
+                  map[OnePictureType.NVR.index] != null ||
+                  map[OnePictureType.JHJ.index] != null ||
+                  map[OnePictureType.LYQ.index] != null ||
+                  map[OnePictureType.YXWL.index] != null;
+
+              var hasJCK = map[OnePictureType.JCK.index] != null;
+
+              if(!hasDY && hasOther && hasJCK){
+                this.showBorder = true;
               }
             }
           }
@@ -385,7 +402,8 @@ class OnePictureDataData {
                 child.type != OnePictureType.SXT.index &&
                 child.type != OnePictureType.NVR.index &&
                 child.type != OnePictureType.JHJ.index &&
-                child.type != OnePictureType.LYQ.index) {
+                child.type != OnePictureType.LYQ.index &&
+                child.type != OnePictureType.YXWL.index) {
               this.showBorder = true;
               break;
             }
