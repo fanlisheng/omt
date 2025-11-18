@@ -95,22 +95,22 @@ class SearchDeviceViewModel extends BaseViewModel {
   }
 
   void _loadInitialData() async {
-    await _fetchInitialData();
+    await _fetchInitialData(forceRefresh: false);
   }
 
   /// 刷新初始化数据（后端更新数据时调用）
   /// 支持手动刷新，例如：viewModel.refreshInitialData()
   Future<void> refreshInitialData() async {
-    await _fetchInitialData();
+    await _fetchInitialData(forceRefresh: true);
   }
 
   /// 获取初始化数据的内部方法
-  Future<void> _fetchInitialData() async {
+  Future<void> _fetchInitialData({required bool forceRefresh}) async {
     bool success = false;
     while (!success) {
       try {
         // 使用状态服务初始化数据
-        DeviceSearchInitData data = await _searchService.initSearchData();
+        DeviceSearchInitData data = await _searchService.initSearchData(forceRefresh:forceRefresh);
 
         instanceList = data.instanceList;
         doorList = data.doorList;

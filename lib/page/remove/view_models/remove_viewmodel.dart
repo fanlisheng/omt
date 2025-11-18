@@ -110,7 +110,7 @@ class RemoveViewModel extends BaseViewModelRefresh<dynamic> {
 
   //拆除设备
   dismantleEventAction() async {
-    if(remainingDeviceList.isEmpty) return;
+    if (remainingDeviceList.isEmpty) return;
     List<int> nodeIds = [];
     for (DeviceListData d in remainingDeviceList) {
       nodeIds.add(d.nodeId.toInt());
@@ -171,18 +171,19 @@ class RemoveViewModel extends BaseViewModelRefresh<dynamic> {
   //   notifyListeners(); // 通知界面更新
   // }
   void _loadInitialData() async {
-    await _fetchInitialData();
+    await _fetchInitialData(forceRefresh: false);
   }
 
   /// 刷新初始化数据（用于下拉刷新）
   Future<void> refreshInitialData() async {
-    await _fetchInitialData();
+    await _fetchInitialData(forceRefresh: true);
   }
 
   /// 获取初始化数据的内部方法
-  Future<void> _fetchInitialData() async {
+  Future<void> _fetchInitialData({required bool forceRefresh}) async {
     // 使用状态服务初始化数据
-    DeviceSearchInitData data = await DeviceSearchService().initSearchData();
+    DeviceSearchInitData data =
+        await DeviceSearchService().initSearchData(forceRefresh: forceRefresh);
 
     instanceList = data.instanceList;
     doorList = data.doorList;
@@ -211,53 +212,53 @@ class RemoveViewModel extends BaseViewModelRefresh<dynamic> {
     });
   }
 
-  // static Future<void> removeDevices({
-  //   required BuildContext dialogContext,
-  //   required BuildContext context,
-  //   required String selectedDismantleCause,
-  //   required List<int> ids,
-  //   String? remark,
-  //   StrIdNameValue? selectedInstance,
-  //   IdNameValue? selectedDoor,
-  //   IdNameValue? selectedInOut,
-  //   required VoidCallback onSuccess,
-  // }) async {
-  //   // 验证拆除原因
-  //   if (selectedDismantleCause.isEmpty) {
-  //     LoadingUtils.showToast(data: "请选择拆除原因");
-  //     return;
-  //   } else {
-  //     if (selectedDismantleCause == "其它" && (remark ?? "").isEmpty) {
-  //       LoadingUtils.showToast(data: "请填写其它描述");
-  //       return;
-  //     }
-  //   }
-  //
-  //   // 关闭对话框
-  //   Navigator.of(dialogContext).pop();
-  //
-  //   // 显示确认对话框
-  //   final result = await DialogUtils.showContentDialog(
-  //     context: context,
-  //     title: "提交拆除设备申请",
-  //     content: "您确定提交拆除这些设备申请,提交后等待\n审核",
-  //     deleteText: "确定",
-  //   );
-  //
-  //   if (result == '确定') {
-  //     // 调用拆除设备接口
-  //     HttpQuery.share.removeService.removeDevice(
-  //       nodeIds: ids,
-  //       instanceId: selectedInstance?.id ?? "",
-  //       gateId: selectedDoor?.id,
-  //       passId: selectedInOut?.id,
-  //       reason: selectedDismantleCause,
-  //       remark: remark,
-  //       onSuccess: (data) {
-  //         // 重新请求数据
-  //         onSuccess();
-  //       },
-  //     );
-  //   }
-  // }
+// static Future<void> removeDevices({
+//   required BuildContext dialogContext,
+//   required BuildContext context,
+//   required String selectedDismantleCause,
+//   required List<int> ids,
+//   String? remark,
+//   StrIdNameValue? selectedInstance,
+//   IdNameValue? selectedDoor,
+//   IdNameValue? selectedInOut,
+//   required VoidCallback onSuccess,
+// }) async {
+//   // 验证拆除原因
+//   if (selectedDismantleCause.isEmpty) {
+//     LoadingUtils.showToast(data: "请选择拆除原因");
+//     return;
+//   } else {
+//     if (selectedDismantleCause == "其它" && (remark ?? "").isEmpty) {
+//       LoadingUtils.showToast(data: "请填写其它描述");
+//       return;
+//     }
+//   }
+//
+//   // 关闭对话框
+//   Navigator.of(dialogContext).pop();
+//
+//   // 显示确认对话框
+//   final result = await DialogUtils.showContentDialog(
+//     context: context,
+//     title: "提交拆除设备申请",
+//     content: "您确定提交拆除这些设备申请,提交后等待\n审核",
+//     deleteText: "确定",
+//   );
+//
+//   if (result == '确定') {
+//     // 调用拆除设备接口
+//     HttpQuery.share.removeService.removeDevice(
+//       nodeIds: ids,
+//       instanceId: selectedInstance?.id ?? "",
+//       gateId: selectedDoor?.id,
+//       passId: selectedInOut?.id,
+//       reason: selectedDismantleCause,
+//       remark: remark,
+//       onSuccess: (data) {
+//         // 重新请求数据
+//         onSuccess();
+//       },
+//     );
+//   }
+// }
 }
