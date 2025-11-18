@@ -215,9 +215,10 @@ class HomePageService {
     if (!forceRefresh) {
       final cachedData = _cacheManager.getCache<T>(cacheKey);
       if (cachedData != null) {
-        // 有缓存数据，直接返回
+        // 有缓存数据，创建深拷贝后返回，避免外部修改影响缓存
+        final dataCopy = _deepCopyData<T>(cachedData);
         if (onSuccess != null) {
-          onSuccess(cachedData);
+          onSuccess(dataCopy);
         }
         return;
       }
@@ -231,9 +232,10 @@ class HomePageService {
       autoHideDialog: autoHideDialog,
       autoShowDialog: autoShowDialog,
       onSuccess: (data) {
-        // 缓存新数据
+        // 缓存新数据的深拷贝，避免外部修改影响缓存
         if (data != null) {
-          _cacheManager.setCache<T>(cacheKey, data);
+          final dataCopy = _deepCopyData<T>(data);
+          _cacheManager.setCache<T>(cacheKey, dataCopy);
         }
         if (onSuccess != null) {
           onSuccess(data);
@@ -242,6 +244,16 @@ class HomePageService {
       onCache: onCache,
       onError: onError,
     );
+  }
+
+  /// 深拷贝数据（针对List类型）
+  T? _deepCopyData<T>(T data) {
+    if (data is List) {
+      // 对于List类型，创建新列表并拷贝元素
+      return List.from(data) as T;
+    }
+    // 其他类型直接返回（如果需要支持更多类型，可以扩展）
+    return data;
   }
 
   deviceScan({
