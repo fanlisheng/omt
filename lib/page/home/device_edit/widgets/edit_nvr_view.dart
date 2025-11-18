@@ -8,6 +8,7 @@ import 'package:kayo_package/views/widget/base/clickable.dart';
 import 'package:kayo_package/views/widget/base/dash_line.dart';
 import 'package:omt/page/home/device_add/widgets/add_camera_view.dart';
 import 'package:omt/utils/color_utils.dart';
+import 'package:omt/widget/combobox.dart';
 
 import '../../../../bean/common/id_name_value.dart';
 import '../../../../bean/home/home_page/device_detail_nvr_entity.dart';
@@ -91,35 +92,14 @@ class EditNvrView extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 8),
-                        ui.ComboBox<IdNameValue>(
-                          isExpanded: true,
-                          value: model.selectedNarInOut,
-                          items: model.inOutList
-                              .map<ui.ComboBoxItem<IdNameValue>>((e) {
-                            return ui.ComboBoxItem<IdNameValue>(
-                              value: e,
-                              child: SizedBox(
-                                child: Text(
-                                  e.name ?? "",
-                                  textAlign: TextAlign.start,
-                                  style: const TextStyle(
-                                      fontSize: 12,
-                                      color: ColorUtils.colorWhite),
-                                ),
-                              ),
-                            );
-                          }).toList(),
+                        FComboBox<IdNameValue>(
+                          selectedValue: model.selectedNarInOut,
+                          items: model.inOutList,
                           onChanged: (a) {
                             model.selectedNarInOut = a;
                             model.notifyListeners();
                           },
-                          placeholder: const Text(
-                            "请选择进/出口",
-                            textAlign: TextAlign.start,
-                            style: TextStyle(
-                                fontSize: 12,
-                                color: ColorUtils.colorBlackLiteLite),
-                          ),
+                          placeholder: "请选择进/出口",
                         ),
                         const SizedBox(
                           width: 20,

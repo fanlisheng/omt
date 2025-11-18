@@ -95,6 +95,17 @@ class SearchDeviceViewModel extends BaseViewModel {
   }
 
   void _loadInitialData() async {
+    await _fetchInitialData();
+  }
+
+  /// 刷新初始化数据（后端更新数据时调用）
+  /// 支持手动刷新，例如：viewModel.refreshInitialData()
+  Future<void> refreshInitialData() async {
+    await _fetchInitialData();
+  }
+
+  /// 获取初始化数据的内部方法
+  Future<void> _fetchInitialData() async {
     bool success = false;
     while (!success) {
       try {

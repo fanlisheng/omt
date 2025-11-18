@@ -7,6 +7,7 @@ import 'package:kayo_package/views/widget/base/clickable.dart';
 import 'package:kayo_package/views/widget/base/dash_line.dart';
 import 'package:omt/page/home/device_add/widgets/add_camera_view.dart';
 import 'package:omt/utils/color_utils.dart';
+import 'package:omt/widget/combobox.dart';
 import 'package:omt/widget/searchable_dropdown.dart';
 import '../../../../bean/common/id_name_value.dart';
 import '../../../../bean/home/home_page/device_detail_power_box_entity.dart';
@@ -75,31 +76,14 @@ class EditPowerBoxView extends StatelessWidget {
                   children: [
                     const RowTitle(name: "进/出口"),
                     const SizedBox(height: 8),
-                    ui.ComboBox<IdNameValue>(
-                      isExpanded: true,
-                      value: model.selectedPowerBoxInOut,
-                      items: model.inOutList
-                          .map<ui.ComboBoxItem<IdNameValue>>((e) {
-                        return ui.ComboBoxItem<IdNameValue>(
-                          value: e,
-                          child: SizedBox(
-                            child: Text(
-                              e.name ?? "",
-                              textAlign: TextAlign.start,
-                            ),
-                          ),
-                        );
-                      }).toList(),
+                    FComboBox<IdNameValue>(
+                      selectedValue: model.selectedPowerBoxInOut,
+                      items: model.inOutList,
                       onChanged: (a) {
-                        model.selectedPowerBoxInOut = a!;
+                        model.selectedPowerBoxInOut = a;
                         model.notifyListeners();
                       },
-                      placeholder: const Text(
-                        "请选择进/出口",
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                            fontSize: 12, color: ColorUtils.colorBlackLiteLite),
-                      ),
+                      placeholder: "请选择进/出口",
                     ),
                   ],
                 ),
@@ -209,6 +193,9 @@ class EditPowerBoxView extends StatelessWidget {
                             labelSelector: (item) => item.deviceCode ?? "",
                             onSelected: (a) {
                               model.selectedPowerBoxCode(a);
+                            },
+                            onRefresh: () async {
+                              await model.refreshPowerBoxList();
                             },
                           ),
                           // ui.ComboBox<DeviceDetailPowerBoxData>(

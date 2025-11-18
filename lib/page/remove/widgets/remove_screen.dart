@@ -11,6 +11,7 @@ import 'package:omt/widget/combobox.dart';
 import '../../../bean/remove/device_list_entity.dart';
 import '../../../utils/device_utils.dart';
 import '../../../widget/nav/dnavigation_view.dart';
+import '../../../widget/searchable_dropdown.dart';
 import '../view_models/remove_viewmodel.dart';
 
 class RemoveScreen extends StatelessWidget {
@@ -300,77 +301,95 @@ class RemoveScreen extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           EquallyRow(
-            one: AutoSuggestBox<StrIdNameValue>(
-              key: model.asgbKey,
-              placeholder: "请选择",
+            // one: AutoSuggestBox<StrIdNameValue>(
+            //   key: model.asgbKey,
+            //   placeholder: "请选择",
+            //   focusNode: model.focusNode,
+            //   controller: model.instanceController,
+            //   placeholderStyle: const TextStyle(fontSize: 12),
+            //   decoration: WidgetStateProperty.resolveWith<BoxDecoration>(
+            //     (Set<WidgetState> states) {
+            //       return const BoxDecoration(
+            //         border: Border(
+            //           bottom: BorderSide(
+            //             color: ColorUtils.transparent,
+            //             width: 2.0,
+            //           ),
+            //         ),
+            //       );
+            //     },
+            //   ),
+            //   onChanged: (text, reason) {
+            //     if (reason == TextChangedReason.cleared) {
+            //       model.selectedInstance = null;
+            //       model.notifyListeners();
+            //     }
+            //   },
+            //   items: model.instanceList
+            //       .map<AutoSuggestBoxItem<StrIdNameValue>>(
+            //         (instance) => AutoSuggestBoxItem<StrIdNameValue>(
+            //             value: instance,
+            //             label: instance.name ?? "",
+            //             onFocusChange: (focused) {
+            //               if (focused) debugPrint('Focused ${instance.name}');
+            //             },
+            //             onSelected: () {
+            //               model.selectedInstance = null;
+            //               model.selectedInstance = instance;
+            //               model.selectedDoor = null;
+            //               model.selectedInOut = null;
+            //               model.notifyListeners();
+            //             }),
+            //       )
+            //       .toList(),
+            //   itemBuilder:
+            //       (BuildContext context, AutoSuggestBoxItem<dynamic> item) {
+            //     return InkWell(
+            //       child: Container(
+            //         padding: const EdgeInsets.all(8.0),
+            //         child: Wrap(
+            //           runAlignment: WrapAlignment.center,
+            //           children: [
+            //             Text(
+            //               item.value?.name ?? "", // 假设你想展示 item 的某个字段
+            //               style: const TextStyle(fontSize: 12),
+            //               maxLines: 2,
+            //             ),
+            //           ],
+            //         ),
+            //       ),
+            //       onTap: () {
+            //         if (item.onSelected != null) {
+            //           model.focusNode.unfocus();
+            //           item.onSelected!();
+            //         }
+            //       },
+            //     );
+            //   },
+            //   onSelected: (item) {
+            //     model.selectedInstance = item.value;
+            //     model.notifyListeners();
+            //   },
+            //   onOverlayVisibilityChanged: (visible) {
+            //     model.notifyListeners();
+            //   },
+            // ),
+            one: SearchableDropdown<StrIdNameValue>(
+              asgbKey: model.asgbKey,
               focusNode: model.focusNode,
               controller: model.instanceController,
-              placeholderStyle: const TextStyle(fontSize: 12),
-              decoration: WidgetStateProperty.resolveWith<BoxDecoration>(
-                (Set<WidgetState> states) {
-                  return const BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: ColorUtils.transparent,
-                        width: 2.0,
-                      ),
-                    ),
-                  );
-                },
-              ),
-              onChanged: (text, reason) {
-                if (reason == TextChangedReason.cleared) {
-                  model.selectedInstance = null;
-                  model.notifyListeners();
-                }
-              },
-              items: model.instanceList
-                  .map<AutoSuggestBoxItem<StrIdNameValue>>(
-                    (instance) => AutoSuggestBoxItem<StrIdNameValue>(
-                        value: instance,
-                        label: instance.name ?? "",
-                        onFocusChange: (focused) {
-                          if (focused) debugPrint('Focused ${instance.name}');
-                        },
-                        onSelected: () {
-                          model.selectedInstance = null;
-                          model.selectedInstance = instance;
-                          model.selectedDoor = null;
-                          model.selectedInOut = null;
-                          model.notifyListeners();
-                        }),
-                  )
-                  .toList(),
-              itemBuilder:
-                  (BuildContext context, AutoSuggestBoxItem<dynamic> item) {
-                return InkWell(
-                  child: Container(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Wrap(
-                      runAlignment: WrapAlignment.center,
-                      children: [
-                        Text(
-                          item.value?.name ?? "", // 假设你想展示 item 的某个字段
-                          style: const TextStyle(fontSize: 12),
-                          maxLines: 2,
-                        ),
-                      ],
-                    ),
-                  ),
-                  onTap: () {
-                    if (item.onSelected != null) {
-                      model.focusNode.unfocus();
-                      item.onSelected!();
-                    }
-                  },
-                );
-              },
-              onSelected: (item) {
-                model.selectedInstance = item.value;
+              items: model.instanceList,
+              placeholder: "请选择",
+              labelSelector: (item) => item.name ?? "",
+              clearButtonEnabled: true,
+              selectedValue: model.selectedInstance,
+              onSelected: (a) {
+                model.selectedInstance = a;
+                model.selectedDoor = null;
                 model.notifyListeners();
               },
-              onOverlayVisibilityChanged: (visible) {
-                model.notifyListeners();
+              onRefresh: () async {
+                await model.refreshInitialData();
               },
             ),
             two: FComboBox<IdNameValue>(

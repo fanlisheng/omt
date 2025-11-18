@@ -72,6 +72,16 @@ class AddPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
       },
     );
   }
+
+  /// 刷新电源箱列表数据
+  Future<void> refreshPowerBoxList() async {
+    HttpQuery.share.installService.getUnboundPowerBox(
+      onSuccess: (List<DeviceDetailPowerBoxData>? data) {
+        powerBoxList = data ?? [];
+        notifyListeners();
+      },
+    );
+  }
   
   /// 智能恢复缓存选择项（公共方法）
   void smartRestoreCacheSelections() {

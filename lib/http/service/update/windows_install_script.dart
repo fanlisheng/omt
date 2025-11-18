@@ -30,12 +30,20 @@ class WindowsInstallScript {
 @echo off
 setlocal enabledelayedexpansion
 
-REM Set log file path to project directory
+REM Set log file path to project directory with fallback
 set "LOG_DIR=%~dp0"
 if "%LOG_DIR%"=="" set "LOG_DIR=%CD%"
 REM Remove trailing backslash if present
 if "%LOG_DIR:~-1%"=="\\" set "LOG_DIR=%LOG_DIR:~0,-1%"
 set "LOG_FILE=%LOG_DIR%\\omt_update_log.txt"
+
+REM Test if we can write to log file, fallback to TEMP if not
+echo Testing log file creation... > "%LOG_FILE%" 2>&1
+if %ERRORLEVEL% NEQ 0 (
+    set "LOG_DIR=%TEMP%"
+    set "LOG_FILE=%LOG_DIR%\\omt_update_log.txt"
+    echo [%date% %time%] WARNING: Cannot write to project directory, using TEMP >> "%LOG_FILE%"
+)
 
 REM Initialize log file
 echo [%date% %time%] OMT Update Installer Starting... > "%LOG_FILE%"
@@ -174,9 +182,9 @@ if %ERRORLEVEL% EQU 0 (
     goto launch_success
 )
 
-REM Method 2: Direct execution with full path
-echo [%date% %time%] Trying Method 2: direct execution >> "%LOG_FILE%"
-"%APP_PATH%" >nul 2>&1 &
+REM Method 2: Direct execution with start command
+echo [%date% %time%] Trying Method 2: start with full path >> "%LOG_FILE%"
+start "" "%APP_PATH%" >nul 2>&1
 ping 127.0.0.1 -n 3 >nul 2>&1
 tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
 if %ERRORLEVEL% EQU 0 (
@@ -191,16 +199,17 @@ if "%WIN7%"=="0" (
     powershell -Command "Start-Process -FilePath '%APP_PATH%' -WindowStyle Normal" >nul 2>&1
     ping 127.0.0.1 -n 3 >nul 2>&1
     tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
-    if !ERRORLEVEL! EQU 0 (
+    set "PS_RESULT=!ERRORLEVEL!"
+    if !PS_RESULT! EQU 0 (
         echo [%date% %time%] SUCCESS: Application started with Method 3 >> "%LOG_FILE%"
         echo Application started successfully!
         goto launch_success
     )
 )
 
-REM Method 4: Explorer association
-echo [%date% %time%] Trying Method 4: Explorer association >> "%LOG_FILE%"
-explorer "%APP_PATH%" >nul 2>&1
+REM Method 4: Using call command
+echo [%date% %time%] Trying Method 4: call command >> "%LOG_FILE%"
+call "%APP_PATH%" >nul 2>&1
 ping 127.0.0.1 -n 4 >nul 2>&1
 tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
 if %ERRORLEVEL% EQU 0 (

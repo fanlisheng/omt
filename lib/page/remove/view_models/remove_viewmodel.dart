@@ -170,8 +170,17 @@ class RemoveViewModel extends BaseViewModelRefresh<dynamic> {
   //   selectedDismantleCause = cause;
   //   notifyListeners(); // 通知界面更新
   // }
-
   void _loadInitialData() async {
+    await _fetchInitialData();
+  }
+
+  /// 刷新初始化数据（用于下拉刷新）
+  Future<void> refreshInitialData() async {
+    await _fetchInitialData();
+  }
+
+  /// 获取初始化数据的内部方法
+  Future<void> _fetchInitialData() async {
     // 使用状态服务初始化数据
     DeviceSearchInitData data = await DeviceSearchService().initSearchData();
 

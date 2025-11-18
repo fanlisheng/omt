@@ -8,6 +8,7 @@ import 'package:omt/utils/log_utils.dart';
 import 'package:omt/widget/checkbox.dart';
 import 'package:omt/widget/combobox.dart';
 
+import '../../../../widget/searchable_dropdown.dart';
 import '../view_models/search_device_viewmodel.dart';
 
 class FilterView extends StatefulWidget {
@@ -35,124 +36,106 @@ class _FilterViewState extends State<FilterView> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           // Expanded(
-          //   flex: 2, // 0.5 的比例
-          //   child: _buildMenu(
-          //     model: model,
-          //     selectedValue: model.selectedInstance?.name ?? "",
-          //     options: model.instanceList,
-          //     onSelected: (value) {
-          //       model.selectedInstance = value;
-          //       model.notifyListeners();
+          //   flex: 3, // 0.5 的比例
+          //   child: AutoSuggestBox<StrIdNameValue>(
+          //     key: model.asgbKey,
+          //     enabled: model.searchState != DeviceSearchState.searching,
+          //     placeholder: "请选择",
+          //     focusNode: model.focusNode,
+          //     controller: model.controller,
+          //     placeholderStyle: const m.TextStyle(fontSize: 12),
+          //     decoration: WidgetStateProperty.resolveWith<BoxDecoration>(
+          //       (Set<WidgetState> states) {
+          //         return const BoxDecoration(
+          //           border: Border(
+          //             bottom: BorderSide(
+          //               color: ColorUtils.transparent,
+          //               width: 2.0,
+          //             ),
+          //           ),
+          //         );
+          //       },
+          //     ),
+          //     onChanged: (text, reason) {
+          //       if (reason == TextChangedReason.cleared) {
+          //         model.selectedInstance = null;
+          //         model.notifyListeners();
+          //       }
+          //     },
+          //     items: model.instanceList
+          //         .map<AutoSuggestBoxItem<StrIdNameValue>>(
+          //           (instance) => AutoSuggestBoxItem<StrIdNameValue>(
+          //               value: instance,
+          //               label: instance.name ?? "",
+          //               onFocusChange: (focused) {
+          //                 if (focused) debugPrint('Focused ${instance.name}');
+          //               },
+          //               onSelected: () {
+          //                 model.selectedInstance = null;
+          //                 model.selectedInstance = instance;
+          //                 model.selectedDoor = null;
+          //                 model.selectedInOut = null;
+          //                 model.notifyListeners();
+          //               }),
+          //         )
+          //         .toList(),
+          //     itemBuilder:
+          //         (BuildContext context, AutoSuggestBoxItem<dynamic> item) {
+          //       return m.InkWell(
+          //         child: Container(
+          //           padding: const EdgeInsets.all(8.0),
+          //           child: Wrap(
+          //             runAlignment: WrapAlignment.center,
+          //             children: [
+          //               Text(
+          //                 item.value?.name ?? "", // 假设你想展示 item 的某个字段
+          //                 style: const TextStyle(fontSize: 12),
+          //                 maxLines: 2,
+          //               ),
+          //             ],
+          //           ),
+          //         ),
+          //         onTap: () {
+          //           if (item.onSelected != null) {
+          //             model.focusNode.unfocus();
+          //             item.onSelected!();
+          //           }
+          //         },
+          //       );
+          //     },
+          //     onSelected: (item) {
+          //       setState(() => model.selectedInstance = item.value);
+          //     },
+          //     onOverlayVisibilityChanged: (visible) {
+          //       debugPrint('Overlay is visible: $visible');
+          //       setState(() {});
           //     },
           //   ),
           // ),
 
-          // InkWell(child: Text(
-          //   "搜索",
-          //   style: TextStyle(fontSize: 12, color: ColorUtils.colorGreenLiteLite),
-          // ),onTap: model.searchEventAction,),
-
-          // Expanded(
-          //     flex: 2, // 0.5 的比例
-          //     child: FComboBox<IdNameValue>(
-          //         selectedValue: model.selectedInstance,
-          //         items: model.instanceList,
-          //         onChanged: (a) {
-          //           model.selectedInstance = a;
-          //           model.notifyListeners();
-          //         },
-          //         placeholder: "请选择实例")),
           Expanded(
-            flex: 3, // 0.5 的比例
-            child: AutoSuggestBox<StrIdNameValue>(
-              key: model.asgbKey,
-              enabled: model.searchState != DeviceSearchState.searching,
-              placeholder: "请选择",
+            flex: 3,
+            child: SearchableDropdown<StrIdNameValue>(
+              asgbKey: model.asgbKey,
               focusNode: model.focusNode,
               controller: model.controller,
-              placeholderStyle: const m.TextStyle(fontSize: 12),
-              decoration: WidgetStateProperty.resolveWith<BoxDecoration>(
-                (Set<WidgetState> states) {
-                  return const BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: ColorUtils.transparent,
-                        width: 2.0,
-                      ),
-                    ),
-                  );
-                },
-              ),
-              onChanged: (text, reason) {
-                if (reason == TextChangedReason.cleared) {
-                  model.selectedInstance = null;
-                  model.notifyListeners();
-                }
+              items: model.instanceList,
+              placeholder: "请选择",
+              labelSelector: (item) => item.name ?? "",
+              clearButtonEnabled: true,
+              selectedValue: model.selectedInstance,
+              onSelected: (a) {
+                model.selectedInstance = a;
+                model.selectedDoor = null;
+                model.notifyListeners();
               },
-              items: model.instanceList
-                  .map<AutoSuggestBoxItem<StrIdNameValue>>(
-                    (instance) => AutoSuggestBoxItem<StrIdNameValue>(
-                        value: instance,
-                        label: instance.name ?? "",
-                        onFocusChange: (focused) {
-                          if (focused) debugPrint('Focused ${instance.name}');
-                        },
-                        onSelected: () {
-                          model.selectedInstance = null;
-                          model.selectedInstance = instance;
-                          model.selectedDoor = null;
-                          model.selectedInOut = null;
-                          model.notifyListeners();
-                        }),
-                  )
-                  .toList(),
-              itemBuilder:
-                  (BuildContext context, AutoSuggestBoxItem<dynamic> item) {
-                return m.InkWell(
-                  child: Container(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Wrap(
-                      runAlignment: WrapAlignment.center,
-                      children: [
-                        Text(
-                          item.value?.name ?? "", // 假设你想展示 item 的某个字段
-                          style: const TextStyle(fontSize: 12),
-                          maxLines: 2,
-                        ),
-                      ],
-                    ),
-                  ),
-                  onTap: () {
-                    if (item.onSelected != null) {
-                      model.focusNode.unfocus();
-                      item.onSelected!();
-                    }
-                  },
-                );
-              },
-              onSelected: (item) {
-                setState(() => model.selectedInstance = item.value);
-              },
-              onOverlayVisibilityChanged: (visible) {
-                debugPrint('Overlay is visible: $visible');
-                setState(() {});
+              onRefresh: () async {
+                await model.refreshInitialData();
               },
             ),
           ),
 
           const SizedBox(width: 15),
-          // Expanded(
-          //   flex: 1, // 0.25 的比例
-          //   child: _buildMenu(
-          //     model: model,
-          //     selectedValue: model.selectedDoor?.name ?? '',
-          //     options: model.doorList,
-          //     onSelected: (value) {
-          //       model.selectedDoor = value;
-          //       model.notifyListeners();
-          //     },
-          //   ),
-          // ),
           Expanded(
               flex: 1, // 0.5 的比例
               child: FComboBox<IdNameValue>(
@@ -166,18 +149,6 @@ class _FilterViewState extends State<FilterView> {
                   },
                   placeholder: "请选择大门编号")),
           const SizedBox(width: 15),
-          // Expanded(
-          //   flex: 1, // 0.25 的比例
-          //   child: _buildMenu(
-          //     model: model,
-          //     selectedValue: model.selectedInOut?.name ?? '',
-          //     options: model.inOutList,
-          //     onSelected: (value) {
-          //       model.selectedInOut = value;
-          //       model.notifyListeners();
-          //     },
-          //   ),
-          // ),
           Expanded(
               flex: 1, // 0.5 的比例
               child: FComboBox<IdNameValue>(

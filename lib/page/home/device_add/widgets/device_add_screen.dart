@@ -6,6 +6,7 @@ import 'package:kayo_package/kayo_package.dart';
 import 'package:kayo_package/mvvm/base/provider_widget.dart';
 import 'package:fluent_ui/fluent_ui.dart' as fu;
 import 'package:omt/bean/common/id_name_value.dart';
+import 'package:omt/widget/combobox.dart';
 import 'package:omt/page/home/device_add/widgets/add_ai_view.dart';
 import 'package:omt/page/home/device_add/widgets/add_battery_exchange_view.dart';
 import 'package:omt/page/home/device_add/widgets/add_camera_view.dart';
@@ -169,32 +170,15 @@ class DeviceAddScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 8),
-              ComboBox<IdNameValue>(
-                isExpanded: false,
-                value: model.deviceTypeSelected,
-                items: model.deviceTypes.map<ComboBoxItem<IdNameValue>>((e) {
-                  return ComboBoxItem<IdNameValue>(
-                    value: e,
-                    child: SizedBox(
-                      width: 300,
-                      child: Text(
-                        e.name,
-                        textAlign: TextAlign.start,
-                      ),
-                    ),
-                  );
-                }).toList(),
+              FComboBox<IdNameValue>(
+                selectedValue: model.deviceTypeSelected,
+                items: model.deviceTypes,
                 onChanged: (a) {
                   model.selectedDeviceType(a);
-                  model.deviceTypeSelected = a!;
+                  model.deviceTypeSelected = a;
                   model.notifyListeners();
                 },
-                placeholder: const Text(
-                  "请选择设备类型",
-                  textAlign: TextAlign.start,
-                  style: TextStyle(
-                      fontSize: 12, color: ColorUtils.colorBlackLiteLite),
-                ),
+                placeholder: "请选择设备类型",
               ),
             ],
           ),
@@ -297,30 +281,14 @@ class DeviceAddScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 8),
-              ComboBox<String>(
-                isExpanded: false,
-                value: model.selectedNetworkEnv,
-                items: model.networkEnvList.map<ComboBoxItem<String>>((e) {
-                  return ComboBoxItem<String>(
-                    value: e.name,
-                    child: SizedBox(
-                      child: Text(
-                        e.name ?? "",
-                        textAlign: TextAlign.start,
-                      ),
-                    ),
-                  );
-                }).toList(),
+              FComboBox<IdNameValue>(
+                selectedValue: model.selectedNetworkEnv,
+                items: model.networkEnvList,
                 onChanged: (a) {
-                  model.selectedNetworkEnv = a!;
+                  model.selectedNetworkEnv = a;
                   model.notifyListeners();
                 },
-                placeholder: const Text(
-                  "现场网络环境",
-                  textAlign: TextAlign.start,
-                  style: TextStyle(
-                      fontSize: 12, color: ColorUtils.colorBlackLiteLite),
-                ),
+                placeholder: "现场网络环境",
               ),
             ],
           ),

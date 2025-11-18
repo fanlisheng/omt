@@ -186,9 +186,10 @@ class AddAiViewModel extends BaseViewModelRefresh<dynamic> {
   }
 
   //删除
-  deleteAiAction(int index) async {
+  deleteAiAction(int index,BuildContext context1) async {
+    LoadingUtils.showInfo(data: "测试一下");
     final result = await DialogUtils.showContentDialog(
-        context: context!,
+        context: context1,
         title: "确定删除",
         content: "确定删除该Ai设备？",
         deleteText: "确定");

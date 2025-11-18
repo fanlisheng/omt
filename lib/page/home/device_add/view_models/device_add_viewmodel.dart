@@ -45,13 +45,13 @@ class DeviceAddViewModel extends BaseViewModelRefresh<dynamic> {
   bool isInstall = false; //是安装 默认否
 
   IdNameValue? deviceTypeSelected;
-  List deviceTypes = [];
+  List<IdNameValue> deviceTypes = [];
 
   // ===== 共用 进出口 =====
   // List<IdNameValue> inOutList = [];
 
   // ===== 网络环境相关属性 =====
-  String selectedNetworkEnv = "";
+  IdNameValue? selectedNetworkEnv;
   List<IdNameValue> networkEnvList = [];
 
   // ===== 各个子ViewModel =====

@@ -59,6 +59,21 @@ class EditPowerBoxViewModel extends BaseViewModelRefresh<dynamic> {
     );
   }
 
+  /// 刷新电源箱列表数据
+  Future<void> refreshPowerBoxList() async {
+    HttpQuery.share.installService.getUnboundPowerBox(
+      onSuccess: (List<DeviceDetailPowerBoxData>? data) {
+        powerBoxList = data ?? [];
+        // 添加当前电源箱到列表
+        if (!powerBoxList
+            .any((element) => element.deviceCode == deviceInfo.deviceCode)) {
+          powerBoxList.add(deviceInfo);
+        }
+        notifyListeners();
+      },
+    );
+  }
+
   @override
   void dispose() {
     controller.dispose;

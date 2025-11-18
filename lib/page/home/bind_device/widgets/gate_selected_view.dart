@@ -2,6 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:kayo_package/extension/_index_extension.dart';
 import 'package:omt/bean/common/id_name_value.dart';
 import 'package:omt/utils/color_utils.dart';
+import 'package:omt/widget/combobox.dart';
 import '../view_models/bind_device_viewmodel.dart';
 
 class GateSelectedView extends StatefulWidget {
@@ -69,24 +70,14 @@ class _GateSelectedViewState extends State<GateSelectedView> {
             spacing: 10.0,
             runSpacing: 10.0,
             children: [
-              ComboBox<IdNameValue>(
-                isExpanded: false,
-                value: model.selectedDoor,
-                items: model.doorList.map<ComboBoxItem<IdNameValue>>((e) {
-                  return ComboBoxItem<IdNameValue>(
-                    value: e,
-                    child: Text(e.name ?? ""),
-                  );
-                }).toList(),
+              FComboBox<IdNameValue>(
+                selectedValue: model.selectedDoor,
+                items: model.doorList,
                 onChanged: (color) {
                   model.selectedDoor = color;
                   model.notifyListeners();
                 },
-                placeholder: const Text(
-                  "请选择大门编号",
-                  style: TextStyle(
-                      fontSize: 12, color: ColorUtils.colorBlackLiteLite),
-                ),
+                placeholder: "请选择大门编号",
               ),
               // DropdownButtonFormField<String>(
               //   value: model.gateNo,

@@ -228,6 +228,9 @@ class _InstallDeviceScreenState extends State<InstallDeviceScreen> {
                   onSelected: (a) {
                     model.onInstanceSelected(a);
                   },
+                  onRefresh: () async {
+                    await model.refreshInitialData();
+                  },
                 ),
                 two: FComboBox<IdNameValue>(
                     selectedValue: model.selectedDoor,

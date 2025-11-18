@@ -108,7 +108,7 @@ class AddAiView extends StatelessWidget {
                           if (model.aiDeviceList.length > 1) ...[
                             Button(
                               onPressed: () {
-                                model.deleteAiAction(index);
+                                model.deleteAiAction(index,context);
                               },
                               child: Row(
                                 children: [

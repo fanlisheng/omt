@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:kayo_package/mvvm/base/provider_widget.dart';
 import 'package:omt/page/home/device_add/widgets/add_camera_view.dart';
 import 'package:omt/utils/color_utils.dart';
+import 'package:omt/widget/combobox.dart';
 
 import '../../../../bean/common/id_name_value.dart';
 import '../view_models/add_battery_exchange_viewmodel.dart';
@@ -125,32 +126,14 @@ class AddBatteryExchangeView extends StatelessWidget {
       ),
       const SizedBox(height: 5),
       EquallyRow(
-        one: ComboBox<IdNameValue>(
-          isExpanded: true,
-          value: model.selectedInOut,
-          items: model.inOutList.map<ComboBoxItem<IdNameValue>>((e) {
-            return ComboBoxItem<IdNameValue>(
-              value: e,
-              child: SizedBox(
-                child: Text(
-                  e.name ?? "",
-                  textAlign: TextAlign.start,
-                  style: const TextStyle(
-                      fontSize: 12, color: ColorUtils.colorWhite),
-                ),
-              ),
-            );
-          }).toList(),
+        one: FComboBox<IdNameValue>(
+          selectedValue: model.selectedInOut,
+          items: model.inOutList,
           onChanged: (a) {
-            model.selectedInOut = a!;
+            model.selectedInOut = a;
             model.notifyListeners();
           },
-          placeholder: const Text(
-            "请选择进/出口",
-            textAlign: TextAlign.start,
-            style: TextStyle(
-                fontSize: 12, color: ColorUtils.colorBlackLiteLite),
-          ),
+          placeholder: "请选择进/出口",
         ),
         two: Container(),
       ),

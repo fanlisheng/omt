@@ -12,10 +12,11 @@ class SearchableDropdown<T> extends StatefulWidget {
   final TextStyle placeholderStyle;
   final WidgetStateProperty<BoxDecoration> decoration;
   final Function(T?)? onSelected;
-  final String Function(T) labelSelector; // 新增：自定义 label 生成
+  final String Function(T) labelSelector; // 自定义 label 生成
   final bool enabled;
   final bool clearButtonEnabled;
-  final T? selectedValue; // 新增：当前选中的值
+  final T? selectedValue; // 当前选中的值
+  final Future<void> Function()? onRefresh; // 刷新回调
 
   const SearchableDropdown({
     super.key,
@@ -37,7 +38,8 @@ class SearchableDropdown<T> extends StatefulWidget {
     required this.labelSelector, // 要求提供 labelSelector
     this.enabled = true,
     this.clearButtonEnabled = false,
-    this.selectedValue, // 新增：当前选中的值
+    this.selectedValue, // 当前选中的值
+    this.onRefresh, // 刷新回调
   });
 
   @override
@@ -114,74 +116,98 @@ class SearchableDropdownState<T> extends State<SearchableDropdown<T>> {
 
   @override
   Widget build(BuildContext context) {
-    return AutoSuggestBox<T>(
-      key: widget.asgbKey,
-      enabled: widget.enabled,
-      placeholder: widget.placeholder,
-      focusNode: widget.focusNode,
-      controller: widget.controller,
-      placeholderStyle: widget.placeholderStyle,
-      decoration: widget.decoration,
-      clearButtonEnabled: widget.clearButtonEnabled,
-      onChanged: (text, reason) {
-        if (reason == TextChangedReason.cleared) {
-          setState(() {
-            _selectedInstance = null;
-            _filteredItems = widget.items;
-          });
-          if (widget.onSelected != null) {
-            widget.onSelected!(null);
-          }
-        }
-      },
-      items: _filteredItems
-          .map<AutoSuggestBoxItem<T>>(
-            (instance) => AutoSuggestBoxItem<T>(
-          value: instance,
-          label: widget.labelSelector(instance), // 使用 labelSelector
-          onSelected: () {
-            setState(() {
-              _selectedInstance = instance;
-              widget.controller.text = widget.labelSelector(instance);
-            });
-            widget.focusNode.unfocus();
-            if (widget.onSelected != null) {
-              widget.onSelected!(instance);
+    // 判断是否显示刷新按钮：没有选中数据且有刷新回调
+    final showRefreshButton = _selectedInstance == null && widget.onRefresh != null;
+
+    return Stack(
+      children: [
+        AutoSuggestBox<T>(
+          key: widget.asgbKey,
+          enabled: widget.enabled,
+          placeholder: widget.placeholder,
+          focusNode: widget.focusNode,
+          controller: widget.controller,
+          placeholderStyle: widget.placeholderStyle,
+          decoration: widget.decoration,
+          clearButtonEnabled: widget.clearButtonEnabled && !showRefreshButton,
+          onChanged: (text, reason) {
+            if (reason == TextChangedReason.cleared) {
+              setState(() {
+                _selectedInstance = null;
+                _filteredItems = widget.items;
+              });
+              if (widget.onSelected != null) {
+                widget.onSelected!(null);
+              }
             }
+          },
+          items: _filteredItems
+              .map<AutoSuggestBoxItem<T>>(
+                (instance) => AutoSuggestBoxItem<T>(
+              value: instance,
+              label: widget.labelSelector(instance), // 使用 labelSelector
+              onSelected: () {
+                setState(() {
+                  _selectedInstance = instance;
+                  widget.controller.text = widget.labelSelector(instance);
+                });
+                widget.focusNode.unfocus();
+                if (widget.onSelected != null) {
+                  widget.onSelected!(instance);
+                }
+              },
+            ),
+          )
+              .toList(),
+          itemBuilder: (BuildContext context, AutoSuggestBoxItem<dynamic> item) {
+            return ui.InkWell(
+              child: Container(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  widget.labelSelector(item.value as T), // 使用 labelSelector
+                  style: const TextStyle(fontSize: 12),
+                  maxLines: 2,
+                ),
+              ),
+              onTap: () {
+                if (item.onSelected != null) {
+                  widget.focusNode.unfocus();
+                  item.onSelected!();
+                }
+              },
+            );
+          },
+          onSelected: (item) {
+            setState(() {
+              _selectedInstance = item.value as T;
+            });
+            if (widget.onSelected != null) {
+              widget.onSelected!(item.value as T);
+            }
+          },
+          onOverlayVisibilityChanged: (visible) {
+            debugPrint('下拉框可见性: $visible');
+            setState(() {});
           },
         ),
-      )
-          .toList(),
-      itemBuilder: (BuildContext context, AutoSuggestBoxItem<dynamic> item) {
-        return ui.InkWell(
-          child: Container(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              widget.labelSelector(item.value as T), // 使用 labelSelector
-              style: const TextStyle(fontSize: 12),
-              maxLines: 2,
+        // 刷新按钮 - 显示在右侧
+        if (showRefreshButton)
+          Positioned(
+            right: 8,
+            top: 0,
+            bottom: 0,
+            child: Center(
+              child: IconButton(
+                icon: const Icon(FluentIcons.refresh),
+                onPressed: widget.onRefresh != null
+                    ? () async {
+                        await widget.onRefresh!();
+                      }
+                    : null,
+              ),
             ),
           ),
-          onTap: () {
-            if (item.onSelected != null) {
-              widget.focusNode.unfocus();
-              item.onSelected!();
-            }
-          },
-        );
-      },
-      onSelected: (item) {
-        setState(() {
-          _selectedInstance = item.value as T;
-        });
-        if (widget.onSelected != null) {
-          widget.onSelected!(item.value as T);
-        }
-      },
-      onOverlayVisibilityChanged: (visible) {
-        debugPrint('下拉框可见性: $visible');
-        setState(() {});
-      },
+      ],
     );
   }
 }

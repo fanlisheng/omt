@@ -13,6 +13,7 @@ import 'package:omt/bean/home/home_page/device_detail_router_entity_entity.dart'
 import 'package:omt/bean/home/home_page/device_entity.dart';
 import 'package:omt/http/api.dart';
 import 'package:omt/http/http_manager.dart';
+import 'package:omt/http/cache/http_cache_manager.dart';
 import 'package:omt/utils/result.dart';
 
 import '../../../../bean/home/home_page/device_detail_exchange_entity.dart';
@@ -37,6 +38,8 @@ import '../../video/video_configuration_service.dart';
 ///
 
 class HomePageService {
+  final HttpCacheManager _cacheManager = HttpCacheManager();
+
   get _list async => '${API.share.host}xxx/xxx';
 
   get _detail async => '${API.share.host}xxx/xxx';
@@ -144,16 +147,14 @@ class HomePageService {
     ValueChanged<List<StrIdNameValue>?>? onCache,
     ValueChanged<String>? onError,
   }) async {
-    String url = await _instanceList;
-    HttpManager.share.doHttpPost<List<StrIdNameValue>>(
-      url,
-      {"area_code": areaCode},
-      method: 'GET',
-      autoHideDialog: true,
-      autoShowDialog: true,
+    _cacheAndFetch<List<StrIdNameValue>>(
+      url: _instanceList,
+      params: {"area_code": areaCode},
       onSuccess: onSuccess,
       onCache: onCache,
       onError: onError,
+      autoHideDialog: true,
+      autoShowDialog: true,
     );
   }
 
@@ -162,15 +163,14 @@ class HomePageService {
     ValueChanged<List<IdNameValue>?>? onCache,
     ValueChanged<String>? onError,
   }) async {
-    HttpManager.share.doHttpPost<List<IdNameValue>>(
-      await _gateList,
-      {},
-      method: 'GET',
-      autoHideDialog: true,
-      autoShowDialog: true,
+    _cacheAndFetch<List<IdNameValue>>(
+      url: _gateList,
+      params: {},
       onSuccess: onSuccess,
       onCache: onCache,
       onError: onError,
+      autoHideDialog: true,
+      autoShowDialog: true,
     );
   }
 
@@ -179,13 +179,57 @@ class HomePageService {
     ValueChanged<List<IdNameValue>?>? onCache,
     ValueChanged<String>? onError,
   }) async {
-    HttpManager.share.doHttpPost<List<IdNameValue>>(
-      await _inOutList,
-      {},
-      method: 'GET',
+    _cacheAndFetch<List<IdNameValue>>(
+      url: _inOutList,
+      params: {},
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
       autoHideDialog: false,
       autoShowDialog: false,
-      onSuccess: onSuccess,
+    );
+  }
+
+  /// 通用的缓存和获取方法，使用 URL 作为缓存 key
+  void _cacheAndFetch<T>({
+    required dynamic url,
+    required Map<String, dynamic> params,
+    required ValueChanged<T?>? onSuccess,
+    ValueChanged<T?>? onCache,
+    ValueChanged<String>? onError,
+    required bool autoHideDialog,
+    required bool autoShowDialog,
+  }) async {
+    // 使用 URL 作为缓存 key
+    final actualUrl = await url;
+    final cacheKey = actualUrl;
+
+    // 先返回缓存数据
+    final cachedData = _cacheManager.getCache<T>(cacheKey);
+    if (cachedData != null) {
+      // 有缓存数据，直接返回
+      if (onSuccess != null) {
+        onSuccess(cachedData);
+      }
+      return;
+    }
+
+    // 没有缓存，发起网络请求
+    HttpManager.share.doHttpPost<T>(
+      actualUrl,
+      params,
+      method: 'GET',
+      autoHideDialog: autoHideDialog,
+      autoShowDialog: autoShowDialog,
+      onSuccess: (data) {
+        // 缓存新数据
+        if (data != null) {
+          _cacheManager.setCache<T>(cacheKey, data);
+        }
+        if (onSuccess != null) {
+          onSuccess(data);
+        }
+      },
       onCache: onCache,
       onError: onError,
     );

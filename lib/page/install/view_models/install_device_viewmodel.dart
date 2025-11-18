@@ -195,6 +195,28 @@ class InstallDeviceViewModel extends BaseViewModelRefresh<dynamic> {
     }
   }
 
+  /// 刷新初始化数据（用于下拉刷新）
+  Future<void> refreshInitialData() async {
+    bool success = false;
+    while (!success) {
+      try {
+        // 使用状态服务初始化数据
+        DeviceSearchInitData data = await _searchService.initSearchData();
+
+        instanceList = data.instanceList;
+        doorList = data.doorList;
+        inOutList = data.inOutList;
+
+        success = true; // 获取成功，退出循环
+        notifyListeners();
+      } catch (e) {
+        // 可选：记录错误日志
+        print('刷新数据请求错误 $e');
+        await Future.delayed(const Duration(seconds: 1)); // 延迟后重试，避免过于频繁请求
+      }
+    }
+  }
+
   /// 智能恢复选择项，优先保持缓存的选择
   void _smartRestoreSelections(
       StrIdNameValue? cachedInstance, IdNameValue? cachedDoor) {

@@ -4,6 +4,7 @@ import 'package:kayo_package/extension/_index_extension.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/utils/color_utils.dart';
 import 'package:omt/widget/checkbox.dart';
+import 'package:omt/widget/combobox.dart';
 import '../../../../bean/common/id_name_value.dart';
 import '../../../../bean/home/home_page/device_detail_power_entity.dart';
 import '../../../../theme.dart';
@@ -81,32 +82,14 @@ class _EditPowerViewState extends State<EditPowerView> {
               ),
               const SizedBox(height: 5),
               EquallyRow(
-                one: ComboBox<IdNameValue>(
-                  isExpanded: true,
-                  value: model.selectedPowerInOut,
-                  items: model.inOutList.map<ComboBoxItem<IdNameValue>>((e) {
-                    return ComboBoxItem<IdNameValue>(
-                      value: e,
-                      child: SizedBox(
-                        child: Text(
-                          e.name ?? "",
-                          textAlign: TextAlign.start,
-                          style: const TextStyle(
-                              fontSize: 12, color: ColorUtils.colorWhite),
-                        ),
-                      ),
-                    );
-                  }).toList(),
+                one: FComboBox<IdNameValue>(
+                  selectedValue: model.selectedPowerInOut,
+                  items: model.inOutList,
                   onChanged: (a) {
-                    model.selectedPowerInOut = a!;
+                    model.selectedPowerInOut = a;
                     model.notifyListeners();
                   },
-                  placeholder: const Text(
-                    "请选择进/出口",
-                    textAlign: TextAlign.start,
-                    style: TextStyle(
-                        fontSize: 12, color: ColorUtils.colorBlackLiteLite),
-                  ),
+                  placeholder: "请选择进/出口",
                 ),
                 two: Container(),
               ),

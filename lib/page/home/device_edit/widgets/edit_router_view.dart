@@ -9,6 +9,7 @@ import 'package:kayo_package/views/widget/base/dash_line.dart';
 import 'package:omt/theme.dart';
 import 'package:omt/utils/color_utils.dart';
 import 'package:omt/utils/intent_utils.dart';
+import 'package:omt/widget/combobox.dart';
 import '../../../../bean/common/id_name_value.dart';
 import '../../../../bean/home/home_page/device_detail_router_entity_entity.dart';
 import '../../../../widget/nav/dnavigation_view.dart';
@@ -83,35 +84,14 @@ class EditRouterView extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 8),
-                        ui.ComboBox<IdNameValue>(
-                          isExpanded: true,
-                          value: model.selectedRouterInOut,
-                          items: model.inOutList
-                              .map<ui.ComboBoxItem<IdNameValue>>((e) {
-                            return ui.ComboBoxItem<IdNameValue>(
-                              value: e,
-                              child: SizedBox(
-                                child: Text(
-                                  e.name ?? "",
-                                  textAlign: TextAlign.start,
-                                  style: const TextStyle(
-                                      fontSize: 12,
-                                      color: ColorUtils.colorWhite),
-                                ),
-                              ),
-                            );
-                          }).toList(),
+                        FComboBox<IdNameValue>(
+                          selectedValue: model.selectedRouterInOut,
+                          items: model.inOutList,
                           onChanged: (a) {
-                            model.selectedRouterInOut = a!;
+                            model.selectedRouterInOut = a;
                             model.notifyListeners();
                           },
-                          placeholder: const Text(
-                            "请选择进/出口",
-                            textAlign: TextAlign.start,
-                            style: TextStyle(
-                                fontSize: 12,
-                                color: ColorUtils.colorBlackLiteLite),
-                          ),
+                          placeholder: "请选择进/出口",
                         ),
                         const SizedBox(
                           width: 20,
@@ -182,35 +162,14 @@ class EditRouterView extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 8),
-                        ui.ComboBox<IdNameValue>(
-                          isExpanded: true,
-                          value: model.selectedRouterType,
-                          items: model.routerTypeList
-                              .map<ui.ComboBoxItem<IdNameValue>>((e) {
-                            return ui.ComboBoxItem<IdNameValue>(
-                              value: e,
-                              child: SizedBox(
-                                child: Text(
-                                  e.name ?? "",
-                                  textAlign: TextAlign.start,
-                                  style: const TextStyle(
-                                      fontSize: 12,
-                                      color: ColorUtils.colorWhite),
-                                ),
-                              ),
-                            );
-                          }).toList(),
+                        FComboBox<IdNameValue>(
+                          selectedValue: model.selectedRouterType,
+                          items: model.routerTypeList,
                           onChanged: (a) {
-                            model.selectedRouterType = a!;
+                            model.selectedRouterType = a;
                             model.notifyListeners();
                           },
-                          placeholder: const Text(
-                            "请选择有线/无线",
-                            textAlign: TextAlign.start,
-                            style: TextStyle(
-                                fontSize: 12,
-                                color: ColorUtils.colorBlackLiteLite),
-                          ),
+                          placeholder: "请选择有线/无线",
                         ),
                         const SizedBox(
                           width: 20,

@@ -76,32 +76,14 @@ class _AddPowerViewState extends State<AddPowerView> {
               ),
               const SizedBox(height: 5),
               EquallyRow(
-                one: ComboBox<IdNameValue>(
-                  isExpanded: true,
-                  value: model.selectedPowerInOut,
-                  items: model.inOutList.map<ComboBoxItem<IdNameValue>>((e) {
-                    return ComboBoxItem<IdNameValue>(
-                      value: e,
-                      child: SizedBox(
-                        child: Text(
-                          e.name ?? "",
-                          textAlign: TextAlign.start,
-                          style: const TextStyle(
-                              fontSize: 12, color: ColorUtils.colorWhite),
-                        ),
-                      ),
-                    );
-                  }).toList(),
+                one: FComboBox<IdNameValue>(
+                  selectedValue: model.selectedPowerInOut,
+                  items: model.inOutList,
                   onChanged: (a) {
-                    model.selectedPowerInOut = a!;
+                    model.selectedPowerInOut = a;
                     model.notifyListeners();
                   },
-                  placeholder: const Text(
-                    "请选择进/出口",
-                    textAlign: TextAlign.start,
-                    style: TextStyle(
-                        fontSize: 12, color: ColorUtils.colorWhite),
-                  ),
+                  placeholder: "请选择进/出口",
                 ),
                 two: Container(),
               ),
