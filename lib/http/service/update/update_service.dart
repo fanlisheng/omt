@@ -500,10 +500,10 @@ class UpdateService {
           try {
             await logMessage('尝试方法0: 使用cmd /c执行bat文件');
             await logMessage('启动脚本: $scriptPath');
-            // 使用 cmd /c 来正确执行 .bat 文件
+            // 使用 cmd /c 来正确执行 .bat 文件（/c 参数会在执行完后自动关闭窗口）
             final process = await Process.start(
               'cmd', 
-              ['/c', scriptPath],
+              ['/c', 'start', '/B', scriptPath],  // /B 参数表示在后台运行，不创建新窗口
               workingDirectory: scriptDir,
               mode: ProcessStartMode.detached,
             );
@@ -831,31 +831,40 @@ WshShell.Run """$scriptPath""", 0, False
     await logMessage('强制退出应用，退出码: $exitCode');
     
     try {
-      // 禁用窗口关闭确认，实现静默退出
-      await logMessage('禁用窗口关闭确认...');
-      await windowManager.setPreventClose(false);
+      // 先记录日志
+      await logMessage('准备强制退出进程，PID: ${pid}');
       
-      // 方法1: 使用 windowManager.close() (推荐方式，不会卡住)
-      await logMessage('尝试方法1: 使用 windowManager.close()');
-      await windowManager.close();
-      await logMessage('方法1成功: windowManager.close() 执行完成');
-      return;
+      // 尝试销毁窗口（异步，不等待结果）
+      windowManager.destroy().catchError((e) {
+        print('销毁窗口失败: $e');
+      });
+      
+      // 等待100ms让窗口销毁
+      await Future.delayed(Duration(milliseconds: 100));
+      
+      // 在Windows上，使用taskkill确保进程被杀死
+      if (Platform.isWindows) {
+        await logMessage('使用taskkill强制终止当前进程...');
+        try {
+          // 异步执行taskkill，不等待结果
+          Process.run('taskkill', ['/F', '/PID', pid.toString()]).then((_) {
+            print('taskkill执行完成');
+          }).catchError((e) {
+            print('taskkill失败: $e');
+          });
+        } catch (e) {
+          await logMessage('taskkill失败: $e');
+        }
+      }
+      
+      // 立即强制退出进程
+      await logMessage('执行 exit($exitCode) 强制退出');
+      exit(exitCode);
       
     } catch (e) {
-      await logMessage('方法1失败: $e');
-      
-      try {
-        // 方法2: 最后的保障 - 使用 exit() (可能会卡住)
-        await logMessage('尝试方法2: 使用 exit() (最后保障)');
-        await logMessage('警告: exit() 可能会导致应用卡住');
-        exit(exitCode);
-        
-      } catch (e2) {
-        await logMessage('所有退出方法都失败: $e2');
-        await logMessage('错误堆栈: ${StackTrace.current}');
-        // 最后的最后，还是尝试 exit
-        exit(exitCode);
-      }
+      await logMessage('退出失败: $e');
+      // 最终保障：无论如何都要退出
+      exit(exitCode);
     }
   }
 }

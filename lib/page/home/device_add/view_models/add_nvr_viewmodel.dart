@@ -34,15 +34,12 @@ class AddNvrViewModel extends BaseViewModel {
       refreshNvrAction();
     }
 
-    if(inOutList.isEmpty){
-      // 初始化进/出口列表
-      HttpQuery.share.homePageService.getInOutList(
-        onSuccess: (List<IdNameValue>? data) {
-          inOutList = data ?? [];
-          notifyListeners();
-        },
-      );
-    }
+    HttpQuery.share.homePageService.getInOutList(
+      onSuccess: (List<IdNameValue>? data) {
+        inOutList = data ?? [];
+        notifyListeners();
+      },
+    );
   }
 
   @override
