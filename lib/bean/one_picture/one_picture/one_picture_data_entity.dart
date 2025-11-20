@@ -73,6 +73,7 @@ class OnePictureDataData {
   String? mac;
   bool sameTypeData = false;
   bool ignore = false;
+  bool show = true;
   bool unknown = false;
   OnePictureDataData? parent;
 

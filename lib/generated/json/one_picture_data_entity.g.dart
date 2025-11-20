@@ -133,6 +133,10 @@ OnePictureDataData $OnePictureDataDataFromJson(Map<String, dynamic> json) {
   if (ignore != null) {
     onePictureDataData.ignore = ignore;
   }
+  final bool? show = jsonConvert.convert<bool>(json['show']);
+  if (show != null) {
+    onePictureDataData.show = show;
+  }
   final bool? unknown = jsonConvert.convert<bool>(json['unknown']);
   if (unknown != null) {
     onePictureDataData.unknown = unknown;
@@ -195,6 +199,7 @@ Map<String, dynamic> $OnePictureDataDataToJson(OnePictureDataData entity) {
   data['mac'] = entity.mac;
   data['sameTypeData'] = entity.sameTypeData;
   data['ignore'] = entity.ignore;
+  data['show'] = entity.show;
   data['unknown'] = entity.unknown;
   data['parent'] = entity.parent?.toJson();
   data['nextList'] = entity.nextList.map((v) => v.toJson()).toList();
@@ -222,6 +227,7 @@ extension OnePictureDataDataExtension on OnePictureDataData {
     String? mac,
     bool? sameTypeData,
     bool? ignore,
+    bool? show,
     bool? unknown,
     OnePictureDataData? parent,
     IconData? iconData,
@@ -248,6 +254,7 @@ extension OnePictureDataDataExtension on OnePictureDataData {
       ..mac = mac ?? this.mac
       ..sameTypeData = sameTypeData ?? this.sameTypeData
       ..ignore = ignore ?? this.ignore
+      ..show = show ?? this.show
       ..unknown = unknown ?? this.unknown
       ..parent = parent ?? this.parent
       ..iconData = iconData ?? this.iconData

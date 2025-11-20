@@ -383,10 +383,29 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
   String _getNodeId(OnePictureDataData? data) =>
       '${data?.type}_${data?.nodeCode ?? ''}';
 
+  void _pruneEmptyJck(OnePictureDataData node) {
+    if (node.children.isNotEmpty) {
+      for (var child in node.children) {
+        _pruneEmptyJck(child);
+      }
+      node.children.removeWhere((e) =>
+          e.type == OnePictureType.JCK.index && e.children.isEmpty);
+    }
+  }
+
   OnePictureDataData? _dealHttpData(OnePictureDataData? data) {
     if (data == null) {
       return null;
     }
+
+    if (data.children.isNotEmpty) {
+      for (var item in data.children) {
+        _pruneEmptyJck(item);
+      }
+      data.children.removeWhere((e) =>
+          e.type == OnePictureType.JCK.index && e.children.isEmpty);
+    }
+
     var opd = data.copyWith(nextList: []);
     setArrowBorder(opd);
     setJCK(opd, callback: (id, data) {
