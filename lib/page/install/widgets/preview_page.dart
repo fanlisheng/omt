@@ -27,30 +27,30 @@ class PreviewPage extends StatelessWidget {
         autoLoadData: true,
         builder: (context, model, child) {
           return contentView();
-              // : const Center(
-              //     child: Column(
-              //       mainAxisAlignment: MainAxisAlignment.center,
-              //       children: [
-              //         fu.ProgressRing(),
-              //         SizedBox(height: 20),
-              //         Text(
-              //           "正在生成预览数据，请稍候...",
-              //           style: TextStyle(
-              //             color: ColorUtils.colorGreenLiteLite,
-              //             fontSize: 16,
-              //           ),
-              //         ),
-              //         SizedBox(height: 20),
-              //         // fu.FilledButton(
-              //         //   child: const Text("重新生成预览"),
-              //         //   onPressed: () {
-              //         //     // 使用公开方法重新生成预览数据
-              //         //     installDeviceViewModel.rebuildPreviewData();
-              //         //   },
-              //         // ),
-              //       ],
-              //     ),
-              //   );
+          // : const Center(
+          //     child: Column(
+          //       mainAxisAlignment: MainAxisAlignment.center,
+          //       children: [
+          //         fu.ProgressRing(),
+          //         SizedBox(height: 20),
+          //         Text(
+          //           "正在生成预览数据，请稍候...",
+          //           style: TextStyle(
+          //             color: ColorUtils.colorGreenLiteLite,
+          //             fontSize: 16,
+          //           ),
+          //         ),
+          //         SizedBox(height: 20),
+          //         // fu.FilledButton(
+          //         //   child: const Text("重新生成预览"),
+          //         //   onPressed: () {
+          //         //     // 使用公开方法重新生成预览数据
+          //         //     installDeviceViewModel.rebuildPreviewData();
+          //         //   },
+          //         // ),
+          //       ],
+          //     ),
+          //   );
         });
   }
 
@@ -72,7 +72,9 @@ class PreviewPage extends StatelessWidget {
                 onePictureHttpData: model.onePictureDataData),
           ),
         ),
-        const fu.SizedBox(height: 10,),
+        const fu.SizedBox(
+          height: 10,
+        ),
         Container(
           height: 40,
           margin: const EdgeInsets.only(left: 16, right: 16, bottom: 15),
@@ -90,16 +92,7 @@ class PreviewPage extends StatelessWidget {
               ),
               Expanded(
                 child: buildDeviceStatistics(
-                    statistics:
-                        "设备统计：  1个电池  /  1个电源箱  /  2个路由器  /  2个交换机  /  2个边缘设备（1个异常）  /  2个摄像头（1个异常）  /  1个NVR（1个异常）"),
-                // child: Text(
-                //   model.deviceStatistics,
-                //   style: const TextStyle(
-                //     color: ColorUtils.colorGreen,
-                //     fontSize: 12,
-                //   ),
-                //   maxLines: 2,
-                // ),
+                    statistics: model.getDeviceStatistics()),
               ),
             ],
           ),

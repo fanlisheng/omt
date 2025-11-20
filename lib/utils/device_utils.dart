@@ -306,6 +306,7 @@ class DeviceUtils {
     DeviceType.nvr: "NVR",
     DeviceType.powerBox: "电源箱",
     DeviceType.battery: "电池",
+    DeviceType.mainsPower: "市电",
     DeviceType.exchange: "交换机",
     DeviceType.camera: "摄像头",
     DeviceType.router: "路由器",
@@ -331,11 +332,26 @@ class DeviceUtils {
     9: DeviceType.exchange,
     10: DeviceType.ai,
     11: DeviceType.camera,
+    12: DeviceType.mainsPower,  // 电池
+    13: DeviceType.battery,  // 电池
   };
 
   static int getDeviceTypeInt(String deviceTypeText) {
     return _deviceTypeMap[deviceTypeText] ?? 0;
   }
+
+  /// 根据设备类型int获取中文名称
+  /// 通过 intToDeviceTypeMap 获取 DeviceType，再调用 getDeviceTypeName(DeviceType) 获取名称
+  static String getDeviceTypeNameByInt(int deviceType) {
+    final deviceTypeEnum = intToDeviceTypeMap[deviceType];
+    if (deviceTypeEnum == null) {
+      return '未知设备';
+    }
+    return getDeviceTypeName(deviceTypeEnum);
+  }
+
+  /// 获取所有可统计的设备类型int列表
+  static List<int> get countableDeviceTypes => intToDeviceTypeMap.keys.toList();
 
   static String getDeviceTypeForMacAddress(String macAddress) {
     String macPrefix = macAddress.toUpperCase().substring(0, 8);
