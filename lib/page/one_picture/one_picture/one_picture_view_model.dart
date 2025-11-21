@@ -20,6 +20,7 @@ import '../../home/device_add/view_models/device_add_viewmodel.dart';
 import '../../home/device_detail/view_models/device_detail_viewmodel.dart';
 import 'dart:ui' as ui;
 import 'package:vector_math/vector_math_64.dart' as vmath;
+import 'dart:math' as math;
 
 ///
 ///  omt
@@ -41,6 +42,14 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
 
   final TransformationController transformationController =
       TransformationController();
+
+  final GlobalKey graphKey = GlobalKey();
+  final GlobalKey interactiveKey = GlobalKey();
+  bool hasFitted = false;
+  Size? viewportSize;
+  double minScale = 0.1;
+  double maxScale = 2.0;
+  Timer? _animTimer;
 
   Graph graph = Graph();
 
@@ -82,6 +91,155 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
       transformationController.value = vmath.Matrix4.identity()
         // ..translate(0, 0, 0.0) // 初始平移
         ..scale(0.7, 0.7, 0.7); // 初始缩放
+    });
+  }
+
+  void setViewport(Size size) {
+    viewportSize = size;
+  }
+
+  Size? _graphSize() {
+    return graphKey.currentContext?.size;
+  }
+
+  vmath.Matrix4 _clampMatrix(vmath.Matrix4 m) {
+    final vp = viewportSize;
+    final child = _graphSize();
+    if (vp == null || child == null) return m;
+    final s = m.storage[0];
+    final wS = child.width * s;
+    final hS = child.height * s;
+    double tx = m.storage[12];
+    double ty = m.storage[13];
+    if (wS <= vp.width) {
+      tx = tx.clamp(0.0, vp.width - wS);
+    } else {
+      tx = tx.clamp(vp.width - wS, 0.0);
+    }
+    if (hS <= vp.height) {
+      ty = ty.clamp(0.0, vp.height - hS);
+    } else {
+      ty = ty.clamp(vp.height - hS, 0.0);
+    }
+    m.storage[12] = tx;
+    m.storage[13] = ty;
+    return m;
+  }
+
+  void _setTransform(vmath.Matrix4 m) {
+    transformationController.value = m;
+  }
+
+  void fitToViewport(Size viewport) {
+    final child = _graphSize();
+    if (child == null || child.width == 0 || child.height == 0) {
+      return;
+    }
+    final sx = viewport.width / child.width;
+    final sy = viewport.height / child.height;
+    final scale = math.min(sx, sy).clamp(minScale, maxScale).toDouble();
+    final tx = (viewport.width - child.width * scale) / 2;
+    final ty = (viewport.height - child.height * scale) / 2;
+    final m = vmath.Matrix4.identity()
+      ..translate(tx, ty)
+      ..scale(scale, scale, scale);
+    _setTransform(m);
+  }
+
+  void tryFitOnce(Size viewport) {
+    if (hasFitted) return;
+    hasFitted = true;
+    fitToViewport(viewport);
+  }
+
+  void _fitWithScale(double scale) {
+    final vp = viewportSize;
+    final child = _graphSize();
+    if (vp == null || child == null) return;
+    final s = scale.clamp(minScale, maxScale).toDouble();
+    final tx = (vp.width - child.width * s) / 2;
+    final ty = (vp.height - child.height * s) / 2;
+    final m = vmath.Matrix4.identity()
+      ..translate(tx, ty)
+      ..scale(s, s, s);
+    _setTransform(m);
+  }
+
+  void _scaleAroundCenter(double targetScale) {
+    final m = transformationController.value;
+    final currentScale = m.storage[0];
+    double next = targetScale.clamp(minScale, maxScale).toDouble();
+    final factor = next / currentScale;
+    double ax;
+    double ay;
+    if (viewportSize != null) {
+      final inv = vmath.Matrix4.copy(m)..invert();
+      final vp = viewportSize!;
+      final vCenter = vmath.Vector3(vp.width / 2, vp.height / 2, 0);
+      final cCenter = inv.transform3(vCenter);
+      ax = cCenter.x;
+      ay = cCenter.y;
+    } else {
+      final child = _graphSize();
+      if (child == null || child.width == 0 || child.height == 0) {
+        return;
+      }
+      ax = child.width / 2;
+      ay = child.height / 2;
+    }
+
+    final anchor = vmath.Matrix4.identity()
+      ..translate(ax, ay)
+      ..scale(factor, factor, factor)
+      ..translate(-ax, -ay);
+    anchor.multiply(m);
+    _setTransform(anchor);
+  }
+
+  void zoomIn() {
+    final s = transformationController.value.storage[0];
+    final next = (s * 1.2);
+    _scaleAroundCenter(next);
+  }
+
+  void zoomOut() {
+    final s = transformationController.value.storage[0];
+    final next = (s * 0.8);
+    _scaleAroundCenter(next);
+  }
+
+  void zoomWheelAt(double dy, ui.Offset local) {
+    final s = transformationController.value.storage[0];
+    final next = (dy > 0 ? s * 0.8 : s * 1.2).clamp(minScale, maxScale);
+    _scaleAroundCenter(next);
+  }
+
+  void _animateWheelTo(double targetScale, ui.Offset local, {int steps = 6}) {
+    _animTimer?.cancel();
+    int remaining = steps;
+    final m0 = transformationController.value;
+    final s0 = m0.storage[0];
+    final inv0 = vmath.Matrix4.copy(m0)..invert();
+    final vCenter0 = vmath.Vector3(local.dx, local.dy, 0);
+    final cCenter0 = inv0.transform3(vCenter0);
+    final ax = cCenter0.x;
+    final ay = cCenter0.y;
+    final totalRatio = (targetScale / s0);
+    final stepFactorConst = math.pow(totalRatio, 1 / steps).toDouble();
+    _animTimer = Timer.periodic(Duration(milliseconds: 16), (t) {
+      if (remaining <= 0) {
+        t.cancel();
+        _animTimer = null;
+        return;
+      }
+      final m = transformationController.value;
+      final anchor = vmath.Matrix4.identity()
+        ..translate(ax, ay)
+        ..scale(stepFactorConst, stepFactorConst, stepFactorConst)
+        ..translate(-ax, -ay);
+      anchor.multiply(m);
+      _setTransform(anchor);
+      remaining -= 1;
     });
   }
 

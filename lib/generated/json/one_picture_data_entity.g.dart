@@ -146,6 +146,10 @@ OnePictureDataData $OnePictureDataDataFromJson(Map<String, dynamic> json) {
   if (parent != null) {
     onePictureDataData.parent = parent;
   }
+  final bool? showAddBtn2 = jsonConvert.convert<bool>(json['showAddBtn2']);
+  if (showAddBtn2 != null) {
+    onePictureDataData.showAddBtn2 = showAddBtn2;
+  }
   final List<OnePictureDataData>? nextList = (json['nextList'] as List<
       dynamic>?)
       ?.map(
@@ -202,6 +206,7 @@ Map<String, dynamic> $OnePictureDataDataToJson(OnePictureDataData entity) {
   data['show'] = entity.show;
   data['unknown'] = entity.unknown;
   data['parent'] = entity.parent?.toJson();
+  data['showAddBtn2'] = entity.showAddBtn2;
   data['nextList'] = entity.nextList.map((v) => v.toJson()).toList();
   data['lineColor'] = entity.lineColor;
   data['errorTxt'] = entity.errorTxt;
@@ -230,6 +235,7 @@ extension OnePictureDataDataExtension on OnePictureDataData {
     bool? show,
     bool? unknown,
     OnePictureDataData? parent,
+    bool? showAddBtn2,
     IconData? iconData,
     String? icon,
     List<OnePictureDataData>? nextList,
@@ -257,6 +263,7 @@ extension OnePictureDataDataExtension on OnePictureDataData {
       ..show = show ?? this.show
       ..unknown = unknown ?? this.unknown
       ..parent = parent ?? this.parent
+      ..showAddBtn2 = showAddBtn2 ?? this.showAddBtn2
       ..iconData = iconData ?? this.iconData
       ..icon = icon ?? this.icon
       ..nextList = nextList ?? this.nextList

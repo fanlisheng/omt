@@ -76,6 +76,7 @@ class OnePictureDataData {
   bool show = true;
   bool unknown = false;
   OnePictureDataData? parent;
+  bool showAddBtn2 = false;
 
   List<String> get faultList {
     return fault ?? [];
@@ -229,6 +230,7 @@ class OnePictureDataData {
         type == OnePictureType.DM.index &&
         children.isEmpty &&
         nextList.isEmpty) {
+       showAddBtn2 = true;
       return '未绑定设备';
     } else {
       return name.defaultStr(data: typeText);

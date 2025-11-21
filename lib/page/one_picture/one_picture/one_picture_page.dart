@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter/gestures.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/one_picture/one_picture/one_picture_data_entity.dart';
 import 'package:omt/utils/color_utils.dart';
@@ -62,47 +63,83 @@ class OnePicturePageState extends State<OnePicturePage> {
                         model, model.theOnePictureDataData?.theNodeId)
                   ],
                 )
-              : InteractiveViewer(
-                  constrained: false,
-                  // clipBehavior: Clip.antiAlias,
-                  boundaryMargin: const EdgeInsets.all(50),
-                  // transformationController: model.transformationController,
-                  minScale: 0.1,
-                  maxScale: 1,
-                  child: (model.graph.nodeCount() == 0
-                      ? ((model.theOnePictureDataData?.getChildList() ?? [])
-                              .isNotEmpty
-                          ? (Row(
-                              children: model.theOnePictureDataData!
-                                  .getChildList()
-                                  .map((e) {
-                                final Graph graph = Graph();
-                                SugiyamaConfiguration builder =
-                                    SugiyamaConfiguration()
-                                      ..bendPointShape =
-                                          CurvedBendPointShape(curveLength: 12)
-                                      ..coordinateAssignment =
-                                          CoordinateAssignment.Left;
-                                return rectangleSubWidget2(
-                                    model: model,
-                                    data: e,
-                                    graph: graph,
-                                    builder: builder);
-                              }).toList(),
-                            ))
-                          : Container())
-                      : GraphView(
-                          graph: model.graph,
-                          algorithm: SugiyamaAlgorithm(model.builder),
-                          paint: Paint()
-                            ..color = Colors.green
-                            ..strokeWidth = 2
-                            ..style = PaintingStyle.stroke,
-                          builder: (Node node) {
-                            var a = node.key!.value as String?;
-                            return rectangleWidget(model, a);
-                          },
-                        )));
+              : LayoutBuilder(builder: (context, constraints) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    model.setViewport(constraints.biggest);
+                    model.tryFitOnce(constraints.biggest);
+                  });
+                  return Listener(
+                    onPointerSignal: (event) {
+                      if (event is PointerScrollEvent) {
+                        final ctx = model.interactiveKey.currentContext;
+                        final ro = ctx?.findRenderObject() as RenderBox?;
+                        if (ro == null) return;
+                        final local = ro.globalToLocal(event.position);
+                        final size = ro.size;
+                        if (local.dx < 0 ||
+                            local.dy < 0 ||
+                            local.dx > size.width ||
+                            local.dy > size.height) {
+                          return;
+                        }
+                        model.zoomWheelAt(event.scrollDelta.dy, local);
+                      }
+                    },
+                    child: Stack(
+                      children: [
+                        InteractiveViewer(
+                          key: model.interactiveKey,
+                          constrained: false,
+                          boundaryMargin: const EdgeInsets.all(double.infinity),
+                          transformationController:
+                              model.transformationController,
+                          alignment: Alignment.topLeft,
+                          scaleEnabled: false,
+                          minScale: model.minScale,
+                          maxScale: model.maxScale,
+                          child: (model.graph.nodeCount() == 0
+                              ? ((model.theOnePictureDataData?.getChildList() ??
+                                          [])
+                                      .isNotEmpty
+                                  ? (Row(
+                                      key: model.graphKey,
+                                      children: model.theOnePictureDataData!
+                                          .getChildList()
+                                          .map((e) {
+                                        final Graph graph = Graph();
+                                        SugiyamaConfiguration builder =
+                                            SugiyamaConfiguration()
+                                              ..bendPointShape =
+                                                  CurvedBendPointShape(
+                                                      curveLength: 12)
+                                              ..coordinateAssignment =
+                                                  CoordinateAssignment.Left;
+                                        return rectangleSubWidget2(
+                                            model: model,
+                                            data: e,
+                                            graph: graph,
+                                            builder: builder);
+                                      }).toList(),
+                                    ))
+                                  : Container())
+                              : GraphView(
+                                  key: model.graphKey,
+                                  graph: model.graph,
+                                  algorithm: SugiyamaAlgorithm(model.builder),
+                                  paint: Paint()
+                                    ..color = Colors.green
+                                    ..strokeWidth = 2
+                                    ..style = PaintingStyle.stroke,
+                                  builder: (Node node) {
+                                    var a = node.key!.value as String?;
+                                    return rectangleWidget(model, a);
+                                  },
+                                )),
+                        )
+                      ],
+                    ),
+                  );
+                });
         });
   }
 
@@ -184,9 +221,10 @@ class OnePicturePageState extends State<OnePicturePage> {
                 padding: onePictureDataData?.showAddBtnDM != true
                     ? null
                     : const EdgeInsetsDirectional.only(top: 50),
-                child: _item(onePictureDataData))
+                child: _item(onePictureDataData, model))
             .addRightIcon(
-                onTap: onePictureDataData?.showAddBtnDM != true || model.cannotTap()
+                onTap: onePictureDataData?.showAddBtnDM != true ||
+                        model.cannotTap()
                     ? null
                     : () {
                         model.onTapItemNew(onePictureDataData);
@@ -253,7 +291,7 @@ class OnePicturePageState extends State<OnePicturePage> {
                             Border.all(color: '#347979'.toColor(), width: 1),
                         borderRadius: BorderRadius.circular(4)),
                     child: (oData?.getChildList() ?? []).isEmpty
-                        ? _item(oData)
+                        ? _item(oData, model)
                         : Row(
                             children: oData!.getChildList().map((e) {
                               final Graph graph = Graph();
@@ -334,8 +372,7 @@ class OnePicturePageState extends State<OnePicturePage> {
                       EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 16),
                   padding:
                       EdgeInsets.only(left: 0, right: 0, top: 0, bottom: 0),
-                  borderRadius: 4.0)
-          ;
+                  borderRadius: 4.0);
         } else {
           if (data.showBorder == true) {}
           if (data.ignore == true) {}
@@ -411,7 +448,9 @@ class OnePicturePageState extends State<OnePicturePage> {
                                   : '#347979')
                               .toColor(),
                           width: 1,
-                          dash: data.getChildList().length > 0 && (data.type == OnePictureType.DM.index || data.type == OnePictureType.JCK.index) ,
+                          dash: data.getChildList().length > 0 &&
+                              (data.type == OnePictureType.DM.index ||
+                                  data.type == OnePictureType.JCK.index),
                           margin: EdgeInsets.only(
                               left: 16,
                               right: 16,
@@ -420,10 +459,10 @@ class OnePicturePageState extends State<OnePicturePage> {
                           borderRadius: 4.0),
                 ],
               )
-            : _item(data));
+            : _item(data, model));
   }
 
-  Widget _item(OnePictureDataData? oData) {
+  Widget _item(OnePictureDataData? oData, OnePictureViewModel model) {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (event) {
@@ -495,7 +534,11 @@ class OnePicturePageState extends State<OnePicturePage> {
                   );
                 }).toList())
             ],
-          )),
+          )).addAdd(
+          oData: oData,
+          onTap: () {
+            model.onTapItemNew(oData);
+          }),
     );
   }
 
@@ -518,7 +561,7 @@ class OnePicturePageState extends State<OnePicturePage> {
     viewModel?.onePictureHttpData = data;
     viewModel?.setupOnePictureHttpData();
   }
-  
+
   // 清除页面数据的方法
   clearData() {
     viewModel?.onePictureHttpData = null;
@@ -555,7 +598,7 @@ extension on Widget {
   }
 }
 
-extension on Container {
+extension on Widget {
   Widget addRightIcon({required Function()? onTap, Widget? btn}) {
     if (null == onTap) {
       return this;
@@ -573,6 +616,35 @@ extension on Container {
                     child: const Row(
                       children: [Icon(Icons.add), Text('添加设备')],
                     ))),
+      ],
+    );
+  }
+}
+
+extension on Widget {
+  Widget addAdd(
+      {required Function()? onTap, required OnePictureDataData? oData}) {
+    if (null == onTap || oData?.showAddBtn2 != true) {
+      return this;
+    }
+
+    return Stack(
+      children: [
+        Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: '#888888'.toColor(), width: 1),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            padding: const EdgeInsetsDirectional.only(top: 50),
+            child: this),
+        Positioned(
+            right: 12,
+            top: 12,
+            child: TextButton(
+                onPressed: onTap,
+                child: const Row(
+                  children: [Icon(Icons.add), Text('添加设备')],
+                ))),
       ],
     );
   }
