@@ -32,7 +32,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
       this.instanceName, this.onePictureHttpData);
 
   final TransformationController transformationController =
-  TransformationController();
+      TransformationController();
 
   final GlobalKey graphKey = GlobalKey();
   final GlobalKey interactiveKey = GlobalKey();
@@ -213,8 +213,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
   }
 
   @override
-  loadData({onSuccess, onCache, onError}) async {
-  }
+  loadData({onSuccess, onCache, onError}) async {}
 
   void requestData() {
     if (instanceId == null) {
@@ -239,6 +238,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
                   ..name = '未发现绑定设备'
                   ..type = OnePictureType.OTHER.index
                   ..id = '-99'
+                  ..showAddBtn2 = true
               ];
             _setDataMap(opd);
             setArrowBorder(opd);
@@ -246,7 +246,8 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
             opd = OnePictureDataData()
               ..name = '未发现绑定设备'
               ..type = OnePictureType.OTHER.index
-              ..id = '-99';
+              ..id = '-99'
+              ..showAddBtn2 = true;
             _setDataMap(opd);
           } else {
             _setDataMap(data);
@@ -354,12 +355,12 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
 
         var elementsToMoveToEnd = data.children
             .where((e) =>
-        e.type == OnePictureType.LYQ.index ||
-            e.type == OnePictureType.YXWL.index)
+                e.type == OnePictureType.LYQ.index ||
+                e.type == OnePictureType.YXWL.index)
             .toList();
 
         data.children.removeWhere((e) =>
-        e.type == OnePictureType.LYQ.index ||
+            e.type == OnePictureType.LYQ.index ||
             e.type == OnePictureType.YXWL.index);
 
         data.children.addAll(elementsToMoveToEnd);
@@ -407,12 +408,12 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
 
         var elementsToMoveToEnd = data.children
             .where((e) =>
-        e.type == OnePictureType.LYQ.index ||
-            e.type == OnePictureType.YXWL.index)
+                e.type == OnePictureType.LYQ.index ||
+                e.type == OnePictureType.YXWL.index)
             .toList();
 
         data.children.removeWhere((e) =>
-        e.type == OnePictureType.LYQ.index ||
+            e.type == OnePictureType.LYQ.index ||
             e.type == OnePictureType.YXWL.index);
 
         data.children.addAll(elementsToMoveToEnd);
@@ -438,7 +439,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
         _pruneEmptyJck(child);
       }
       node.children.removeWhere(
-              (e) => e.type == OnePictureType.JCK.index && e.children.isEmpty);
+          (e) => e.type == OnePictureType.JCK.index && e.children.isEmpty);
     }
   }
 
@@ -452,7 +453,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
         _pruneEmptyJck(item);
       }
       data.children.removeWhere(
-              (e) => e.type == OnePictureType.JCK.index && e.children.isEmpty);
+          (e) => e.type == OnePictureType.JCK.index && e.children.isEmpty);
     }
 
     var opd = data.copyWith(nextList: []);
@@ -535,7 +536,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
     }
 
     List<OnePictureDataData> childrenList =
-    opd.sameTypeData == true ? opd.children : [];
+        opd.sameTypeData == true ? opd.children : [];
     for (var type in typeMap.keys) {
       if (typeMap[type]!.length == 1) {
         childrenList.addAll(typeMap[type]!);
@@ -544,7 +545,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
           childrenList.addAll(typeMap[type]!);
         } else {
           var father =
-          typeMap[type]![0].copyWith(children: [], sameTypeData: true);
+              typeMap[type]![0].copyWith(children: [], sameTypeData: true);
           father.children.addAll(typeMap[type]!);
           childrenList.add(father);
         }
@@ -606,7 +607,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
         typeMap.getOrNull<List<OnePictureDataData>>(OnePictureType.JCK.index) ??
             [];
     List<OnePictureDataData> gdsb = typeMap
-        .getOrNull<List<OnePictureDataData>>(OnePictureType.GDSB.index) ??
+            .getOrNull<List<OnePictureDataData>>(OnePictureType.GDSB.index) ??
         [];
     List<OnePictureDataData> dyx =
         typeMap.getOrNull<List<OnePictureDataData>>(OnePictureType.DYX.index) ??
@@ -615,7 +616,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
         typeMap.getOrNull<List<OnePictureDataData>>(OnePictureType.LYQ.index) ??
             [];
     List<OnePictureDataData> yxwl = typeMap
-        .getOrNull<List<OnePictureDataData>>(OnePictureType.YXWL.index) ??
+            .getOrNull<List<OnePictureDataData>>(OnePictureType.YXWL.index) ??
         [];
     List<OnePictureDataData> nvr =
         typeMap.getOrNull<List<OnePictureDataData>>(OnePictureType.NVR.index) ??
@@ -624,7 +625,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
         typeMap.getOrNull<List<OnePictureDataData>>(OnePictureType.JHJ.index) ??
             [];
     List<OnePictureDataData> aisb = typeMap
-        .getOrNull<List<OnePictureDataData>>(OnePictureType.AISB.index) ??
+            .getOrNull<List<OnePictureDataData>>(OnePictureType.AISB.index) ??
         [];
     List<OnePictureDataData> sxt =
         typeMap.getOrNull<List<OnePictureDataData>>(OnePictureType.SXT.index) ??
@@ -701,8 +702,8 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
           _powerSub(opd.children[0],
               jck: jck.isEmpty && opd.type == OnePictureType.JCK.index
                   ? jckf == null
-                  ? []
-                  : [jckf]
+                      ? []
+                      : [jckf]
                   : jck,
               lyq: lyq,
               yxwl: yxwl,
@@ -760,14 +761,14 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
                 paint: Paint()
                   ..strokeWidth = 2
                   ..color = (opd.unknown &&
-                      (next.type == OnePictureType.DYX.index ||
-                          next.type == OnePictureType.SD.index ||
-                          next.type == OnePictureType.DC.index ||
-                          next.type == OnePictureType.GDSB.index))
+                          (next.type == OnePictureType.DYX.index ||
+                              next.type == OnePictureType.SD.index ||
+                              next.type == OnePictureType.DC.index ||
+                              next.type == OnePictureType.GDSB.index))
                       ? ColorUtils.transparent
                       : opd.lineColor.toColor(),
                 arrowTitle:
-                next.showName == true ? next.showNameText(arrow: true) : '',
+                    next.showName == true ? next.showNameText(arrow: true) : '',
                 arrowTitleColor: ColorUtils.colorBlackLite.dark);
             doSetDataToGraph(graph, next, parentNode: nodeNext);
 
@@ -867,9 +868,9 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
     if (data == null || cannotTap()) {
       return;
     }
-    IntentUtils.share.push(context,
-        routeName: RouterPage.DeviceAddPage,
-        data: {"pNodeCode": data.nodeCode})?.then((value) {
+    IntentUtils.share.push(context, routeName: RouterPage.DeviceAddPage, data: {
+      "pNodeCode": data.nodeCode ?? gateId ?? instanceId
+    })?.then((value) {
       if (IntentUtils.share.isResultOk(value)) {
         requestData();
       }
@@ -878,12 +879,12 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
 
   void _powerSub(OnePictureDataData opd,
       {List<OnePictureDataData>? jck,
-        List<OnePictureDataData>? lyq,
-        List<OnePictureDataData>? nvr,
-        List<OnePictureDataData>? jhj,
-        List<OnePictureDataData>? yxwl,
-        List<OnePictureDataData>? aisb,
-        List<OnePictureDataData>? sxt}) {
+      List<OnePictureDataData>? lyq,
+      List<OnePictureDataData>? nvr,
+      List<OnePictureDataData>? jhj,
+      List<OnePictureDataData>? yxwl,
+      List<OnePictureDataData>? aisb,
+      List<OnePictureDataData>? sxt}) {
     if (jck?.isNotEmpty == true) {
       opd.nextList.insert(0, jck![0]);
     }
@@ -900,7 +901,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
     if (jhj?.isNotEmpty == true) {
       if (jhj!.length > 1) {
         var father =
-        jhj[0].copyWith(children: jhj, sameTypeData: true, name: '');
+            jhj[0].copyWith(children: jhj, sameTypeData: true, name: '');
         opd.nextList.add(father);
         dataMap[_getNodeId(father)] = father;
         for (var child in jhj) {
