@@ -546,8 +546,8 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
       for (var child in node.children) {
         _pruneEmptyJck(child);
       }
-      node.children.removeWhere((e) =>
-          e.type == OnePictureType.JCK.index && e.children.isEmpty);
+      node.children.removeWhere(
+          (e) => e.type == OnePictureType.JCK.index && e.children.isEmpty);
     }
   }
 
@@ -560,8 +560,8 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
       for (var item in data.children) {
         _pruneEmptyJck(item);
       }
-      data.children.removeWhere((e) =>
-          e.type == OnePictureType.JCK.index && e.children.isEmpty);
+      data.children.removeWhere(
+          (e) => e.type == OnePictureType.JCK.index && e.children.isEmpty);
     }
 
     var opd = data.copyWith(nextList: []);
