@@ -1,5 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart' as fu;
 import 'package:flutter/material.dart';
+import 'package:kayo_package/extension/_index_extension.dart';
 import 'package:kayo_package/utils/loading_utils.dart';
 import 'package:omt/bean/common/id_name_value.dart';
 import '../../../../http/http_query.dart';
@@ -26,9 +27,9 @@ class PowerBoxBindDeviceDialogPage {
             deviceTypeList = list;
           },
           onSubmit:
-              (BuildContext dialogContext, IdNameValue? deviceType) async {
+              (BuildContext dialogContext, IdNameValue? deviceType1) async {
             // 验证设备类型
-            if (deviceType == null) {
+            if (deviceType1 == null) {
               LoadingUtils.showToast(data: "请选择设备类型");
               return;
             }
@@ -40,7 +41,7 @@ class PowerBoxBindDeviceDialogPage {
             HttpQuery.share.homePageService.dcInterfaceBindDevice(
               deviceCode: deviceCode,
               id: dcId,
-              deviceType: deviceType.id ?? 0,
+              deviceType: (deviceType1.value ?? "0").toInt(),
               onSuccess: (data) {
                 // 成功后执行回调
                 onSuccess();
