@@ -22,15 +22,6 @@ import 'dart:ui' as ui;
 import 'package:vector_math/vector_math_64.dart' as vmath;
 import 'dart:math' as math;
 
-///
-///  omt
-///  one_picture_view_model.dart
-///  一张图
-///
-///  Created by kayoxu on 2024-12-03 at 10:09:44
-///  Copyright © 2024 .. All rights reserved.
-///
-
 class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
   String? instanceName;
   String? instanceId;
@@ -49,7 +40,6 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
   Size? viewportSize;
   double minScale = 0.1;
   double maxScale = 2.0;
-  Timer? _animTimer;
 
   Graph graph = Graph();
 
@@ -58,12 +48,10 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
     ..coordinateAssignment = CoordinateAssignment.Center;
 
   OnePictureDataData? onePictureHttpData;
-
   OnePictureDataData? theOnePictureDataData;
   OnePictureDataData? theHoverOnePictureDataData;
 
   Map<String, OnePictureDataData> dataMap = {};
-
   int currentIndex = 0;
 
   bool cannotTap() {
@@ -73,9 +61,6 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
   @override
   void initState() async {
     super.initState();
-    // requestData();
-
-    // setupOnePictureHttpData();
 
     DeviceUtils.getNetworkMac(onData: (data) {
       if (SharedUtils.networkMac != data) {
@@ -87,10 +72,8 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
     reInitData();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // 在 Widget 构建完成后设置初始变换
       transformationController.value = vmath.Matrix4.identity()
-        // ..translate(0, 0, 0.0) // 初始平移
-        ..scale(0.7, 0.7, 0.7); // 初始缩放
+        ..scale(0.7, 0.7, 0.7);
     });
   }
 
@@ -100,30 +83,6 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
 
   Size? _graphSize() {
     return graphKey.currentContext?.size;
-  }
-
-  vmath.Matrix4 _clampMatrix(vmath.Matrix4 m) {
-    final vp = viewportSize;
-    final child = _graphSize();
-    if (vp == null || child == null) return m;
-    final s = m.storage[0];
-    final wS = child.width * s;
-    final hS = child.height * s;
-    double tx = m.storage[12];
-    double ty = m.storage[13];
-    if (wS <= vp.width) {
-      tx = tx.clamp(0.0, vp.width - wS);
-    } else {
-      tx = tx.clamp(vp.width - wS, 0.0);
-    }
-    if (hS <= vp.height) {
-      ty = ty.clamp(0.0, vp.height - hS);
-    } else {
-      ty = ty.clamp(vp.height - hS, 0.0);
-    }
-    m.storage[12] = tx;
-    m.storage[13] = ty;
-    return m;
   }
 
   void _setTransform(vmath.Matrix4 m) {
@@ -152,95 +111,66 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
     fitToViewport(viewport);
   }
 
-  void _fitWithScale(double scale) {
-    final vp = viewportSize;
-    final child = _graphSize();
-    if (vp == null || child == null) return;
-    final s = scale.clamp(minScale, maxScale).toDouble();
-    final tx = (vp.width - child.width * s) / 2;
-    final ty = (vp.height - child.height * s) / 2;
-    final m = vmath.Matrix4.identity()
-      ..translate(tx, ty)
-      ..scale(s, s, s);
-    _setTransform(m);
+  /// 核心修复：指定屏幕点(focalPoint)进行定点缩放
+  /// 解决了平移后缩放漂移的问题
+  void _zoomToPoint(double targetScale, ui.Offset focalPoint) {
+    final matrix = transformationController.value;
+    final double currentScale = matrix.storage[0];
+    final double tx = matrix.storage[12];
+    final double ty = matrix.storage[13];
+
+    // 1. 限制缩放范围
+    double newScale = targetScale.clamp(minScale, maxScale).toDouble();
+
+    // 2. 计算鼠标指向的内容在“原始画布”上的坐标 (Scene Point)
+    // 场景坐标 = (屏幕坐标 - 平移量) / 当前缩放比例
+    double sceneX = (focalPoint.dx - tx) / currentScale;
+    double sceneY = (focalPoint.dy - ty) / currentScale;
+
+    // 3. 计算新的平移量，使得该内容点在缩放后依然位于鼠标下方
+    // 新平移量 = 屏幕坐标 - 场景坐标 * 新缩放比例
+    double newTx = focalPoint.dx - sceneX * newScale;
+    double newTy = focalPoint.dy - sceneY * newScale;
+
+    // 4. 应用新矩阵
+    transformationController.value = vmath.Matrix4.identity()
+      ..translate(newTx, newTy)
+      ..scale(newScale, newScale, newScale);
   }
 
-  void _scaleAroundCenter(double targetScale) {
-    final m = transformationController.value;
-    final currentScale = m.storage[0];
-    double next = targetScale.clamp(minScale, maxScale).toDouble();
-    final factor = next / currentScale;
-    double ax;
-    double ay;
-    if (viewportSize != null) {
-      final inv = vmath.Matrix4.copy(m)..invert();
-      final vp = viewportSize!;
-      final vCenter = vmath.Vector3(vp.width / 2, vp.height / 2, 0);
-      final cCenter = inv.transform3(vCenter);
-      ax = cCenter.x;
-      ay = cCenter.y;
-    } else {
-      final child = _graphSize();
-      if (child == null || child.width == 0 || child.height == 0) {
-        return;
-      }
-      ax = child.width / 2;
-      ay = child.height / 2;
-    }
-
-    final anchor = vmath.Matrix4.identity()
-      ..translate(ax, ay)
-      ..scale(factor, factor, factor)
-      ..translate(-ax, -ay);
-    anchor.multiply(m);
-    _setTransform(anchor);
-  }
-
+  /// 按钮放大
   void zoomIn() {
-    final s = transformationController.value.storage[0];
-    final next = (s * 1.2);
-    _scaleAroundCenter(next);
+    final currentScale = transformationController.value.storage[0];
+    final targetScale = currentScale * 1.2;
+
+    // 以视口中心为缩放点
+    final center = viewportSize != null
+        ? ui.Offset(viewportSize!.width / 2, viewportSize!.height / 2)
+        : ui.Offset.zero;
+
+    _zoomToPoint(targetScale, center);
   }
 
+  /// 按钮缩小
   void zoomOut() {
-    final s = transformationController.value.storage[0];
-    final next = (s * 0.8);
-    _scaleAroundCenter(next);
+    final currentScale = transformationController.value.storage[0];
+    final targetScale = currentScale * 0.8;
+
+    final center = viewportSize != null
+        ? ui.Offset(viewportSize!.width / 2, viewportSize!.height / 2)
+        : ui.Offset.zero;
+
+    _zoomToPoint(targetScale, center);
   }
 
+  /// 鼠标滚轮缩放
   void zoomWheelAt(double dy, ui.Offset local) {
-    final s = transformationController.value.storage[0];
-    final next = (dy > 0 ? s * 0.8 : s * 1.2).clamp(minScale, maxScale);
-    _scaleAroundCenter(next);
-  }
+    final currentScale = transformationController.value.storage[0];
+    // 向上滚放大，向下滚缩小
+    final targetScale = dy > 0 ? currentScale * 0.8 : currentScale * 1.2;
 
-  void _animateWheelTo(double targetScale, ui.Offset local, {int steps = 6}) {
-    _animTimer?.cancel();
-    int remaining = steps;
-    final m0 = transformationController.value;
-    final s0 = m0.storage[0];
-    final inv0 = vmath.Matrix4.copy(m0)..invert();
-    final vCenter0 = vmath.Vector3(local.dx, local.dy, 0);
-    final cCenter0 = inv0.transform3(vCenter0);
-    final ax = cCenter0.x;
-    final ay = cCenter0.y;
-    final totalRatio = (targetScale / s0);
-    final stepFactorConst = math.pow(totalRatio, 1 / steps).toDouble();
-    _animTimer = Timer.periodic(Duration(milliseconds: 16), (t) {
-      if (remaining <= 0) {
-        t.cancel();
-        _animTimer = null;
-        return;
-      }
-      final m = transformationController.value;
-      final anchor = vmath.Matrix4.identity()
-        ..translate(ax, ay)
-        ..scale(stepFactorConst, stepFactorConst, stepFactorConst)
-        ..translate(-ax, -ay);
-      anchor.multiply(m);
-      _setTransform(anchor);
-      remaining -= 1;
-    });
+    // 传入鼠标当前位置作为缩放锚点
+    _zoomToPoint(targetScale, local);
   }
 
   void setupOnePictureHttpData() {
@@ -252,17 +182,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
       OnePictureDataData? opd;
       _setDataMap(data);
       opd = _dealHttpData(data);
-      if (opd != null) {
-        // if(opd.nextList.isNotEmpty){
-        //   if(opd.type == OnePictureType.DM.index){
-        //     ///
-        //   }
-        // }
-      }
-
       setDataToGraph(opd);
-
-      // data = opd;
       theOnePictureDataData = opd;
       notifyListeners();
 
@@ -293,9 +213,7 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
   }
 
   @override
-  loadData({onSuccess, onCache, onError}) async {
-    // var userInfo = await SharedUtils.getUserInfo();
-  }
+  loadData({onSuccess, onCache, onError}) async {}
 
   void requestData() {
     if (instanceId == null) {
@@ -308,7 +226,6 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
         onSuccess: (data) {
           currentIndex = 0;
           onePictureHttpData = data;
-
           dataMap.clear();
           OnePictureDataData? opd;
           if (null == data && null == gateId && null == passId) {
@@ -321,54 +238,29 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
                   ..name = '未发现绑定设备'
                   ..type = OnePictureType.OTHER.index
                   ..id = '-99'
+                  ..showAddBtn2 = true
               ];
-
             _setDataMap(opd);
-
             setArrowBorder(opd);
           } else if (null == data) {
             opd = OnePictureDataData()
               ..name = '未发现绑定设备'
               ..type = OnePictureType.OTHER.index
-              ..id = '-99';
+              ..id = '-99'
+              ..showAddBtn2 = true;
             _setDataMap(opd);
           } else {
             _setDataMap(data);
             opd = _dealHttpData(data);
           }
-
-          if (opd != null) {
-            // if(opd.nextList.isNotEmpty){
-            //   if(opd.type == OnePictureType.DM.index){
-            //     ///
-            //   }
-            // }
-          }
-
           setDataToGraph(opd);
-
-          // data = opd;
           theOnePictureDataData = opd;
           notifyListeners();
-
           Timer(Duration(milliseconds: 500), () {
             notifyListeners();
           });
-
-          // onSuccess?.call(opd);
         },
-        onCache: (data) {
-          // onePictureHttpData = data;
-          // dataMap.clear();
-          //
-          // _setDataMap(data);
-          //
-          // OnePictureDataData? opd = _dealHttpData(data);
-          //
-          // setDataToGraph(opd);
-
-          // onCache?.call(data);
-        },
+        onCache: (data) {},
         onError: (e) {});
   }
 
@@ -546,8 +438,8 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
       for (var child in node.children) {
         _pruneEmptyJck(child);
       }
-      node.children.removeWhere((e) =>
-          e.type == OnePictureType.JCK.index && e.children.isEmpty);
+      node.children.removeWhere(
+          (e) => e.type == OnePictureType.JCK.index && e.children.isEmpty);
     }
   }
 
@@ -560,8 +452,8 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
       for (var item in data.children) {
         _pruneEmptyJck(item);
       }
-      data.children.removeWhere((e) =>
-          e.type == OnePictureType.JCK.index && e.children.isEmpty);
+      data.children.removeWhere(
+          (e) => e.type == OnePictureType.JCK.index && e.children.isEmpty);
     }
 
     var opd = data.copyWith(nextList: []);
@@ -851,7 +743,6 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
     bool haNode = false;
     if (null != opd) {
       var nodeRoot = parentNode ?? Node.Id(_getNodeId(opd));
-      // var childList = opd.getChildList();
       if (opd.nextList.isNotEmpty) {
         OnePictureDataData? jhj;
         List<OnePictureDataData> jhjTargetList = [];
@@ -932,12 +823,6 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
       return;
     }
     if (data?.unknown == true) {
-      if (data?.type == OnePictureType.DYX.index) {
-        /// 电源箱未知
-      } else if (data?.type == OnePictureType.SD.index ||
-          data?.type == OnePictureType.DC.index) {
-        /// 电源未知
-      }
       return;
     }
     if (null == data?.nodeCode ||
@@ -983,9 +868,9 @@ class OnePictureViewModel extends BaseViewModelRefresh<OnePictureDataData?> {
     if (data == null || cannotTap()) {
       return;
     }
-    IntentUtils.share.push(context,
-        routeName: RouterPage.DeviceAddPage,
-        data: {"pNodeCode": data.nodeCode})?.then((value) {
+    IntentUtils.share.push(context, routeName: RouterPage.DeviceAddPage, data: {
+      "pNodeCode": data.nodeCode ?? gateId ?? instanceId
+    })?.then((value) {
       if (IntentUtils.share.isResultOk(value)) {
         requestData();
       }
