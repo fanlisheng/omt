@@ -16,259 +16,230 @@ class WindowsInstallScript {
         .replaceAll('/', '\\');
     final downloadPathWin = downloadPath.replaceAll('/', '\\');
     
-    // 使用简化的脚本模板
+     // 使用简化的脚本模板，使用安全的占位符格式
     return _getSimplifiedScriptTemplate()
-        .replaceAll('\${appName}', appName)
-        .replaceAll('\${sourceDir}', extractedPathWin)
-        .replaceAll('\${targetDir}', targetDirWin)
-        .replaceAll('\${zipPath}', downloadPathWin);
+        .replaceAll('__APPNAME__', appName)
+        .replaceAll('__SOURCEDIR__', extractedPathWin)
+        .replaceAll('__TARGETDIR__', targetDirWin)
+        .replaceAll('__ZIPPATH__', downloadPathWin);
   }
 
   /// 获取兼容Windows 7+的脚本模板（带日志和增强兼容性）
+  /// 注意：使用纯ASCII避免编码问题
   static String _getSimplifiedScriptTemplate() {
-    return '''
-@echo off
+    return '''@echo off
 setlocal enabledelayedexpansion
 
-REM Set code page to UTF-8 for Chinese support
-chcp 65001 >nul 2>&1
+title OMT Update Installer
 
-REM Set window title
-title OMT 更新安装程序
-
-REM Use TEMP directory for log file (always writable, no permission issues)
-set "LOG_DIR=%TEMP%\\OMT_Update"
+set LOG_DIR=%TEMP%\\OMT_Update
 if not exist "%LOG_DIR%" mkdir "%LOG_DIR%" >nul 2>&1
-set "LOG_FILE=%LOG_DIR%\\omt_update_log.txt"
+set LOG_FILE=%LOG_DIR%\\omt_update_log.txt
 
-REM Initialize log file
-echo [%date% %time%] OMT 更新安装程序启动... > "%LOG_FILE%"
-echo OMT 更新安装程序启动...
-echo 日志文件: %LOG_FILE%
+echo [%date% %time%] OMT Update started > "%LOG_FILE%"
+echo OMT Update Installer starting...
+echo Log file: %LOG_FILE%
 
-REM Check admin privileges
-echo [%date% %time%] 检查管理员权限... >> "%LOG_FILE%"
+echo [%date% %time%] Checking admin privileges >> "%LOG_FILE%"
 net session >nul 2>&1
-if %ERRORLEVEL% EQU 0 (
-    set "IS_ADMIN=1"
-    echo [%date% %time%] 以管理员权限运行 >> "%LOG_FILE%"
-    echo 以管理员权限运行...
-) else (
-    set "IS_ADMIN=0"
-    echo [%date% %time%] 以普通用户权限运行 >> "%LOG_FILE%"
-    echo 以普通用户权限运行...
-)
+if %ERRORLEVEL% EQU 0 goto admin_ok
+echo [%date% %time%] Running as normal user >> "%LOG_FILE%"
+echo Running as normal user...
+goto set_vars
 
-REM Set variables early for process checking
-set "APP_NAME=\${appName}"
+:admin_ok
+echo [%date% %time%] Running as admin >> "%LOG_FILE%"
+echo Running as administrator...
 
-REM Critical: Initial delay to let application exit gracefully
-echo [%date% %time%] 等待5秒让应用程序退出... >> "%LOG_FILE%"
-echo 等待应用程序退出...
+:set_vars
+set APP_NAME=__APPNAME__
+set SOURCE_DIR=__SOURCEDIR__
+set TARGET_DIR=__TARGETDIR__
+set ZIP_PATH=__ZIPPATH__
+
+echo [%date% %time%] APP_NAME=%APP_NAME% >> "%LOG_FILE%"
+echo [%date% %time%] SOURCE_DIR=%SOURCE_DIR% >> "%LOG_FILE%"
+echo [%date% %time%] TARGET_DIR=%TARGET_DIR% >> "%LOG_FILE%"
+
+echo [%date% %time%] Waiting 5 seconds for app to exit >> "%LOG_FILE%"
+echo Waiting for application to exit...
 ping 127.0.0.1 -n 6 >nul 2>&1
 
-REM Wait for application to exit with active checking
-echo [%date% %time%] 开始检查进程是否退出... >> "%LOG_FILE%"
+echo [%date% %time%] Checking process status >> "%LOG_FILE%"
 
-REM Check if process is still running and wait up to 30 seconds
-set "WAIT_COUNT=0"
+set WAIT_COUNT=0
+
 :wait_loop
 tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
 if %ERRORLEVEL% NEQ 0 goto process_exited
 
-set /a WAIT_COUNT+=1
+set /a WAIT_COUNT=WAIT_COUNT+1
+echo [%date% %time%] Process running, attempt %WAIT_COUNT% >> "%LOG_FILE%"
 if %WAIT_COUNT% GEQ 30 goto force_kill
 
-echo [%date% %time%] Process still running, waiting... (attempt %WAIT_COUNT%/30) >> "%LOG_FILE%"
 ping 127.0.0.1 -n 2 >nul 2>&1
 goto wait_loop
 
 :force_kill
-echo [%date% %time%] 警告: 进程未正常退出，强制终止... >> "%LOG_FILE%"
-echo 警告: 强制关闭应用程序...
+echo [%date% %time%] Force killing process >> "%LOG_FILE%"
+echo Warning: Force closing application...
 taskkill /F /IM "%APP_NAME%" >nul 2>&1
 ping 127.0.0.1 -n 3 >nul 2>&1
-echo [%date% %time%] 进程已强制终止 >> "%LOG_FILE%"
+echo [%date% %time%] Process force killed >> "%LOG_FILE%"
 goto process_exited
 
 :process_exited
-echo [%date% %time%] 应用程序进程已退出 >> "%LOG_FILE%"
-echo 应用程序已关闭
+echo [%date% %time%] Application process exited >> "%LOG_FILE%"
+echo Application closed
 
-REM Critical: Wait to ensure ALL file handles are released (including DLLs)
-echo [%date% %time%] 等待5秒释放文件句柄... >> "%LOG_FILE%"
-echo 等待文件句柄释放...
+echo [%date% %time%] Waiting for file handles >> "%LOG_FILE%"
+echo Waiting for file handles to release...
 ping 127.0.0.1 -n 6 >nul 2>&1
 
-REM Detect Windows version and set compatibility
-echo [%date% %time%] Detecting Windows version... >> "%LOG_FILE%"
-for /f "tokens=4-5 delims=. " %%i in ('ver') do set VERSION=%%i.%%j
-if "%VERSION%"=="6.1" (
-    set "WIN7=1"
-    echo [%date% %time%] Windows 7 detected >> "%LOG_FILE%"
-) else (
-    set "WIN7=0"
-    echo [%date% %time%] Windows 8+ detected >> "%LOG_FILE%"
-)
+echo [%date% %time%] Detecting Windows version >> "%LOG_FILE%"
+set WIN7=0
+ver | find "6.1" >nul 2>&1
+if %ERRORLEVEL% EQU 0 set WIN7=1
+echo [%date% %time%] WIN7=%WIN7% >> "%LOG_FILE%"
 
-REM Set path variables
-set "SOURCE_DIR=\${sourceDir}"
-set "TARGET_DIR=\${targetDir}"
-set "ZIP_PATH=\${zipPath}"
-set "APP_PATH=%TARGET_DIR%\\%APP_NAME%"
+set APP_PATH=%TARGET_DIR%\\%APP_NAME%
 
-echo [%date% %time%] Variables set: >> "%LOG_FILE%"
-echo [%date% %time%] APP_NAME=%APP_NAME% >> "%LOG_FILE%"
-echo [%date% %time%] SOURCE_DIR=%SOURCE_DIR% >> "%LOG_FILE%"
-echo [%date% %time%] TARGET_DIR=%TARGET_DIR% >> "%LOG_FILE%"
-echo [%date% %time%] APP_PATH=%APP_PATH% >> "%LOG_FILE%"
+echo Checking source: %SOURCE_DIR%
+echo [%date% %time%] Checking source: %SOURCE_DIR% >> "%LOG_FILE%"
+if not exist "%SOURCE_DIR%" goto source_not_exist
+echo [%date% %time%] Source exists >> "%LOG_FILE%"
+goto source_ok
 
-echo 检查源目录: %SOURCE_DIR%
-echo [%date% %time%] 检查源目录: %SOURCE_DIR% >> "%LOG_FILE%"
-if not exist "%SOURCE_DIR%" (
-    echo [%date% %time%] 错误: 源目录不存在: %SOURCE_DIR% >> "%LOG_FILE%"
-    echo 错误: 源目录不存在 >> "%LOG_FILE%"
-    exit /b 1
-)
-echo [%date% %time%] 源目录存在 >> "%LOG_FILE%"
+:source_not_exist
+echo [%date% %time%] ERROR: Source not found: %SOURCE_DIR% >> "%LOG_FILE%"
+echo ERROR: Source directory not found
+exit /b 1
 
-echo 准备目标目录: %TARGET_DIR%
-echo [%date% %time%] 准备目标目录: %TARGET_DIR% >> "%LOG_FILE%"
-if not exist "%TARGET_DIR%" (
-    mkdir "%TARGET_DIR%"
-    if %ERRORLEVEL% NEQ 0 (
-        echo [%date% %time%] 错误: 无法创建目标目录 >> "%LOG_FILE%"
-        echo 错误: 无法创建目标目录 >> "%LOG_FILE%"
-        exit /b 1
-    )
-    echo [%date% %time%] 目标目录已创建 >> "%LOG_FILE%"
-) else (
-    echo [%date% %time%] 目标目录已存在 >> "%LOG_FILE%"
-)
+:source_ok
+echo Preparing target: %TARGET_DIR%
+echo [%date% %time%] Preparing target: %TARGET_DIR% >> "%LOG_FILE%"
+if exist "%TARGET_DIR%" goto target_exists
+mkdir "%TARGET_DIR%" >nul 2>&1
+if %ERRORLEVEL% NEQ 0 goto target_create_failed
+echo [%date% %time%] Target created >> "%LOG_FILE%"
+goto target_ready
 
-REM Double-check process is really gone before copying
-echo [%date% %time%] Final process check before copying... >> "%LOG_FILE%"
+:target_create_failed
+echo [%date% %time%] ERROR: Cannot create target >> "%LOG_FILE%"
+echo ERROR: Cannot create target directory
+exit /b 1
+
+:target_exists
+echo [%date% %time%] Target exists >> "%LOG_FILE%"
+
+:target_ready
+echo [%date% %time%] Final process check >> "%LOG_FILE%"
 tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
-if %ERRORLEVEL% EQU 0 (
-    echo [%date% %time%] WARNING: Process still detected, waiting additional 5 seconds... >> "%LOG_FILE%"
-    ping 127.0.0.1 -n 6 >nul 2>&1
-)
+if %ERRORLEVEL% EQU 0 ping 127.0.0.1 -n 6 >nul 2>&1
 
-echo 正在复制文件...
-echo [%date% %time%] 开始文件复制操作... >> "%LOG_FILE%"
-REM Use xcopy for Win7 compatibility, robocopy for Win8+
-if "%WIN7%"=="1" (
-    echo [%date% %time%] Using xcopy for Windows 7 compatibility >> "%LOG_FILE%"
-    xcopy "%SOURCE_DIR%\\*" "%TARGET_DIR%\\" /E /Y /I /R /H >nul 2>&1
-    set "COPY_RESULT=!ERRORLEVEL!"
-    echo [%date% %time%] xcopy completed with exit code: !COPY_RESULT! >> "%LOG_FILE%"
-    if !COPY_RESULT! GEQ 4 (
-        echo [%date% %time%] ERROR: xcopy failed with code !COPY_RESULT! >> "%LOG_FILE%"
-        echo ERROR: Copy failed with xcopy >> "%LOG_FILE%"
-        exit /b 1
-    )
-) else (
-    echo [%date% %time%] Using robocopy for Windows 8+ >> "%LOG_FILE%"
-    robocopy "%SOURCE_DIR%" "%TARGET_DIR%" /E /R:3 /W:2 >> "%LOG_FILE%" 2>&1
-    set "COPY_RESULT=!ERRORLEVEL!"
-    echo [%date% %time%] robocopy completed with exit code: !COPY_RESULT! >> "%LOG_FILE%"
-    if !COPY_RESULT! GTR 7 (
-        echo [%date% %time%] ERROR: robocopy failed with code !COPY_RESULT! >> "%LOG_FILE%"
-        echo ERROR: Copy failed, check log file >> "%LOG_FILE%"
-        exit /b 1
-    )
-)
-echo [%date% %time%] File copy operation completed successfully >> "%LOG_FILE%"
+echo Copying files...
+echo [%date% %time%] Starting file copy >> "%LOG_FILE%"
 
-echo 清理临时文件...
-echo [%date% %time%] 开始清理... >> "%LOG_FILE%"
-if exist "%ZIP_PATH%" (
-    del "%ZIP_PATH%" >nul 2>&1
-    echo [%date% %time%] Deleted zip file: %ZIP_PATH% >> "%LOG_FILE%"
-) else (
-    echo [%date% %time%] Zip file not found for cleanup: %ZIP_PATH% >> "%LOG_FILE%"
-)
+if "%WIN7%"=="1" goto use_xcopy
+goto use_robocopy
 
-echo 启动应用程序...
-echo [%date% %time%] 切换到目标目录: %TARGET_DIR% >> "%LOG_FILE%"
+:use_xcopy
+echo [%date% %time%] Using xcopy >> "%LOG_FILE%"
+xcopy "%SOURCE_DIR%\\*" "%TARGET_DIR%\\" /E /Y /I /R /H >nul 2>&1
+set COPY_RESULT=%ERRORLEVEL%
+echo [%date% %time%] xcopy result: %COPY_RESULT% >> "%LOG_FILE%"
+if %COPY_RESULT% GEQ 4 goto copy_failed
+goto copy_success
+
+:use_robocopy
+echo [%date% %time%] Using robocopy >> "%LOG_FILE%"
+robocopy "%SOURCE_DIR%" "%TARGET_DIR%" /E /R:3 /W:2 >> "%LOG_FILE%" 2>&1
+set COPY_RESULT=%ERRORLEVEL%
+echo [%date% %time%] robocopy result: %COPY_RESULT% >> "%LOG_FILE%"
+if %COPY_RESULT% GTR 7 goto copy_failed
+goto copy_success
+
+:copy_failed
+echo [%date% %time%] ERROR: Copy failed >> "%LOG_FILE%"
+echo ERROR: File copy failed
+exit /b 1
+
+:copy_success
+echo [%date% %time%] Copy completed >> "%LOG_FILE%"
+
+echo Cleaning temp files...
+echo [%date% %time%] Cleaning up >> "%LOG_FILE%"
+if exist "%ZIP_PATH%" del "%ZIP_PATH%" >nul 2>&1
+
+echo Starting application...
+echo [%date% %time%] Changing to target: %TARGET_DIR% >> "%LOG_FILE%"
 cd /d "%TARGET_DIR%"
 
-REM Verify executable exists
-if not exist "%APP_PATH%" (
-    echo [%date% %time%] ERROR: Executable not found: %APP_PATH% >> "%LOG_FILE%"
-    echo ERROR: Application executable not found >> "%LOG_FILE%"
-    exit /b 1
-)
+if not exist "%APP_PATH%" goto exe_not_found
+goto start_app
 
-echo [%date% %time%] Starting application with multiple methods... >> "%LOG_FILE%"
+:exe_not_found
+echo [%date% %time%] ERROR: Executable not found: %APP_PATH% >> "%LOG_FILE%"
+echo ERROR: Application executable not found
+exit /b 1
 
-REM Method 1: Standard start command with relative path
-echo [%date% %time%] 尝试方法1: 相对路径启动 >> "%LOG_FILE%"
+:start_app
+echo [%date% %time%] Starting application >> "%LOG_FILE%"
+
+echo [%date% %time%] Method 1: relative path >> "%LOG_FILE%"
 start "" "%APP_NAME%" >nul 2>&1
 ping 127.0.0.1 -n 5 >nul 2>&1
 tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
-if %ERRORLEVEL% EQU 0 (
-    echo [%date% %time%] 成功: 方法1启动成功 >> "%LOG_FILE%"
-    echo 应用程序启动成功！
-    goto launch_success
-)
+if %ERRORLEVEL% EQU 0 goto launch_success
 
-REM Method 2: Start command with full path
-echo [%date% %time%] 尝试方法2: 完整路径启动 >> "%LOG_FILE%"
+echo [%date% %time%] Method 2: full path >> "%LOG_FILE%"
 start "" "%APP_PATH%" >nul 2>&1
 ping 127.0.0.1 -n 5 >nul 2>&1
 tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
-if %ERRORLEVEL% EQU 0 (
-    echo [%date% %time%] 成功: 方法2启动成功 >> "%LOG_FILE%"
-    echo 应用程序启动成功！
-    goto launch_success
-)
+if %ERRORLEVEL% EQU 0 goto launch_success
 
-REM Method 3: CMD start as fallback
-echo [%date% %time%] 尝试方法3: CMD启动 >> "%LOG_FILE%"
+echo [%date% %time%] Method 3: cmd start >> "%LOG_FILE%"
 cmd /c start "" "%APP_PATH%" >nul 2>&1
 ping 127.0.0.1 -n 6 >nul 2>&1
 tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
-if %ERRORLEVEL% EQU 0 (
-    echo [%date% %time%] 成功: 方法3启动成功 >> "%LOG_FILE%"
-    echo 应用程序启动成功！
-    goto launch_success
-)
+if %ERRORLEVEL% EQU 0 goto launch_success
 
-REM All methods failed
 echo [%date% %time%] ERROR: All launch methods failed >> "%LOG_FILE%"
-echo [%date% %time%] Please check: >> "%LOG_FILE%"
-echo [%date% %time%] 1. Application permissions >> "%LOG_FILE%"
-echo [%date% %time%] 2. Antivirus software blocking >> "%LOG_FILE%"
-echo [%date% %time%] 3. Windows Defender SmartScreen >> "%LOG_FILE%"
-echo [%date% %time%] 4. User Account Control settings >> "%LOG_FILE%"
+echo ERROR: Failed to start application
+echo Please check antivirus or Windows Defender settings
 exit /b 1
 
 :launch_success
-echo [%date% %time%] 最终验证... >> "%LOG_FILE%"
+echo [%date% %time%] Launch successful >> "%LOG_FILE%"
+echo Application started successfully!
 ping 127.0.0.1 -n 3 >nul 2>&1
 tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
-if %ERRORLEVEL% EQU 0 (
-    echo [%date% %time%] 确认: 应用程序正在运行 >> "%LOG_FILE%"
-    echo [%date% %time%] 更新过程成功完成 >> "%LOG_FILE%"
-    echo.
-    echo ========================================
-    echo       更新成功完成！
-    echo ========================================
-    echo 应用程序正在运行
-    echo 日志: %LOG_FILE%
-) else (
-    echo [%date% %time%] 警告: 应用程序可能立即关闭 >> "%LOG_FILE%"
-    echo.
-    echo ========================================
-    echo       更新完成
-    echo ========================================
-    echo 注意: 应用程序状态不确定
-    echo 日志: %LOG_FILE%
-)
+if %ERRORLEVEL% EQU 0 goto final_success
+goto final_warning
 
+:final_success
+echo [%date% %time%] Application running >> "%LOG_FILE%"
+echo [%date% %time%] Update completed successfully >> "%LOG_FILE%"
 echo.
-echo 此窗口将在3秒后自动关闭...
+echo ========================================
+echo       Update Completed Successfully!
+echo ========================================
+echo Application is running
+echo Log: %LOG_FILE%
+goto finish
+
+:final_warning
+echo [%date% %time%] Warning: Application may have closed >> "%LOG_FILE%"
+echo.
+echo ========================================
+echo       Update Completed
+echo ========================================
+echo Note: Application status uncertain
+echo Log: %LOG_FILE%
+
+:finish
+echo.
+echo Window will close in 3 seconds...
 timeout /t 3 /nobreak >nul 2>&1
 exit /b 0
 ''';

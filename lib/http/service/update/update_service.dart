@@ -400,7 +400,8 @@ class UpdateService {
       }
 
       final scriptFile = File(scriptPath);
-      await scriptFile.writeAsString(scriptContent);
+      // 使用系统编码（中文Windows上是GBK/ANSI）写入bat脚本
+      await scriptFile.writeAsString(scriptContent, encoding: systemEncoding);
       await logMessage('创建安装脚本: $scriptPath');
       
       // 确保脚本文件存在
@@ -562,7 +563,7 @@ class UpdateService {
 Set WshShell = CreateObject("WScript.Shell")
 WshShell.Run """$scriptPath""", 0, False
 ''';
-            await File(vbsPath).writeAsString(vbsContent);
+            await File(vbsPath).writeAsString(vbsContent, encoding: systemEncoding);
             await logMessage('VBS脚本已创建: $vbsPath');
             
             final result = await Process.run('wscript', [vbsPath], 
