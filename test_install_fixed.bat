@@ -1,40 +1,11 @@
-import 'dart:io';
-
-/// Windows安装脚本模板
-/// 用于生成自动更新安装的批处理脚本
-class WindowsInstallScript {
-  
-  /// 生成测试版本的安装脚本（简化版本）
-  static String generateTestScript({
-    required String extractedPath,
-    required String downloadPath,
-    String appName = 'omt.exe',
-    String? targetDir,
-  }) {
-    final extractedPathWin = extractedPath.replaceAll('/', '\\');
-    final targetDirWin = (targetDir ?? Directory(extractedPath).parent.path)
-        .replaceAll('/', '\\');
-    final downloadPathWin = downloadPath.replaceAll('/', '\\');
-    
-     // 使用简化的脚本模板，使用安全的占位符格式
-    return _getSimplifiedScriptTemplate()
-        .replaceAll('__APPNAME__', appName)
-        .replaceAll('__SOURCEDIR__', extractedPathWin)
-        .replaceAll('__TARGETDIR__', targetDirWin)
-        .replaceAll('__ZIPPATH__', downloadPathWin);
-  }
-
-  /// 获取兼容Windows 7+的脚本模板（带日志和增强兼容性）
-  /// 注意：使用纯ASCII避免编码问题
-  static String _getSimplifiedScriptTemplate() {
-    return '''@echo off
+@echo off
 setlocal enabledelayedexpansion
 
 title OMT Update Installer
 
-set LOG_DIR=%TEMP%\\OMT_Update
+set LOG_DIR=%TEMP%\OMT_Update
 if not exist "%LOG_DIR%" mkdir "%LOG_DIR%" >nul 2>&1
-set LOG_FILE=%LOG_DIR%\\omt_update_log.txt
+set LOG_FILE=%LOG_DIR%\omt_update_log.txt
 
 echo [%date% %time%] OMT Update started > "%LOG_FILE%"
 echo OMT Update Installer starting...
@@ -53,10 +24,10 @@ echo Running as administrator...
 goto set_vars
 
 :set_vars
-set APP_NAME=__APPNAME__
-set SOURCE_DIR=__SOURCEDIR__
-set TARGET_DIR=__TARGETDIR__
-set ZIP_PATH=__ZIPPATH__
+set APP_NAME=omt.exe
+set SOURCE_DIR=C:\Users\lc\Desktop\omt\windows-app\update_extracted
+set TARGET_DIR=C:\Users\lc\Desktop\omt\windows-app
+set ZIP_PATH=C:\Users\lc\Desktop\omt\windows-app\downloads\update.zip
 
 echo [%date% %time%] APP_NAME=%APP_NAME% >> "%LOG_FILE%"
 echo [%date% %time%] SOURCE_DIR=%SOURCE_DIR% >> "%LOG_FILE%"
@@ -103,7 +74,7 @@ ver | find "6.1" >nul 2>&1
 if %ERRORLEVEL% EQU 0 set WIN7=1
 echo [%date% %time%] WIN7=%WIN7% >> "%LOG_FILE%"
 
-set APP_PATH=%TARGET_DIR%\\%APP_NAME%
+set APP_PATH=%TARGET_DIR%\%APP_NAME%
 
 echo Checking source: %SOURCE_DIR%
 echo [%date% %time%] Checking source: %SOURCE_DIR% >> "%LOG_FILE%"
@@ -146,7 +117,7 @@ goto use_robocopy
 
 :use_xcopy
 echo [%date% %time%] Using xcopy >> "%LOG_FILE%"
-xcopy "%SOURCE_DIR%\\*" "%TARGET_DIR%\\" /E /Y /I /R /H >nul 2>&1
+xcopy "%SOURCE_DIR%\*" "%TARGET_DIR%\" /E /Y /I /R /H >nul 2>&1
 set COPY_RESULT=%ERRORLEVEL%
 echo [%date% %time%] xcopy result: %COPY_RESULT% >> "%LOG_FILE%"
 if %COPY_RESULT% GEQ 4 goto copy_failed
@@ -243,6 +214,3 @@ echo.
 echo Window will close in 3 seconds...
 timeout /t 3 /nobreak >nul 2>&1
 exit /b 0
-''';
-  }
-}
