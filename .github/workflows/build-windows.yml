@@ -2,28 +2,37 @@ name: Build Flutter Windows App
 
 on:
   push:
-    branches: [ master ]  # 当推送到 main 分支时触发
+    branches: [ master ]
   pull_request:
-    branches: [ master ]  # 当有 PR 到 main 分支时触发
+    branches: [ master ]
+  workflow_dispatch:  # 允许手动触发
+    inputs:
+      version:
+        description: '版本号 (例如: 1.0.0)'
+        required: false
+        default: '1.0.0'
+
+env:
+  APP_VERSION: ${{ github.event.inputs.version || '1.0.0' }}
 
 jobs:
   build-windows:
-    runs-on: windows-latest  # 使用最新的 Windows 运行器
+    runs-on: windows-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4  # 签出代码
+        uses: actions/checkout@v4
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.27.1'  # 指定你项目的 Flutter 版本
-          channel: 'stable'         # 使用稳定通道
+          flutter-version: '3.27.1'
+          channel: 'stable'
 
       - name: Get dependencies
         run: flutter pub get
 
       - name: Build Windows app
-        run: flutter build windows
+        run: flutter build windows --release
 
       - name: Replace system_theme_plugin.dll
         run: |
@@ -42,8 +51,71 @@ jobs:
             dir "build\windows\x64\runner\Release"
         shell: cmd
 
-      - name: Upload Windows build
+      # 安装 Inno Setup
+      - name: Install Inno Setup
+        run: |
+          choco install innosetup -y
+        shell: cmd
+
+      # 更新版本号到 Inno Setup 脚本
+      - name: Update version in Inno Setup script
+        run: |
+          $content = Get-Content "windows/installer/setup.iss" -Raw
+          $content = $content -replace '#define MyAppVersion ".*"', '#define MyAppVersion "${{ env.APP_VERSION }}"'
+          Set-Content "windows/installer/setup.iss" -Value $content
+        shell: pwsh
+
+      # 创建安装程序输出目录
+      - name: Create installer output directory
+        run: mkdir -p build/installer
+        shell: bash
+
+      # 使用 Inno Setup 创建安装程序
+      - name: Build installer with Inno Setup
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "windows\installer\setup.iss"
+        shell: pwsh
+
+      # 重命名安装程序文件
+      - name: Rename installer
+        run: |
+          mv build/installer/OMT-Setup-*.exe build/installer/OMT-Setup.exe
+        shell: bash
+
+      # 上传安装程序（仅一个 exe 文件）
+      - name: Upload Windows installer
         uses: actions/upload-artifact@v4
         with:
-          name: windows-app
-          path: build/windows/x64/runner/Release/
+          name: OMT-Setup-${{ env.APP_VERSION }}
+          path: build/installer/OMT-Setup.exe
+
+      # 每次推送到 master 都更新 latest Release（提供固定下载链接）
+      - name: Update latest Release
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: latest
+          name: 最新版本 (Latest)
+          body: |
+            ## 自动构建
+            版本: ${{ env.APP_VERSION }}
+            构建时间: ${{ github.event.head_commit.timestamp }}
+            
+            ### 下载
+            点击下方 `OMT-Setup.exe` 下载安装程序
+          files: build/installer/OMT-Setup.exe
+          prerelease: true
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # 创建正式 Release（推送 tag 时）
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/') && github.ref != 'refs/tags/latest'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/installer/OMT-Setup.exe
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
