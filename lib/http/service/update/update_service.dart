@@ -382,17 +382,13 @@ class UpdateService {
       
       if (Platform.isWindows) {
         scriptPath = '${scriptDir.path}${Platform.pathSeparator}install_update.bat';
-        // 使用项目目录作为安装目标目录
-        String currentAppDir = projectDir;
-        await logMessage('使用项目目录作为安装目标: $currentAppDir');
+        await logMessage('安装程序路径: ${_downloadPath ?? ''}');
         
-        scriptContent = WindowsInstallScript.generateTestScript(
-          extractedPath: _extractedPath!,
-          downloadPath: _downloadPath ?? '',
-          targetDir: currentAppDir,
+        scriptContent = WindowsInstallScript.generateInstallScript(
+          installerPath: _downloadPath ?? '',
         );
         
-        await logMessage('最终目标安装目录: $currentAppDir');
+        await logMessage('将运行 exe 安装程序完成更新');
       } else {
         // 非Windows平台不支持
         await logMessage('当前平台不支持自动安装: ${Platform.operatingSystem}');
