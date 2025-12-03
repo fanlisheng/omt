@@ -255,57 +255,76 @@ class _UpdateDialogState extends State<UpdateDialog> {
   }
 
   Widget _buildNormalButtons() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Column(
       children: [
-        // 版本记录按钮
-        Container(
-          width: 110,
-          height: 32,
-          child: OutlinedButton(
-            onPressed: () {
-              // 版本记录功能
-            },
-            style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: Color(0xFFE5E5E5), width: 1),
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(4),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // 版本记录按钮
+            Container(
+              width: 110,
+              height: 32,
+              child: OutlinedButton(
+                onPressed: () {
+                  // 版本记录功能
+                },
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Color(0xFFE5E5E5), width: 1),
+                  backgroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+                child: const Text(
+                  '版本记录',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF44C5C4),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ),
             ),
-            child: const Text(
-              '版本记录',
-              style: TextStyle(
-                fontSize: 12,
-                color: Color(0xFF44C5C4),
-                fontWeight: FontWeight.w500,
+            const SizedBox(width: 16),
+            // 立即安装按钮
+            Container(
+              width: 110,
+              height: 32,
+              child: ElevatedButton(
+                onPressed: _startDownload,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF44C5C4),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  elevation: 0,
+                ),
+                child: const Text(
+                  '立即安装',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ),
             ),
-          ),
+          ],
         ),
-        const SizedBox(width: 16),
-        // 立即安装按钮
-        Container(
-          width: 110,
-          height: 32,
-          child: ElevatedButton(
-            onPressed: _startDownload,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF44C5C4),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(4),
-              ),
-              elevation: 0,
+        // 调试按钮（仅开发时使用）
+        const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextButton(
+              onPressed: _debugTestInstall,
+              child: const Text('调试:检查', style: TextStyle(fontSize: 10, color: Colors.grey)),
             ),
-            child: const Text(
-              '立即安装',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
-              ),
+            TextButton(
+              onPressed: _debugRunInstall,
+              child: const Text('调试:安装', style: TextStyle(fontSize: 10, color: Colors.orange)),
             ),
-          ),
+          ],
         ),
       ],
     );
@@ -395,47 +414,59 @@ class _UpdateDialogState extends State<UpdateDialog> {
   }
 
   Future<void> _extractAndCheck() async {
+    await _updateService.logMessage('=== _extractAndCheck 开始 ===');
     try {
       _showSnack('正在解压更新包...', Colors.blue, seconds: 2);
 
       final extractSuccess = await _updateService.extractUpdatePackage();
+      await _updateService.logMessage('extractUpdatePackage 结果: $extractSuccess');
 
       if (extractSuccess) {
         bool found = false;
 
         if (Platform.isWindows) {
           found = await _updateService.existsByExtension('.exe');
+          await _updateService.logMessage('existsByExtension(.exe) 结果: $found');
         } else {
           found = true;
         }
 
         if (found) {
+          await _updateService.logMessage('检查通过，安装介质已就绪');
           _showSnack('解压完成，安装介质已就绪', Colors.green, seconds: 2);
         } else {
+          await _updateService.logMessage('未找到安装程序');
           _showSnack('解压完成，但未找到安装程序 (.exe 文件)', Colors.orange);
         }
       } else {
+        await _updateService.logMessage('解压失败');
         _showSnack('解压失败，请检查文件完整性', Colors.red);
       }
     } catch (e) {
+      await _updateService.logMessage('解压出错: $e');
       _showSnack('解压过程出错: $e', Colors.red);
     }
+    await _updateService.logMessage('=== _extractAndCheck 结束 ===');
   }
 
   Future<void> _installWithFeedback() async {
+    await _updateService.logMessage('=== _installWithFeedback 开始 ===');
     setState(() {
       _isInstalling = true;
     });
     try {
       if (!Platform.isWindows) {
+        await _updateService.logMessage('平台检查失败: 非 Windows');
         _showSnack('当前平台不支持自动安装，请在Windows系统上使用此功能', Colors.red);
         setState(() {
           _isInstalling = false;
         });
         return;
       }
+      await _updateService.logMessage('平台检查通过: Windows');
 
       final hasExe = await _updateService.existsByExtension('.exe');
+      await _updateService.logMessage('existsByExtension(.exe) 结果: $hasExe');
       if (!hasExe) {
         _showSnack('未找到安装程序(.exe)。请检查ZIP内容是否包含安装包。', Colors.red);
         setState(() {
@@ -444,6 +475,7 @@ class _UpdateDialogState extends State<UpdateDialog> {
         return;
       }
 
+      await _updateService.logMessage('准备调用 installUpdate()');
       final ok = await _updateService.installUpdate();
       if (!ok) {
         _showSnack('安装程序未能启动。可能被系统或安全软件拦截，或者安装脚本创建失败。', Colors.red);
@@ -462,6 +494,74 @@ class _UpdateDialogState extends State<UpdateDialog> {
           _isInstalling = false;
         });
       }
+    }
+  }
+
+  // 调试：检查已下载的安装程序
+  Future<void> _debugTestInstall() async {
+    _showSnack('正在检查...', Colors.blue);
+    final result = await _updateService.debugTestInstall();
+    
+    if (mounted) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('调试检查结果'),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('项目目录: ${result['projectDir'] ?? 'unknown'}'),
+                Text('下载目录: ${result['downloadsDir'] ?? 'unknown'}'),
+                Text('下载目录存在: ${result['downloadsDirExists'] ?? false}'),
+                Text('EXE路径: ${result['exePath'] ?? 'unknown'}'),
+                Text('EXE存在: ${result['exeExists'] ?? false}'),
+                Text('EXE大小: ${result['exeSize'] ?? 0} 字节'),
+                Text('isExeInstaller: ${result['isExeInstaller'] ?? false}'),
+                Text('existsByExtension: ${result['existsByExtension'] ?? false}'),
+                Text('应用目录: ${result['appDir'] ?? 'unknown'}'),
+                if (result['error'] != null) 
+                  Text('错误: ${result['error']}', style: const TextStyle(color: Colors.red)),
+                if (result['success'] == true)
+                  const Text('✓ 检查通过', style: TextStyle(color: Colors.green)),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('关闭'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  // 调试：直接运行安装（会退出应用）
+  Future<void> _debugRunInstall() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('确认调试安装'),
+        content: const Text('这将直接运行 downloads 目录中的安装程序，应用会退出。确定继续？'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('取消'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('确定', style: TextStyle(color: Colors.orange)),
+          ),
+        ],
+      ),
+    );
+    
+    if (confirm == true) {
+      _showSnack('正在启动安装...', Colors.orange);
+      await _updateService.debugRunInstall();
     }
   }
 

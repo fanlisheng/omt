@@ -929,4 +929,97 @@ WshShell.Run """$scriptPath""", 0, False
       exit(exitCode);
     }
   }
+
+  /// 调试方法：直接测试安装 downloads 目录中已存在的 exe
+  /// 不需要下载，直接运行安装流程
+  Future<Map<String, dynamic>> debugTestInstall() async {
+    final result = <String, dynamic>{};
+    
+    try {
+      await logMessage('=== 调试测试安装开始 ===');
+      
+      // 获取项目目录
+      final projectDir = await _getProjectDirectory();
+      result['projectDir'] = projectDir;
+      await logMessage('项目目录: $projectDir');
+      
+      // 查找 downloads 目录中的 exe
+      final downloadsDir = Directory('$projectDir/downloads');
+      result['downloadsDir'] = downloadsDir.path;
+      result['downloadsDirExists'] = await downloadsDir.exists();
+      await logMessage('下载目录: ${downloadsDir.path}');
+      await logMessage('下载目录存在: ${result['downloadsDirExists']}');
+      
+      if (!result['downloadsDirExists']) {
+        result['error'] = '下载目录不存在';
+        return result;
+      }
+      
+      // 查找 exe 文件
+      String? exePath;
+      await for (final entity in downloadsDir.list()) {
+        if (entity is File && entity.path.toLowerCase().endsWith('.exe')) {
+          exePath = entity.path;
+          break;
+        }
+      }
+      
+      result['exePath'] = exePath;
+      await logMessage('找到的 EXE: $exePath');
+      
+      if (exePath == null) {
+        result['error'] = '未找到 exe 文件';
+        return result;
+      }
+      
+      // 设置路径
+      _downloadPath = exePath;
+      _extractedPath = exePath;
+      
+      result['isExeInstaller'] = isExeInstaller;
+      await logMessage('isExeInstaller: ${result['isExeInstaller']}');
+      
+      // 检查 exe 文件信息
+      final exeFile = File(exePath);
+      result['exeExists'] = await exeFile.exists();
+      result['exeSize'] = await exeFile.length();
+      await logMessage('EXE 存在: ${result['exeExists']}');
+      await logMessage('EXE 大小: ${result['exeSize']} 字节');
+      
+      // 测试 existsByExtension
+      final hasExe = await existsByExtension('.exe');
+      result['existsByExtension'] = hasExe;
+      await logMessage('existsByExtension(.exe): $hasExe');
+      
+      // 获取应用目录
+      final appDir = File(Platform.resolvedExecutable).parent.path;
+      result['appDir'] = appDir;
+      await logMessage('应用目录: $appDir');
+      
+      result['success'] = true;
+      result['message'] = '调试信息收集完成，可以调用 installUpdate() 进行安装';
+      await logMessage('=== 调试测试安装结束 ===');
+      
+    } catch (e) {
+      result['error'] = e.toString();
+      await logMessage('调试测试出错: $e');
+    }
+    
+    return result;
+  }
+
+  /// 调试方法：直接执行安装（危险：会退出应用）
+  Future<bool> debugRunInstall() async {
+    await logMessage('=== 调试执行安装 ===');
+    
+    // 先收集信息
+    final info = await debugTestInstall();
+    if (info['error'] != null) {
+      await logMessage('调试信息收集失败: ${info['error']}');
+      return false;
+    }
+    
+    // 执行安装
+    return await installUpdate();
+  }
 }
