@@ -1,5 +1,6 @@
 ; Inno Setup Script for OMT Flutter Windows App
-; 静默安装 - 用户双击即可完成安装，无需任何交互
+; 静默安装 - 运行时加 /VERYSILENT 参数实现完全静默
+; 例如: OMT-Setup.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
 
 #define MyAppName "OMT"
 #define MyAppVersion "1.0.0"
@@ -52,6 +53,11 @@ UsePreviousTasks=yes
 Uninstallable=yes
 UninstallDisplayIcon={app}\{#MyAppExeName}
 
+; 静默安装相关
+; 不显示"This will install..." 确认框
+AlwaysShowDirOnReadyPage=no
+AlwaysShowGroupOnReadyPage=no
+
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
@@ -67,8 +73,8 @@ Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 
 [Run]
-; 安装完成后自动启动应用
-Filename: "{app}\{#MyAppExeName}"; Flags: nowait postinstall
+; 安装完成后自动启动应用（静默模式也会执行）
+Filename: "{app}\{#MyAppExeName}"; Flags: nowait postinstall skipifsilent runasoriginaluser
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}"

@@ -382,13 +382,19 @@ class UpdateService {
       
       if (Platform.isWindows) {
         scriptPath = '${scriptDir.path}${Platform.pathSeparator}install_update.bat';
-        await logMessage('安装程序路径: ${_downloadPath ?? ''}');
+        
+        // 获取应用程序所在目录（omt.exe的父目录）
+        final appDir = File(Platform.resolvedExecutable).parent.path;
+        
+        await logMessage('解压目录: $_extractedPath');
+        await logMessage('应用目录: $appDir');
         
         scriptContent = WindowsInstallScript.generateInstallScript(
-          installerPath: _downloadPath ?? '',
+          extractedPath: _extractedPath!,
+          appDir: appDir,
         );
         
-        await logMessage('将运行 exe 安装程序完成更新');
+        await logMessage('将覆盖应用目录中的文件完成更新');
       } else {
         // 非Windows平台不支持
         await logMessage('当前平台不支持自动安装: ${Platform.operatingSystem}');
