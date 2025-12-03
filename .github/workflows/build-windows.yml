@@ -2,7 +2,7 @@ name: Build Flutter Windows App
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, release ]
   pull_request:
     branches: [ master ]
   workflow_dispatch:  # 允许手动触发
@@ -11,9 +11,16 @@ on:
         description: '版本号 (例如: 1.0.0)'
         required: false
         default: '1.0.0'
+      publish:
+        description: '是否发布版本（上传文件并创建版本记录）'
+        required: false
+        type: boolean
+        default: false
 
 env:
   APP_VERSION: ${{ github.event.inputs.version || '1.0.0' }}
+  MINIO_UPLOAD_URL: http://106.75.154.221:8321/minio/file
+  VERSION_API_URL: http://106.75.154.221:8082/api/client_version/create
 
 permissions:
   contents: write
@@ -33,6 +40,21 @@ jobs:
 
       - name: Get dependencies
         run: flutter pub get
+
+      # 从 pubspec.yaml 获取版本号（放在构建前，供后续步骤使用）
+      - name: Get version from pubspec.yaml
+        id: get_version
+        run: |
+          $content = Get-Content "pubspec.yaml" -Raw
+          if ($content -match 'version:\s*(\d+\.\d+\.\d+)') {
+            $version = $matches[1]
+            echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+            echo "Extracted version: $version"
+          } else {
+            echo "VERSION=1.0.0" >> $env:GITHUB_OUTPUT
+            echo "Could not extract version, using default"
+          }
+        shell: pwsh
 
       - name: Build Windows app
         run: flutter build windows --release
@@ -60,12 +82,13 @@ jobs:
           choco install innosetup -y
         shell: cmd
 
-      # 更新版本号到 Inno Setup 脚本
+      # 更新版本号到 Inno Setup 脚本（使用 pubspec.yaml 中的版本）
       - name: Update version in Inno Setup script
         run: |
           $content = Get-Content "windows/installer/setup.iss" -Raw
-          $content = $content -replace '#define MyAppVersion ".*"', '#define MyAppVersion "${{ env.APP_VERSION }}"'
+          $content = $content -replace '#define MyAppVersion ".*"', '#define MyAppVersion "${{ steps.get_version.outputs.VERSION }}"'
           Set-Content "windows/installer/setup.iss" -Value $content
+          echo "Updated Inno Setup version to: ${{ steps.get_version.outputs.VERSION }}"
         shell: pwsh
 
       # 创建安装程序输出目录
@@ -85,11 +108,102 @@ jobs:
           mv build/installer/OMT-Setup-*.exe build/installer/OMT-Setup.exe
         shell: bash
 
-      # 上传安装程序（仅一个 exe 文件）
+      # 计算文件大小和 MD5
+      - name: Calculate file info
+        id: file_info
+        run: |
+          $file = "build/installer/OMT-Setup.exe"
+          $fileInfo = Get-Item $file
+          $fileSize = $fileInfo.Length
+          $md5 = (Get-FileHash -Path $file -Algorithm MD5).Hash.ToLower()
+          
+          echo "FILE_SIZE=$fileSize" >> $env:GITHUB_OUTPUT
+          echo "FILE_MD5=$md5" >> $env:GITHUB_OUTPUT
+          echo "FILE_NAME=OMT-Setup.exe" >> $env:GITHUB_OUTPUT
+          
+          echo "File size: $fileSize bytes"
+          echo "File MD5: $md5"
+        shell: pwsh
+
+      # 上传文件到 Minio（仅在 release 分支或手动发布时执行）
+      - name: Upload to Minio
+        id: upload_minio
+        if: github.ref == 'refs/heads/release' || github.event.inputs.publish == 'true'
+        run: |
+          $file = "build/installer/OMT-Setup.exe"
+          $fileName = "OMT-Setup.exe"
+          $fileSize = "${{ steps.file_info.outputs.FILE_SIZE }}"
+          $fileMd5 = "${{ steps.file_info.outputs.FILE_MD5 }}"
+          
+          # 构建 multipart form data 请求
+          $boundary = [System.Guid]::NewGuid().ToString()
+          $filePath = (Resolve-Path $file).Path
+          
+          # 使用 curl 上传文件
+          $response = curl.exe -s -X POST "${{ env.MINIO_UPLOAD_URL }}" `
+            -F "file=@$filePath" `
+            -F "url=" `
+            -F "file_path=" `
+            -F "file_name=$fileName" `
+            -F "file_size_local=$fileSize" `
+            -F "file_md5=$fileMd5"
+          
+          echo "Upload response: $response"
+          
+          # 解析返回的 URL
+          $json = $response | ConvertFrom-Json
+          $downloadUrl = $json.path
+          
+          if ($downloadUrl) {
+            echo "DOWNLOAD_URL=$downloadUrl" >> $env:GITHUB_OUTPUT
+            echo "Download URL: $downloadUrl"
+          } else {
+            echo "Warning: Could not get download URL from response"
+            echo "DOWNLOAD_URL=" >> $env:GITHUB_OUTPUT
+          }
+        shell: pwsh
+
+      # 调用接口创建版本记录（仅在 release 分支或手动发布时执行）
+      - name: Create version record via API
+        if: github.ref == 'refs/heads/release' || github.event.inputs.publish == 'true'
+        run: |
+          $version = "${{ steps.get_version.outputs.VERSION }}"
+          $url = "${{ steps.upload_minio.outputs.DOWNLOAD_URL }}"
+          $fileSize = "${{ steps.file_info.outputs.FILE_SIZE }}"
+          $fileMd5 = "${{ steps.file_info.outputs.FILE_MD5 }}"
+          
+          # 读取 changelog
+          $changelog = ""
+          if (Test-Path "CHANGELOG.md") {
+            $changelog = Get-Content "CHANGELOG.md" -Raw
+          }
+          
+          # 创建 JSON 请求体
+          $body = @{
+            version = $version
+            url = $url
+            change_log = $changelog
+            is_force_update = $false
+            file_size = [int64]$fileSize
+            file_md5 = $fileMd5
+          } | ConvertTo-Json -Depth 10
+          
+          echo "Creating version record..."
+          echo "Request body: $body"
+          
+          # 调用 API 创建版本记录
+          $response = curl.exe -s -X POST "${{ env.VERSION_API_URL }}" `
+            -H "Content-Type: application/json" `
+            -d $body
+          
+          echo "API Response: $response"
+        shell: pwsh
+
+      # 上传安装程序到 Artifacts
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4
         with:
-          name: OMT-Setup-${{ env.APP_VERSION }}
+          name: OMT-Setup-${{ steps.get_version.outputs.VERSION }}
           path: build/installer/OMT-Setup.exe
 
       # 每次推送到 master 都更新 latest Release（提供固定下载链接）
@@ -98,11 +212,13 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: latest
-          name: 最新版本 (Latest)
+          name: 最新版本 (Latest) v${{ steps.get_version.outputs.VERSION }}
           body: |
             ## 自动构建
-            版本: ${{ env.APP_VERSION }}
+            版本: ${{ steps.get_version.outputs.VERSION }}
             构建时间: ${{ github.event.head_commit.timestamp }}
+            文件大小: ${{ steps.file_info.outputs.FILE_SIZE }} bytes
+            MD5: ${{ steps.file_info.outputs.FILE_MD5 }}
             
             ### 下载
             点击下方 `OMT-Setup.exe` 下载安装程序
