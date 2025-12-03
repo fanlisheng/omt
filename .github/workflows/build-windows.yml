@@ -154,14 +154,17 @@ jobs:
           
           echo "Parsed - path: $path, id: $id, size: $size"
           
-          # 拼接完整的下载 URL: {baseUrl}/{id}/{path}
           $baseUrl = "${{ env.MINIO_UPLOAD_URL }}"
-          if ($path -and $id) {
-            $downloadUrl = "$baseUrl/$id/$path"
+          if ($path) {
+            if ($baseUrl.EndsWith('/')) {
+              $downloadUrl = "$baseUrl$path"
+            } else {
+              $downloadUrl = "$baseUrl/$id/$path"
+            }
             echo "DOWNLOAD_URL=$downloadUrl" >> $env:GITHUB_OUTPUT
             echo "Download URL: $downloadUrl"
           } else {
-            echo "Warning: Could not get download URL from response (path=$path, id=$id)"
+            echo "Warning: Could not get path from response"
             echo "Full response for debugging: $response"
             echo "DOWNLOAD_URL=" >> $env:GITHUB_OUTPUT
           }
