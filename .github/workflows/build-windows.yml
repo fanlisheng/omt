@@ -151,11 +151,19 @@ jobs:
           
           echo "Upload response: $response"
           
-          # 解析返回的数据
+          # 解析返回的数据（可能在 data 字段里）
           $json = $response | ConvertFrom-Json
-          $path = $json.path
-          $id = $json.id
-          $size = $json.size
+          
+          # 尝试从 data 字段获取，如果没有则直接从根获取
+          if ($json.data) {
+            $path = $json.data.path
+            $id = $json.data.id
+            $size = $json.data.size
+          } else {
+            $path = $json.path
+            $id = $json.id
+            $size = $json.size
+          }
           
           echo "Parsed - path: $path, id: $id, size: $size"
           
@@ -167,6 +175,7 @@ jobs:
             echo "Download URL: $downloadUrl"
           } else {
             echo "Warning: Could not get download URL from response (path=$path, id=$id)"
+            echo "Full response for debugging: $response"
             echo "DOWNLOAD_URL=" >> $env:GITHUB_OUTPUT
           }
         shell: pwsh
