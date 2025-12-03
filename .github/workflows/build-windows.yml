@@ -140,35 +140,22 @@ jobs:
           $boundary = [System.Guid]::NewGuid().ToString()
           $filePath = (Resolve-Path $file).Path
           
-          # 使用 curl 上传文件
+          # 使用 curl 上传文件（只发送 file 字段，与 Flutter 代码一致）
           $response = curl.exe -s -X POST "${{ env.MINIO_UPLOAD_URL }}" `
-            -F "file=@$filePath" `
-            -F "url=" `
-            -F "file_path=" `
-            -F "file_name=$fileName" `
-            -F "file_size_local=$fileSize" `
-            -F "file_md5=$fileMd5"
+            -F "file=@$filePath;filename=$fileName"
           
           echo "Upload response: $response"
           
-          # 解析返回的数据（可能在 data 字段里）
+          # 解析返回的数据（直接从根获取 path, id, size）
           $json = $response | ConvertFrom-Json
-          
-          # 尝试从 data 字段获取，如果没有则直接从根获取
-          if ($json.data) {
-            $path = $json.data.path
-            $id = $json.data.id
-            $size = $json.data.size
-          } else {
-            $path = $json.path
-            $id = $json.id
-            $size = $json.size
-          }
+          $path = $json.path
+          $id = $json.id
+          $size = $json.size
           
           echo "Parsed - path: $path, id: $id, size: $size"
           
           # 拼接完整的下载 URL: {baseUrl}/{id}/{path}
-          $baseUrl = "${{ env.MINIO_DOWNLOAD_BASE_URL }}"
+          $baseUrl = "${{ env.MINIO_UPLOAD_URL }}"
           if ($path -and $id) {
             $downloadUrl = "$baseUrl/$id/$path"
             echo "DOWNLOAD_URL=$downloadUrl" >> $env:GITHUB_OUTPUT
