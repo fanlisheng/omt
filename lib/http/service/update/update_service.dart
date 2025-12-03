@@ -274,7 +274,7 @@ class UpdateService {
     return 0;
   }
 
-  // 下载更新包（固定zip）
+  // 下载更新包（支持 exe 和 zip）
   Future<bool> downloadUpdate(
       UpdateInfo updateInfo, Function(double) onProgress) async {
     if (_isDownloading) return false;
@@ -292,8 +292,20 @@ class UpdateService {
         await baseDir.create(recursive: true);
       }
 
-      const fileName = 'update.zip';
+      // 根据 URL 扩展名决定保存文件名（固定文件名，避免旧文件堆积）
+      final url = updateInfo.downloadUrl.toLowerCase();
+      final String fileName;
+      if (url.endsWith('.exe')) {
+        fileName = 'OMT-Setup.exe';
+      } else if (url.endsWith('.zip')) {
+        fileName = 'update.zip';
+      } else {
+        // 默认为 exe
+        fileName = 'OMT-Setup.exe';
+      }
       _downloadPath = '${baseDir.path}/$fileName';
+      
+      await logMessage('保存文件名: $fileName');
       
       await logMessage('下载目录设置为: ${baseDir.path}');
 
@@ -386,15 +398,29 @@ class UpdateService {
         // 获取应用程序所在目录（omt.exe的父目录）
         final appDir = File(Platform.resolvedExecutable).parent.path;
         
-        await logMessage('解压目录: $_extractedPath');
-        await logMessage('应用目录: $appDir');
-        
-        scriptContent = WindowsInstallScript.generateInstallScript(
-          extractedPath: _extractedPath!,
-          appDir: appDir,
-        );
-        
-        await logMessage('将覆盖应用目录中的文件完成更新');
+        if (isExeInstaller) {
+          // exe 安装程序：直接运行静默安装到应用目录
+          await logMessage('安装程序路径: $_extractedPath');
+          await logMessage('安装目标目录: $appDir');
+          
+          scriptContent = WindowsInstallScript.generateInstallerScript(
+            installerPath: _extractedPath!,
+            appDir: appDir,
+          );
+          
+          await logMessage('将运行 EXE 安装程序完成更新（静默模式，安装到原目录）');
+        } else {
+          // zip 解压后：覆盖文件
+          await logMessage('解压目录: $_extractedPath');
+          await logMessage('应用目录: $appDir');
+          
+          scriptContent = WindowsInstallScript.generateInstallScript(
+            extractedPath: _extractedPath!,
+            appDir: appDir,
+          );
+          
+          await logMessage('将覆盖应用目录中的文件完成更新');
+        }
       } else {
         // 非Windows平台不支持
         await logMessage('当前平台不支持自动安装: ${Platform.operatingSystem}');
@@ -622,11 +648,21 @@ WshShell.Run """$scriptPath""", 0, False
     return false;
   }
 
-  // 解压ZIP更新包
+  // 判断下载的是否为 exe 安装程序
+  bool get isExeInstaller => _downloadPath?.toLowerCase().endsWith('.exe') ?? false;
+
+  // 解压ZIP更新包（如果是exe则跳过解压）
   Future<bool> extractUpdatePackage() async {
     if (_downloadPath == null) return false;
 
     try {
+      // 如果是 exe 安装程序，不需要解压，直接标记为准备好
+      if (isExeInstaller) {
+        await logMessage('下载的是 EXE 安装程序，跳过解压步骤');
+        _extractedPath = _downloadPath; // 直接使用 exe 路径
+        return true;
+      }
+
       // 使用统一的项目目录获取方法
       final projectDir = await _getProjectDirectory();
       

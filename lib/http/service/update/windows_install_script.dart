@@ -21,17 +21,22 @@ class WindowsInstallScript {
         .replaceAll('__APP_DIR__', appDirWin);
   }
 
-  /// 旧版兼容方法 - 运行exe安装程序
-  @Deprecated('Use generateInstallScript with extractedPath and appDir instead')
+  /// 生成安装程序脚本（运行 exe 安装程序，静默模式）
+  /// [installerPath] - exe 安装程序路径
+  /// [appDir] - 应用程序所在目录（安装目标目录）
+  /// [appName] - 应用程序名称（用于等待进程退出）
   static String generateInstallerScript({
     required String installerPath,
+    required String appDir,
     String appName = 'omt.exe',
   }) {
     final installerPathWin = installerPath.replaceAll('/', '\\');
+    final appDirWin = appDir.replaceAll('/', '\\');
     
     return _getInstallerScriptTemplate()
         .replaceAll('__APPNAME__', appName)
-        .replaceAll('__INSTALLER_PATH__', installerPathWin);
+        .replaceAll('__INSTALLER_PATH__', installerPathWin)
+        .replaceAll('__APP_DIR__', appDirWin);
   }
 
   /// 获取覆盖式更新脚本模板
@@ -144,7 +149,7 @@ exit /b 0
 ''';
   }
 
-  /// 旧版安装程序脚本模板（保留兼容）
+  /// 安装程序脚本模板（运行 exe 安装程序到指定目录）
   static String _getInstallerScriptTemplate() {
     return '''@echo off
 setlocal enabledelayedexpansion
@@ -160,9 +165,11 @@ echo OMT Update starting...
 
 set APP_NAME=__APPNAME__
 set INSTALLER_PATH=__INSTALLER_PATH__
+set APP_DIR=__APP_DIR__
 
 echo [%date% %time%] APP_NAME=%APP_NAME% >> "%LOG_FILE%"
 echo [%date% %time%] INSTALLER_PATH=%INSTALLER_PATH% >> "%LOG_FILE%"
+echo [%date% %time%] APP_DIR=%APP_DIR% >> "%LOG_FILE%"
 
 :: Check if installer exists
 if not exist "%INSTALLER_PATH%" goto installer_not_found
@@ -195,15 +202,15 @@ echo [%date% %time%] Application exited >> "%LOG_FILE%"
 echo Application closed
 
 :: Wait a moment for file handles to release
-ping 127.0.0.1 -n 2 >nul 2>&1
+ping 127.0.0.1 -n 3 >nul 2>&1
 
-:: Run the installer (completely silent)
+:: Run the installer (completely silent, install to APP_DIR)
 echo Running installer...
-echo [%date% %time%] Running installer (silent): %INSTALLER_PATH% >> "%LOG_FILE%"
+echo [%date% %time%] Running installer (silent) to: %APP_DIR% >> "%LOG_FILE%"
 
-start "" "%INSTALLER_PATH%" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICATIONS
+start "" /wait "%INSTALLER_PATH%" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICATIONS /DIR="%APP_DIR%"
 set RUN_RESULT=%ERRORLEVEL%
-echo [%date% %time%] Installer started, result: %RUN_RESULT% >> "%LOG_FILE%"
+echo [%date% %time%] Installer finished, result: %RUN_RESULT% >> "%LOG_FILE%"
 
 if %RUN_RESULT% NEQ 0 goto install_failed
 

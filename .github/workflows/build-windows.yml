@@ -20,6 +20,7 @@ on:
 env:
   APP_VERSION: ${{ github.event.inputs.version || '1.0.0' }}
   MINIO_UPLOAD_URL: http://106.75.154.221:8321/minio/file
+  MINIO_DOWNLOAD_BASE_URL: http://106.75.154.221:8082
   VERSION_API_URL: http://106.75.154.221:8082/api/client_version/create
 
 permissions:
@@ -150,15 +151,22 @@ jobs:
           
           echo "Upload response: $response"
           
-          # 解析返回的 URL
+          # 解析返回的数据
           $json = $response | ConvertFrom-Json
-          $downloadUrl = $json.path
+          $path = $json.path
+          $id = $json.id
+          $size = $json.size
           
-          if ($downloadUrl) {
+          echo "Parsed - path: $path, id: $id, size: $size"
+          
+          # 拼接完整的下载 URL: {baseUrl}/{id}/{path}
+          $baseUrl = "${{ env.MINIO_DOWNLOAD_BASE_URL }}"
+          if ($path -and $id) {
+            $downloadUrl = "$baseUrl/$id/$path"
             echo "DOWNLOAD_URL=$downloadUrl" >> $env:GITHUB_OUTPUT
             echo "Download URL: $downloadUrl"
           } else {
-            echo "Warning: Could not get download URL from response"
+            echo "Warning: Could not get download URL from response (path=$path, id=$id)"
             echo "DOWNLOAD_URL=" >> $env:GITHUB_OUTPUT
           }
         shell: pwsh

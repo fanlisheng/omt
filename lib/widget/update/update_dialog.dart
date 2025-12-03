@@ -361,28 +361,6 @@ class _UpdateDialogState extends State<UpdateDialog> {
     );
   }
 
-  String _getActionButtonText() {
-    if (_isDownloading) {
-      return '下载中...';
-    } else if (_isInstalling) {
-      return '安装中...';
-    } else if (_downloadCompleted) {
-      return '立即安装';
-    } else {
-      return '立即安装';
-    }
-  }
-
-  void _handleAction() async {
-    if (_downloadCompleted) {
-      // 安装更新
-      await _installWithFeedback();
-    } else {
-      // 开始下载
-      _startDownload();
-    }
-  }
-
   Future<void> _startDownload() async {
     setState(() {
       _isDownloading = true;
