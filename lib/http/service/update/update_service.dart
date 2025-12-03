@@ -400,8 +400,20 @@ class UpdateService {
         
         if (isExeInstaller) {
           // exe 安装程序：直接运行静默安装到应用目录
+          await logMessage('=== EXE 安装模式 ===');
           await logMessage('安装程序路径: $_extractedPath');
+          await logMessage('安装程序路径(Windows格式): ${_extractedPath!.replaceAll('/', '\\')}');
           await logMessage('安装目标目录: $appDir');
+          await logMessage('安装目标目录(Windows格式): ${appDir.replaceAll('/', '\\')}');
+          
+          // 检查安装程序文件是否存在
+          final installerFile = File(_extractedPath!);
+          final installerExists = await installerFile.exists();
+          await logMessage('安装程序文件存在: $installerExists');
+          if (installerExists) {
+            final installerSize = await installerFile.length();
+            await logMessage('安装程序文件大小: $installerSize 字节');
+          }
           
           scriptContent = WindowsInstallScript.generateInstallerScript(
             installerPath: _extractedPath!,
@@ -409,6 +421,7 @@ class UpdateService {
           );
           
           await logMessage('将运行 EXE 安装程序完成更新（静默模式，安装到原目录）');
+          await logMessage('生成的脚本内容长度: ${scriptContent.length} 字符');
         } else {
           // zip 解压后：覆盖文件
           await logMessage('解压目录: $_extractedPath');
@@ -750,7 +763,17 @@ WshShell.Run """$scriptPath""", 0, False
 
   // 工具：是否存在某扩展名文件
   Future<bool> existsByExtension(String extLower) async {
+    if (_extractedPath == null) return false;
+    
+    // 如果是 exe 安装程序，直接检查文件本身
+    if (isExeInstaller) {
+      return _extractedPath!.toLowerCase().endsWith(extLower);
+    }
+    
+    // 否则遍历目录查找
     final dir = Directory(_extractedPath!);
+    if (!await dir.exists()) return false;
+    
     await for (final entity in dir.list(recursive: true)) {
       if (entity is File && entity.path.toLowerCase().endsWith(extLower)) {
         return true;

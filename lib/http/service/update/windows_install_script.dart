@@ -171,8 +171,17 @@ echo [%date% %time%] APP_NAME=%APP_NAME% >> "%LOG_FILE%"
 echo [%date% %time%] INSTALLER_PATH=%INSTALLER_PATH% >> "%LOG_FILE%"
 echo [%date% %time%] APP_DIR=%APP_DIR% >> "%LOG_FILE%"
 
+:: 显示当前目录
+echo [%date% %time%] Current directory: %CD% >> "%LOG_FILE%"
+
 :: Check if installer exists
-if not exist "%INSTALLER_PATH%" goto installer_not_found
+echo [%date% %time%] Checking if installer exists... >> "%LOG_FILE%"
+if not exist "%INSTALLER_PATH%" (
+    echo [%date% %time%] ERROR: Installer file not found! >> "%LOG_FILE%"
+    dir "%INSTALLER_PATH%" >> "%LOG_FILE%" 2>&1
+    goto installer_not_found
+)
+echo [%date% %time%] Installer file found >> "%LOG_FILE%"
 
 :: Wait for app to exit
 echo Waiting for application to exit...
@@ -207,14 +216,22 @@ ping 127.0.0.1 -n 3 >nul 2>&1
 :: Run the installer (completely silent, install to APP_DIR)
 echo Running installer...
 echo [%date% %time%] Running installer (silent) to: %APP_DIR% >> "%LOG_FILE%"
+echo [%date% %time%] Installer command: "%INSTALLER_PATH%" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICATIONS /DIR="%APP_DIR%" >> "%LOG_FILE%"
 
-start "" /wait "%INSTALLER_PATH%" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICATIONS /DIR="%APP_DIR%"
+:: 尝试解除下载文件的阻止（可能被 Windows 安全策略阻止）
+powershell -Command "Unblock-File -Path '%INSTALLER_PATH%'" >nul 2>&1
+
+:: 直接运行安装程序并等待完成
+echo [%date% %time%] Starting installer... >> "%LOG_FILE%"
+"%INSTALLER_PATH%" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICATIONS /DIR="%APP_DIR%"
 set RUN_RESULT=%ERRORLEVEL%
 echo [%date% %time%] Installer finished, result: %RUN_RESULT% >> "%LOG_FILE%"
 
-if %RUN_RESULT% NEQ 0 goto install_failed
+:: 无论结果如何，尝试启动应用
+echo [%date% %time%] Starting application after install... >> "%LOG_FILE%"
+start "" "%APP_DIR%\\omt.exe"
 
-echo [%date% %time%] Update completed successfully >> "%LOG_FILE%"
+echo [%date% %time%] Update completed, result: %RUN_RESULT% >> "%LOG_FILE%"
 echo Update completed!
 goto finish
 
