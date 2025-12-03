@@ -91,13 +91,17 @@ class UpdateManager {
     var context1 = ContextUtils.instance.getGlobalContextOrThrow();
     showDialog(
       context: context1,
-      barrierDismissible: !updateInfo.forceUpdate,
-      builder: (context) => UpdateDialog(
-        updateInfo: updateInfo,
-        onCancel: () {
-          // 保存更新信息到本地，下次启动时提醒
-          _updateService.saveUpdateInfo(updateInfo);
-        },
+      barrierDismissible: false,  // 禁止点击空白关闭
+      useRootNavigator: true,
+      builder: (context) => PopScope(
+        canPop: false,  // 禁止 ESC/返回键关闭
+        child: UpdateDialog(
+          updateInfo: updateInfo,
+          onCancel: () {
+            // 保存更新信息到本地，下次启动时提醒
+            _updateService.saveUpdateInfo(updateInfo);
+          },
+        ),
       ),
     );
   }

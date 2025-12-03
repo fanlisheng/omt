@@ -218,16 +218,16 @@ echo Running installer...
 echo [%date% %time%] Running installer (silent) to: %APP_DIR% >> "%LOG_FILE%"
 echo [%date% %time%] Installer command: "%INSTALLER_PATH%" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICATIONS /DIR="%APP_DIR%" >> "%LOG_FILE%"
 
-:: 尝试解除下载文件的阻止（可能被 Windows 安全策略阻止）
+:: Unblock downloaded file (may be blocked by Windows security policy)
 powershell -Command "Unblock-File -Path '%INSTALLER_PATH%'" >nul 2>&1
 
-:: 直接运行安装程序并等待完成
+:: Run installer and wait for completion
 echo [%date% %time%] Starting installer... >> "%LOG_FILE%"
 "%INSTALLER_PATH%" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICATIONS /DIR="%APP_DIR%"
 set RUN_RESULT=%ERRORLEVEL%
 echo [%date% %time%] Installer finished, result: %RUN_RESULT% >> "%LOG_FILE%"
 
-:: 无论结果如何，尝试启动应用
+:: Start application after install
 echo [%date% %time%] Starting application after install... >> "%LOG_FILE%"
 start "" "%APP_DIR%\\omt.exe"
 
