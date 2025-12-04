@@ -2,10 +2,12 @@ name: Build Flutter Windows App
 
 on:
   push:
-    branches: [ master, release ]
+    branches:
+      - master
+      - release
   pull_request:
     branches: [ master ]
-  workflow_dispatch:  # 允许手动触发
+  workflow_dispatch: # 允许手动触发
     inputs:
       version:
         description: '版本号 (例如: 1.0.0)'
@@ -62,19 +64,19 @@ jobs:
 
       - name: Replace system_theme_plugin.dll
         run: |
-            if exist "windows_deps\system_theme_plugin.dll" (
-              if exist "build\windows\x64\runner\Release" (
-                copy "windows_deps\system_theme_plugin.dll" "build\windows\x64\runner\Release\system_theme_plugin.dll"
-                echo Replaced system_theme_plugin.dll successfully.
-              ) else (
-                echo Error: Target directory build\windows\x64\runner\Release not found.
-                exit 1
-              )
+          if exist "windows_deps\system_theme_plugin.dll" (
+            if exist "build\windows\x64\runner\Release" (
+              copy "windows_deps\system_theme_plugin.dll" "build\windows\x64\runner\Release\system_theme_plugin.dll"
+              echo Replaced system_theme_plugin.dll successfully.
             ) else (
-              echo Error: Source file windows_deps\system_theme_plugin.dll not found.
+              echo Error: Target directory build\windows\x64\runner\Release not found.
               exit 1
             )
-            dir "build\windows\x64\runner\Release"
+          ) else (
+            echo Error: Source file windows_deps\system_theme_plugin.dll not found.
+            exit 1
+          )
+          dir "build\windows\x64\runner\Release"
         shell: cmd
 
       # 安装 Inno Setup

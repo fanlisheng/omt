@@ -68,9 +68,14 @@ if not exist "%EXTRACTED_PATH%" goto source_not_found
 :: Check if app dir exists
 if not exist "%APP_DIR%" goto app_dir_not_found
 
-:: Wait for app to exit
+:: Wait for app to exit (give it 1 second to fully terminate after exit(0))
 echo Waiting for application to exit...
 echo [%date% %time%] Waiting for app to exit >> "%LOG_FILE%"
+timeout /t 1 /nobreak >nul 2>&1
+
+:: Quick check - if already exited, skip waiting
+tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
+if %ERRORLEVEL% NEQ 0 goto process_exited
 
 set WAIT_COUNT=0
 
@@ -79,10 +84,10 @@ tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
 if %ERRORLEVEL% NEQ 0 goto process_exited
 
 set /a WAIT_COUNT=WAIT_COUNT+1
-echo [%date% %time%] Process running, attempt %WAIT_COUNT% >> "%LOG_FILE%"
-if %WAIT_COUNT% GEQ 30 goto force_kill
+echo [%date% %time%] Process still running, attempt %WAIT_COUNT% >> "%LOG_FILE%"
+if %WAIT_COUNT% GEQ 5 goto force_kill
 
-ping 127.0.0.1 -n 2 >nul 2>&1
+timeout /t 1 /nobreak >nul 2>&1
 goto wait_loop
 
 :force_kill
@@ -183,9 +188,14 @@ if not exist "%INSTALLER_PATH%" (
 )
 echo [%date% %time%] Installer file found >> "%LOG_FILE%"
 
-:: Wait for app to exit
+:: Wait for app to exit (give it 1 second to fully terminate after exit(0))
 echo Waiting for application to exit...
 echo [%date% %time%] Waiting for app to exit >> "%LOG_FILE%"
+timeout /t 1 /nobreak >nul 2>&1
+
+:: Quick check - if already exited, skip waiting
+tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
+if %ERRORLEVEL% NEQ 0 goto process_exited
 
 set WAIT_COUNT=0
 
@@ -194,10 +204,10 @@ tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
 if %ERRORLEVEL% NEQ 0 goto process_exited
 
 set /a WAIT_COUNT=WAIT_COUNT+1
-echo [%date% %time%] Process running, attempt %WAIT_COUNT% >> "%LOG_FILE%"
-if %WAIT_COUNT% GEQ 30 goto force_kill
+echo [%date% %time%] Process still running, attempt %WAIT_COUNT% >> "%LOG_FILE%"
+if %WAIT_COUNT% GEQ 5 goto force_kill
 
-ping 127.0.0.1 -n 2 >nul 2>&1
+timeout /t 1 /nobreak >nul 2>&1
 goto wait_loop
 
 :force_kill
