@@ -68,24 +68,30 @@ if not exist "%EXTRACTED_PATH%" goto source_not_found
 :: Check if app dir exists
 if not exist "%APP_DIR%" goto app_dir_not_found
 
-:: Wait for app to exit (give it 1 second to fully terminate after exit(0))
-echo Waiting for application to exit...
-echo [%date% %time%] Waiting for app to exit >> "%LOG_FILE%"
-timeout /t 1 /nobreak >nul 2>&1
-
-:: Quick check - if already exited, skip waiting
-tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
-if %ERRORLEVEL% NEQ 0 goto process_exited
-
+:: Wait for app to exit (PowerShell for fast detection)
+echo [%date% %time%] Starting process wait check for: %APP_NAME% >> "%LOG_FILE%"
 set WAIT_COUNT=0
 
 :wait_loop
-tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
-if %ERRORLEVEL% NEQ 0 goto process_exited
+echo [%date% %time%] Check #%WAIT_COUNT%: Looking for process '%APP_NAME:~0,-4%' >> "%LOG_FILE%"
+powershell -Command "if (Get-Process -Name '%APP_NAME:~0,-4%' -ErrorAction SilentlyContinue) { exit 1 } else { exit 0 }" >nul 2>&1
+set PROCESS_CHECK=%ERRORLEVEL%
+echo [%date% %time%] Check result: %PROCESS_CHECK% (0=not found, 1=found) >> "%LOG_FILE%"
+
+if %PROCESS_CHECK% EQU 0 (
+    echo [%date% %time%] Process not found, continuing... >> "%LOG_FILE%"
+    goto process_exited
+)
+
+if %WAIT_COUNT% EQU 0 (
+    echo Waiting for application to exit...
+    echo [%date% %time%] Process still running, entering wait loop >> "%LOG_FILE%"
+)
 
 set /a WAIT_COUNT=WAIT_COUNT+1
-echo [%date% %time%] Process still running, attempt %WAIT_COUNT% >> "%LOG_FILE%"
-if %WAIT_COUNT% GEQ 5 goto force_kill
+echo [%date% %time%] Wait count: %WAIT_COUNT%/10 >> "%LOG_FILE%"
+
+if %WAIT_COUNT% GEQ 10 goto force_kill
 
 timeout /t 1 /nobreak >nul 2>&1
 goto wait_loop
@@ -93,15 +99,15 @@ goto wait_loop
 :force_kill
 echo [%date% %time%] Force killing process >> "%LOG_FILE%"
 taskkill /F /IM "%APP_NAME%" >nul 2>&1
-ping 127.0.0.1 -n 2 >nul 2>&1
+timeout /t 1 /nobreak >nul 2>&1
 goto process_exited
 
 :process_exited
 echo [%date% %time%] Application exited >> "%LOG_FILE%"
 echo Application closed
 
-:: Wait a moment for file handles to release
-ping 127.0.0.1 -n 3 >nul 2>&1
+:: Wait for file handles to release
+timeout /t 1 /nobreak >nul 2>&1
 
 :: Copy files from extracted path to app directory (overwrite)
 echo Copying update files...
@@ -154,110 +160,85 @@ exit /b 0
 ''';
   }
 
-  /// 安装程序脚本模板（运行 exe 安装程序到指定目录）
+  /// 安装程序脚本模板（运行 exe 安装程序到指定目录）- 简化快速版
   static String _getInstallerScriptTemplate() {
     return '''@echo off
 setlocal enabledelayedexpansion
 
-title OMT Update
+title OMT Installer Update
 
 set LOG_DIR=%TEMP%\\OMT_Update
 if not exist "%LOG_DIR%" mkdir "%LOG_DIR%" >nul 2>&1
 set LOG_FILE=%LOG_DIR%\\omt_update_log.txt
 
-echo [%date% %time%] OMT Update started > "%LOG_FILE%"
-echo OMT Update starting...
+echo [%date% %time%] Installer update started > "%LOG_FILE%"
+echo Running installer update...
 
 set APP_NAME=__APPNAME__
 set INSTALLER_PATH=__INSTALLER_PATH__
 set APP_DIR=__APP_DIR__
 
-echo [%date% %time%] APP_NAME=%APP_NAME% >> "%LOG_FILE%"
-echo [%date% %time%] INSTALLER_PATH=%INSTALLER_PATH% >> "%LOG_FILE%"
-echo [%date% %time%] APP_DIR=%APP_DIR% >> "%LOG_FILE%"
-
-:: Show current directory
-echo [%date% %time%] Current directory: %CD% >> "%LOG_FILE%"
+echo [%date% %time%] Installer: %INSTALLER_PATH% >> "%LOG_FILE%"
 
 :: Check if installer exists
-echo [%date% %time%] Checking if installer exists... >> "%LOG_FILE%"
 if not exist "%INSTALLER_PATH%" (
-    echo [%date% %time%] ERROR: Installer file not found! >> "%LOG_FILE%"
-    dir "%INSTALLER_PATH%" >> "%LOG_FILE%" 2>&1
-    goto installer_not_found
+    echo [%date% %time%] ERROR: Installer not found >> "%LOG_FILE%"
+    echo ERROR: Installer not found
+    exit /b 1
 )
-echo [%date% %time%] Installer file found >> "%LOG_FILE%"
 
-:: Wait for app to exit (give it 1 second to fully terminate after exit(0))
-echo Waiting for application to exit...
-echo [%date% %time%] Waiting for app to exit >> "%LOG_FILE%"
-timeout /t 1 /nobreak >nul 2>&1
+:: Wait for app to exit (PowerShell for fast detection)
+echo [%date% %time%] Starting process wait check for: %APP_NAME% >> "%LOG_FILE%"
+set /a COUNT=0
 
-:: Quick check - if already exited, skip waiting
-tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
-if %ERRORLEVEL% NEQ 0 goto process_exited
+:wait_exit
+echo [%date% %time%] Check #%COUNT%: Looking for process '%APP_NAME:~0,-4%' >> "%LOG_FILE%"
+powershell -Command "if (Get-Process -Name '%APP_NAME:~0,-4%' -ErrorAction SilentlyContinue) { exit 1 } else { exit 0 }" >nul 2>&1
+set PROCESS_CHECK=%ERRORLEVEL%
+echo [%date% %time%] Check result: %PROCESS_CHECK% (0=not found, 1=found) >> "%LOG_FILE%"
 
-set WAIT_COUNT=0
+if %PROCESS_CHECK% EQU 0 (
+    echo [%date% %time%] Process not found, continuing... >> "%LOG_FILE%"
+    goto app_closed
+)
 
-:wait_loop
-tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
-if %ERRORLEVEL% NEQ 0 goto process_exited
+if %COUNT% EQU 0 (
+    echo Waiting for application to exit...
+    echo [%date% %time%] Process still running, entering wait loop >> "%LOG_FILE%"
+)
 
-set /a WAIT_COUNT=WAIT_COUNT+1
-echo [%date% %time%] Process still running, attempt %WAIT_COUNT% >> "%LOG_FILE%"
-if %WAIT_COUNT% GEQ 5 goto force_kill
+set /a COUNT=COUNT+1
+echo [%date% %time%] Wait count: %COUNT%/10 >> "%LOG_FILE%"
 
-timeout /t 1 /nobreak >nul 2>&1
-goto wait_loop
+if %COUNT% GEQ 10 (
+    echo [%date% %time%] Max wait reached, force killing app >> "%LOG_FILE%"
+    taskkill /F /IM "%APP_NAME%" >nul 2>&1
+    timeout /t 1 /nobreak >nul
+    goto app_closed
+)
 
-:force_kill
-echo [%date% %time%] Force killing process >> "%LOG_FILE%"
-taskkill /F /IM "%APP_NAME%" >nul 2>&1
-ping 127.0.0.1 -n 2 >nul 2>&1
-goto process_exited
+timeout /t 1 /nobreak >nul
+goto wait_exit
 
-:process_exited
-echo [%date% %time%] Application exited >> "%LOG_FILE%"
-echo Application closed
+:app_closed
+echo [%date% %time%] App exited >> "%LOG_FILE%"
 
-:: Wait a moment for file handles to release
-ping 127.0.0.1 -n 3 >nul 2>&1
-
-:: Run the installer (completely silent, install to APP_DIR)
-echo Running installer...
-echo [%date% %time%] Running installer (silent) to: %APP_DIR% >> "%LOG_FILE%"
-echo [%date% %time%] Installer command: "%INSTALLER_PATH%" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICATIONS /DIR="%APP_DIR%" >> "%LOG_FILE%"
-
-:: Unblock downloaded file (may be blocked by Windows security policy)
+:: Unblock installer file
 powershell -Command "Unblock-File -Path '%INSTALLER_PATH%'" >nul 2>&1
 
-:: Run installer and wait for completion
-echo [%date% %time%] Starting installer... >> "%LOG_FILE%"
+:: Run silent installer
+echo Running installer...
+echo [%date% %time%] Starting installer >> "%LOG_FILE%"
 "%INSTALLER_PATH%" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICATIONS /DIR="%APP_DIR%"
 set RUN_RESULT=%ERRORLEVEL%
-echo [%date% %time%] Installer finished, result: %RUN_RESULT% >> "%LOG_FILE%"
+echo [%date% %time%] Installer finished: %RUN_RESULT% >> "%LOG_FILE%"
 
-:: Start application after install
-echo [%date% %time%] Starting application after install... >> "%LOG_FILE%"
-start "" "%APP_DIR%\\omt.exe"
+:: Start app
+echo Starting application...
+start "" "%APP_DIR%\\%APP_NAME%"
 
-echo [%date% %time%] Update completed, result: %RUN_RESULT% >> "%LOG_FILE%"
+echo [%date% %time%] Update completed >> "%LOG_FILE%"
 echo Update completed!
-goto finish
-
-:installer_not_found
-echo [%date% %time%] ERROR: Installer not found: %INSTALLER_PATH% >> "%LOG_FILE%"
-echo ERROR: Installer not found
-exit /b 1
-
-:install_failed
-echo [%date% %time%] ERROR: Install failed >> "%LOG_FILE%"
-echo ERROR: Installation failed
-exit /b 1
-
-:finish
-echo.
-timeout /t 2 /nobreak >nul 2>&1
 exit /b 0
 ''';
   }
