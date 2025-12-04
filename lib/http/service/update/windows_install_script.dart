@@ -171,7 +171,7 @@ echo [%date% %time%] APP_NAME=%APP_NAME% >> "%LOG_FILE%"
 echo [%date% %time%] INSTALLER_PATH=%INSTALLER_PATH% >> "%LOG_FILE%"
 echo [%date% %time%] APP_DIR=%APP_DIR% >> "%LOG_FILE%"
 
-:: 显示当前目录
+:: Show current directory
 echo [%date% %time%] Current directory: %CD% >> "%LOG_FILE%"
 
 :: Check if installer exists

@@ -441,8 +441,9 @@ class UpdateService {
       }
 
       final scriptFile = File(scriptPath);
-      // 使用系统编码（中文Windows上是GBK/ANSI）写入bat脚本
-      await scriptFile.writeAsString(scriptContent, encoding: systemEncoding);
+      // 使用latin1编码写入bat脚本（脚本只包含ASCII字符，避免编码问题）
+      // 注意：不要使用systemEncoding，因为某些Windows系统可能无法正确处理
+      await scriptFile.writeAsString(scriptContent, encoding: latin1);
       await logMessage('创建安装脚本: $scriptPath');
       
       // 确保脚本文件存在
@@ -504,9 +505,9 @@ class UpdateService {
       // 脚本内部已包含延迟，直接启动
       await logMessage('开始执行安装脚本');
 
-      // 读取脚本内容的前几行进行验证
+      // 读取脚本内容的前几行进行验证（使用latin1编码匹配写入时的编码）
       try {
-        final lines = await scriptFile.readAsLines();
+        final lines = await scriptFile.readAsLines(encoding: latin1);
         await logMessage('脚本总行数: ${lines.length}');
         if (lines.isNotEmpty) {
           await logMessage('脚本第一行: ${lines.first}');
@@ -604,7 +605,7 @@ class UpdateService {
 Set WshShell = CreateObject("WScript.Shell")
 WshShell.Run """$scriptPath""", 0, False
 ''';
-            await File(vbsPath).writeAsString(vbsContent, encoding: systemEncoding);
+            await File(vbsPath).writeAsString(vbsContent, encoding: latin1);
             await logMessage('VBS脚本已创建: $vbsPath');
             
             final result = await Process.run('wscript', [vbsPath], 
