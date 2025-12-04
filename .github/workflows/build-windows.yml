@@ -35,14 +35,48 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 缓存 Flutter SDK
+      - name: Cache Flutter SDK
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ env.FLUTTER_HOME }}
+            ~/.pub-cache
+          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.27.1'
           channel: 'stable'
+          cache: true
+
+      # 缓存 pub 依赖
+      - name: Cache pub dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ env.PUB_CACHE }}
+            ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
 
       - name: Get dependencies
         run: flutter pub get
+
+      # 缓存 build/.dart_tool（方案 A：改善 20-40 秒）
+      - name: Cache build outputs
+        uses: actions/cache@v4
+        with:
+          path: |
+            build/
+            .dart_tool/
+          key: flutter-build-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            flutter-build-${{ runner.os }}-
 
       # 从 pubspec.yaml 获取版本号（放在构建前，供后续步骤使用）
       - name: Get version from pubspec.yaml
@@ -59,10 +93,17 @@ jobs:
           }
         shell: pwsh
 
-      - name: Build Windows app
+      # 方案 B：master 和 release 分开构建策略
+      - name: Build Windows app (Release)
+        if: github.ref == 'refs/heads/release' || github.event.inputs.publish == 'true'
         run: flutter build windows --release
 
-      - name: Replace system_theme_plugin.dll
+      - name: Build Windows app (Debug for Master)
+        if: github.ref == 'refs/heads/master' && github.event.inputs.publish != 'true'
+        run: flutter build windows --debug
+
+      - name: Replace system_theme_plugin.dll (Release)
+        if: github.ref == 'refs/heads/release' || github.event.inputs.publish == 'true'
         run: |
           if exist "windows_deps\system_theme_plugin.dll" (
             if exist "build\windows\x64\runner\Release" (
@@ -79,14 +120,31 @@ jobs:
           dir "build\windows\x64\runner\Release"
         shell: cmd
 
-      # 安装 Inno Setup
+      - name: Replace system_theme_plugin.dll (Debug)
+        if: github.ref == 'refs/heads/master' && github.event.inputs.publish != 'true'
+        run: |
+          if exist "windows_deps\system_theme_plugin.dll" (
+            if exist "build\windows\x64\runner\Debug" (
+              copy "windows_deps\system_theme_plugin.dll" "build\windows\x64\runner\Debug\system_theme_plugin.dll"
+              echo Replaced system_theme_plugin.dll successfully.
+            ) else (
+              echo Warning: Target directory build\windows\x64\runner\Debug not found, skipping.
+            )
+          ) else (
+            echo Warning: Source file windows_deps\system_theme_plugin.dll not found, skipping.
+          )
+        shell: cmd
+
+      # 安装 Inno Setup（仅 release 需要）
       - name: Install Inno Setup
+        if: github.ref == 'refs/heads/release' || github.event.inputs.publish == 'true'
         run: |
           choco install innosetup -y
         shell: cmd
 
       # 更新版本号到 Inno Setup 脚本（使用 pubspec.yaml 中的版本）
       - name: Update version in Inno Setup script
+        if: github.ref == 'refs/heads/release' || github.event.inputs.publish == 'true'
         run: |
           $content = Get-Content "windows/installer/setup.iss" -Raw
           $content = $content -replace '#define MyAppVersion ".*"', '#define MyAppVersion "${{ steps.get_version.outputs.VERSION }}"'
@@ -96,24 +154,28 @@ jobs:
 
       # 创建安装程序输出目录
       - name: Create installer output directory
+        if: github.ref == 'refs/heads/release' || github.event.inputs.publish == 'true'
         run: mkdir -p build/installer
         shell: bash
 
       # 使用 Inno Setup 创建安装程序
       - name: Build installer with Inno Setup
+        if: github.ref == 'refs/heads/release' || github.event.inputs.publish == 'true'
         run: |
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "windows\installer\setup.iss"
         shell: pwsh
 
       # 重命名安装程序文件
       - name: Rename installer
+        if: github.ref == 'refs/heads/release' || github.event.inputs.publish == 'true'
         run: |
           mv build/installer/OMT-Setup-*.exe build/installer/OMT-Setup.exe
         shell: bash
 
-      # 计算文件大小和 MD5
+      # 计算文件大小和 MD5（仅 release 需要）
       - name: Calculate file info
         id: file_info
+        if: github.ref == 'refs/heads/release' || github.event.inputs.publish == 'true'
         run: |
           $file = "build/installer/OMT-Setup.exe"
           $fileInfo = Get-Item $file
@@ -142,9 +204,41 @@ jobs:
           $boundary = [System.Guid]::NewGuid().ToString()
           $filePath = (Resolve-Path $file).Path
           
-          # 使用 curl 上传文件（只发送 file 字段，与 Flutter 代码一致）
-          $response = curl.exe -s -X POST "${{ env.MINIO_UPLOAD_URL }}" `
-            -F "file=@$filePath;filename=$fileName"
+          echo "Starting upload to Minio..."
+          $startTime = Get-Date
+          
+          # 使用 curl 上传文件（增加超时和重试）
+          $maxRetries = 3
+          $retryCount = 0
+          $uploadSuccess = $false
+          
+          while ($retryCount -lt $maxRetries -and -not $uploadSuccess) {
+            try {
+              $response = curl.exe -s --max-time 300 --connect-timeout 30 -X POST "${{ env.MINIO_UPLOAD_URL }}" `
+                -F "file=@$filePath;filename=$fileName"
+              
+              if ($LASTEXITCODE -eq 0) {
+                $uploadSuccess = $true
+                $endTime = Get-Date
+                $duration = ($endTime - $startTime).TotalSeconds
+                echo "Upload completed in $duration seconds"
+              } else {
+                $retryCount++
+                echo "Upload failed, retry $retryCount/$maxRetries"
+                Start-Sleep -Seconds 2
+              }
+            } catch {
+              $retryCount++
+              echo "Upload error: $_"
+              echo "Retry $retryCount/$maxRetries"
+              Start-Sleep -Seconds 2
+            }
+          }
+          
+          if (-not $uploadSuccess) {
+            echo "Upload failed after $maxRetries retries"
+            exit 1
+          }
           
           echo "Upload response: $response"
           
@@ -208,12 +302,20 @@ jobs:
           echo "API Response: $response"
         shell: pwsh
 
-      # 上传安装程序到 Artifacts
-      - name: Upload Windows installer
+      # 上传安装程序到 Artifacts（release 上传 setup，master 上传 debug 文件）
+      - name: Upload Windows installer (Release)
+        if: github.ref == 'refs/heads/release' || github.event.inputs.publish == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: OMT-Setup-${{ steps.get_version.outputs.VERSION }}
           path: build/installer/OMT-Setup.exe
+
+      - name: Upload Windows Debug Build (Master)
+        if: github.ref == 'refs/heads/master' && github.event.inputs.publish != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: OMT-Debug-${{ steps.get_version.outputs.VERSION }}
+          path: build/windows/x64/runner/Debug/
 
       # 每次推送到 master 都更新 latest Release（提供固定下载链接）
       - name: Update latest Release
