@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:ui';
+import 'dart:io';
 
 import 'package:fluent_ui/fluent_ui.dart' as fu;
 import 'package:flutter/cupertino.dart';
@@ -161,7 +162,8 @@ class _MyHomePageState extends State<MyHomePage>
                     textDarkOnlyOpacity: true, color: ColorUtils.colorWhite),
                 onPressed: () {
                   Navigator.pop(KayoPackage.share.context);
-                  windowManager.destroy();
+                  windowManager.close();
+                  exit(0);
                 },
               ),
               fu.Button(
@@ -221,7 +223,7 @@ class _MyHomePageState extends State<MyHomePage>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this); //添加观察者
-    windowManager.addListener(this);
+    windowManager.removeListener(this);
 
     super.dispose();
     // SocketService.socketClose();
