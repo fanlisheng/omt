@@ -7,7 +7,7 @@
 #define MyAppExeName "omt.exe"
 #define MyAppName "运维配置客户端"
 #define MyAppVersion "1.0.0"
-#define MyAppPublisher "KayoXu"
+#define MyAppPublisher "成都福立盟环保大数据有限公司"
 #define MyAppURL "[https://github.com/KayoXu/omt](https://github.com/KayoXu/omt)"
 
 [Setup]
