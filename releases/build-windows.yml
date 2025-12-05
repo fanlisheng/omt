@@ -31,13 +31,16 @@ jobs:
       - name: Build Windows
         run: flutter build windows --release
 
-      # 5. 生成安装包 (修正版)
-      # 使用 Chocolatey 安装 Inno Setup，稳定可靠
+      # 5. 生成安装包 (Inno Setup)
       - name: Build Installer
         shell: powershell
         run: |
           choco install innosetup --no-progress
-          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installers/setup.iss
+          
+          # [必须] 下载中文语言包到 installers 目录
+          $LangUrl = "https://raw.githubusercontent.com/jrsoftware/issrc/main/Files/Languages/ChineseSimplified.isl"
+          Invoke-WebRequest -Uri $LangUrl -OutFile "installers\ChineseSimplified.isl"
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "installers\setup.iss"
 
       # 6. 上传产物
       - name: Upload Artifact
