@@ -29,6 +29,7 @@ class HomePage extends StatelessWidget {
           return fu.NavigationView(
             appBar: fu.NavigationAppBar(
                 title: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
                   onPanStart: (details) {
                     windowManager.startDragging();
                   },

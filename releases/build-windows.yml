@@ -51,14 +51,23 @@ jobs:
           $LangUrl = "https://raw.githubusercontent.com/jrsoftware/issrc/main/Files/Languages/Unofficial/ChineseSimplified.isl"
           Invoke-WebRequest -Uri $LangUrl -OutFile "installers\ChineseSimplified.isl"
           
-          # 2. [新增] 下载微软 VC++ 运行时安装包
-          # 下载到 installers 目录，方便 setup.iss 引用
-          echo "正在下载 VC++ 运行库..."
+          # 2. 下载微软 VC++ 运行时安装包
           $VcUrl = "https://aka.ms/vs/17/release/vc_redist.x64.exe"
           Invoke-WebRequest -Uri $VcUrl -OutFile "installers\VC_redist.x64.exe"
           
-          # 3. 编译脚本
-          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "installers\setup.iss"
+          # ========================================================
+          # 3. [关键修复] 强制添加 BOM 头 (解决中文乱码/路径报错)
+          # ========================================================
+          echo "正在修正 setup.iss 编码为 UTF-8 BOM..."
+          $IssPath = "installers\setup.iss"
+          # Get-Content -Encoding UTF8 会正确读取无 BOM 的 UTF-8 文件
+          # Set-Content -Encoding UTF8 在 PowerShell 5.1 中会自动添加 BOM
+          $Content = Get-Content -Path $IssPath -Encoding UTF8
+          Set-Content -Path $IssPath -Value $Content -Encoding UTF8
+          
+          # 4. 编译脚本
+          echo "开始编译..."
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" $IssPath
 
       # 6. 上传产物
       - name: Upload Artifact
