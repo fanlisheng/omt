@@ -2,12 +2,10 @@ name: Build Flutter Windows App
 
 on:
   push:
-    branches:
-      - master
-      - release
+    branches: [ master, release ]
   pull_request:
     branches: [ master ]
-  workflow_dispatch: # 允许手动触发
+  workflow_dispatch:  # 允许手动触发
     inputs:
       version:
         description: '版本号 (例如: 1.0.0)'
@@ -64,19 +62,19 @@ jobs:
 
       - name: Replace system_theme_plugin.dll
         run: |
-          if exist "windows_deps\system_theme_plugin.dll" (
-            if exist "build\windows\x64\runner\Release" (
-              copy "windows_deps\system_theme_plugin.dll" "build\windows\x64\runner\Release\system_theme_plugin.dll"
-              echo Replaced system_theme_plugin.dll successfully.
+            if exist "windows_deps\system_theme_plugin.dll" (
+              if exist "build\windows\x64\runner\Release" (
+                copy "windows_deps\system_theme_plugin.dll" "build\windows\x64\runner\Release\system_theme_plugin.dll"
+                echo Replaced system_theme_plugin.dll successfully.
+              ) else (
+                echo Error: Target directory build\windows\x64\runner\Release not found.
+                exit 1
+              )
             ) else (
-              echo Error: Target directory build\windows\x64\runner\Release not found.
+              echo Error: Source file windows_deps\system_theme_plugin.dll not found.
               exit 1
             )
-          ) else (
-            echo Error: Source file windows_deps\system_theme_plugin.dll not found.
-            exit 1
-          )
-          dir "build\windows\x64\runner\Release"
+            dir "build\windows\x64\runner\Release"
         shell: cmd
 
       # 安装 Inno Setup
@@ -108,21 +106,21 @@ jobs:
       # 重命名安装程序文件
       - name: Rename installer
         run: |
-          mv build/installer/OMT-Setup-*.exe build/installer/OMT-Setup.exe
+          mv build/installer/omt-install-*.exe build/installer/omt-install.exe
         shell: bash
 
       # 计算文件大小和 MD5
       - name: Calculate file info
         id: file_info
         run: |
-          $file = "build/installer/OMT-Setup.exe"
+          $file = "build/installer/omt-install.exe"
           $fileInfo = Get-Item $file
           $fileSize = $fileInfo.Length
           $md5 = (Get-FileHash -Path $file -Algorithm MD5).Hash.ToLower()
           
           echo "FILE_SIZE=$fileSize" >> $env:GITHUB_OUTPUT
           echo "FILE_MD5=$md5" >> $env:GITHUB_OUTPUT
-          echo "FILE_NAME=OMT-Setup.exe" >> $env:GITHUB_OUTPUT
+          echo "FILE_NAME=omt-install.exe" >> $env:GITHUB_OUTPUT
           
           echo "File size: $fileSize bytes"
           echo "File MD5: $md5"
@@ -133,8 +131,8 @@ jobs:
         id: upload_minio
         if: github.ref == 'refs/heads/release' || github.event.inputs.publish == 'true'
         run: |
-          $file = "build/installer/OMT-Setup.exe"
-          $fileName = "OMT-Setup.exe"
+          $file = "build/installer/omt-install.exe"
+          $fileName = "omt-install.exe"
           $fileSize = "${{ steps.file_info.outputs.FILE_SIZE }}"
           $fileMd5 = "${{ steps.file_info.outputs.FILE_MD5 }}"
           
@@ -142,9 +140,9 @@ jobs:
           $boundary = [System.Guid]::NewGuid().ToString()
           $filePath = (Resolve-Path $file).Path
           
-          # 使用 curl 上传文件（只发送 file 字段，与 Flutter 代码一致）
+          # 使用 curl 上传文件
           $response = curl.exe -s -X POST "${{ env.MINIO_UPLOAD_URL }}" `
-            -F "file=@$filePath;filename=$fileName"
+            -F "file=@$filePath"
           
           echo "Upload response: $response"
           
@@ -212,8 +210,8 @@ jobs:
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4
         with:
-          name: OMT-Setup-${{ steps.get_version.outputs.VERSION }}
-          path: build/installer/OMT-Setup.exe
+          name: omt-install-${{ steps.get_version.outputs.VERSION }}
+          path: build/installer/omt-install.exe
 
       # 每次推送到 master 都更新 latest Release（提供固定下载链接）
       - name: Update latest Release
@@ -230,8 +228,8 @@ jobs:
             MD5: ${{ steps.file_info.outputs.FILE_MD5 }}
             
             ### 下载
-            点击下方 `OMT-Setup.exe` 下载安装程序
-          files: build/installer/OMT-Setup.exe
+            点击下方 `omt-install.exe` 下载安装程序
+          files: build/installer/omt-install.exe
           prerelease: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -241,7 +239,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/') && github.ref != 'refs/tags/latest'
         uses: softprops/action-gh-release@v1
         with:
-          files: build/installer/OMT-Setup.exe
+          files: build/installer/omt-install.exe
           draft: false
           prerelease: false
         env:

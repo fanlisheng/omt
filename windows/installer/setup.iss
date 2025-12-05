@@ -3,9 +3,8 @@
 ; 例如: OMT-Setup.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
 
 #define MyAppName "OMT"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.4.2"
 #define MyAppPublisher "OMT Team"
-#define MyAppURL "https://github.com/your-repo/omt"
 #define MyAppExeName "omt.exe"
 
 [Setup]
@@ -15,12 +14,9 @@ AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
-AppPublisherURL={#MyAppURL}
-AppSupportURL={#MyAppURL}
-AppUpdatesURL={#MyAppURL}
 
-; 安装目录（安装到安装程序所在目录）
-DefaultDirName={src}\{#MyAppName}
+; 安装目录（在安装程序同级目录创建 omt 文件夹）
+DefaultDirName={src}\omt
 DefaultGroupName={#MyAppName}
 
 ; 禁用所有向导页面（实现静默安装）
@@ -35,7 +31,7 @@ PrivilegesRequired=lowest
 
 ; 输出设置
 OutputDir=..\..\build\installer
-OutputBaseFilename=OMT-Setup-{#MyAppVersion}
+OutputBaseFilename=omt-install-{#MyAppVersion}
 SetupIconFile=..\..\windows\runner\resources\app_icon.ico
 Compression=lzma2/max
 SolidCompression=yes
