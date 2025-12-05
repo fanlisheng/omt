@@ -15,11 +15,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. 配置 Flutter 环境 (锁定 3.7.12)
+      # 2. 配置 Flutter 环境 (锁定 3.27.0)
       - name: Setup Flutter SDK
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.7.12'
+          flutter-version: '3.27.0'
           channel: 'stable'
           cache: true
 
