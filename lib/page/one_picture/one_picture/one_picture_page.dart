@@ -123,7 +123,7 @@ class OnePicturePageState extends State<OnePicturePage> {
                                     ))
                                   : Container())
                               : GraphView(
-                                  key: model.graphKey,
+                                  // key: model.graphKey,
                                   graph: model.graph,
                                   algorithm: SugiyamaAlgorithm(model.builder),
                                   paint: Paint()

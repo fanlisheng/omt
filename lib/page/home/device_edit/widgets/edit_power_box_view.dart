@@ -264,12 +264,11 @@ class EditPowerBoxView extends StatelessWidget {
                     model.selectedDeviceDetailPowerBox?.deviceCode ?? "",
                     context: model.context!,
                     onOpenDcSuccess: (info) {
-                      model.selectedDeviceDetailPowerBox?.dcInterfaces
-                          ?.remove(info);
+                      model.selectedPowerBoxCode(model.selectedDeviceDetailPowerBox);
                       LoadingUtils.showToast(
                           data:
                           "${(info.statusText == "打开") ? "关闭" : "打开"}成功!");
-                      model.notifyListeners();
+                      // model.notifyListeners();
                     },
                     onRecordSuccess: (info) {
                       LoadingUtils.showToast(data: "记录成功!");

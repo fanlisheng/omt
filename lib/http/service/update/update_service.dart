@@ -274,7 +274,7 @@ class UpdateService {
     return 0;
   }
 
-  // 下载更新包（固定zip）
+  // 下载更新包（支持 exe 和 zip）
   Future<bool> downloadUpdate(
       UpdateInfo updateInfo, Function(double) onProgress) async {
     if (_isDownloading) return false;
@@ -292,8 +292,20 @@ class UpdateService {
         await baseDir.create(recursive: true);
       }
 
-      const fileName = 'update.zip';
+      // 根据 URL 扩展名决定保存文件名（固定文件名，避免旧文件堆积）
+      final url = updateInfo.downloadUrl.toLowerCase();
+      final String fileName;
+      if (url.endsWith('.exe')) {
+        fileName = 'OMT-Setup.exe';
+      } else if (url.endsWith('.zip')) {
+        fileName = 'update.zip';
+      } else {
+        // 默认为 exe
+        fileName = 'OMT-Setup.exe';
+      }
       _downloadPath = '${baseDir.path}/$fileName';
+      
+      await logMessage('保存文件名: $fileName');
       
       await logMessage('下载目录设置为: ${baseDir.path}');
 
@@ -382,17 +394,46 @@ class UpdateService {
       
       if (Platform.isWindows) {
         scriptPath = '${scriptDir.path}${Platform.pathSeparator}install_update.bat';
-        // 使用项目目录作为安装目标目录
-        String currentAppDir = projectDir;
-        await logMessage('使用项目目录作为安装目标: $currentAppDir');
         
-        scriptContent = WindowsInstallScript.generateTestScript(
-          extractedPath: _extractedPath!,
-          downloadPath: _downloadPath ?? '',
-          targetDir: currentAppDir,
-        );
+        // 获取应用程序所在目录（omt.exe的父目录）
+        final appDir = File(Platform.resolvedExecutable).parent.path;
         
-        await logMessage('最终目标安装目录: $currentAppDir');
+        if (isExeInstaller) {
+          // exe 安装程序：直接运行静默安装到应用目录
+          await logMessage('=== EXE 安装模式 ===');
+          await logMessage('安装程序路径: $_extractedPath');
+          await logMessage('安装程序路径(Windows格式): ${_extractedPath!.replaceAll('/', '\\')}');
+          await logMessage('安装目标目录: $appDir');
+          await logMessage('安装目标目录(Windows格式): ${appDir.replaceAll('/', '\\')}');
+          
+          // 检查安装程序文件是否存在
+          final installerFile = File(_extractedPath!);
+          final installerExists = await installerFile.exists();
+          await logMessage('安装程序文件存在: $installerExists');
+          if (installerExists) {
+            final installerSize = await installerFile.length();
+            await logMessage('安装程序文件大小: $installerSize 字节');
+          }
+          
+          scriptContent = WindowsInstallScript.generateInstallerScript(
+            installerPath: _extractedPath!,
+            appDir: appDir,
+          );
+          
+          await logMessage('将运行 EXE 安装程序完成更新（静默模式，安装到原目录）');
+          await logMessage('生成的脚本内容长度: ${scriptContent.length} 字符');
+        } else {
+          // zip 解压后：覆盖文件
+          await logMessage('解压目录: $_extractedPath');
+          await logMessage('应用目录: $appDir');
+          
+          scriptContent = WindowsInstallScript.generateInstallScript(
+            extractedPath: _extractedPath!,
+            appDir: appDir,
+          );
+          
+          await logMessage('将覆盖应用目录中的文件完成更新');
+        }
       } else {
         // 非Windows平台不支持
         await logMessage('当前平台不支持自动安装: ${Platform.operatingSystem}');
@@ -400,7 +441,9 @@ class UpdateService {
       }
 
       final scriptFile = File(scriptPath);
-      await scriptFile.writeAsString(scriptContent);
+      // 使用latin1编码写入bat脚本（脚本只包含ASCII字符，避免编码问题）
+      // 注意：不要使用systemEncoding，因为某些Windows系统可能无法正确处理
+      await scriptFile.writeAsString(scriptContent, encoding: latin1);
       await logMessage('创建安装脚本: $scriptPath');
       
       // 确保脚本文件存在
@@ -462,9 +505,9 @@ class UpdateService {
       // 脚本内部已包含延迟，直接启动
       await logMessage('开始执行安装脚本');
 
-      // 读取脚本内容的前几行进行验证
+      // 读取脚本内容的前几行进行验证（使用latin1编码匹配写入时的编码）
       try {
-        final lines = await scriptFile.readAsLines();
+        final lines = await scriptFile.readAsLines(encoding: latin1);
         await logMessage('脚本总行数: ${lines.length}');
         if (lines.isNotEmpty) {
           await logMessage('脚本第一行: ${lines.first}');
@@ -562,7 +605,7 @@ class UpdateService {
 Set WshShell = CreateObject("WScript.Shell")
 WshShell.Run """$scriptPath""", 0, False
 ''';
-            await File(vbsPath).writeAsString(vbsContent);
+            await File(vbsPath).writeAsString(vbsContent, encoding: latin1);
             await logMessage('VBS脚本已创建: $vbsPath');
             
             final result = await Process.run('wscript', [vbsPath], 
@@ -619,11 +662,21 @@ WshShell.Run """$scriptPath""", 0, False
     return false;
   }
 
-  // 解压ZIP更新包
+  // 判断下载的是否为 exe 安装程序
+  bool get isExeInstaller => _downloadPath?.toLowerCase().endsWith('.exe') ?? false;
+
+  // 解压ZIP更新包（如果是exe则跳过解压）
   Future<bool> extractUpdatePackage() async {
     if (_downloadPath == null) return false;
 
     try {
+      // 如果是 exe 安装程序，不需要解压，直接标记为准备好
+      if (isExeInstaller) {
+        await logMessage('下载的是 EXE 安装程序，跳过解压步骤');
+        _extractedPath = _downloadPath; // 直接使用 exe 路径
+        return true;
+      }
+
       // 使用统一的项目目录获取方法
       final projectDir = await _getProjectDirectory();
       
@@ -711,7 +764,17 @@ WshShell.Run """$scriptPath""", 0, False
 
   // 工具：是否存在某扩展名文件
   Future<bool> existsByExtension(String extLower) async {
+    if (_extractedPath == null) return false;
+    
+    // 如果是 exe 安装程序，直接检查文件本身
+    if (isExeInstaller) {
+      return _extractedPath!.toLowerCase().endsWith(extLower);
+    }
+    
+    // 否则遍历目录查找
     final dir = Directory(_extractedPath!);
+    if (!await dir.exists()) return false;
+    
     await for (final entity in dir.list(recursive: true)) {
       if (entity is File && entity.path.toLowerCase().endsWith(extLower)) {
         return true;
@@ -866,5 +929,98 @@ WshShell.Run """$scriptPath""", 0, False
       // 最终保障：无论如何都要退出
       exit(exitCode);
     }
+  }
+
+  /// 调试方法：直接测试安装 downloads 目录中已存在的 exe
+  /// 不需要下载，直接运行安装流程
+  Future<Map<String, dynamic>> debugTestInstall() async {
+    final result = <String, dynamic>{};
+    
+    try {
+      await logMessage('=== 调试测试安装开始 ===');
+      
+      // 获取项目目录
+      final projectDir = await _getProjectDirectory();
+      result['projectDir'] = projectDir;
+      await logMessage('项目目录: $projectDir');
+      
+      // 查找 downloads 目录中的 exe
+      final downloadsDir = Directory('$projectDir/downloads');
+      result['downloadsDir'] = downloadsDir.path;
+      result['downloadsDirExists'] = await downloadsDir.exists();
+      await logMessage('下载目录: ${downloadsDir.path}');
+      await logMessage('下载目录存在: ${result['downloadsDirExists']}');
+      
+      if (!result['downloadsDirExists']) {
+        result['error'] = '下载目录不存在';
+        return result;
+      }
+      
+      // 查找 exe 文件
+      String? exePath;
+      await for (final entity in downloadsDir.list()) {
+        if (entity is File && entity.path.toLowerCase().endsWith('.exe')) {
+          exePath = entity.path;
+          break;
+        }
+      }
+      
+      result['exePath'] = exePath;
+      await logMessage('找到的 EXE: $exePath');
+      
+      if (exePath == null) {
+        result['error'] = '未找到 exe 文件';
+        return result;
+      }
+      
+      // 设置路径
+      _downloadPath = exePath;
+      _extractedPath = exePath;
+      
+      result['isExeInstaller'] = isExeInstaller;
+      await logMessage('isExeInstaller: ${result['isExeInstaller']}');
+      
+      // 检查 exe 文件信息
+      final exeFile = File(exePath);
+      result['exeExists'] = await exeFile.exists();
+      result['exeSize'] = await exeFile.length();
+      await logMessage('EXE 存在: ${result['exeExists']}');
+      await logMessage('EXE 大小: ${result['exeSize']} 字节');
+      
+      // 测试 existsByExtension
+      final hasExe = await existsByExtension('.exe');
+      result['existsByExtension'] = hasExe;
+      await logMessage('existsByExtension(.exe): $hasExe');
+      
+      // 获取应用目录
+      final appDir = File(Platform.resolvedExecutable).parent.path;
+      result['appDir'] = appDir;
+      await logMessage('应用目录: $appDir');
+      
+      result['success'] = true;
+      result['message'] = '调试信息收集完成，可以调用 installUpdate() 进行安装';
+      await logMessage('=== 调试测试安装结束 ===');
+      
+    } catch (e) {
+      result['error'] = e.toString();
+      await logMessage('调试测试出错: $e');
+    }
+    
+    return result;
+  }
+
+  /// 调试方法：直接执行安装（危险：会退出应用）
+  Future<bool> debugRunInstall() async {
+    await logMessage('=== 调试执行安装 ===');
+    
+    // 先收集信息
+    final info = await debugTestInstall();
+    if (info['error'] != null) {
+      await logMessage('调试信息收集失败: ${info['error']}');
+      return false;
+    }
+    
+    // 执行安装
+    return await installUpdate();
   }
 }

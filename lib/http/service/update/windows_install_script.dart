@@ -1,275 +1,263 @@
-import 'dart:io';
-
 /// Windows安装脚本模板
 /// 用于生成自动更新安装的批处理脚本
+/// 直接覆盖应用目录中的文件，然后从原位置启动应用
 class WindowsInstallScript {
   
-  /// 生成测试版本的安装脚本（简化版本）
-  static String generateTestScript({
+  /// 生成安装脚本（覆盖式更新）
+  /// [extractedPath] - 解压后的更新文件目录
+  /// [appDir] - 应用程序所在目录（将覆盖此目录中的文件）
+  /// [appName] - 应用程序名称（用于等待进程退出和启动）
+  static String generateInstallScript({
     required String extractedPath,
-    required String downloadPath,
+    required String appDir,
     String appName = 'omt.exe',
-    String? targetDir,
   }) {
     final extractedPathWin = extractedPath.replaceAll('/', '\\');
-    final targetDirWin = (targetDir ?? Directory(extractedPath).parent.path)
-        .replaceAll('/', '\\');
-    final downloadPathWin = downloadPath.replaceAll('/', '\\');
+    final appDirWin = appDir.replaceAll('/', '\\');
     
-    // 使用简化的脚本模板
-    return _getSimplifiedScriptTemplate()
-        .replaceAll('\${appName}', appName)
-        .replaceAll('\${sourceDir}', extractedPathWin)
-        .replaceAll('\${targetDir}', targetDirWin)
-        .replaceAll('\${zipPath}', downloadPathWin);
+    return _getOverwriteScriptTemplate()
+        .replaceAll('__APPNAME__', appName)
+        .replaceAll('__EXTRACTED_PATH__', extractedPathWin)
+        .replaceAll('__APP_DIR__', appDirWin);
   }
 
-  /// 获取兼容Windows 7+的脚本模板（带日志和增强兼容性）
-  static String _getSimplifiedScriptTemplate() {
-    return '''
-@echo off
+  /// 生成安装程序脚本（运行 exe 安装程序，静默模式）
+  /// [installerPath] - exe 安装程序路径
+  /// [appDir] - 应用程序所在目录（安装目标目录）
+  /// [appName] - 应用程序名称（用于等待进程退出）
+  static String generateInstallerScript({
+    required String installerPath,
+    required String appDir,
+    String appName = 'omt.exe',
+  }) {
+    final installerPathWin = installerPath.replaceAll('/', '\\');
+    final appDirWin = appDir.replaceAll('/', '\\');
+    
+    return _getInstallerScriptTemplate()
+        .replaceAll('__APPNAME__', appName)
+        .replaceAll('__INSTALLER_PATH__', installerPathWin)
+        .replaceAll('__APP_DIR__', appDirWin);
+  }
+
+  /// 获取覆盖式更新脚本模板
+  /// 将解压目录中的文件覆盖到应用目录，然后启动应用
+  static String _getOverwriteScriptTemplate() {
+    return '''@echo off
 setlocal enabledelayedexpansion
 
-REM Set code page to UTF-8 for Chinese support
-chcp 65001 >nul 2>&1
+title OMT Update
 
-REM Set window title
-title OMT 更新安装程序
-
-REM Use TEMP directory for log file (always writable, no permission issues)
-set "LOG_DIR=%TEMP%\\OMT_Update"
+set LOG_DIR=%TEMP%\\OMT_Update
 if not exist "%LOG_DIR%" mkdir "%LOG_DIR%" >nul 2>&1
-set "LOG_FILE=%LOG_DIR%\\omt_update_log.txt"
+set LOG_FILE=%LOG_DIR%\\omt_update_log.txt
 
-REM Initialize log file
-echo [%date% %time%] OMT 更新安装程序启动... > "%LOG_FILE%"
-echo OMT 更新安装程序启动...
-echo 日志文件: %LOG_FILE%
+echo [%date% %time%] OMT Update started > "%LOG_FILE%"
+echo OMT Update starting...
 
-REM Check admin privileges
-echo [%date% %time%] 检查管理员权限... >> "%LOG_FILE%"
-net session >nul 2>&1
-if %ERRORLEVEL% EQU 0 (
-    set "IS_ADMIN=1"
-    echo [%date% %time%] 以管理员权限运行 >> "%LOG_FILE%"
-    echo 以管理员权限运行...
-) else (
-    set "IS_ADMIN=0"
-    echo [%date% %time%] 以普通用户权限运行 >> "%LOG_FILE%"
-    echo 以普通用户权限运行...
-)
+set APP_NAME=__APPNAME__
+set EXTRACTED_PATH=__EXTRACTED_PATH__
+set APP_DIR=__APP_DIR__
 
-REM Set variables early for process checking
-set "APP_NAME=\${appName}"
+echo [%date% %time%] APP_NAME=%APP_NAME% >> "%LOG_FILE%"
+echo [%date% %time%] EXTRACTED_PATH=%EXTRACTED_PATH% >> "%LOG_FILE%"
+echo [%date% %time%] APP_DIR=%APP_DIR% >> "%LOG_FILE%"
 
-REM Critical: Initial delay to let application exit gracefully
-echo [%date% %time%] 等待5秒让应用程序退出... >> "%LOG_FILE%"
-echo 等待应用程序退出...
-ping 127.0.0.1 -n 6 >nul 2>&1
+:: Check if extracted path exists
+if not exist "%EXTRACTED_PATH%" goto source_not_found
 
-REM Wait for application to exit with active checking
-echo [%date% %time%] 开始检查进程是否退出... >> "%LOG_FILE%"
+:: Check if app dir exists
+if not exist "%APP_DIR%" goto app_dir_not_found
 
-REM Check if process is still running and wait up to 30 seconds
-set "WAIT_COUNT=0"
+:: Wait for app to exit (give it 1 second to fully terminate after exit(0))
+echo Waiting for application to exit...
+echo [%date% %time%] Waiting for app to exit >> "%LOG_FILE%"
+timeout /t 1 /nobreak >nul 2>&1
+
+:: Quick check - if already exited, skip waiting
+tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
+if %ERRORLEVEL% NEQ 0 goto process_exited
+
+set WAIT_COUNT=0
+
 :wait_loop
 tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
 if %ERRORLEVEL% NEQ 0 goto process_exited
 
-set /a WAIT_COUNT+=1
-if %WAIT_COUNT% GEQ 30 goto force_kill
+set /a WAIT_COUNT=WAIT_COUNT+1
+echo [%date% %time%] Process still running, attempt %WAIT_COUNT% >> "%LOG_FILE%"
+if %WAIT_COUNT% GEQ 5 goto force_kill
 
-echo [%date% %time%] Process still running, waiting... (attempt %WAIT_COUNT%/30) >> "%LOG_FILE%"
-ping 127.0.0.1 -n 2 >nul 2>&1
+timeout /t 1 /nobreak >nul 2>&1
 goto wait_loop
 
 :force_kill
-echo [%date% %time%] 警告: 进程未正常退出，强制终止... >> "%LOG_FILE%"
-echo 警告: 强制关闭应用程序...
+echo [%date% %time%] Force killing process >> "%LOG_FILE%"
 taskkill /F /IM "%APP_NAME%" >nul 2>&1
-ping 127.0.0.1 -n 3 >nul 2>&1
-echo [%date% %time%] 进程已强制终止 >> "%LOG_FILE%"
+ping 127.0.0.1 -n 2 >nul 2>&1
 goto process_exited
 
 :process_exited
-echo [%date% %time%] 应用程序进程已退出 >> "%LOG_FILE%"
-echo 应用程序已关闭
+echo [%date% %time%] Application exited >> "%LOG_FILE%"
+echo Application closed
 
-REM Critical: Wait to ensure ALL file handles are released (including DLLs)
-echo [%date% %time%] 等待5秒释放文件句柄... >> "%LOG_FILE%"
-echo 等待文件句柄释放...
-ping 127.0.0.1 -n 6 >nul 2>&1
+:: Wait a moment for file handles to release
+ping 127.0.0.1 -n 3 >nul 2>&1
 
-REM Detect Windows version and set compatibility
-echo [%date% %time%] Detecting Windows version... >> "%LOG_FILE%"
-for /f "tokens=4-5 delims=. " %%i in ('ver') do set VERSION=%%i.%%j
-if "%VERSION%"=="6.1" (
-    set "WIN7=1"
-    echo [%date% %time%] Windows 7 detected >> "%LOG_FILE%"
-) else (
-    set "WIN7=0"
-    echo [%date% %time%] Windows 8+ detected >> "%LOG_FILE%"
-)
+:: Copy files from extracted path to app directory (overwrite)
+echo Copying update files...
+echo [%date% %time%] Copying files from %EXTRACTED_PATH% to %APP_DIR% >> "%LOG_FILE%"
 
-REM Set path variables
-set "SOURCE_DIR=\${sourceDir}"
-set "TARGET_DIR=\${targetDir}"
-set "ZIP_PATH=\${zipPath}"
-set "APP_PATH=%TARGET_DIR%\\%APP_NAME%"
+:: Use xcopy to overwrite all files
+xcopy "%EXTRACTED_PATH%\\*" "%APP_DIR%\\" /E /Y /I /Q >>"%LOG_FILE%" 2>&1
+set COPY_RESULT=%ERRORLEVEL%
+echo [%date% %time%] Copy result: %COPY_RESULT% >> "%LOG_FILE%"
 
-echo [%date% %time%] Variables set: >> "%LOG_FILE%"
-echo [%date% %time%] APP_NAME=%APP_NAME% >> "%LOG_FILE%"
-echo [%date% %time%] SOURCE_DIR=%SOURCE_DIR% >> "%LOG_FILE%"
-echo [%date% %time%] TARGET_DIR=%TARGET_DIR% >> "%LOG_FILE%"
-echo [%date% %time%] APP_PATH=%APP_PATH% >> "%LOG_FILE%"
+if %COPY_RESULT% NEQ 0 goto copy_failed
 
-echo 检查源目录: %SOURCE_DIR%
-echo [%date% %time%] 检查源目录: %SOURCE_DIR% >> "%LOG_FILE%"
-if not exist "%SOURCE_DIR%" (
-    echo [%date% %time%] 错误: 源目录不存在: %SOURCE_DIR% >> "%LOG_FILE%"
-    echo 错误: 源目录不存在 >> "%LOG_FILE%"
-    exit /b 1
-)
-echo [%date% %time%] 源目录存在 >> "%LOG_FILE%"
+echo [%date% %time%] Files copied successfully >> "%LOG_FILE%"
+echo Files updated!
 
-echo 准备目标目录: %TARGET_DIR%
-echo [%date% %time%] 准备目标目录: %TARGET_DIR% >> "%LOG_FILE%"
-if not exist "%TARGET_DIR%" (
-    mkdir "%TARGET_DIR%"
-    if %ERRORLEVEL% NEQ 0 (
-        echo [%date% %time%] 错误: 无法创建目标目录 >> "%LOG_FILE%"
-        echo 错误: 无法创建目标目录 >> "%LOG_FILE%"
-        exit /b 1
-    )
-    echo [%date% %time%] 目标目录已创建 >> "%LOG_FILE%"
-) else (
-    echo [%date% %time%] 目标目录已存在 >> "%LOG_FILE%"
-)
+:: Wait a moment before starting app
+ping 127.0.0.1 -n 2 >nul 2>&1
 
-REM Double-check process is really gone before copying
-echo [%date% %time%] Final process check before copying... >> "%LOG_FILE%"
-tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
-if %ERRORLEVEL% EQU 0 (
-    echo [%date% %time%] WARNING: Process still detected, waiting additional 5 seconds... >> "%LOG_FILE%"
-    ping 127.0.0.1 -n 6 >nul 2>&1
-)
+:: Start the application from original location
+echo Starting application...
+echo [%date% %time%] Starting application: %APP_DIR%\\%APP_NAME% >> "%LOG_FILE%"
 
-echo 正在复制文件...
-echo [%date% %time%] 开始文件复制操作... >> "%LOG_FILE%"
-REM Use xcopy for Win7 compatibility, robocopy for Win8+
-if "%WIN7%"=="1" (
-    echo [%date% %time%] Using xcopy for Windows 7 compatibility >> "%LOG_FILE%"
-    xcopy "%SOURCE_DIR%\\*" "%TARGET_DIR%\\" /E /Y /I /R /H >nul 2>&1
-    set "COPY_RESULT=!ERRORLEVEL!"
-    echo [%date% %time%] xcopy completed with exit code: !COPY_RESULT! >> "%LOG_FILE%"
-    if !COPY_RESULT! GEQ 4 (
-        echo [%date% %time%] ERROR: xcopy failed with code !COPY_RESULT! >> "%LOG_FILE%"
-        echo ERROR: Copy failed with xcopy >> "%LOG_FILE%"
-        exit /b 1
-    )
-) else (
-    echo [%date% %time%] Using robocopy for Windows 8+ >> "%LOG_FILE%"
-    robocopy "%SOURCE_DIR%" "%TARGET_DIR%" /E /R:3 /W:2 >> "%LOG_FILE%" 2>&1
-    set "COPY_RESULT=!ERRORLEVEL!"
-    echo [%date% %time%] robocopy completed with exit code: !COPY_RESULT! >> "%LOG_FILE%"
-    if !COPY_RESULT! GTR 7 (
-        echo [%date% %time%] ERROR: robocopy failed with code !COPY_RESULT! >> "%LOG_FILE%"
-        echo ERROR: Copy failed, check log file >> "%LOG_FILE%"
-        exit /b 1
-    )
-)
-echo [%date% %time%] File copy operation completed successfully >> "%LOG_FILE%"
+start "" "%APP_DIR%\\%APP_NAME%"
+set START_RESULT=%ERRORLEVEL%
+echo [%date% %time%] Application started, result: %START_RESULT% >> "%LOG_FILE%"
 
-echo 清理临时文件...
-echo [%date% %time%] 开始清理... >> "%LOG_FILE%"
-if exist "%ZIP_PATH%" (
-    del "%ZIP_PATH%" >nul 2>&1
-    echo [%date% %time%] Deleted zip file: %ZIP_PATH% >> "%LOG_FILE%"
-) else (
-    echo [%date% %time%] Zip file not found for cleanup: %ZIP_PATH% >> "%LOG_FILE%"
-)
+echo [%date% %time%] Update completed successfully >> "%LOG_FILE%"
+echo Update completed!
+goto finish
 
-echo 启动应用程序...
-echo [%date% %time%] 切换到目标目录: %TARGET_DIR% >> "%LOG_FILE%"
-cd /d "%TARGET_DIR%"
-
-REM Verify executable exists
-if not exist "%APP_PATH%" (
-    echo [%date% %time%] ERROR: Executable not found: %APP_PATH% >> "%LOG_FILE%"
-    echo ERROR: Application executable not found >> "%LOG_FILE%"
-    exit /b 1
-)
-
-echo [%date% %time%] Starting application with multiple methods... >> "%LOG_FILE%"
-
-REM Method 1: Standard start command with relative path
-echo [%date% %time%] 尝试方法1: 相对路径启动 >> "%LOG_FILE%"
-start "" "%APP_NAME%" >nul 2>&1
-ping 127.0.0.1 -n 5 >nul 2>&1
-tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
-if %ERRORLEVEL% EQU 0 (
-    echo [%date% %time%] 成功: 方法1启动成功 >> "%LOG_FILE%"
-    echo 应用程序启动成功！
-    goto launch_success
-)
-
-REM Method 2: Start command with full path
-echo [%date% %time%] 尝试方法2: 完整路径启动 >> "%LOG_FILE%"
-start "" "%APP_PATH%" >nul 2>&1
-ping 127.0.0.1 -n 5 >nul 2>&1
-tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
-if %ERRORLEVEL% EQU 0 (
-    echo [%date% %time%] 成功: 方法2启动成功 >> "%LOG_FILE%"
-    echo 应用程序启动成功！
-    goto launch_success
-)
-
-REM Method 3: CMD start as fallback
-echo [%date% %time%] 尝试方法3: CMD启动 >> "%LOG_FILE%"
-cmd /c start "" "%APP_PATH%" >nul 2>&1
-ping 127.0.0.1 -n 6 >nul 2>&1
-tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
-if %ERRORLEVEL% EQU 0 (
-    echo [%date% %time%] 成功: 方法3启动成功 >> "%LOG_FILE%"
-    echo 应用程序启动成功！
-    goto launch_success
-)
-
-REM All methods failed
-echo [%date% %time%] ERROR: All launch methods failed >> "%LOG_FILE%"
-echo [%date% %time%] Please check: >> "%LOG_FILE%"
-echo [%date% %time%] 1. Application permissions >> "%LOG_FILE%"
-echo [%date% %time%] 2. Antivirus software blocking >> "%LOG_FILE%"
-echo [%date% %time%] 3. Windows Defender SmartScreen >> "%LOG_FILE%"
-echo [%date% %time%] 4. User Account Control settings >> "%LOG_FILE%"
+:source_not_found
+echo [%date% %time%] ERROR: Extracted path not found: %EXTRACTED_PATH% >> "%LOG_FILE%"
+echo ERROR: Update files not found
 exit /b 1
 
-:launch_success
-echo [%date% %time%] 最终验证... >> "%LOG_FILE%"
-ping 127.0.0.1 -n 3 >nul 2>&1
-tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
-if %ERRORLEVEL% EQU 0 (
-    echo [%date% %time%] 确认: 应用程序正在运行 >> "%LOG_FILE%"
-    echo [%date% %time%] 更新过程成功完成 >> "%LOG_FILE%"
-    echo.
-    echo ========================================
-    echo       更新成功完成！
-    echo ========================================
-    echo 应用程序正在运行
-    echo 日志: %LOG_FILE%
-) else (
-    echo [%date% %time%] 警告: 应用程序可能立即关闭 >> "%LOG_FILE%"
-    echo.
-    echo ========================================
-    echo       更新完成
-    echo ========================================
-    echo 注意: 应用程序状态不确定
-    echo 日志: %LOG_FILE%
-)
+:app_dir_not_found
+echo [%date% %time%] ERROR: App directory not found: %APP_DIR% >> "%LOG_FILE%"
+echo ERROR: Application directory not found
+exit /b 1
 
+:copy_failed
+echo [%date% %time%] ERROR: Copy failed >> "%LOG_FILE%"
+echo ERROR: Failed to copy update files
+exit /b 1
+
+:finish
 echo.
-echo 此窗口将在3秒后自动关闭...
-timeout /t 3 /nobreak >nul 2>&1
+timeout /t 2 /nobreak >nul 2>&1
+exit /b 0
+''';
+  }
+
+  /// 安装程序脚本模板（运行 exe 安装程序到指定目录）
+  static String _getInstallerScriptTemplate() {
+    return '''@echo off
+setlocal enabledelayedexpansion
+
+title OMT Update
+
+set LOG_DIR=%TEMP%\\OMT_Update
+if not exist "%LOG_DIR%" mkdir "%LOG_DIR%" >nul 2>&1
+set LOG_FILE=%LOG_DIR%\\omt_update_log.txt
+
+echo [%date% %time%] OMT Update started > "%LOG_FILE%"
+echo OMT Update starting...
+
+set APP_NAME=__APPNAME__
+set INSTALLER_PATH=__INSTALLER_PATH__
+set APP_DIR=__APP_DIR__
+
+echo [%date% %time%] APP_NAME=%APP_NAME% >> "%LOG_FILE%"
+echo [%date% %time%] INSTALLER_PATH=%INSTALLER_PATH% >> "%LOG_FILE%"
+echo [%date% %time%] APP_DIR=%APP_DIR% >> "%LOG_FILE%"
+
+:: Show current directory
+echo [%date% %time%] Current directory: %CD% >> "%LOG_FILE%"
+
+:: Check if installer exists
+echo [%date% %time%] Checking if installer exists... >> "%LOG_FILE%"
+if not exist "%INSTALLER_PATH%" (
+    echo [%date% %time%] ERROR: Installer file not found! >> "%LOG_FILE%"
+    dir "%INSTALLER_PATH%" >> "%LOG_FILE%" 2>&1
+    goto installer_not_found
+)
+echo [%date% %time%] Installer file found >> "%LOG_FILE%"
+
+:: Wait for app to exit (give it 1 second to fully terminate after exit(0))
+echo Waiting for application to exit...
+echo [%date% %time%] Waiting for app to exit >> "%LOG_FILE%"
+timeout /t 1 /nobreak >nul 2>&1
+
+:: Quick check - if already exited, skip waiting
+tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
+if %ERRORLEVEL% NEQ 0 goto process_exited
+
+set WAIT_COUNT=0
+
+:wait_loop
+tasklist /FI "IMAGENAME eq %APP_NAME%" 2>nul | find /I "%APP_NAME%" >nul
+if %ERRORLEVEL% NEQ 0 goto process_exited
+
+set /a WAIT_COUNT=WAIT_COUNT+1
+echo [%date% %time%] Process still running, attempt %WAIT_COUNT% >> "%LOG_FILE%"
+if %WAIT_COUNT% GEQ 5 goto force_kill
+
+timeout /t 1 /nobreak >nul 2>&1
+goto wait_loop
+
+:force_kill
+echo [%date% %time%] Force killing process >> "%LOG_FILE%"
+taskkill /F /IM "%APP_NAME%" >nul 2>&1
+ping 127.0.0.1 -n 2 >nul 2>&1
+goto process_exited
+
+:process_exited
+echo [%date% %time%] Application exited >> "%LOG_FILE%"
+echo Application closed
+
+:: Wait a moment for file handles to release
+ping 127.0.0.1 -n 3 >nul 2>&1
+
+:: Run the installer (completely silent, install to APP_DIR)
+echo Running installer...
+echo [%date% %time%] Running installer (silent) to: %APP_DIR% >> "%LOG_FILE%"
+echo [%date% %time%] Installer command: "%INSTALLER_PATH%" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICATIONS /DIR="%APP_DIR%" >> "%LOG_FILE%"
+
+:: Unblock downloaded file (may be blocked by Windows security policy)
+powershell -Command "Unblock-File -Path '%INSTALLER_PATH%'" >nul 2>&1
+
+:: Run installer and wait for completion
+echo [%date% %time%] Starting installer... >> "%LOG_FILE%"
+"%INSTALLER_PATH%" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /CLOSEAPPLICATIONS /DIR="%APP_DIR%"
+set RUN_RESULT=%ERRORLEVEL%
+echo [%date% %time%] Installer finished, result: %RUN_RESULT% >> "%LOG_FILE%"
+
+:: Start application after install
+echo [%date% %time%] Starting application after install... >> "%LOG_FILE%"
+start "" "%APP_DIR%\\omt.exe"
+
+echo [%date% %time%] Update completed, result: %RUN_RESULT% >> "%LOG_FILE%"
+echo Update completed!
+goto finish
+
+:installer_not_found
+echo [%date% %time%] ERROR: Installer not found: %INSTALLER_PATH% >> "%LOG_FILE%"
+echo ERROR: Installer not found
+exit /b 1
+
+:install_failed
+echo [%date% %time%] ERROR: Install failed >> "%LOG_FILE%"
+echo ERROR: Installation failed
+exit /b 1
+
+:finish
+echo.
+timeout /t 2 /nobreak >nul 2>&1
 exit /b 0
 ''';
   }
