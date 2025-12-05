@@ -31,12 +31,15 @@ jobs:
       - name: Build Windows
         run: flutter build windows --release
 
-      # === 🔍 新增调试步骤：列出生成的 Exe 文件名 ===
+      # === 🔍 调试步骤 (修正版) ===
       - name: Check Exe Name
         shell: powershell
         run: |
-          echo "查看 Release 目录下的 .exe 文件："
-          Get-ChildItem build\windows\runner\Release\*.exe | Select-Object Name
+          # 改用英文，避免编码报错
+          Write-Host "Checking Release directory for .exe files:"
+          
+          # ⚠️ 注意：这里加上了 x64，因为 Flutter 3.10+ 默认输出到 x64 目录
+          Get-ChildItem build\windows\x64\runner\Release\*.exe | Select-Object Name
 
       # 5. 生成安装包 ...
 
