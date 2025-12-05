@@ -27,9 +27,18 @@ jobs:
       - name: Install Dependencies
         run: flutter pub get
 
-      # 4. 开始编译 (Release 模式)
+      # 4. 开始编译
       - name: Build Windows
         run: flutter build windows --release
+
+      # === 🔍 新增调试步骤：列出生成的 Exe 文件名 ===
+      - name: Check Exe Name
+        shell: powershell
+        run: |
+          echo "查看 Release 目录下的 .exe 文件："
+          Get-ChildItem build\windows\runner\Release\*.exe | Select-Object Name
+
+      # 5. 生成安装包 ...
 
       # 5. 生成安装包 (Inno Setup)
       - name: Build Installer
