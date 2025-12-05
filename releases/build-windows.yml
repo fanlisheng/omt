@@ -37,9 +37,21 @@ jobs:
         run: |
           choco install innosetup --no-progress
           
-          # [必须] 下载中文语言包到 installers 目录
-          $LangUrl = "https://raw.githubusercontent.com/jrsoftware/issrc/main/Files/Languages/ChineseSimplified.isl"
+          # [修正] 使用正确的 Unofficial 目录链接下载中文语言包
+          $LangUrl = "https://raw.githubusercontent.com/jrsoftware/issrc/main/Files/Languages/Unofficial/ChineseSimplified.isl"
+          
+          echo "正在下载语言包..."
           Invoke-WebRequest -Uri $LangUrl -OutFile "installers\ChineseSimplified.isl"
+          
+          # 检查文件是否真的下载成功 (调试用)
+          if (Test-Path "installers\ChineseSimplified.isl") {
+              echo "✅ 语言包下载成功"
+          } else {
+              echo "❌ 语言包下载失败"
+              exit 1
+          }
+          
+          echo "开始编译..."
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "installers\setup.iss"
 
       # 6. 上传产物
