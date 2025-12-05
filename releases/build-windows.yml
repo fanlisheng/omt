@@ -2,8 +2,8 @@ name: Build Windows App
 
 on:
   push:
-    branches: [ "master" ] # 对应你 Jenkins 推送的分支
-  workflow_dispatch:      # 允许手动触发
+    branches: [ "master" ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -15,11 +15,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. 配置 Flutter 环境 (已锁定 3.7.12)
+      # 2. 配置 Flutter 环境 (锁定 3.7.12)
       - name: Setup Flutter SDK
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.7.12' # === 关键修改：强制使用 3.7.12 ===
+          flutter-version: '3.7.12'
           channel: 'stable'
           cache: true
 
@@ -31,19 +31,18 @@ jobs:
       - name: Build Windows
         run: flutter build windows --release
 
-      # 5. 生成安装包 (Inno Setup)
-      # ⚠️ 确保你项目根目录下有 installers/setup.iss 文件
-      - name: Create Installer
-        uses: Minionguyj/innosetup-script-action@v1.0.0
-        with:
-          path: installers/setup.iss
+      # 5. 生成安装包 (修正版)
+      # 使用 Chocolatey 安装 Inno Setup，稳定可靠
+      - name: Build Installer
+        shell: powershell
+        run: |
+          choco install innosetup --no-progress
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installers/setup.iss
 
       # 6. 上传产物
-      # 对应 Jenkins 脚本里的 ARTIFACT_NAME="windows-app"
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: windows-app
-          # 上传 Inno Setup 生成的 setup.exe
           path: build/windows/installer/*.exe
           retention-days: 3
