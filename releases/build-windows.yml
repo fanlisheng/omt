@@ -47,21 +47,17 @@ jobs:
         run: |
           choco install innosetup --no-progress
           
-          # [修正] 使用正确的 Unofficial 目录链接下载中文语言包
+          # 1. 下载中文语言包
           $LangUrl = "https://raw.githubusercontent.com/jrsoftware/issrc/main/Files/Languages/Unofficial/ChineseSimplified.isl"
-          
-          echo "正在下载语言包..."
           Invoke-WebRequest -Uri $LangUrl -OutFile "installers\ChineseSimplified.isl"
           
-          # 检查文件是否真的下载成功 (调试用)
-          if (Test-Path "installers\ChineseSimplified.isl") {
-              echo "✅ 语言包下载成功"
-          } else {
-              echo "❌ 语言包下载失败"
-              exit 1
-          }
+          # 2. [新增] 下载微软 VC++ 运行时安装包
+          # 下载到 installers 目录，方便 setup.iss 引用
+          echo "正在下载 VC++ 运行库..."
+          $VcUrl = "https://aka.ms/vs/17/release/vc_redist.x64.exe"
+          Invoke-WebRequest -Uri $VcUrl -OutFile "installers\VC_redist.x64.exe"
           
-          echo "开始编译..."
+          # 3. 编译脚本
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "installers\setup.iss"
 
       # 6. 上传产物
