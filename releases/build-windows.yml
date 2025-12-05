@@ -41,8 +41,6 @@ jobs:
           # ⚠️ 注意：这里加上了 x64，因为 Flutter 3.10+ 默认输出到 x64 目录
           Get-ChildItem build\windows\x64\runner\Release\*.exe | Select-Object Name
 
-      # 5. 生成安装包 ...
-
       # 5. 生成安装包 (Inno Setup)
       - name: Build Installer
         shell: powershell
