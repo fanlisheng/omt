@@ -1,0 +1,10 @@
+{
+  "appName": "客户端",
+  "url": "",
+  "iosDelayUpdateHour": 2400.0,
+  "version": "",
+  "apkSize": "",
+  "buildTime": "",
+  "buildTimeStr": "",
+  "description": "修复点云图数据太多，导致内存溢出的问题"
+}
