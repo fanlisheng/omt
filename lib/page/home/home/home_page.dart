@@ -1,4 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart' as fu;
+import 'package:window_manager/window_manager.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:kayo_package/kayo_package.dart';
@@ -27,34 +28,38 @@ class HomePage extends StatelessWidget {
         builder: (context, model, child) {
           return fu.NavigationView(
             appBar: fu.NavigationAppBar(
-                title: fu.Row(
-                  children: [
-                    ImageView(
-                        src: source("ic_logo"),
-                        width: 22,
-                        height: 22,
-                        margin: const fu.EdgeInsets.only(right: 10)),
-                    Text(
-                      "福立盟运维配置客户端",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: "#E9F4F5".toColor(),
-                      ),
-                    ),
-                    // 版本号显示
-                    if (model.currentVersion.isNotEmpty) ...<Widget>[
-                      const SizedBox(width: 8),
+                title: GestureDetector(
+                  onPanStart: (details) {
+                    windowManager.startDragging();
+                  },
+                  child: fu.Row(
+                    children: [
+                      ImageView(
+                          src: source("ic_logo"),
+                          width: 22,
+                          height: 22,
+                          margin: const fu.EdgeInsets.only(right: 10)),
                       Text(
-                        "v${model.currentVersion}",
+                        "福立盟运维配置客户端",
                         style: TextStyle(
-                          fontSize: 12,
-                          color: "#B8E6EA".toColor(),
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: "#E9F4F5".toColor(),
                         ),
                       ),
-                    ],
-                    // 新版本提示标识
-                    if (model.hasNewVersion) ...<Widget>[
+                      // 版本号显示
+                      if (model.currentVersion.isNotEmpty) ...<Widget>[
+                        const SizedBox(width: 8),
+                        Text(
+                          "v${model.currentVersion}",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: "#B8E6EA".toColor(),
+                          ),
+                        ),
+                      ],
+                      // 新版本提示标识
+                      if (model.hasNewVersion) ...<Widget>[
                         const SizedBox(width: 8),
                         GestureDetector(
                           onTap: () => model.onNewVersionTap(),
@@ -83,7 +88,8 @@ class HomePage extends StatelessWidget {
                           ),
                         ),
                       ],
-                  ],
+                    ],
+                  ),
                 ),
                 automaticallyImplyLeading: false,
                 actions: SysUtils.appBarAction(context),
@@ -147,7 +153,7 @@ class HomePage extends StatelessWidget {
                     ],
             ),
             transitionBuilder: null,
-            );
+          );
         });
   }
 }
