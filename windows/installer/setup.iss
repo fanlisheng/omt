@@ -4,8 +4,9 @@
 
 #define MyAppName "OMT"
 #define MyAppVersion "1.4.2"
-#define MyAppPublisher "OMT Team"
+#define MyAppPublisher "成都福立盟环保大数据有限公司"
 #define MyAppExeName "omt.exe"
+#define MyAppURL "https://github.com/KayoXu/omt"
 
 [Setup]
 ; 应用程序信息
@@ -14,6 +15,8 @@ AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
+AppPublisherURL={#MyAppURL}
+AppSupportURL={#MyAppURL}
 
 ; 安装目录（在安装程序同级目录创建 omt 文件夹）
 DefaultDirName={src}\omt
@@ -55,11 +58,14 @@ AlwaysShowDirOnReadyPage=no
 AlwaysShowGroupOnReadyPage=no
 
 [Languages]
-Name: "english"; MessagesFile: "compiler:Default.isl"
+; 使用中文语言包
+Name: "chinesesimplified"; MessagesFile: "ChineseSimplified.isl"
 
 [Files]
 ; 复制所有构建产物
-Source: "..\..\build\windows\x64\runner\Release\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\build\windows\x64\runner\Release\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "vc_redist.x64.exe"
+; VC++ 运行时安装包（放到临时目录）
+Source: "..\..\build\windows\x64\runner\Release\vc_redist.x64.exe"; DestDir: "{tmp}"; Flags: ignoreversion deleteafterinstall
 
 [Icons]
 ; 开始菜单
@@ -69,6 +75,8 @@ Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 
 [Run]
+; 静默安装 VC++ 运行时（在主程序启动前执行）
+Filename: "{tmp}\vc_redist.x64.exe"; Parameters: "/install /quiet /norestart"; StatusMsg: "正在安装 Microsoft Visual C++ 运行时..."; Flags: waituntilterminated runhidden
 ; 安装完成后自动启动应用（静默模式也会执行）
 Filename: "{app}\{#MyAppExeName}"; Flags: nowait postinstall skipifsilent runasoriginaluser
 

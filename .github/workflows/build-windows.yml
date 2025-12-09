@@ -60,6 +60,39 @@ jobs:
       - name: Build Windows app
         run: flutter build windows --release
 
+      # 下载 Microsoft Visual C++ Redistributable 和中文语言包
+      - name: Download VC++ Redistributable and Chinese Language Pack
+        run: |
+          # 下载 VC++ Redistributable
+          $vcRedistUrl = "https://aka.ms/vs/17/release/vc_redist.x64.exe"
+          $vcOutputPath = "build/windows/x64/runner/Release/vc_redist.x64.exe"
+          
+          echo "Downloading VC++ Redistributable from: $vcRedistUrl"
+          Invoke-WebRequest -Uri $vcRedistUrl -OutFile $vcOutputPath -UseBasicParsing
+          
+          if (Test-Path $vcOutputPath) {
+            $fileInfo = Get-Item $vcOutputPath
+            echo "Downloaded VC++ Redistributable successfully: $($fileInfo.Length) bytes"
+          } else {
+            echo "Error: Failed to download VC++ Redistributable"
+            exit 1
+          }
+          
+          # 下载 Inno Setup 中文语言包
+          $langUrl = "https://raw.githubusercontent.com/jrsoftware/issrc/main/Files/Languages/Unofficial/ChineseSimplified.isl"
+          $langOutputPath = "windows/installer/ChineseSimplified.isl"
+          
+          echo "Downloading Chinese language pack from: $langUrl"
+          Invoke-WebRequest -Uri $langUrl -OutFile $langOutputPath -UseBasicParsing
+          
+          if (Test-Path $langOutputPath) {
+            echo "Downloaded Chinese language pack successfully"
+          } else {
+            echo "Error: Failed to download Chinese language pack"
+            exit 1
+          }
+        shell: pwsh
+
       - name: Replace system_theme_plugin.dll
         run: |
             if exist "windows_deps\system_theme_plugin.dll" (
@@ -90,6 +123,16 @@ jobs:
           $content = $content -replace '#define MyAppVersion ".*"', '#define MyAppVersion "${{ steps.get_version.outputs.VERSION }}"'
           Set-Content "windows/installer/setup.iss" -Value $content
           echo "Updated Inno Setup version to: ${{ steps.get_version.outputs.VERSION }}"
+        shell: pwsh
+
+      # 修正 setup.iss 编码为 UTF-8 BOM（解决中文乱码）
+      - name: Fix setup.iss encoding to UTF-8 BOM
+        run: |
+          $IssPath = "windows/installer/setup.iss"
+          echo "Converting setup.iss to UTF-8 with BOM..."
+          $Content = Get-Content -Path $IssPath -Encoding UTF8
+          Set-Content -Path $IssPath -Value $Content -Encoding UTF8
+          echo "Encoding fixed successfully"
         shell: pwsh
 
       # 创建安装程序输出目录
