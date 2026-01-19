@@ -183,33 +183,78 @@ jobs:
           $boundary = [System.Guid]::NewGuid().ToString()
           $filePath = (Resolve-Path $file).Path
           
-          # 使用 curl 上传文件
+          echo "Uploading file: $filePath"
+          echo "File name: $fileName"
+          
+          # 使用 curl 上传文件，添加文件名和类型信息
           $response = curl.exe -s -X POST "${{ env.MINIO_UPLOAD_URL }}" `
-            -F "file=@$filePath"
+            -F "file=@$filePath;filename=$fileName;type=application/octet-stream"
           
           echo "Upload response: $response"
           
-          # 解析返回的数据（直接从根获取 path, id, size）
-          $json = $response | ConvertFrom-Json
-          $path = $json.path
-          $id = $json.id
-          $size = $json.size
-          
-          echo "Parsed - path: $path, id: $id, size: $size"
-          
-          $baseUrl = "${{ env.MINIO_UPLOAD_URL }}"
-          if ($path) {
-            if ($baseUrl.EndsWith('/')) {
-              $downloadUrl = "$baseUrl$path"
-            } else {
-              $downloadUrl = "$baseUrl/$id/$path"
-            }
-            echo "DOWNLOAD_URL=$downloadUrl" >> $env:GITHUB_OUTPUT
-            echo "Download URL: $downloadUrl"
-          } else {
-            echo "Warning: Could not get path from response"
-            echo "Full response for debugging: $response"
+          # 检查响应是否为空或是错误信息
+          if ([string]::IsNullOrWhiteSpace($response)) {
+            echo "Error: Empty response from server"
             echo "DOWNLOAD_URL=" >> $env:GITHUB_OUTPUT
+            exit 1
+          }
+          
+          # 尝试解析 JSON 响应
+          try {
+            $json = $response | ConvertFrom-Json
+            
+            # 处理新的嵌套响应格式: {statusCode: 200, data: {code: 200, data: {...}}}
+            if ($json.statusCode -ne $null) {
+              echo "Detected new response format with statusCode: $($json.statusCode)"
+              
+              if ($json.statusCode -ne 200) {
+                echo "Error: Server returned status code $($json.statusCode)"
+                echo "Response: $response"
+                echo "DOWNLOAD_URL=" >> $env:GITHUB_OUTPUT
+                exit 1
+              }
+              
+              # 从嵌套的 data 中获取实际数据
+              if ($json.data -ne $null -and $json.data.data -ne $null) {
+                $actualData = $json.data.data
+                $path = $actualData.path
+                $id = $actualData.id
+                $size = $actualData.size
+              } elseif ($json.data -ne $null) {
+                # 尝试直接从 data 获取
+                $path = $json.data.path
+                $id = $json.data.id
+                $size = $json.data.size
+              }
+            } else {
+              # 旧的响应格式：直接从根获取 path, id, size
+              $path = $json.path
+              $id = $json.id
+              $size = $json.size
+            }
+            
+            echo "Parsed - path: $path, id: $id, size: $size"
+            
+            $baseUrl = "${{ env.MINIO_DOWNLOAD_BASE_URL }}"
+            if ($path) {
+              if ($id) {
+                $downloadUrl = "$baseUrl/$id/$path"
+              } else {
+                $downloadUrl = "$baseUrl/$path"
+              }
+              echo "DOWNLOAD_URL=$downloadUrl" >> $env:GITHUB_OUTPUT
+              echo "Download URL: $downloadUrl"
+            } else {
+              echo "Warning: Could not get path from response"
+              echo "Full response for debugging: $response"
+              echo "DOWNLOAD_URL=" >> $env:GITHUB_OUTPUT
+            }
+          } catch {
+            echo "Error: Failed to parse JSON response"
+            echo "Response text: $response"
+            echo "Error details: $_"
+            echo "DOWNLOAD_URL=" >> $env:GITHUB_OUTPUT
+            exit 1
           }
         shell: pwsh
 
