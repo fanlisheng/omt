@@ -169,32 +169,57 @@ jobs:
           echo "File MD5: $md5"
         shell: pwsh
 
+      # 压缩安装程序为 zip 格式（解决服务器不接受 exe 扩展名的问题）
+      - name: Compress installer to zip
+        id: compress
+        if: github.ref == 'refs/heads/release' || github.event.inputs.publish == 'true'
+        run: |
+          $exeFile = "build/installer/omt-install.exe"
+          $zipFile = "build/installer/omt-install.zip"
+          
+          echo "Compressing $exeFile to $zipFile..."
+          Compress-Archive -Path $exeFile -DestinationPath $zipFile -Force
+          
+          if (Test-Path $zipFile) {
+            $zipInfo = Get-Item $zipFile
+            echo "ZIP_FILE=$zipFile" >> $env:GITHUB_OUTPUT
+            echo "ZIP_SIZE=$($zipInfo.Length)" >> $env:GITHUB_OUTPUT
+            echo "Compression successful: $($zipInfo.Length) bytes"
+          } else {
+            echo "Error: Failed to create zip file"
+            exit 1
+          }
+        shell: pwsh
+
       # 上传文件到 Minio（仅在 release 分支或手动发布时执行）
       - name: Upload to Minio
         id: upload_minio
         if: github.ref == 'refs/heads/release' || github.event.inputs.publish == 'true'
         run: |
-          $file = "build/installer/omt-install.exe"
-          $fileName = "omt-install.exe"
-          $fileSize = "${{ steps.file_info.outputs.FILE_SIZE }}"
-          $fileMd5 = "${{ steps.file_info.outputs.FILE_MD5 }}"
+          $file = "build/installer/omt-install.zip"
+          $fileName = "omt-install.zip"
           
-          # 构建 multipart form data 请求
-          $boundary = [System.Guid]::NewGuid().ToString()
           $filePath = (Resolve-Path $file).Path
           
           echo "Uploading file: $filePath"
           echo "File name: $fileName"
           
-          # 使用 curl 上传文件，添加文件名和类型信息
+          # 使用 curl 上传 zip 文件
           $response = curl.exe -s -X POST "${{ env.MINIO_UPLOAD_URL }}" `
-            -F "file=@$filePath;filename=$fileName;type=application/octet-stream"
+            -F "file=@$filePath"
           
           echo "Upload response: $response"
           
           # 检查响应是否为空或是错误信息
           if ([string]::IsNullOrWhiteSpace($response)) {
             echo "Error: Empty response from server"
+            echo "DOWNLOAD_URL=" >> $env:GITHUB_OUTPUT
+            exit 1
+          }
+          
+          # 检查是否是非 JSON 错误响应
+          if ($response -notmatch '^\s*\{') {
+            echo "Error: Server returned non-JSON response: $response"
             echo "DOWNLOAD_URL=" >> $env:GITHUB_OUTPUT
             exit 1
           }
