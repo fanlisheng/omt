@@ -19,9 +19,9 @@ on:
 
 env:
   APP_VERSION: ${{ github.event.inputs.version || '1.0.0' }}
-  MINIO_UPLOAD_URL: http://106.75.154.221:8321/minio/file
-  MINIO_DOWNLOAD_BASE_URL: http://106.75.154.221:8082
-  VERSION_API_URL: http://106.75.154.221:8082/api/client_version/create
+  MINIO_UPLOAD_URL: http://223.85.203.92:18011/minio/file
+  MINIO_DOWNLOAD_BASE_URL: http://223.85.203.92:8082
+  VERSION_API_URL: http://223.85.203.92:8082/api/client_version/create
 
 permissions:
   contents: write

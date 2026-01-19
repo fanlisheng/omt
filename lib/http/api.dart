@@ -41,7 +41,7 @@ class API extends BaseAPI {
     _hostSocket = null;
 
     await SharedUtils.setHost(isEnv == false
-        ? 'http://183.224.113.211:8003/'
+        ? 'http://223.85.203.92:8082/'
         // ? 'http://192.168.101.184:8001/'
         // : 'http://221.237.108.38:8043/'
         // : 'http://192.168.101.131:8080/'
@@ -54,7 +54,7 @@ class API extends BaseAPI {
         : 'http://192.168.101.184:8004/');
 
     await SharedUtils.setHostFile(isEnv == false
-        ? 'http://183.224.113.211:8098/minio/'
+        ? 'http://223.85.203.92:18011/minio/'
         : 'http://183.224.113.211:8098/minio/');
 
     await SharedUtils.setHostSocket(isEnv == false
