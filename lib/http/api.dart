@@ -31,7 +31,7 @@ class API extends BaseAPI {
   }
 
   @override
-  bool get isEnv => true;
+  bool get isEnv => false;
 
   @override
   init() async {
