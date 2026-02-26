@@ -2,7 +2,8 @@ name: Build Flutter Windows App
 
 on:
   push:
-    branches: [ master, release ]
+#    master,
+    branches: [ release ]
   pull_request:
     branches: [ master ]
   workflow_dispatch:  # 允许手动触发
