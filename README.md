@@ -8,7 +8,7 @@ flutter_rust_bridge_codegen integrate
 flutter_rust_bridge_codegen generate
 
 
-git push origin master && git push gitee master
+git push github master && git push gitee master
 
 
 # omt
