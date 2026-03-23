@@ -174,8 +174,17 @@ class UserLoginViewModel extends BaseViewModelRefresh<UserInfoData> {
           if (userInfoData == null) return;
           userInfoData.token = data2["token"];
           await SharedUtils.setUserInfo(userInfoData);
-          await AuthUtils.share.init(userLoginData: userInfoData);
-          IntentUtils.share.goHome(context);
+          
+          HttpQuery.share.userLoginService.validateMac(
+            mac: _macAddress,
+            onSuccess: (valData) async {
+              await AuthUtils.share.init(userLoginData: userInfoData);
+              IntentUtils.share.goHome(context);
+            },
+            onError: (err) async {
+              await SharedUtils.clear();
+            }
+          );
         });
   }
 

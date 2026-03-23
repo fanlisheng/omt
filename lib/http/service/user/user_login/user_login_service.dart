@@ -16,13 +16,15 @@ import '../../../http_manager.dart';
 ///
 
 class UserLoginService {
-  get _login async => '${API.share.host}api/moat/phone/login';
+  get _login async => '${API.share.login}moat/phone/login';
+  // api/
+  get _getPositions async => '${API.share.login}api/moat/user/positions';
 
-  get _getPositions async => '${API.share.host}api/moat/user/positions';
-
-  get _confirm async => '${API.share.host}api/moat/position/confirm';
+  get _confirm async => '${API.share.login}moat/position/confirm';
 
   // get _detail async => '${API.share.host}xxx/xxx';
+
+    get _validateMac async => '${API.share.host}api/moat/user/validate_mac';
 
   login({
     required String phone,
@@ -42,7 +44,8 @@ class UserLoginService {
         // "password": "585b8aeb3e295e4c15becdc9088f9d63",
         // "phone": "15196612685",
         // "password": "585b8aeb3e295e4c15becdc9088f9d63",
-        "platform_id": platformId ?? 1,
+        "platform_id": platformId ?? 5,
+        "org_dept_id": 6,
         "mac": mac
       },
       method: 'POST',
@@ -81,6 +84,27 @@ class UserLoginService {
       await _confirm,
       {
         "position_id": positionId,
+      },
+      method: 'POST',
+      autoHideDialog: true,
+      autoShowDialog: true,
+      onSuccess: onSuccess,
+      onCache: onCache,
+      onError: onError,
+    );
+  }
+
+
+  validateMac({
+    required String mac,
+    ValueChanged<Map?>? onSuccess,
+    ValueChanged<Map?>? onCache,
+    ValueChanged<String>? onError,
+  }) async {
+    HttpManager.share.doHttpPost<Map>(
+      await _validateMac,
+      {
+        "mac": mac,
       },
       method: 'POST',
       autoHideDialog: true,

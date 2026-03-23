@@ -16,6 +16,7 @@ class API extends BaseAPI {
 
   static API? _instance;
 
+  final String _login = 'http://106.75.138.97:8349/';
   String? _host;
   String? _hostWeb;
 
@@ -118,6 +119,9 @@ class API extends BaseAPI {
   Future<String> buildControlWebcamUrl(String endpoint) async {
     return '${await hostVideoConfiguration}${getWebcamApiPath(endpoint)}';
   }
+
+  @override
+  String get login => _login;
 
   @override
   String get host => _host ?? '';
