@@ -25,6 +25,8 @@ class SharedUtils {
   static const String _shared_control_ip = '_shared_control_ip';
   static const String _shared_user_info_data = '_shared_user_info_data';
   static const String _shared_the_auth = '_shared_the_auth';
+  static const String _shared_area_code = '_shared_area_code';
+  static const String _shared_area_name = '_shared_area_name';
 
   static String networkMac = '';
 
@@ -111,6 +113,22 @@ class SharedUtils {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var string = prefs.getStringList(key) ?? [];
     return string;
+  }
+
+  static Future<String> getAreaCode() async {
+    return await getString(_shared_area_code) ?? '';
+  }
+
+  static setAreaCode(String data) {
+    return set(_shared_area_code, data);
+  }
+
+  static Future<String> getAreaName() async {
+    return await getString(_shared_area_name) ?? '';
+  }
+
+  static setAreaName(String data) {
+    return set(_shared_area_name, data);
   }
 
   //搜索历史数据

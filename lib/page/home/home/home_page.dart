@@ -93,7 +93,14 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
                 automaticallyImplyLeading: false,
-                actions: SysUtils.appBarAction(context),
+                actions: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (model.selectedAreaName != null) _buildAreaSelectionButton(model, context),
+                    const SizedBox(width: 16),
+                    SysUtils.appBarAction(context),
+                  ],
+                ),
                 leading: null,
                 decoration: const BoxDecoration(
                   image: DecorationImage(
@@ -157,4 +164,161 @@ class HomePage extends StatelessWidget {
           );
         });
   }
+
+  Widget _buildAreaSelectionButton(HomeViewModel model, BuildContext context) {
+    return _AreaDropdownButton(model: model);
+  }
 }
+
+class _AreaDropdownButton extends StatefulWidget {
+  final HomeViewModel model;
+
+  const _AreaDropdownButton({required this.model});
+
+  @override
+  __AreaDropdownButtonState createState() => __AreaDropdownButtonState();
+}
+
+class __AreaDropdownButtonState extends State<_AreaDropdownButton> {
+  final _flyoutController = fu.FlyoutController();
+  bool _isOpen = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _flyoutController.addListener(_onFlyoutChanged);
+  }
+
+  void _onFlyoutChanged() {
+    if (mounted) {
+      setState(() {
+        _isOpen = _flyoutController.isOpen;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _flyoutController.removeListener(_onFlyoutChanged);
+    _flyoutController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return fu.FlyoutTarget(
+      controller: _flyoutController,
+      child: GestureDetector(
+        onTap: () {
+          if (widget.model.areaList.isEmpty) return;
+          _flyoutController.showFlyout(
+            autoModeConfiguration:  fu.FlyoutAutoConfiguration(
+              preferredMode: fu.FlyoutPlacementMode.bottomCenter,
+            ),
+            builder: (context) {
+              return fu.FlyoutContent(
+                padding: EdgeInsets.zero,
+                color: const Color(0xFF384F4E),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: SizedBox(
+                  width: 122,
+                  height: widget.model.areaList.length * 36.0 > 400 ? 400 : widget.model.areaList.length * 36.0 + 8,
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    itemCount: widget.model.areaList.length,
+                    itemBuilder: (context, index) {
+                      var area = widget.model.areaList[index];
+                      bool isSelected = area.fullName == widget.model.selectedAreaName;
+                      return GestureDetector(
+                        onTap: () {
+                          widget.model.onAreaChanged(area);
+                          Navigator.of(context).pop();
+                        },
+                        child: Container(
+                          height: 36,
+                          alignment: Alignment.centerLeft,
+                          padding: const EdgeInsets.only(left: 16),
+                          color: isSelected ? const Color(0xFF3E8480) : fu.Colors.transparent,
+                          child: Text(
+                            area.fullName ?? '',
+                            style: TextStyle(
+                              color: isSelected ? fu.Colors.white : const Color(0xFF90A4A3),
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              );
+            },
+          );
+        },
+        child: Container(
+          width: 122,
+          height: 30,
+          decoration: BoxDecoration(
+            color: const Color.fromRGBO(255, 255, 255, 0.15),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      'assets/home/ic_location.png',
+                      width: 12,
+                      height: 14,
+                      color: const Color(0xFFFFFFFF),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      widget.model.selectedAreaName ?? '',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontFamily: 'PingFang SC',
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFFFFFFFF),
+                        height: 18 / 14,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                width: 30,
+                height: 30,
+                decoration: const BoxDecoration(
+                  color: Color.fromRGBO(255, 255, 255, 0.15),
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(4),
+                    bottomRight: Radius.circular(4),
+                  ),
+                ),
+                child: Center(
+                  child: Transform.rotate(
+                    angle: _isOpen ? 3.141592653589793 : 0,
+                    child: Image.asset(
+                      'assets/home/ic_down_outlined.png',
+                      width: 14,
+                      height: 14,
+                      color: const Color(0xFFFFFFFF),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+

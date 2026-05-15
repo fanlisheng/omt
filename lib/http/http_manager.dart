@@ -5,6 +5,9 @@ import 'package:omt/utils/json_utils.dart';
 import 'package:omt/utils/log_utils.dart';
 import 'package:omt/utils/shared_utils.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:dio/dio.dart';
+import 'package:kayo_package/http/bean/base_result_data.dart';
+import 'package:flutter/foundation.dart';
 
 ///
 ///  tfblue_app
@@ -64,6 +67,12 @@ class HttpManager extends BaseHttpManager {
         'Authorization': 'Bearer ${userLoginInfo?.token ?? ''}',
       });
     }
+    
+    // String areaCode = await SharedUtils.getAreaCode();
+    // if (!BaseSysUtils.empty(areaCode)) {
+    //   map['area_code'] = areaCode;
+    // }
+
     map.addAll({
       'Type': 'mobile',
       'Platform': 'zt',
@@ -135,6 +144,70 @@ class HttpManager extends BaseHttpManager {
   @override
   String textRequestError() {
     return '请求失败';
+  }
+
+  @override
+  netFetch(String? url, dynamic params, Map<String, dynamic>? header,
+      Options? option, String? contentType,
+      {bool autoShowDialog = true,
+      bool autoHideDialog = true,
+      String? method,
+      ValueChanged<BaseResultData>? onSuccess,
+      ValueChanged<String>? onError,
+      CancelToken? cancelToken,
+      ProgressCallback? onSendProgress,
+      ProgressCallback? onReceiveProgress}) async {
+    if (url != null) {
+      final List<String> areaCodeEndpoints = [
+        "/api/device/tree",
+        "/api/device/devices",
+        "/api/device/list",
+        "/api/device/devices_group_remove_status",
+        "/api/device/scan",
+        "/api/device/bind_gate",
+        "/api/device/ai_device/detail",
+        "/api/device/camera/snap_list",
+        "/api/device/nvr/detail",
+        "/api/device/power_box/detail",
+        "/api/device/camera/camera_type_map",
+        "/api/device/camera/control_status_map",
+        "/api/device/aidevice_camera/install",
+        "/api/device/install/step1",
+        "/api/device/install/step2",
+        "/api/device/tree/preview",
+        "/api/approval/remove/create",
+        "/api/entity/instance/list"
+      ];
+      bool shouldAddAreaCode = false;
+      for (var endpoint in areaCodeEndpoints) {
+        if (url.contains(endpoint)) {
+          shouldAddAreaCode = true;
+          break;
+        }
+      }
+
+      if (shouldAddAreaCode) {
+        String areaCode = await SharedUtils.getAreaCode();
+        if (!BaseSysUtils.empty(areaCode)) {
+          if (params is Map) {
+            params = Map<String, dynamic>.from(params);
+            params['area_code'] = areaCode;
+          } else if (params == null) {
+            params = {'area_code': areaCode};
+          }
+        }
+      }
+    }
+
+    return super.netFetch(url, params, header, option, contentType,
+        autoShowDialog: autoShowDialog,
+        autoHideDialog: autoHideDialog,
+        method: method,
+        onSuccess: onSuccess,
+        onError: onError,
+        cancelToken: cancelToken,
+        onSendProgress: onSendProgress,
+        onReceiveProgress: onReceiveProgress);
   }
 
   getIphoneModel(String platform) {

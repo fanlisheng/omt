@@ -24,6 +24,8 @@ import 'package:omt/widget/update/update_manager.dart';
 import 'package:omt/http/service/update/update_service.dart';
 import 'package:omt/utils/context_utils.dart';
 import 'package:omt/http/service/home/home_page/home_page_service.dart';
+import 'package:omt/bean/area/area_entity.dart';
+import 'package:omt/http/http_query.dart';
 
 import '../../../http/service/install/install_cache_service.dart';
 import '../../../test/select_detail_page.dart';
@@ -63,6 +65,9 @@ class NavigationBodyItem extends StatelessWidget {
 class HomeViewModel extends BaseViewModelRefresh<dynamic> {
   int topIndex = 0;
   PaneDisplayMode displayMode = PaneDisplayMode.open;
+
+  String? selectedAreaName;
+  List<AreaData> areaList = [];
   
   // 版本信息相关
   String currentVersion = '';
@@ -326,6 +331,9 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
   void initState() async {
     super.initState();
 
+    selectedAreaName = await SharedUtils.getAreaName();
+    _loadAreas();
+
     // 加载版本信息和检查更新状态
     await _loadVersionInfo();
     // await _checkUpdateStatus();
@@ -363,6 +371,25 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
   @override
   loadData({onSuccess, onCache, onError}) {
     ///网络请求
+  }
+
+  void _loadAreas() {
+    HttpQuery.share.areaService.getAreas(onSuccess: (data) {
+      if (data != null && data.isNotEmpty) {
+        areaList = data;
+        notifyListeners();
+      }
+    });
+  }
+
+  void onAreaChanged(AreaData area) async {
+    if (area.fullName != null && area.areaCode != null) {
+      selectedAreaName = area.fullName;
+      await SharedUtils.setAreaCode(area.areaCode!);
+      await SharedUtils.setAreaName(area.fullName!);
+      notifyListeners();
+      // Reload pages if needed or wait for next request
+    }
   }
 
   void setDisplayMode(PaneDisplayMode mode) {

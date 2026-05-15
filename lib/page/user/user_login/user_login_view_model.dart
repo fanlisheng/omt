@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 // import 'package:get_mac_address/get_mac_address.dart';
 import 'package:kayo_package/kayo_package.dart';
 import 'package:omt/bean/user/user_login/user_login_data.dart';
+import 'package:omt/bean/area/area_entity.dart';
 import 'package:omt/http/http_manager.dart';
 import 'package:omt/page/user/user_login/user_position_selection_page.dart';
 import 'package:omt/utils/auth_utils.dart';
@@ -54,6 +55,9 @@ class UserLoginViewModel extends BaseViewModelRefresh<UserInfoData> {
   String selectedProject = "成都项目";
   List<String> projectList = ["成都项目"];
 
+  String? selectedArea;
+  List<AreaData> areaList = [];
+
   // final _getMacAddressPlugin = GetMacAddress();
   String _macAddress = '';
 
@@ -61,6 +65,7 @@ class UserLoginViewModel extends BaseViewModelRefresh<UserInfoData> {
   void initState() async {
     super.initState();
     initPlatformState();
+    loadAreas();
 
     phoneController = TextEditingController();
     pwdController = TextEditingController();
@@ -87,6 +92,41 @@ class UserLoginViewModel extends BaseViewModelRefresh<UserInfoData> {
   @override
   loadData({onSuccess, onCache, onError}) {
     ///网络请求
+  }
+
+  bool isAreaLoading = false;
+
+  void loadAreas() {
+    isAreaLoading = true;
+    notifyListeners();
+    HttpQuery.share.areaService.getAreas(
+      onSuccess: (data) {
+        isAreaLoading = false;
+        if (data != null && data.isNotEmpty) {
+          areaList = data;
+          selectedArea = areaList.first.fullName;
+          SharedUtils.setAreaCode(areaList.first.areaCode ?? '');
+          SharedUtils.setAreaName(areaList.first.fullName ?? '');
+        }
+        notifyListeners();
+      },
+      onError: (err) {
+        isAreaLoading = false;
+        notifyListeners();
+      }
+    );
+  }
+
+  void onAreaChanged(String? value) {
+    if (value != null) {
+      selectedArea = value;
+      var area = areaList.firstWhere((e) => e.fullName == value, orElse: () => AreaData());
+      if (area.areaCode != null) {
+        SharedUtils.setAreaCode(area.areaCode!);
+        SharedUtils.setAreaName(area.fullName!);
+      }
+      notifyListeners();
+    }
   }
 
   void onEditValueChange(String value) {
@@ -123,6 +163,12 @@ class UserLoginViewModel extends BaseViewModelRefresh<UserInfoData> {
       LoadingUtils.showInfo(data: '请输入密码');
       return;
     }
+
+    if (BaseSysUtils.empty(selectedArea)) {
+      LoadingUtils.showInfo(data: '请选择区域');
+      return;
+    }
+
     UserInfoData userInfoData = UserInfoData();
     HttpQuery.share.userLoginService.login(
         phone: phone,

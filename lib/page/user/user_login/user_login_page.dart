@@ -140,7 +140,7 @@ class UserLoginPage extends StatelessWidget {
           Expanded(flex: 46, child: Container()),
           ConstrainedBox(
             constraints: const BoxConstraints(
-                maxWidth: 280.0, minWidth: 280.0, maxHeight: 342.0),
+                maxWidth: 280.0, minWidth: 280.0, maxHeight: 450.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -151,6 +151,42 @@ class UserLoginPage extends StatelessWidget {
                   items: model.projectList,
                   onChanged: (v) {},
                   placeholder: "",
+                  bgColor: "#EEF6F5".toColor(),
+                  icon: Image.asset(
+                    'assets/login/ic_dropdown_arrow.png',
+                    width: 16,
+                    height: 16,
+                  ),
+                  height: 40,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    _titleView("区域"),
+                    if (model.areaList.isEmpty)
+                      GestureDetector(
+                        onTap: model.isAreaLoading ? null : () => model.loadAreas(),
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 6),
+                          child: Text(
+                            model.isAreaLoading ? "加载中..." : "加载失败，点击重试",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: model.isAreaLoading ? ColorUtils.colorBlackLiteLite : ColorUtils.colorRed,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                FComboBox(
+                  selectedValue: model.selectedArea,
+                  items: model.areaList.map((e) => e.fullName ?? '').toList(),
+                  onChanged: (v) {
+                    model.onAreaChanged(v);
+                  },
+                  placeholder: "请选择区域",
                   bgColor: "#EEF6F5".toColor(),
                   icon: Image.asset(
                     'assets/login/ic_dropdown_arrow.png',
