@@ -25,6 +25,7 @@ import 'package:omt/http/service/update/update_service.dart';
 import 'package:omt/utils/context_utils.dart';
 import 'package:omt/http/service/home/home_page/home_page_service.dart';
 import 'package:omt/bean/area/area_entity.dart';
+import 'package:omt/bean/common/area_change_event.dart';
 import 'package:omt/http/http_query.dart';
 
 import '../../../http/service/install/install_cache_service.dart';
@@ -389,6 +390,7 @@ class HomeViewModel extends BaseViewModelRefresh<dynamic> {
       await SharedUtils.setAreaName(area.fullName!);
       notifyListeners();
       // Reload pages if needed or wait for next request
+      BaseCode.eventBus.fire(AreaChangeEvent());
     }
   }
 

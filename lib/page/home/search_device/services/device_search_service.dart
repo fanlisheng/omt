@@ -7,6 +7,7 @@ import 'package:omt/http/http_query.dart';
 import 'package:omt/utils/device_utils.dart';
 import 'package:omt/page/home/search_device/view_models/search_device_viewmodel.dart';
 import 'package:omt/utils/log_utils.dart';
+import 'package:omt/utils/shared_utils.dart';
 import '../../../one_picture/one_picture/one_picture_page.dart';
 import 'dart:async';
 
@@ -23,7 +24,12 @@ class DeviceSearchService {
   Future<List<StrIdNameValue>> getInstanceList({required bool forceRefresh}) async {
     final completer = Completer<List<StrIdNameValue>>();
 
-    HttpQuery.share.homePageService.getInstanceList("5101",
+    String areaCode = await SharedUtils.getAreaCode();
+    if (areaCode.isEmpty) {
+      areaCode = "5101";
+    }
+
+    HttpQuery.share.homePageService.getInstanceList(areaCode,
         forceRefresh: forceRefresh,
         onSuccess: (List<StrIdNameValue>? data) {
       completer.complete(data ?? []);

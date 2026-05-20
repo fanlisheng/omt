@@ -1,0 +1,3 @@
+class AreaChangeEvent {
+  AreaChangeEvent();
+}

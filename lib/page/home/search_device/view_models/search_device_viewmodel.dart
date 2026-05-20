@@ -1,4 +1,8 @@
 import 'dart:io';
+import 'dart:async';
+import 'package:kayo_package/utils/loading_utils.dart';
+import 'package:omt/bean/common/area_change_event.dart';
+import 'package:omt/utils/shared_utils.dart';
 
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:go_router/go_router.dart';
@@ -32,6 +36,8 @@ enum DeviceSearchState {
 class SearchDeviceViewModel extends BaseViewModel {
   // 注入服务
   final DeviceSearchService _searchService = DeviceSearchService();
+
+  StreamSubscription? _areaChangeSub;
 
   //设备搜索状态
   DeviceSearchState searchState = DeviceSearchState.notSearched;
@@ -73,6 +79,19 @@ class SearchDeviceViewModel extends BaseViewModel {
     super.initState();
     _setupFocusListener();
     _loadInitialData();
+
+    _areaChangeSub = BaseCode.eventBus.on<AreaChangeEvent>().listen((event) {
+      _handleAreaChange();
+    });
+  }
+
+  void _handleAreaChange() async {
+    LoadingUtils.show(data: '加载中...');
+    try {
+       await refreshInitialData();
+    } finally {
+       LoadingUtils.dismiss();
+    }
   }
 
   void _setupFocusListener() {
@@ -128,6 +147,7 @@ class SearchDeviceViewModel extends BaseViewModel {
 
   @override
   void dispose() {
+    _areaChangeSub?.cancel();
     controller.dispose();
     focusNode.dispose();
     super.dispose();
