@@ -21,7 +21,6 @@ on:
 env:
   APP_VERSION: ${{ github.event.inputs.version || '1.0.0' }}
   MINIO_UPLOAD_URL: http://223.85.203.92:18011/minio/file
-  MINIO_DOWNLOAD_BASE_URL: http://223.85.203.92:18011
   VERSION_API_URL: http://223.85.203.92:8082/api/client_version/create
 
 permissions:
@@ -261,7 +260,7 @@ jobs:
             
             echo "Parsed - path: $path, id: $id, size: $size"
             
-            $baseUrl = "${{ env.MINIO_DOWNLOAD_BASE_URL }}"
+            $baseUrl = "${{ env.MINIO_UPLOAD_URL }}"
             if ($path) {
               if ($id) {
                 $downloadUrl = "$baseUrl/$id/$path"
