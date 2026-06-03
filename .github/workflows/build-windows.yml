@@ -16,7 +16,7 @@ on:
         description: '是否发布版本（上传文件并创建版本记录）'
         required: false
         type: boolean
-        default: false
+        default: true
 
 env:
   APP_VERSION: ${{ github.event.inputs.version || '1.0.0' }}
