@@ -42,8 +42,7 @@ class API extends BaseAPI {
     _hostSocket = null;
 
     await SharedUtils.setHost(isEnv == false
-    // ? 'http://223.85.203.92:8082/'
-        ? 'http://127.0.0.1:8080/'
+        ? 'http://223.85.203.92:8082/'
         // ? 'http://192.168.101.184:8001/'
         // : 'http://221.237.108.38:8043/'
         // : 'http://192.168.101.131:8080/'
